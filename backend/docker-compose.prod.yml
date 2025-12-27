@@ -1,0 +1,119 @@
+services:
+  chuchu-fastapi-migrate:
+    env_file:
+      - ./.env
+    environment:
+      - environment=prod
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    working_dir: /project
+    command: >
+      bash -c "
+        echo 'Running migrations...' &&
+        sleep 10 &&
+        poetry run alembic upgrade head &&
+        echo 'Migrations completed!'
+      "
+    network_mode: host
+    restart: "no"
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+        reservations:
+          memory: 512M
+
+  # FastAPI 서버용 서비스
+  chuchu-fastapi:
+    env_file:
+      - ./.env
+    environment:
+      - environment=prod
+    container_name: chuchu-fastapi
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    working_dir: /project
+    network_mode: host
+    volumes:
+      - ./logs:/project/logs
+  
+  chuchu-mysql:
+    container_name: chuchu-mysql
+    image: mysql/mysql-server:8.0.27
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USERNAME}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - TZ=Asia/Seoul
+    command: [
+      "--character-set-server=utf8mb4",
+      "--collation-server=utf8mb4_unicode_ci",
+      "--skip-character-set-client-handshake",
+      "--lower_case_table_names=1",
+      "--max_connections=2048",
+      "--wait_timeout=28800",
+      "--interactive_timeout=28800",
+      "--net_read_timeout=60",
+      "--net_write_timeout=60",
+      "--connect_timeout=60",
+      "--innodb_buffer_pool_size=1G",
+      "--innodb_lock_wait_timeout=120",
+      "--max_allowed_packet=1G",
+      "--tmp_table_size=256M",
+      "--max_heap_table_size=256M"
+    ]
+    ports:
+      - "${PROD_MYSQL_PORT}:3306"
+    network_mode: host
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+      interval: 30s
+  
+  redis:
+    container_name: adkick-redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    volumes:
+      - ${REDIS_DATA_PATH}:/data
+    restart: always
+    network_mode: host
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+      interval: 30s
+  
+  chuchu-minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    container_name: chuchu-minio
+    restart: always
+    ports:
+      - "${PROD_STORAGE_API_PORT}:9000"
+      - "${PROD_STORAGE_CONSOLE_PORT}:9001"
+    volumes:
+      - ${PROD_STORAGE_PATH}:/data
+    environment:
+      - MINIO_ROOT_USER=${PROD_STORAGE_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${PROD_STORAGE_SECRET_KEY}
+      - TZ=Asia/Seoul
+    network_mode: host
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://${PROD_STORAGE_ENDPOINT}/minio/health/live"]
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+      interval: 30s

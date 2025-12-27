@@ -1,0 +1,86 @@
+services:
+  chuchu-mysql:
+    container_name: chuchu-mysql
+    image: mysql/mysql-server:8.0.27
+    environment:
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USERNAME}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - TZ=Asia/Seoul
+    command: [
+      "--character-set-server=utf8mb4",
+      "--collation-server=utf8mb4_unicode_ci",
+      "--skip-character-set-client-handshake",
+      "--lower_case_table_names=1",
+      "--max_connections=2048",
+      "--wait_timeout=28800",
+      "--interactive_timeout=28800",
+      "--net_read_timeout=60",
+      "--net_write_timeout=60",
+      "--connect_timeout=60",
+      "--innodb_buffer_pool_size=1G",
+      "--innodb_lock_wait_timeout=120",
+      "--max_allowed_packet=1G",
+      "--tmp_table_size=256M",
+      "--max_heap_table_size=256M"
+    ]
+    ports:
+      - "${LOCAL_MYSQL_PORT}:3306"
+    networks:
+      - chuchu-network
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+      interval: 30s
+
+  chuchu-redis:
+    container_name: chuchu-redis
+    image: redis:latest
+    ports:
+      - "${LOCAL_REDIS_PORT}:6379"
+    environment:
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    volumes:
+      - ${REDIS_DATA_PATH}:/data
+    restart: always
+    networks:
+      - chuchu-network
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+      interval: 30s
+
+  chuchu-minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    container_name: chuchu-${LOCAL_STORAGE_PROVIDER}
+    restart: always
+    ports:
+      - "${LOCAL_STORAGE_API_PORT}:9000"
+      - "${LOCAL_STORAGE_CONSOLE_PORT}:9001"
+    volumes:
+      - ${LOCAL_STORAGE_PATH}:/data
+    environment:
+      - MINIO_ROOT_USER=${LOCAL_STORAGE_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${LOCAL_STORAGE_SECRET_KEY}
+      - TZ=Asia/Seoul
+    networks:
+      - chuchu-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://${LOCAL_STORAGE_ENDPOINT}/minio/health/live"]
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+      interval: 30s
+
+networks:
+  chuchu-network:
+    driver: bridge
+    name: chuchu-network
