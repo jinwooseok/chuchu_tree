@@ -1,0 +1,108 @@
+
+# core/exceptions/error_codes.py
+from enum import Enum
+from typing import NamedTuple
+
+
+class ErrorCodeInfo(NamedTuple):
+    """에러 코드 정보"""
+    code: str
+    message: str
+    status_code: int
+    
+class ErrorCode(Enum):
+    INTERNAL_SERVER_ERROR = ErrorCodeInfo(
+        code="INTERNAL_SERVER_ERROR",
+        message="오류가 발생했습니다.",
+        status_code=500
+    )
+    
+    AUTHORIZATION_FAILED = ErrorCodeInfo(
+        code="AUTHORIZATION_FAILED",
+        message="인증에 실패했습니다.",
+        status_code=401
+    )
+    
+    SOCIAL_LOGIN_FAILED = ErrorCodeInfo(
+        code="SOCIAL_LOGIN_FAILED",
+        message="소셜 로그인에 실패했습니다.",
+        status_code=401
+    )
+    
+    INVALID_PROVIDER = ErrorCodeInfo(
+        code="INVALID_PROVIDER",
+        message="유효하지 않은 제공자입니다.",
+        status_code=400
+    )
+    
+    NO_LOGIN_STATUS = ErrorCodeInfo(
+        code="NO_LOGIN_STATUS",
+        message="로그인된 상태가 아닙니다.",
+        status_code=401
+    )
+    
+    LOGIN_STATUS = ErrorCodeInfo(
+        code="LOGIN_STATUS",
+        message="이미 로그인된 상태입니다.",
+        status_code=401
+    )
+    
+    EXPIRED_TOKEN = ErrorCodeInfo(
+        code="EXPIRED_TOKEN",
+        message="만료된 토큰입니다.",
+        status_code=401
+    )
+    
+    INVALID_TOKEN = ErrorCodeInfo(
+        code="INVALID_TOKEN",
+        message="유효하지 않은 토큰입니다.",
+        status_code=401
+    )
+    
+    INVALID_PASSWORD = ErrorCodeInfo(
+        code="INVALID_PASSWORD",
+        message="틀린 비밀번호입니다.",
+        status_code=401
+    )
+
+    INVALID_PASSWORD_FORMAT = ErrorCodeInfo(
+        code="INVALID_PASSWORD_FORMAT",
+        message="비밀번호 형식이 올바르지 않습니다.",
+        status_code=400
+    )
+
+    INVALID_EMAIL_FORMAT = ErrorCodeInfo(
+        code="INVALID_EMAIL_FORMAT",
+        message="이메일 형식이 올바르지 않습니다.",
+        status_code=400
+    )
+
+    MISSING_REQUIRED_FIELD = ErrorCodeInfo(
+        code="MISSING_REQUIRED_FIELD",
+        message="필수 입력값이 누락되었습니다.",
+        status_code=400
+    )
+
+    INVALID_INPUT_TYPE = ErrorCodeInfo(
+        code="INVALID_INPUT_TYPE",
+        message="입력값의 형식이 올바르지 않습니다.",
+        status_code=400
+    )
+
+    INPUT_TOO_SHORT = ErrorCodeInfo(
+        code="INPUT_TOO_SHORT",
+        message="입력값이 너무 짧습니다.",
+        status_code=400
+    )
+
+    DATABASE_ERROR = ErrorCodeInfo(
+        code="DATABASE_ERROR",
+        message="데이터베이스 에러가 발생했습니다.",
+        status_code=422
+    )
+    
+    PERMISSION_DENIED = ErrorCodeInfo(
+        code="PERMISSION_DENIED",
+        message="권한이 없습니다.",
+        status_code=403
+    )

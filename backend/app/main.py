@@ -20,8 +20,6 @@ class AppWithContainer(FastAPI):
 async def lifespan(app: AppWithContainer):
     injection_container = Container()
     app.container = injection_container
-    db = injection_container.db()
-    # core.database.database_instance = db
     try:
         yield
     finally:
@@ -48,7 +46,7 @@ if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app.main:app",
                 host="127.0.0.1",
-                port=8080,
+                port=8000,
                 reload=True, # 개발버전용 reload=True / 배포버전은 False
                 log_config=None # uvicorn 기본 로깅 비활성화
 )

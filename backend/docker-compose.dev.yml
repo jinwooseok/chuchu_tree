@@ -3,10 +3,10 @@ services:
     env_file:
       - ./.env
     environment:
-      - environment=prod
+      - environment=dev
     build:
       context: .
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.dev
     working_dir: /project
     command: >
       bash -c "
@@ -29,19 +29,19 @@ services:
     env_file:
       - ./.env
     environment:
-      - environment=prod
-    container_name: chuchu-fastapi-prod
+      - environment=dev
+    container_name: chuchu-fastapi-dev
     restart: always
     build:
       context: .
-      dockerfile: Dockerfile.prod
+      dockerfile: Dockerfile.dev
     working_dir: /project
     network_mode: host
     volumes:
       - ./logs:/project/logs
   
   chuchu-mysql:
-    container_name: chuchu-mysql-prod
+    container_name: chuchu-mysql-dev
     image: mysql/mysql-server:8.0.27
     environment:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
@@ -67,7 +67,7 @@ services:
       "--max_heap_table_size=256M"
     ]
     ports:
-      - "${PROD_MYSQL_PORT}:3306"
+      - "${DEV_MYSQL_PORT}:3306"
     network_mode: host
     restart: always
     healthcheck:
@@ -77,11 +77,11 @@ services:
       start_period: 30s
       interval: 30s
   
-  redis:
-    container_name: chuchu-redis-prod
+  chuchu-redis:
+    container_name: chuchu-redis-dev
     image: redis:latest
     ports:
-      - "${PROD_REDIS_PORT}:6379"
+      - "${DEV_REDIS_PORT}:6379"
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
     command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
@@ -99,20 +99,20 @@ services:
   chuchu-minio:
     image: minio/minio:latest
     command: server /data --console-address ":9001"
-    container_name: chuchu-minio-prod
+    container_name: chuchu-minio-dev
     restart: always
     ports:
-      - "${PROD_STORAGE_API_PORT}:9000"
-      - "${PROD_STORAGE_CONSOLE_PORT}:9001"
+      - "${DEV_STORAGE_API_PORT}:9000"
+      - "${DEV_STORAGE_CONSOLE_PORT}:9001"
     volumes:
-      - ${PROD_STORAGE_PATH}:/data
+      - ${DEV_STORAGE_PATH}:/data
     environment:
-      - MINIO_ROOT_USER=${PROD_STORAGE_ACCESS_KEY}
-      - MINIO_ROOT_PASSWORD=${PROD_STORAGE_SECRET_KEY}
+      - MINIO_ROOT_USER=${DEV_STORAGE_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${DEV_STORAGE_SECRET_KEY}
       - TZ=Asia/Seoul
     network_mode: host
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://${PROD_STORAGE_ENDPOINT}/minio/health/live"]
+      test: ["CMD", "curl", "-f", "http://${DEV_STORAGE_ENDPOINT}/minio/health/live"]
       timeout: 10s
       retries: 5
       start_period: 10s
