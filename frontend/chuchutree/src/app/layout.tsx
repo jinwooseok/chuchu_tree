@@ -1,11 +1,12 @@
-import type { Metadata } from "next";
-import "./globals.css";
+import type { Metadata } from 'next';
+import './globals.css';
+import Providers from '@/lib/providers';
 
 export const metadata: Metadata = {
-  title: "ChuChuTree",
-  description: "ChuChuTree Algorithm Calendar",
+  title: 'ChuChuTree',
+  description: 'ChuChuTree Algorithm Calendar',
   icons: {
-    icon: "/icon.png",
+    icon: '/icon.png',
   },
 };
 
@@ -16,7 +17,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
