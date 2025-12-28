@@ -106,3 +106,9 @@ class ErrorCode(Enum):
         message="권한이 없습니다.",
         status_code=403
     )
+    
+    IS_ALREALY_LINKED = ErrorCodeInfo(
+        code="IS_ALREALY_LINKED",
+        message="이미 연동된 계정입니다.",
+        status_code=400
+    )
