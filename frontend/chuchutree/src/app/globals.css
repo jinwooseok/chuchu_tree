@@ -8,6 +8,29 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-paperlogy);
   --font-mono: var(--font-geist-mono);
+
+  /* >>>>>>>>>>>커스텀>>>>>>>>>>> */
+  --color-innerground-white: var(--innerground-white);
+  --color-innerground-darkgray: var(--innerground-darkgray);
+  --color-tier-undefined: var(--tier-undefined);
+  --color-tier-bronze: var(--tier-bronze);
+  --color-tier-silver: var(--tier-silver);
+  --color-tier-gold: var(--tier-gold);
+  --color-tier-platinum: var(--tier-platinum);
+  --color-tier-diamond: var(--tier-diamond);
+  --color-tier-ruby: var(--tier-ruby);
+  --color-imediated-bg: var(--imediated-bg);
+  --color-imediated-text: var(--imediated-text);
+  --color-advanced-bg: var(--advanced-bg);
+  --color-advanced-text: var(--advanced-text);
+  --color-master-bg: var(--master-bg);
+  --color-master-text: var(--master-text);
+  --color-locked-bg: var(--locked-bg);
+  --color-locked-text: var(--locked-text);
+  --color-excluded-bg: var(--excluded-bg);
+  --color-excluded-text: var(--excluded-text);
+  /* <<<<<<<<<<<커스텀<<<<<<<<<<<< */
+
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -48,8 +71,27 @@
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
+  --background: #f3f0f0;
   --foreground: oklch(0.145 0 0);
+  --innerground-white: oklch(1 0 0);
+  --innerground-darkgray: #e4e4e4;
+  --tier-undefined: #2d2d2d;
+  --tier-bronze: #ad5600;
+  --tier-silver: #435f7a;
+  --tier-gold: #ec9a00;
+  --tier-platinum: #27e2a4;
+  --tier-diamond: #00b4fc;
+  --tier-ruby: #ff0062;
+  --imediated-bg: #f9b473;
+  --imediated-text: #6e4116;
+  --advanced-bg: #79ab7c;
+  --advanced-text: #4a5c4c;
+  --master-bg: #47c6f9;
+  --master-text: #0d4961;
+  --locked-bg: #e4e4e4;
+  --locked-text: #303030;
+  --excluded-bg: #ed6e6e;
+  --excluded-text: #5d1111;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -62,7 +104,7 @@
   --muted-foreground: oklch(0.556 0 0);
   --accent: oklch(0.97 0 0);
   --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
+  --destructive: #ed6e6e;
   --border: oklch(0.922 0 0);
   --input: oklch(0.922 0 0);
   --ring: oklch(0.708 0 0);
@@ -83,7 +125,26 @@
 
 .dark {
   --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
+  --foreground: #f3f0f0;
+  --innerground-white: oklch(31.317% 0.00004 271.152);
+  --innerground-darkgray: oklch(21.779% 0.00002 271.152);
+  --tier-undefined: #2d2d2d;
+  --tier-bronze: #ad5600;
+  --tier-silver: #435f7a;
+  --tier-gold: #ec9a00;
+  --tier-platinum: #27e2a4;
+  --tier-diamond: #00b4fc;
+  --tier-ruby: #ff0062;
+  --imediated-bg: #f9b473;
+  --imediated-text: #6e4116;
+  --advanced-bg: #79ab7c;
+  --advanced-text: #4a5c4c;
+  --master-bg: #47c6f9;
+  --master-text: #0d4961;
+  --locked-bg: #e4e4e4;
+  --locked-text: #303030;
+  --excluded-bg: #ed6e6e;
+  --excluded-text: #5d1111;
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
