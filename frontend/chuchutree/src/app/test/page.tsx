@@ -1,6 +1,7 @@
 'use client';
 
 import { useCount, usePlusCount, useMinusCount } from '@/lib/store/zustand_test_count';
+import ThemeButton from '@/shared/ui/theme-button';
 
 export default function TestPage() {
   const { num } = useCount();
@@ -11,6 +12,8 @@ export default function TestPage() {
       <div>{num}</div>
       <div onClick={() => plus(2)}>+2</div>
       <div onClick={minus}>-</div>
+
+      <ThemeButton />
     </>
   );
 }
