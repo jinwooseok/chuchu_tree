@@ -14,7 +14,7 @@ class AppWithContainer(FastAPI):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.container: Container|None = None
+        self.container: Container | None = None
 
 @asynccontextmanager
 async def lifespan(app: AppWithContainer):
