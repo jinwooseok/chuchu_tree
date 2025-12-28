@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
+from app.common.domain.enums import TagLevel
 from app.common.domain.vo.identifiers import TagId
 from app.tag.domain.entity.tag import Tag
-from app.tag.domain.enums import TagLevel
 
 class TagRepository(ABC):
     """Repository 인터페이스"""

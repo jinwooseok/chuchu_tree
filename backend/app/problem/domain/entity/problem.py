@@ -7,7 +7,7 @@ from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
 from app.problem.domain.entity.problem_tag import ProblemTag
 from app.problem.domain.entity.problem_update_history import ProblemUpdateHistory
-from app.problem.domain.vo.tier_level import TierLevel
+from app.common.domain.vo.primitives import TierLevel
 
 @dataclass
 class Problem:

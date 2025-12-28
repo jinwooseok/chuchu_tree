@@ -4,8 +4,8 @@ from datetime import datetime, date
 from app.baekjoon.domain.entity.problem_history import ProblemHistory
 from app.baekjoon.domain.entity.tag_skill_history import TagSkillHistory
 from app.baekjoon.domain.entity.tier_history import TierHistory
-from app.baekjoon.domain.vo.rating import Rating
-from app.baekjoon.domain.vo.statistics import Statistics
+from app.common.domain.vo.primitives import Rating
+from app.common.domain.vo.primitives import Statistics
 from app.common.domain.vo.identifiers import BaekjoonAccountId, ProblemId, TagId, TagSkillId, TierId
 
 @dataclass

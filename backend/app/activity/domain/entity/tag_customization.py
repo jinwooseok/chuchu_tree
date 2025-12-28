@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from app.common.domain.vo.identifiers import TagId, UserAccountId
-from app.tag.domain.enums import ExcludedReason
+from app.common.domain.enums import ExcludedReason
 
 
 @dataclass

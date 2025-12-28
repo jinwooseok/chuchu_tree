@@ -32,3 +32,7 @@ class TierId:
 class UserActivityId:
     value: int
 
+@dataclass(frozen=True)
+class LevelFilterId:
+    """Value Object - 필터 ID"""
+    value: int

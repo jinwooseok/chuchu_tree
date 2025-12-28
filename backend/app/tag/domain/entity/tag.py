@@ -1,11 +1,11 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 
+from app.common.domain.enums import ExcludedReason, TagLevel
 from app.common.domain.vo.identifiers import TagId, TierId
 from app.tag.domain.entity.tag_relation import TagRelation
-from app.tag.domain.enums import ExcludedReason, TagLevel
 from app.tag.domain.vo.tag_exclusion import TagExclusion
-from app.tag.domain.vo.tier_range import TierRange
+from app.common.domain.vo.primitives import TierRange
 
 @dataclass
 class Tag:
@@ -36,7 +36,7 @@ class Tag:
             tag_id=None,
             code=code,
             level=level,
-            exclusion=TagExclusion.not_excluded(),
+            exclusion=TagExclusion.is_not_excluded(),
             applicable_tier_range=TierRange(min_tier_id, max_tier_id),
             min_solved_person_count=0,
             aliases=[],
@@ -54,7 +54,7 @@ class Tag:
     
     def include(self) -> None:
         """도메인 로직 - 태그 제외 해제"""
-        self.exclusion = TagExclusion.not_excluded()
+        self.exclusion = TagExclusion.is_not_excluded()
         self.updated_at = datetime.now()
     
     def add_sub_tag(self, sub_tag_id: TagId) -> None:

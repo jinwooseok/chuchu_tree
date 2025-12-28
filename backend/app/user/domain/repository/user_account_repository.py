@@ -1,8 +1,8 @@
 from abc import ABC, abstractmethod
 
+from app.common.domain.enums import Provider
 from app.common.domain.vo.identifiers import UserAccountId
 from app.user.domain.entity.user_account import UserAccount
-from app.user.domain.enums import Provider
 
 class UserAccountRepository(ABC):
     """Repository 인터페이스"""

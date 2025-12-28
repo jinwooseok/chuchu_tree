@@ -8,7 +8,7 @@ from app.activity.domain.entity.will_solve_problem import WillSolveProblem
 from app.common.domain.vo.identifiers import ProblemId, TagId, UserAccountId, UserActivityId
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
-from app.tag.domain.enums import ExcludedReason
+from app.common.domain.enums import ExcludedReason
 
 @dataclass
 class UserActivity:

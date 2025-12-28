@@ -1,8 +1,8 @@
 from dataclasses import dataclass
 
+from app.common.domain.enums import ExcludedReason
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
-from app.tag.domain.enums import ExcludedReason
 
 @dataclass(frozen=True)
 class TagExclusion:

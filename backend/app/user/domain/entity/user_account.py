@@ -6,7 +6,7 @@ from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
 from app.user.domain.entity.account_link import AccountLink
 from app.user.domain.entity.user_target import UserTarget
-from app.user.domain.enums import Provider
+from app.common.domain.enums import Provider
 
 @dataclass
 class UserAccount:
