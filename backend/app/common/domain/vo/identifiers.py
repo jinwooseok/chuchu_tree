@@ -27,3 +27,8 @@ class TagSkillId:
 @dataclass(frozen=True)
 class TierId:
     value: int
+    
+@dataclass(frozen=True)
+class UserActivityId:
+    value: int
+
