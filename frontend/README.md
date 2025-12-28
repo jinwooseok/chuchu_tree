@@ -18,7 +18,6 @@
 - Jest
 - React Testing Library
 - axios
-- Vite
 - React Query DevTools
 - npm
 - Eslint
