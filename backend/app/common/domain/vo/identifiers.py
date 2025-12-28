@@ -1,0 +1,29 @@
+from dataclasses import dataclass
+
+@dataclass(frozen=True)
+class UserAccountId:
+    value: int
+
+@dataclass(frozen=True)
+class BaekjoonAccountId:
+    value: str
+
+@dataclass(frozen=True)
+class TargetId:
+    value: int
+
+@dataclass(frozen=True)
+class ProblemId:
+    value: int
+
+@dataclass(frozen=True)
+class TagId:
+    value: int
+    
+@dataclass(frozen=True)
+class TagSkillId:
+    value: int
+    
+@dataclass(frozen=True)
+class TierId:
+    value: int

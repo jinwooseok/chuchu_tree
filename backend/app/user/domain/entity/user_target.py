@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
+from app.common.domain.vo.identifiers import TargetId
 from app.user.domain.entity.user_account import UserAccountId
 
 
@@ -8,7 +9,7 @@ class UserTarget:
     """Entity - 유저 목표"""
     user_target_id: int|None
     user_account_id: UserAccountId
-    target_id: 'TargetId'
+    target_id: TargetId
     created_at: datetime
     updated_at: datetime
     deleted_at: datetime|None = None

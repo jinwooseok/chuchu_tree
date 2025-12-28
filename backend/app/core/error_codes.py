@@ -112,3 +112,15 @@ class ErrorCode(Enum):
         message="이미 연동된 계정입니다.",
         status_code=400
     )
+    
+    INVALID_ID_VALUE = ErrorCodeInfo(
+        code="INVALID_ID_VALUE",
+        message="올바르지 않은 아이디입니다.",
+        status_code=400
+    )
+    
+    INVALID_INPUT_VALUE = ErrorCodeInfo(
+        code="INVALID_INPUT_VALUE",
+        message="올바르지 않은 값이 입력됐습니다.",
+        status_code=400
+    )
