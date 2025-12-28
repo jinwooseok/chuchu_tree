@@ -23,7 +23,6 @@
       "@/components/*": ["./src/components/*"],
       "@/entities/*": ["./src/entities/*"],
       "@/features/*": ["./src/features/*"],
-      "@/lib/*": ["./src/lib/*"],
       "@/shared/*": ["./src/shared/*"],
       "@/widgets/*": ["./src/widgets/*"]
     }
