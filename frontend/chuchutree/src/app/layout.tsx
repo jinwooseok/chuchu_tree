@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Providers from '@/lib/providers';
 import localFont from 'next/font/local';
+import { AppSidebar } from '@/widgets/app-sidebar';
 
 const paperlogy = localFont({
   src: [
@@ -82,7 +83,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${paperlogy.variable} antialiased`}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <AppSidebar />
+          {children}
+        </Providers>
       </body>
     </html>
   );
