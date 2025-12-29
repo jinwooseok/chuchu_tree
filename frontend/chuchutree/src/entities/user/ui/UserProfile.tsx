@@ -1,11 +1,13 @@
 'use client';
 
 import { useUser } from '../model/queries';
+import { Loader, InlineFallback } from '@/shared/ui';
 
 export function UserProfile() {
-  const { data: user, isLoading } = useUser();
+  const { data: user, isLoading, error } = useUser();
 
-  if (isLoading) return <div>로딩중...</div>;
+  if (isLoading) return <Loader size="md" text="사용자 정보 로딩 중..." />;
+  if (error) return <InlineFallback error={error as Error} />;
 
   return (
     <div>
