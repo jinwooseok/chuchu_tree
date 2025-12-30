@@ -28,7 +28,7 @@ export default function DashboardLayout() {
       {showInfoSidebar && <InfoSidebar />}
 
       {/* 메인 영역 */}
-      <main className="flex flex-1 flex-col">
+      <main className="flex min-w-0 flex-1 flex-col">
         {/* 상단 영역 (티어바/스트릭) */}
         <div className={`transition-all duration-300 ease-in-out ${topHeight} overflow-hidden`}>
           {topSection === 'tierbar' && <TopTierbar />}
