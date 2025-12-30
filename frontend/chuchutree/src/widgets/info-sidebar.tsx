@@ -8,7 +8,7 @@ export default function InfoSidebar() {
   const { centerSection } = useLayoutStore();
 
   return (
-    <aside className="w-1/5 border-r bg-card">
+    <aside className="w-1/5 animate-in slide-in-from-left border-r bg-card duration-300">
       {centerSection === 'calendar' ? <CalendarSidebar /> : <TagSidebar />}
     </aside>
   );
