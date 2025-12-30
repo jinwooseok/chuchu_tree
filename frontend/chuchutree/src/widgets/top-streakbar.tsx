@@ -95,7 +95,7 @@ const data = [
 
 export default function TopStreakbar() {
   return (
-    <div className="bg-card flex h-full items-center justify-center overflow-hidden p-4">
+    <div className="bg-innerground-white flex h-full items-center justify-center overflow-hidden p-4">
       <div className="max-w-full min-w-0">
         <div className="text-muted-foreground mb-2 flex items-center gap-2 text-sm">
           <Leaf height={14} width={14} />

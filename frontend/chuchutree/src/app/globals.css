@@ -124,7 +124,7 @@
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
+  --background: oklch(0.205 0 0);
   --foreground: #f3f0f0;
   --innerground-white: oklch(31.317% 0.00004 271.152);
   --innerground-darkgray: oklch(21.779% 0.00002 271.152);

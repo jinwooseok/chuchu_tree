@@ -11,7 +11,7 @@ export default function TopTierbar() {
   const totalRatingForNextTier = TIER_INFO[nextTierId].rating - TIER_INFO[MockUserInfoTierId].rating;
   const tierRatio = ((totalRatingForNextTier - ratingToNext) / totalRatingForNextTier) * 100;
   return (
-    <div className="bg-card flex h-full flex-col items-center justify-center gap-2 p-6">
+    <div className="bg-innerground-white flex h-full flex-col items-center justify-center gap-2 p-6">
       <div className="flex w-full justify-between">
         <div className="flex items-center justify-center gap-1">
           <h3 className="text-sm">{TIER_INFO[MockUserInfoTierId].name}</h3>
