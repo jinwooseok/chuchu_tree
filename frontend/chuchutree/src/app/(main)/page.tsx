@@ -1,6 +1,6 @@
-import { userServerApi } from '@/entities/user/api/user.server';
 import { isAuthenticated } from '@/lib/server';
 import { redirect } from 'next/navigation';
+import DashboardLayout from './DashboardLayout';
 
 export default async function HomePage() {
   // 인증 체크
@@ -11,8 +11,5 @@ export default async function HomePage() {
   //   redirect('/sign-in');
   // }
 
-  // 로그인한 경우에만 사용자 데이터 가져오기
-  const user = isLoggedIn ? await userServerApi.getMe() : null;
-
-  return <div>메인</div>;
+  return <DashboardLayout />;
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { Calendar, ChevronUp, Dices, Gem, Leaf, LibraryBig, PanelLeft, User2 } from 'lucide-react';
+import { useLayoutStore } from '@/lib/store/layout';
 
 import {
   Sidebar,
@@ -21,32 +22,39 @@ const ICON_SIZE = 32;
 
 export function AppSidebar() {
   const { state: sidebarOpenState, toggleSidebar: setSidebarOpenState } = useSidebar();
+  const { topSection, centerSection, bottomSection, toggleTopSection, setCenterSection, toggleBottomSection } = useLayoutStore();
+
   // Menu items.
   const items = [
     {
       title: '티어',
-      action: () => console.log('clicked'),
+      action: () => toggleTopSection('tierbar'),
       icon: Gem,
+      isActive: topSection === 'tierbar',
     },
     {
       title: '스트릭',
-      action: () => console.log('clicked'),
+      action: () => toggleTopSection('streak'),
       icon: Leaf,
+      isActive: topSection === 'streak',
     },
     {
       title: '캘린더',
-      action: () => console.log('clicked'),
+      action: () => setCenterSection('calendar'),
       icon: Calendar,
+      isActive: centerSection === 'calendar',
     },
     {
       title: '유형별 숙련도',
-      action: () => console.log('clicked'),
+      action: () => setCenterSection('dashboard'),
       icon: LibraryBig,
+      isActive: centerSection === 'dashboard',
     },
     {
       title: '오늘의 문제',
-      action: () => console.log('clicked'),
+      action: () => toggleBottomSection(),
       icon: Dices,
+      isActive: bottomSection === 'recommend',
     },
   ];
 
@@ -89,7 +97,7 @@ export function AppSidebar() {
               {/* 나머지 link */}
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
+                  <SidebarMenuButton asChild isActive={item.isActive}>
                     <div onClick={item.action} className="cursor-pointer">
                       <item.icon size={ICON_SIZE} />
                       <span>{item.title}</span>
