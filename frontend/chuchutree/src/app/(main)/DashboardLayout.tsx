@@ -17,7 +17,7 @@ export default function DashboardLayout() {
   const topHeight = topSection === 'tierbar' ? 'h-1/6 min-h-[80px] mb-2' : topSection === 'streak' ? 'h-1/3 min-h-[240px] mb-2' : 'h-0';
 
   // 하단 영역 높이 계산
-  const bottomHeight = bottomSection === 'recommend' ? 'h-1/3 min-h-[200px] mt-2' : 'h-0';
+  const bottomHeight = bottomSection === 'recommend' ? 'h-1/3 min-h-[240px] mt-2' : 'h-0';
 
   // AppSidebar가 collapsed일 때만 InfoSidebar 표시
   const showInfoSidebar = sidebarState === 'collapsed';
