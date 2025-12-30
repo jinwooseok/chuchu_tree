@@ -1,9 +1,15 @@
 ### 12.27 작업
 - [x] 기본 세팅 (poetry, 기본 의존성, config, .env 등 필수 파일)
-- [ ] Docker, main, core 로직 (container, transaction, event, response, exception, log, db)
-- [ ] 실행 테스트
-- [ ] 도메인 세팅
-- [ ] Infra Model / DB Schema 작성 및 마이그레이션
+- [x] Docker, main, core 로직 (container, transaction, event, response, exception, log, db)
+- [x] 실행 테스트
+- [x] 도메인 세팅
+- [x] common의 공통 로직 구현 (이벤트, 토큰, 쿠키, DB, Storage, 인가 등)
+- [x] Infra Model / DB Schema 작성
+- [x] 의존성 주입 컨테이너 작성
+- [ ] 앱 실행 테스트
+- [ ] API 명세서 작성
+- [ ] Infra Model / DB Schema 마이그레이션
+- [ ] API 구현
 - [ ] DB 초기 데이터 저장
 - [ ] 홈서버 인프라 세팅
 - [ ] CI/CD 설정
