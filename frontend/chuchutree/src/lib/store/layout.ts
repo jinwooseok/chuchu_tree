@@ -43,8 +43,9 @@ export const useLayoutStore = create<LayoutState>()(
         if (state.topSection === section) {
           state.topSection = null;
         } else {
-          // 다른 버튼 클릭 시 변경
+          // 다른 버튼 클릭 시 변경 + 하단 영역 닫기
           state.topSection = section;
+          state.bottomSection = null;
         }
       }),
 
@@ -57,7 +58,14 @@ export const useLayoutStore = create<LayoutState>()(
     // 하단 영역 토글 (문제추천 열기/닫기)
     toggleBottomSection: () =>
       set((state) => {
-        state.bottomSection = state.bottomSection === 'recommend' ? null : 'recommend';
+        if (state.bottomSection === 'recommend') {
+          // 이미 열려있으면 닫기
+          state.bottomSection = null;
+        } else {
+          // 닫혀있으면 열기 + 상단 영역 닫기
+          state.bottomSection = 'recommend';
+          state.topSection = null;
+        }
       }),
   })),
 );

@@ -7,7 +7,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={false}>
       <AppSidebar />
       <SidebarInset>{children}</SidebarInset>
     </SidebarProvider>
