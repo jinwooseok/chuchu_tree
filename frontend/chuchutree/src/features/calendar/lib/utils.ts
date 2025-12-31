@@ -1,12 +1,15 @@
 import { CalendarApiResponse, CalendarEvent, MonthlyData, Problem } from '@/shared/types/calendar';
 
 /**
- * API 응답 데이터를 react-big-calendar 이벤트 형식으로 변환
+ * API 응답 데이터 또는 MonthlyData 배열을 react-big-calendar 이벤트 형식으로 변환
  */
-export function transformToCalendarEvents(apiResponse: CalendarApiResponse): CalendarEvent[] {
+export function transformToCalendarEvents(data: CalendarApiResponse | MonthlyData[]): CalendarEvent[] {
   const events: CalendarEvent[] = [];
 
-  apiResponse.data.monthlyData.forEach((dayData: MonthlyData) => {
+  // CalendarApiResponse인지 MonthlyData[]인지 확인
+  const monthlyDataArray = Array.isArray(data) ? data : data.data.monthlyData;
+
+  monthlyDataArray.forEach((dayData: MonthlyData) => {
     const date = new Date(dayData.date);
 
     // solved 문제들을 이벤트로 변환

@@ -6,10 +6,10 @@ import { ko } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { ComponentType, useMemo } from 'react';
 
-import mockData from '../mockdata/mock_calendar_data.json';
 import { transformToCalendarEvents, getDisplayTags } from '../lib/utils';
-import { CalendarApiResponse, CalendarEvent } from '@/shared/types/calendar';
+import { CalendarEvent } from '@/shared/types/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
+import { useCalendarStore } from '@/lib/store/calendar';
 
 const locales = {
   ko: ko,
@@ -96,16 +96,25 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
 }
 
 export default function BigCalendar() {
+  // Zustand 스토어에서 데이터 가져오기
+  const monthlyData = useCalendarStore((state) => state.monthlyData);
+  const setSelectedDate = useCalendarStore((state) => state.setSelectedDate);
+
   // mock 데이터를 react-big-calendar 이벤트로 변환
   const events = useMemo(() => {
-    return transformToCalendarEvents(mockData as CalendarApiResponse);
-  }, []);
+    return transformToCalendarEvents(monthlyData);
+  }, [monthlyData]);
 
   // MonthDateHeader를 래핑하여 allEvents를 전달
   const CustomMonthDateHeaderWrapper = useMemo(() => {
     // eslint-disable-next-line react/display-name
     return ({ date, label }: { date: Date; label: string }) => <CustomMonthDateHeader date={date} label={label} allEvents={events} />;
   }, [events]);
+
+  // 날짜 클릭 핸들러
+  const handleSelectSlot = ({ start }: { start: Date }) => {
+    setSelectedDate(start);
+  };
 
   return (
     <div className="calendar-12px h-full w-full">
@@ -125,6 +134,8 @@ export default function BigCalendar() {
         culture="ko"
         views={['month']}
         defaultView="month"
+        selectable
+        onSelectSlot={handleSelectSlot}
         components={{
           toolbar: CustomToolbar as ComponentType<ToolbarProps>,
           month: {
