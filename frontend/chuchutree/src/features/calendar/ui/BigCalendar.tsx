@@ -28,7 +28,9 @@ function CustomToolbar({ date, onNavigate }: ToolbarProps) {
   return (
     <div className="mb-4 flex items-center justify-between">
       {/* 좌측: 년/월 표시 */}
-      <div className="text-lg font-semibold">{format(date, 'yyyy M월', { locale: ko })}</div>
+      <div className="text-lg font-semibold" suppressHydrationWarning>
+        {format(date, 'yyyy M월', { locale: ko })}
+      </div>
 
       {/* 우측: 네비게이션 버튼 */}
       <div className="flex gap-2">
@@ -69,7 +71,9 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
   return (
     <div className="flex h-full flex-col">
       {/* 날짜 숫자 */}
-      <div className="text-right text-sm">{label}</div>
+      <div className="text-right text-sm" suppressHydrationWarning>
+        {label}
+      </div>
 
       {/* 태그 목록 */}
       {displayTags.length > 0 && (

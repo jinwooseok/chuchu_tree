@@ -28,9 +28,15 @@ const formatDateString = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
+// mock 데이터의 첫 번째 날짜를 초기 선택 날짜로 사용 (hydration mismatch 방지)
+const getInitialDate = (): Date => {
+  const firstDateString = mockData.data.monthlyData[0]?.date || '2025-12-10';
+  return new Date(firstDateString);
+};
+
 export const useCalendarStore = create<CalendarStore>((set, get) => ({
   // 초기 상태
-  selectedDate: new Date(),
+  selectedDate: getInitialDate(),
   monthlyData: mockData.data.monthlyData as MonthlyData[],
 
   // 날짜 선택
