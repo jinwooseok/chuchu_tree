@@ -1,11 +1,21 @@
 'use client';
 
-import SmallCalendar from '@/features/calendar/ui/SmallCalendar';
+import dynamic from 'next/dynamic';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { Problem } from '@/shared/types/calendar';
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
+
+// 클라이언트 전용 렌더링 (hydration mismatch 방지)
+const SmallCalendar = dynamic(() => import('@/features/calendar/ui/SmallCalendar'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center" style={{ minHeight: '300px' }}>
+      <div className="text-sm text-gray-400">Loading...</div>
+    </div>
+  ),
+});
 
 // 개별 문제 카드 컴포넌트
 function ProblemCard({ problem, isSolved }: { problem: Problem; isSolved: boolean }) {
