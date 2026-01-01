@@ -23,7 +23,7 @@ export default function DashboardLayout() {
   const showInfoSidebar = sidebarState === 'collapsed';
 
   return (
-    <div className="bg-background flex h-full gap-2 overflow-hidden">
+    <div className="bg-background flex h-[calc(100vh-16px)] gap-2 overflow-hidden">
       {/* Info 사이드바 - AppSidebar가 닫혔을 때만 표시 */}
       {showInfoSidebar && <InfoSidebar />}
 
