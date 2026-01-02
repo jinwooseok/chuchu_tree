@@ -85,7 +85,13 @@
       },
       {
         "categoryName": "MASTER",
-        "tags": []
+        "tags": [
+          {
+            "tagId": 20,
+            "tagCode": "dfs",
+            "tagDisplayName": "깊이 우선 탐색"
+          }
+        ]
       },
       {
         "categoryName": "EXCLUDED",
@@ -134,15 +140,15 @@
         },
         "nextLevelStat": {
           "nextLevel": "ADVANCED",
-          "solvedProblemCount": 15,
+          "solvedProblemCount": 2,
           "requiredMinTier": "G3",
           "higherProblemTier": "P5"
         },
         "accountStat": {
           "currentLevel": "IMEDIATED",
-          "solvedProblemCount": 12,
-          "requiredMinTier": "G3",
-          "higherProblemTier": "P4",
+          "solvedProblemCount": 0,
+          "requiredMinTier": "S3",
+          "higherProblemTier": "G1",
           "lastSolvedDate": "2025-07-12"
         },
         "locked_yn": false,
@@ -166,9 +172,9 @@
         "accountStat": {
           "currentLevel": "IMEDIATED",
           "solvedProblemCount": 18,
-          "requiredMinTier": "S2",
-          "higherProblemTier": "G4",
-          "lastSolvedDate": "2025-08-15"
+          "requiredMinTier": "G5",
+          "higherProblemTier": "P5",
+          "lastSolvedDate": "2025-12-31"
         },
         "locked_yn": false,
         "excluded_yn": false,
@@ -190,7 +196,7 @@
         },
         "accountStat": {
           "currentLevel": "IMEDIATED",
-          "solvedProblemCount": 10,
+          "solvedProblemCount": 30,
           "requiredMinTier": "G1",
           "higherProblemTier": "P5",
           "lastSolvedDate": "2025-09-03"
@@ -509,13 +515,13 @@
           "higherProblemTier": "S5"
         },
         "accountStat": {
-          "currentLevel": "EXCLUDED",
+          "currentLevel": "LOCKED",
           "solvedProblemCount": 50,
           "requiredMinTier": "B3",
           "higherProblemTier": "S5",
           "lastSolvedDate": "2025-06-10"
         },
-        "locked_yn": false,
+        "locked_yn": true,
         "excluded_yn": true,
         "recommandation_yn": false
       },
@@ -528,13 +534,13 @@
           "prevTags": []
         },
         "nextLevelStat": {
-          "nextLevel": "IMEDIATED",
+          "nextLevel": "MASTER",
           "solvedProblemCount": 15,
           "requiredMinTier": "S3",
           "higherProblemTier": "G5"
         },
         "accountStat": {
-          "currentLevel": "EXCLUDED",
+          "currentLevel": "MASTER",
           "solvedProblemCount": 35,
           "requiredMinTier": "S3",
           "higherProblemTier": "G5",
@@ -553,13 +559,13 @@
           "prevTags": []
         },
         "nextLevelStat": {
-          "nextLevel": "IMEDIATED",
-          "solvedProblemCount": 12,
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 30,
           "requiredMinTier": "S2",
           "higherProblemTier": "G4"
         },
         "accountStat": {
-          "currentLevel": "EXCLUDED",
+          "currentLevel": "IMEDIATED",
           "solvedProblemCount": 28,
           "requiredMinTier": "S2",
           "higherProblemTier": "G4",
@@ -606,6 +612,12 @@
               "tagCode": "bfs",
               "tagDisplayName": "너비 우선 탐색",
               "satisfiedYn": false
+            },
+            {
+              "tagId": 17,
+              "tagCode": "prefix_sum",
+              "tagDisplayName": "누적 합",
+              "satisfiedYn": true
             }
           ]
         },
@@ -625,6 +637,31 @@
         "locked_yn": true,
         "excluded_yn": false,
         "recommandation_yn": false
+      },
+      {
+        "tagId": 20,
+        "tagCode": "dfs",
+        "tagDisplayName": "깊이 우선 탐색",
+        "requiredStat": {
+          "requiredMinTier": "G5",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 10,
+          "requiredMinTier": "G3",
+          "higherProblemTier": "P5"
+        },
+        "accountStat": {
+          "currentLevel": "MASTER",
+          "solvedProblemCount": 13,
+          "requiredMinTier": "G2",
+          "higherProblemTier": "P3",
+          "lastSolvedDate": "2025-09-28"
+        },
+        "locked_yn": false,
+        "excluded_yn": false,
+        "recommandation_yn": true
       }
     ]
   },
