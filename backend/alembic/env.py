@@ -32,7 +32,7 @@ target_metadata = app.core.database.Base.metadata
 settings = get_settings()
 SQLALCHEMY_DATABASE_URL = f"mysql+mysqldb://{settings.MYSQL_USERNAME}:{settings.MYSQL_PASSWORD}@{settings.MYSQL_HOST}:{settings.MYSQL_BINDING_PORT}/{settings.MYSQL_DATABASE}"
 url = SQLALCHEMY_DATABASE_URL
-print(url)
+
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
 

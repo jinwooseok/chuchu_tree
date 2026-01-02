@@ -8,7 +8,7 @@ from redis.asyncio import client
 from redis.asyncio.connection import ConnectionPool
 from redis.exceptions import ConnectionError, TimeoutError, RedisError
 
-from config.settings import get_settings
+from app.config.settings import get_settings
 
 logger = logging.getLogger(__name__)
 class AsyncRedisClient:

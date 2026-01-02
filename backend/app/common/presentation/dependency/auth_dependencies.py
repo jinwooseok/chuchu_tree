@@ -4,7 +4,7 @@ from fastapi import Cookie, Depends
 from dependency_injector.wiring import inject, Provide
 from app.common.application.service.auth_service import AuthService
 from app.common.domain.vo.current_user import CurrentUser
-from core.containers import Container
+from app.core.containers import Container
 
 
 @inject

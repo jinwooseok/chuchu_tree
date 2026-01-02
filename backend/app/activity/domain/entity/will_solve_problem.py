@@ -10,7 +10,7 @@ class WillSolveProblem:
     will_solve_problem_id: int|None
     user_account_id: UserAccountId
     problem_id: ProblemId
-    marked: bool
+    solved: bool
     marked_date: date
     created_at: datetime
     updated_at: datetime
@@ -27,7 +27,7 @@ class WillSolveProblem:
             will_solve_problem_id=None,
             user_account_id=user_account_id,
             problem_id=problem_id,
-            marked=True,
+            solved=False,
             marked_date=marked_date,
             created_at=now,
             updated_at=now,

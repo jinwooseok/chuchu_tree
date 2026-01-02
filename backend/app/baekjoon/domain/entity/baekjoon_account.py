@@ -12,7 +12,6 @@ from app.common.domain.vo.identifiers import BaekjoonAccountId, ProblemId, TagId
 class BaekjoonAccount:
     """Aggregate Root - 백준 계정"""
     bj_account_id: BaekjoonAccountId
-    profile_image: str|None
     tier_start_date: str|None
     current_tier_id: TierId
     rating: Rating
@@ -28,12 +27,10 @@ class BaekjoonAccount:
     def create(
         bj_account_id: BaekjoonAccountId,
         tier_id: TierId,
-        profile_image: str|None = None
     ) -> 'BaekjoonAccount':
         now = datetime.now()
         return BaekjoonAccount(
             bj_account_id=bj_account_id,
-            profile_image=profile_image,
             tier_start_date=date.today(),
             current_tier_id=tier_id,
             rating=Rating(0),

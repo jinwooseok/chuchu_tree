@@ -15,6 +15,7 @@ class Tag(Base):
 
     tag_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     tag_code: Mapped[str] = mapped_column(String(100), nullable=False)
+    tag_display_name: Mapped[str] = mapped_column(String(100), nullable=False)
     tag_level: Mapped[str] = mapped_column(String(50), nullable=False, comment='NEWBIE, BEGINNER, REQUIREMENT, DETAIL, CHALLENGE')
     excluded_yn: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
     excluded_reason: Mapped[Optional[str]] = mapped_column(String(50), nullable=True, comment='INSIGNIFICANT, COMPREHENSIVE, MINOR')
