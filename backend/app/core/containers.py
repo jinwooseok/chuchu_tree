@@ -66,7 +66,6 @@ class Container(containers.DeclarativeContainer):
             "app.problem.presentation",
             "app.tag.presentation",
             "app.target.presentation",
-            "app.tier.presentation",
             "app.activity.presentation",
             "app.recommendation.presentation",
         ],
