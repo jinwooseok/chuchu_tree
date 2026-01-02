@@ -1,7 +1,5 @@
 services:
   chuchu-fastapi-migrate:
-    env_file:
-      - ./.env
     environment:
       - environment=prod
     build:
@@ -26,8 +24,6 @@ services:
 
   # FastAPI 서버용 서비스
   chuchu-fastapi:
-    env_file:
-      - ./.env
     environment:
       - environment=prod
     container_name: chuchu-fastapi-prod
@@ -107,8 +103,8 @@ services:
     volumes:
       - ${PROD_STORAGE_PATH}:/data
     environment:
-      - MINIO_ROOT_USER=${PROD_STORAGE_ACCESS_KEY}
-      - MINIO_ROOT_PASSWORD=${PROD_STORAGE_SECRET_KEY}
+      - MINIO_ROOT_USER=${LOCAL_STORAGE_ACCESS_KEY}
+      - MINIO_ROOT_PASSWORD=${LOCAL_STORAGE_SECRET_KEY}
       - TZ=Asia/Seoul
     network_mode: host
     healthcheck:

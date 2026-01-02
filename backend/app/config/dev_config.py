@@ -33,4 +33,4 @@ class DevConfig(BaseConfig):
     STORAGE_SECRET_KEY: str = Field(alias="LOCAL_STORAGE_SECRET_KEY", default="minioadmin", description="스토리지 시크릿 키")
     STORAGE_BUCKET: str = Field(alias="LOCAL_STORAGE_BUCKET", default="adkick-bucket", description="스토리지 버킷명")
     STORAGE_REGION: str = Field(alias="LOCAL_STORAGE_REGION", default="us-east-1", description="스토리지 리전")
-    STORAGE_PATH: str = Field(alias="LOCAL_STORAGE_PATH", default="./storage_data", description="로컬 스토리지 경로")
+    STORAGE_PATH: str = Field(alias="DEV_STORAGE_PATH", default="./storage_data", description="로컬 스토리지 경로")

@@ -33,4 +33,4 @@ class ProdConfig(BaseConfig):
     STORAGE_SECRET_KEY: str = Field(alias="LOCAL_STORAGE_SECRET_KEY", description="스토리지 시크릿 키", default="")
     STORAGE_BUCKET: str = Field(alias="LOCAL_STORAGE_BUCKET", description="스토리지 버킷명", default="")
     STORAGE_REGION: str = Field(alias="LOCAL_STORAGE_REGION", description="스토리지 리전", default="")
-    STORAGE_PATH: str = Field(alias="LOCAL_STORAGE_PATH", description="로컬 스토리지 경로", default="")
+    STORAGE_PATH: str = Field(alias="PROD_STORAGE_PATH", description="로컬 스토리지 경로", default="")
