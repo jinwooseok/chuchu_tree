@@ -12,12 +12,6 @@ class SocialLoginCommand(BaseModel):
     @field_validator('provider', mode="before")
     @classmethod
     def validate_provider(cls, v: str):
-        import logging
-        logger = logging.getLogger(__name__)
-        logger.info(f"Provider validation - Input: '{v}', Type: {type(v)}, Upper: '{v.upper()}'")
-        logger.info(f"Valid providers: {list(Provider._value2member_map_.keys())}")
-
         if not Provider.has_value(v.upper()):
-            logger.error(f"Provider validation failed for: '{v.upper()}'")
             raise APIException(ErrorCode.INVALID_PROVIDER)
         return v.upper()

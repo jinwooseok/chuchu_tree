@@ -124,3 +124,15 @@ class ErrorCode(Enum):
         message="올바르지 않은 값이 입력됐습니다.",
         status_code=400
     )
+
+    INVALID_REQUEST = ErrorCodeInfo(
+        code="INVALID_REQUEST",
+        message="잘못된 요청입니다.",
+        status_code=400
+    )
+
+    INVALID_CSRF_TOKEN = ErrorCodeInfo(
+        code="INVALID_CSRF_TOKEN",
+        message="CSRF 토큰 검증에 실패했습니다.",
+        status_code=403
+    )
