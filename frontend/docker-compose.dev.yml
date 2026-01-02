@@ -1,0 +1,14 @@
+services:
+  frontend-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        - NEXT_PUBLIC_API_URL=https://chuchu-tree-dev.duckdns.org/api/v1
+    image: chuchu-frontend:latest
+    container_name: chuchu-frontend-dev
+    network_mode: host 
+    environment:
+      - NODE_ENV=development
+      - PORT=3334
+    restart: unless-stopped
