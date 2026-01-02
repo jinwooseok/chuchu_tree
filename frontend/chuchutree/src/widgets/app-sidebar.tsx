@@ -3,20 +3,11 @@
 import { Calendar, ChevronUp, Dices, Gem, Leaf, LibraryBig, PanelLeft, User2 } from 'lucide-react';
 import { useLayoutStore } from '@/lib/store/layout';
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarGroup,
-  SidebarGroupAction,
-  SidebarGroupContent,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from '@/components/ui/sidebar';
+import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSidebar } from '@/components/ui/sidebar';
 import Image from 'next/image';
+import { ThemeButton } from '@/shared/ui';
 
 const ICON_SIZE = 32;
 
@@ -121,6 +112,7 @@ export function AppSidebar() {
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
+                <ThemeButton />
                 <DropdownMenuItem>
                   <span>연동 계정 재설정</span>
                 </DropdownMenuItem>
