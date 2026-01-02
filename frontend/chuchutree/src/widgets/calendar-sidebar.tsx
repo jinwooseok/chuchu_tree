@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { Problem } from '@/shared/types/calendar';
-import { TIER_TO_NUM } from '@/shared/constants/tierSystem';
 import Image from 'next/image';
 
 // 클라이언트 전용 렌더링 (hydration mismatch 방지)
@@ -22,16 +21,13 @@ function ProblemCard({ problem, isSolved }: { problem: Problem; isSolved: boolea
   const firstTag = problem.tags[0];
   const tagInfo = TAG_INFO[firstTag?.tagCode as keyof typeof TAG_INFO];
 
-  // will solve는 회색, solved는 tag별 색상
-  const bgColorClass = isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300';
-
   return (
     <div className="bg-background flex items-center justify-between rounded-md p-2 text-xs">
       {/* 문제기본정보 */}
       <div className="mr-4 flex shrink-0 flex-col gap-1 text-center">
         <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300'}`}>{firstTag.tagDisplayName}</div>
         <div className="flex items-center gap-1">
-          <Image src={`/tiers/tier_${TIER_TO_NUM[problem.problemTierName]}.svg`} alt={`Tier ${TIER_TO_NUM[problem.problemTierName]}`} width={24} height={24} className="h-4 w-4" />
+          <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
           <span>{problem.problemId}</span>
         </div>
       </div>
@@ -56,16 +52,8 @@ export default function CalendarSidebar() {
         <SmallCalendar />
       </div>
 
-      {/* 선택된 날짜 표시 */}
-      {/* <div className="text-center text-sm font-semibold text-gray-700" suppressHydrationWarning>
-        {format(selectedDate, 'yyyy년 M월 d일 (eee)', { locale: ko })}
-      </div> */}
-
-      {/* 문제 추가하기 버튼 (향후 구현) */}
-      <button className="mt-2 rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50">+ 오늘 풀 문제 등록하기</button>
-
       {/* Solved 문제 목록 */}
-      <div className="flex flex-col gap-2">
+      <div className="flex cursor-default flex-col gap-2">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold">해결한 문제</h3>
           <span className="text-xs text-gray-500">{solvedProblems.length}개</span>
@@ -83,7 +71,7 @@ export default function CalendarSidebar() {
       </div>
 
       {/* Will Solve 문제 목록 */}
-      <div className="flex flex-col gap-2">
+      <div className="flex cursor-default flex-col gap-2">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold">오늘의 일정</h3>
           <span className="text-xs text-gray-500">{willSolveProblems.length}개</span>
@@ -98,6 +86,8 @@ export default function CalendarSidebar() {
             ))}
           </div>
         )}
+        {/* 문제 추가하기 버튼 (향후 구현) */}
+        <button className="hover:bg-background text-muted-foreground mb-4 cursor-pointer rounded px-2 py-2 text-start text-sm">+ 오늘 풀 문제 등록하기</button>
       </div>
     </div>
   );
