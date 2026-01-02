@@ -1,0 +1,14 @@
+services:
+  frontend-prod:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+      args:
+        - NEXT_PUBLIC_API_URL=https://chuchu-tree.duckdns.org/api/v1
+    image: chuchu-frontend-prod:latest
+    container_name: chuchu-frontend-prod
+    network_mode: host 
+    environment:
+      - NODE_ENV=production
+      - PORT=3333
+    restart: unless-stopped
