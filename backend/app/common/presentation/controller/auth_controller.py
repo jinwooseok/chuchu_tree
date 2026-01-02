@@ -28,7 +28,7 @@ async def social_login(
         쿠키에 access_token, refresh_token 설정
     """
     
-    login_url = auth_application_service.get_social_login_url(SocialLoginCommand(provider=provider, 
+    login_url = await auth_application_service.get_social_login_url(SocialLoginCommand(provider=provider, 
                                                                                  frontend_redirect_url=frontend_redirect_url))
     
     return RedirectResponse(url=login_url, status_code=302)

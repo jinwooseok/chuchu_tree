@@ -18,7 +18,7 @@ class OAuthClient(ABC):
         await self.client.aclose()
     
     @abstractmethod
-    def get_social_login_url(frontend_redirect_url: str | None) -> str:
+    async def get_social_login_url(frontend_redirect_url: str | None) -> str:
         pass
     
     @abstractmethod
@@ -33,7 +33,7 @@ class OAuthClient(ABC):
     async def unlink(self, access_token: str) -> dict[str, any]:
         pass
     
-    def encode_redirect_url_to_state(self, url: str):
+    async def encode_redirect_url_to_state(self, url: str):
         import base64
         import json
         encoded_state = None

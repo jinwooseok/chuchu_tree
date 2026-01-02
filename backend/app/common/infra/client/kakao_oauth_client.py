@@ -8,10 +8,10 @@ class KakaoOAuthClient(OAuthClient):
     USER_INFO_URL = "https://kapi.kakao.com/v2/user/me"
     UNLINK_URL = "https://kapi.kakao.com/v1/user/unlink"
     
-    def get_social_login_url(self, frontend_redirect_url: str | None) -> str:
-        
-        encoded_state = self.encode_redirect_url_to_state(frontend_redirect_url)
-        
+    async def get_social_login_url(self, frontend_redirect_url: str | None) -> str:
+
+        encoded_state = await self.encode_redirect_url_to_state(frontend_redirect_url)
+
         params = {
             "client_id": self.settings.KAKAO_CLIENT_ID,
             "redirect_uri": self.settings.KAKAO_REDIRECT_URI,
@@ -19,7 +19,7 @@ class KakaoOAuthClient(OAuthClient):
             "scope": "profile_nickname",
             "state": encoded_state,
         }
-        
+
         return f"https://kauth.kakao.com/oauth/authorize?{urlencode(params)}"
     
     async def get_access_token(self, code: str) -> dict[str, Any]:

@@ -38,15 +38,14 @@ class AuthApplicationService:
         
         return CurrentUser(member_id, position)
     
-    @transactional
     async def get_social_login_url(self, command: SocialLoginCommand) -> str:
         """소셜 로그인 URL 생성"""
-        
-        if command.provider == Provider.NAVER:
-            return self.naver_oauth_client.get_social_login_url(command.frontend_redirect_url)
+        provider = Provider(command.provider)
+        if provider == Provider.NAVER:
+            return await self.naver_oauth_client.get_social_login_url(command.frontend_redirect_url)
 
-        elif command.provider == Provider.KAKAO:
-            return self.kakao_oauth_client.get_social_login_url(command.frontend_redirect_url)
+        elif provider == Provider.KAKAO:
+            return await self.kakao_oauth_client.get_social_login_url(command.frontend_redirect_url)
         
         else:
             raise APIException(ErrorCode.INVALID_PROVIDER)

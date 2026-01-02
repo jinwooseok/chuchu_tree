@@ -106,7 +106,6 @@ def transactional(func: Callable[..., Awaitable]) -> Callable[..., Awaitable]:
             return await func(*args, **kwargs)
 
         if database_instance is None:
-            logger.info("DB 인스턴스가 없습니다.")
             raise APIException(ErrorCode.DATABASE_ERROR)
 
         is_test_env = environment == 'test'

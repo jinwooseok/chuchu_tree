@@ -40,10 +40,10 @@ class LocalConfig(BaseConfig):
     # ================================
     KAKAO_CLIENT_ID: str = Field(alias="KAKAO_CLIENT_ID", default="", description="카카오 클라이언트 아이디")
     KAKAO_CLIENT_SECRET: str = Field(alias="KAKAO_CLIENT_SECRET", default="", description="카카오 클라이언트 비밀키")
-    KAKAO_REDIRECT_URI: str = Field(alias="DEV_KAKAO_REDIRECT_URI", default="http://localhost:8000/api/auth/kakao/callback", description="카카오 리다이렉트 URI")
+    KAKAO_REDIRECT_URI: str = Field(alias="LOCAL_KAKAO_REDIRECT_URI", default="http://localhost:8000/api/v1/auth/login/kakao/callback", description="카카오 리다이렉트 URI")
     
     NAVER_CLIENT_ID: str = Field(alias="DEV_NAVER_CLIENT_ID", default="", description="네이버 클라이언트 아이디")
     NAVER_CLIENT_SECRET: str = Field(alias="DEV_NAVER_CLIENT_SECRET", default="", description="네이버 클라이언트 비밀키")
-    NAVER_REDIRECT_URI: str = Field(alias="DEV_NAVER_REDIRECT_URI", default="http://localhost:8000/api/auth/naver/callback", description="네이버 리다이렉트 URI")
+    NAVER_REDIRECT_URI: str = Field(alias="LOCAL_NAVER_REDIRECT_URI", default="http://localhost:8000/api/v1/auth/login/naver/callback", description="네이버 리다이렉트 URI")
 
     FRONTEND_REDIRECT_URI: str = Field(alias="DEV_FRONTEND_REDIRECT_URI", default="https://chuchu-tree-dev.duckdns.org", description="프론트엔드 리다이렉트 URI")
