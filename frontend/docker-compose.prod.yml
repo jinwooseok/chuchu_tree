@@ -5,7 +5,7 @@ services:
       dockerfile: Dockerfile.prod
       args:
         - NEXT_PUBLIC_API_URL=https://chuchu-tree.duckdns.org/api/v1
-    image: chuchu-frontend:latest
+    image: chuchu-frontend-prod:latest
     container_name: chuchu-frontend-prod
     network_mode: host 
     environment:
