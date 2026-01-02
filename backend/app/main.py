@@ -6,7 +6,7 @@ from fastapi.concurrency import asynccontextmanager
 from app.core.api_response import ApiResponse
 from app.core.containers import Container
 from app.core.loggers import setup_logging
-
+from app.core import database
 # Import routers
 from app.common.presentation.controller.auth_controller import router as auth_router
 from app.user.presentation.controller.user_controller import router as user_router, admin_router as admin_user_router
@@ -34,10 +34,14 @@ class AppWithContainer(FastAPI):
 async def lifespan(app: AppWithContainer):
     injection_container = Container()
     app.container = injection_container
+    db = injection_container.database()
+    database.database_instance = db
     try:
         yield
     finally:
         # 정리 작업
+        if database.database_instance:
+            await database.database_instance.close()
         return
 
 app = AppWithContainer(
