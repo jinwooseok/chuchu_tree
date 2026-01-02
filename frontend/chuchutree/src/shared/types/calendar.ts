@@ -1,5 +1,7 @@
 // 캘린더 관련 타입 정의
 
+import { TierKey } from "@/shared/constants/tierSystem";
+
 export interface TagAlias {
   alias: string;
 }
@@ -27,7 +29,7 @@ export interface Problem {
   problemId: number;
   problemTitle: string;
   problemTierLevel: number;
-  problemTierName: string;
+  problemTierName: TierKey;
   problemClassLevel: number;
   recommandReasons: RecommendReason[];
   tags: Tag[];
