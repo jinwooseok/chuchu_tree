@@ -11,7 +11,6 @@ class BjAccount(Base):
     __table_args__ = {'comment': '백준 계정'}
 
     bj_account_id: Mapped[str] = mapped_column(String(50), primary_key=True)
-    profile_image: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     tier_start_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
     tier_id: Mapped[int] = mapped_column(Integer, ForeignKey('tier.tier_id'), nullable=False)
     rating: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

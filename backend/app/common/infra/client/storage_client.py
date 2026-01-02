@@ -12,7 +12,7 @@ from datetime import datetime, timedelta, timezone
 import logging
 import os
 
-from config.settings import get_settings
+from app.config.settings import get_settings
 
 
 logger = logging.getLogger(__name__)

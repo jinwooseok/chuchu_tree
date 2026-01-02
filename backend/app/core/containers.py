@@ -131,13 +131,13 @@ class Container(containers.DeclarativeContainer):
     )
 
     # ========================================================================
-    # Infrastructure - OAuth Clients (Factory - 매번 새 인스턴스)
+    # Infrastructure - OAuth Clients
     # ========================================================================
-    kakao_oauth_client = providers.Factory(
+    kakao_oauth_client = providers.Singleton(
         KakaoOAuthClient,
     )
 
-    naver_oauth_client = providers.Factory(
+    naver_oauth_client = providers.Singleton(
         NaverOAuthClient,
     )
 
@@ -164,7 +164,7 @@ class Container(containers.DeclarativeContainer):
     # ========================================================================
     # Application Services
     # ========================================================================
-    auth_service = providers.Factory(
+    auth_service = providers.Singleton(
         AuthService,
         token_service=token_service,
     )

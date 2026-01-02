@@ -44,7 +44,6 @@ async def validation_exception_handler(request, exc):
         error_type = first_error.get('type', '')
 
         # 에러 타입에 따라 적절한 ErrorCode로 매핑
-        from core.error_codes import ErrorCode
 
         # missing: 필수 필드 누락
         if error_type == 'missing':
@@ -69,7 +68,6 @@ async def validation_exception_handler(request, exc):
         )
 
     # 에러 정보가 없는 경우 기본 에러
-    from core.error_codes import ErrorCode
     return ApiResponse(
         status_code=400,
         error_code=ErrorCode.INVALID_REQUEST.value.code,

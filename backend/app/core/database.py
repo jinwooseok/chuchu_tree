@@ -51,7 +51,6 @@ class Database:
                 yield session
                 # 정상 완료 시 자동 commit
         except Exception as ex:
-            logger.exception("Session rollback because of exception")
             raise ex 
         finally:
             _session_context.reset(token)
@@ -70,7 +69,6 @@ class Database:
             # 테스트 완료 후 무조건 롤백
             await transaction.rollback()
         except Exception as ex:
-            logger.exception("Test session exception")
             # 이미 롤백됨
             raise ex
         finally:

@@ -14,6 +14,7 @@ class UserAccount:
     user_account_id: UserAccountId|None
     provider: Provider
     provider_id: str|None
+    profile_image: str|None
     registered_at: datetime
     created_at: datetime
     updated_at: datetime
@@ -27,6 +28,7 @@ class UserAccount:
         return UserAccount(
             user_account_id=None,  # DB에서 할당
             provider=provider,
+            profile_image=None,
             provider_id=provider_id,
             registered_at=now,
             created_at=now,
@@ -61,7 +63,10 @@ class UserAccount:
         
         self.targets.append(UserTarget.create(self.user_account_id, target_id))
         self.updated_at = datetime.now()
-        
+    
+    def update_profile_image(self, profile_image: str) -> None:
+        self.profile_image = profile_image
+    
     def remove_target(self, target_id: TargetId) -> None:
         """도메인 로직 - 목표 제거"""
         for target in self.targets:

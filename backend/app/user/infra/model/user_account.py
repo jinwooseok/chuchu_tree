@@ -24,6 +24,7 @@ class UserAccount(Base):
     user_account_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     provider: Mapped[ProviderEnum] = mapped_column(SQLEnum(ProviderEnum), nullable=False)
     provider_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    profile_image: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     registered_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)

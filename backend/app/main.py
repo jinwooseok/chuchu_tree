@@ -7,11 +7,25 @@ from app.core.api_response import ApiResponse
 from app.core.containers import Container
 from app.core.loggers import setup_logging
 
+# Import routers
+from app.common.presentation.controller.auth_controller import router as auth_router
+from app.user.presentation.controller.user_controller import router as user_router, admin_router as admin_user_router
+from app.baekjoon.presentation.controller.baekjoon_controller import router as baekjoon_router, admin_router as admin_baekjoon_router
+from app.target.presentation.controller.target_controller import (
+    router as target_router,
+    user_router as target_user_router,
+    baekjoon_router as target_baekjoon_router
+)
+from app.activity.presentation.controller.activity_controller import router as activity_router
+from app.problem.presentation.controller.problem_controller import router as problem_router
+from app.tag.presentation.controller.tag_controller import router as tag_router, user_router as tag_user_router
+from app.recommendation.presentation.controller.recommendation_controller import router as recommendation_router
+
 setup_logging()
 
 class AppWithContainer(FastAPI):
     """Container를 포함한 FastAPI 앱 클래스"""
-    
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.container: Container | None = None
@@ -36,6 +50,38 @@ app = AppWithContainer(
     default_response_class=ApiResponse,
     lifespan=lifespan
 )
+
+# Register routers with /api/v1 prefix
+API_V1_PREFIX = "/api/v1"
+
+# Auth routers
+app.include_router(auth_router, prefix=API_V1_PREFIX)
+
+# User routers
+app.include_router(user_router, prefix=API_V1_PREFIX)
+app.include_router(admin_user_router, prefix=API_V1_PREFIX)
+
+# Baekjoon routers
+app.include_router(baekjoon_router, prefix=API_V1_PREFIX)
+app.include_router(admin_baekjoon_router, prefix=API_V1_PREFIX)
+
+# Target routers
+app.include_router(target_router, prefix=API_V1_PREFIX)
+app.include_router(target_user_router, prefix=API_V1_PREFIX)
+app.include_router(target_baekjoon_router, prefix=API_V1_PREFIX)
+
+# Activity router
+app.include_router(activity_router, prefix=API_V1_PREFIX)
+
+# Problem router
+app.include_router(problem_router, prefix=API_V1_PREFIX)
+
+# Tag routers
+app.include_router(tag_router, prefix=API_V1_PREFIX)
+app.include_router(tag_user_router, prefix=API_V1_PREFIX)
+
+# Recommendation router
+app.include_router(recommendation_router, prefix=API_V1_PREFIX)
 
 @app.get("/health")
 async def health_check():

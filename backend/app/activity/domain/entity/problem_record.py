@@ -11,6 +11,9 @@ class ProblemRecord:
     user_account_id: UserAccountId
     problem_id: ProblemId
     marked_date: date
+    solved: bool
+    memo_title: str|None
+    content: str|None
     created_at: datetime
     updated_at: datetime
     deleted_at: datetime|None = None
@@ -27,6 +30,9 @@ class ProblemRecord:
             user_account_id=user_account_id,
             problem_id=problem_id,
             marked_date=marked_date,
+            solved=True,
+            memo_title=None,
+            content=None,
             created_at=now,
             updated_at=now,
             deleted_at=None
