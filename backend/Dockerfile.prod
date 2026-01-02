@@ -39,9 +39,9 @@ COPY . /project
 RUN chmod +x /project/app/main.py
 
 # Blue: 8080, Green: 8081 (현재 미설정)
-EXPOSE 8080
+EXPOSE 8004
 
 CMD ["uvicorn", "app.main:app", \
      "--host", "0.0.0.0", \
-     "--port", "8080", \
+     "--port", "8004", \
      "--workers", "1"]
