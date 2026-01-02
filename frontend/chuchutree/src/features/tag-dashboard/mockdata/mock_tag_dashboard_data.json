@@ -1,0 +1,632 @@
+{
+  "status": 200,
+  "message": "ok",
+  "data": {
+    "categories": [
+      {
+        "categoryName": "IMEDIATED",
+        "tags": [
+          {
+            "tagId": 1,
+            "tagCode": "math",
+            "tagDisplayName": "수학"
+          },
+          {
+            "tagId": 2,
+            "tagCode": "implementation",
+            "tagDisplayName": "구현"
+          },
+          {
+            "tagId": 3,
+            "tagCode": "dp",
+            "tagDisplayName": "다이나믹 프로그래밍"
+          },
+          {
+            "tagId": 4,
+            "tagCode": "greedy",
+            "tagDisplayName": "그리디 알고리즘"
+          },
+          {
+            "tagId": 5,
+            "tagCode": "string",
+            "tagDisplayName": "문자열"
+          }
+        ]
+      },
+      {
+        "categoryName": "ADVANCED",
+        "tags": [
+          {
+            "tagId": 6,
+            "tagCode": "bruteforcing",
+            "tagDisplayName": "브루트포스"
+          },
+          {
+            "tagId": 7,
+            "tagCode": "sorting",
+            "tagDisplayName": "정렬"
+          },
+          {
+            "tagId": 8,
+            "tagCode": "ad_hoc",
+            "tagDisplayName": "애드 혹"
+          },
+          {
+            "tagId": 9,
+            "tagCode": "geometry",
+            "tagDisplayName": "기하학"
+          },
+          {
+            "tagId": 10,
+            "tagCode": "trees",
+            "tagDisplayName": "트리"
+          },
+          {
+            "tagId": 11,
+            "tagCode": "number_theory",
+            "tagDisplayName": "정수론"
+          },
+          {
+            "tagId": 12,
+            "tagCode": "segtree",
+            "tagDisplayName": "세그먼트 트리"
+          },
+          {
+            "tagId": 13,
+            "tagCode": "binary_search",
+            "tagDisplayName": "이분 탐색"
+          },
+          {
+            "tagId": 14,
+            "tagCode": "set",
+            "tagDisplayName": "집합과 맵"
+          }
+        ]
+      },
+      {
+        "categoryName": "MASTER",
+        "tags": []
+      },
+      {
+        "categoryName": "EXCLUDED",
+        "tags": [
+          {
+            "tagId": 15,
+            "tagCode": "arithmetic",
+            "tagDisplayName": "사칙연산"
+          },
+          {
+            "tagId": 16,
+            "tagCode": "simulation",
+            "tagDisplayName": "시뮬레이션"
+          },
+          {
+            "tagId": 17,
+            "tagCode": "prefix_sum",
+            "tagDisplayName": "누적 합"
+          }
+        ]
+      },
+      {
+        "categoryName": "LOCKED",
+        "tags": [
+          {
+            "tagId": 18,
+            "tagCode": "bfs",
+            "tagDisplayName": "너비 우선 탐색"
+          },
+          {
+            "tagId": 19,
+            "tagCode": "shortest_path",
+            "tagDisplayName": "최단 경로"
+          }
+        ]
+      }
+    ],
+    "tags": [
+      {
+        "tagId": 1,
+        "tagCode": "math",
+        "tagDisplayName": "수학",
+        "requiredStat": {
+          "requiredMinTier": "G4",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 15,
+          "requiredMinTier": "G3",
+          "higherProblemTier": "P5"
+        },
+        "accountStat": {
+          "currentLevel": "IMEDIATED",
+          "solvedProblemCount": 12,
+          "requiredMinTier": "G3",
+          "higherProblemTier": "P4",
+          "lastSolvedDate": "2025-07-12"
+        },
+        "locked_yn": false,
+        "excluded_yn": false,
+        "recommandation_yn": true
+      },
+      {
+        "tagId": 2,
+        "tagCode": "implementation",
+        "tagDisplayName": "구현",
+        "requiredStat": {
+          "requiredMinTier": "S5",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 20,
+          "requiredMinTier": "S2",
+          "higherProblemTier": "G3"
+        },
+        "accountStat": {
+          "currentLevel": "IMEDIATED",
+          "solvedProblemCount": 18,
+          "requiredMinTier": "S2",
+          "higherProblemTier": "G4",
+          "lastSolvedDate": "2025-08-15"
+        },
+        "locked_yn": false,
+        "excluded_yn": false,
+        "recommandation_yn": true
+      },
+      {
+        "tagId": 3,
+        "tagCode": "dp",
+        "tagDisplayName": "다이나믹 프로그래밍",
+        "requiredStat": {
+          "requiredMinTier": "G3",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 25,
+          "requiredMinTier": "G1",
+          "higherProblemTier": "P3"
+        },
+        "accountStat": {
+          "currentLevel": "IMEDIATED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": "G1",
+          "higherProblemTier": "P5",
+          "lastSolvedDate": "2025-09-03"
+        },
+        "locked_yn": false,
+        "excluded_yn": false,
+        "recommandation_yn": true
+      },
+      {
+        "tagId": 4,
+        "tagCode": "greedy",
+        "tagDisplayName": "그리디 알고리즘",
+        "requiredStat": {
+          "requiredMinTier": "G5",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 18,
+          "requiredMinTier": "G3",
+          "higherProblemTier": "P4"
+        },
+        "accountStat": {
+          "currentLevel": "IMEDIATED",
+          "solvedProblemCount": 14,
+          "requiredMinTier": "G3",
+          "higherProblemTier": "P5",
+          "lastSolvedDate": "2025-08-28"
+        },
+        "locked_yn": false,
+        "excluded_yn": false,
+        "recommandation_yn": true
+      },
+      {
+        "tagId": 5,
+        "tagCode": "string",
+        "tagDisplayName": "문자열",
+        "requiredStat": {
+          "requiredMinTier": "S4",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 22,
+          "requiredMinTier": "S1",
+          "higherProblemTier": "G2"
+        },
+        "accountStat": {
+          "currentLevel": "IMEDIATED",
+          "solvedProblemCount": 20,
+          "requiredMinTier": "S1",
+          "higherProblemTier": "G3",
+          "lastSolvedDate": "2025-09-10"
+        },
+        "locked_yn": false,
+        "excluded_yn": false,
+        "recommandation_yn": true
+      },
+      {
+        "tagId": 6,
+        "tagCode": "bruteforcing",
+        "tagDisplayName": "브루트포스",
+        "requiredStat": {
+          "requiredMinTier": "G3",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 30,
+          "requiredMinTier": "P5",
+          "higherProblemTier": "P2"
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 25,
+          "requiredMinTier": "P5",
+          "higherProblemTier": "P3",
+          "lastSolvedDate": "2025-09-20"
+        },
+        "locked_yn": false,
+        "excluded_yn": false,
+        "recommandation_yn": true
+      },
+      {
+        "tagId": 7,
+        "tagCode": "sorting",
+        "tagDisplayName": "정렬",
+        "requiredStat": {
+          "requiredMinTier": "S3",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 28,
+          "requiredMinTier": "G5",
+          "higherProblemTier": "P4"
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 22,
+          "requiredMinTier": "G5",
+          "higherProblemTier": "P5",
+          "lastSolvedDate": "2025-09-18"
+        },
+        "locked_yn": false,
+        "excluded_yn": false,
+        "recommandation_yn": true
+      },
+      {
+        "tagId": 8,
+        "tagCode": "ad_hoc",
+        "tagDisplayName": "애드 혹",
+        "requiredStat": {
+          "requiredMinTier": "G2",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 35,
+          "requiredMinTier": "P4",
+          "higherProblemTier": "P1"
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 8,
+          "requiredMinTier": "P4",
+          "higherProblemTier": "P2",
+          "lastSolvedDate": "2025-09-05"
+        },
+        "locked_yn": false,
+        "excluded_yn": false,
+        "recommandation_yn": true
+      },
+      {
+        "tagId": 9,
+        "tagCode": "geometry",
+        "tagDisplayName": "기하학",
+        "requiredStat": {
+          "requiredMinTier": "G1",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 40,
+          "requiredMinTier": "P3",
+          "higherProblemTier": "D5"
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 15,
+          "requiredMinTier": "P3",
+          "higherProblemTier": "P1",
+          "lastSolvedDate": "2025-08-22"
+        },
+        "locked_yn": false,
+        "excluded_yn": false,
+        "recommandation_yn": true
+      },
+      {
+        "tagId": 10,
+        "tagCode": "trees",
+        "tagDisplayName": "트리",
+        "requiredStat": {
+          "requiredMinTier": "G4",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 32,
+          "requiredMinTier": "G1",
+          "higherProblemTier": "P3"
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 18,
+          "requiredMinTier": "G1",
+          "higherProblemTier": "P4",
+          "lastSolvedDate": "2025-09-12"
+        },
+        "locked_yn": false,
+        "excluded_yn": false,
+        "recommandation_yn": true
+      },
+      {
+        "tagId": 11,
+        "tagCode": "number_theory",
+        "tagDisplayName": "정수론",
+        "requiredStat": {
+          "requiredMinTier": "G3",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 35,
+          "requiredMinTier": "P5",
+          "higherProblemTier": "P2"
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 12,
+          "requiredMinTier": "P5",
+          "higherProblemTier": "P3",
+          "lastSolvedDate": "2025-09-01"
+        },
+        "locked_yn": false,
+        "excluded_yn": false,
+        "recommandation_yn": true
+      },
+      {
+        "tagId": 12,
+        "tagCode": "segtree",
+        "tagDisplayName": "세그먼트 트리",
+        "requiredStat": {
+          "requiredMinTier": "G5",
+          "prevTags": [
+            {
+              "tagId": 10,
+              "tagCode": "trees",
+              "tagDisplayName": "트리",
+              "satisfiedYn": true
+            },
+            {
+              "tagId": 7,
+              "tagCode": "sorting",
+              "tagDisplayName": "정렬",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 45,
+          "requiredMinTier": "P2",
+          "higherProblemTier": "D4"
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": "P2",
+          "higherProblemTier": "P1",
+          "lastSolvedDate": "2025-08-30"
+        },
+        "locked_yn": false,
+        "excluded_yn": false,
+        "recommandation_yn": true
+      },
+      {
+        "tagId": 13,
+        "tagCode": "binary_search",
+        "tagDisplayName": "이분 탐색",
+        "requiredStat": {
+          "requiredMinTier": "G5",
+          "prevTags": [
+            {
+              "tagId": 14,
+              "tagCode": "set",
+              "tagDisplayName": "집합과 맵",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 25,
+          "requiredMinTier": "G2",
+          "higherProblemTier": "P4"
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 20,
+          "requiredMinTier": "G2",
+          "higherProblemTier": "P5",
+          "lastSolvedDate": "2025-09-15"
+        },
+        "locked_yn": false,
+        "excluded_yn": false,
+        "recommandation_yn": true
+      },
+      {
+        "tagId": 14,
+        "tagCode": "set",
+        "tagDisplayName": "집합과 맵",
+        "requiredStat": {
+          "requiredMinTier": "S2",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 30,
+          "requiredMinTier": "G4",
+          "higherProblemTier": "P5"
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 24,
+          "requiredMinTier": "G4",
+          "higherProblemTier": "P5",
+          "lastSolvedDate": "2025-09-22"
+        },
+        "locked_yn": false,
+        "excluded_yn": false,
+        "recommandation_yn": true
+      },
+      {
+        "tagId": 15,
+        "tagCode": "arithmetic",
+        "tagDisplayName": "사칙연산",
+        "requiredStat": {
+          "requiredMinTier": "B5",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "IMEDIATED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": "B3",
+          "higherProblemTier": "S5"
+        },
+        "accountStat": {
+          "currentLevel": "EXCLUDED",
+          "solvedProblemCount": 50,
+          "requiredMinTier": "B3",
+          "higherProblemTier": "S5",
+          "lastSolvedDate": "2025-06-10"
+        },
+        "locked_yn": false,
+        "excluded_yn": true,
+        "recommandation_yn": false
+      },
+      {
+        "tagId": 16,
+        "tagCode": "simulation",
+        "tagDisplayName": "시뮬레이션",
+        "requiredStat": {
+          "requiredMinTier": "S5",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "IMEDIATED",
+          "solvedProblemCount": 15,
+          "requiredMinTier": "S3",
+          "higherProblemTier": "G5"
+        },
+        "accountStat": {
+          "currentLevel": "EXCLUDED",
+          "solvedProblemCount": 35,
+          "requiredMinTier": "S3",
+          "higherProblemTier": "G5",
+          "lastSolvedDate": "2025-07-01"
+        },
+        "locked_yn": false,
+        "excluded_yn": true,
+        "recommandation_yn": false
+      },
+      {
+        "tagId": 17,
+        "tagCode": "prefix_sum",
+        "tagDisplayName": "누적 합",
+        "requiredStat": {
+          "requiredMinTier": "S4",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "IMEDIATED",
+          "solvedProblemCount": 12,
+          "requiredMinTier": "S2",
+          "higherProblemTier": "G4"
+        },
+        "accountStat": {
+          "currentLevel": "EXCLUDED",
+          "solvedProblemCount": 28,
+          "requiredMinTier": "S2",
+          "higherProblemTier": "G4",
+          "lastSolvedDate": "2025-07-20"
+        },
+        "locked_yn": false,
+        "excluded_yn": true,
+        "recommandation_yn": false
+      },
+      {
+        "tagId": 18,
+        "tagCode": "bfs",
+        "tagDisplayName": "너비 우선 탐색",
+        "requiredStat": {
+          "requiredMinTier": "S1",
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "IMEDIATED",
+          "solvedProblemCount": 15,
+          "requiredMinTier": "G5",
+          "higherProblemTier": "G2"
+        },
+        "accountStat": {
+          "currentLevel": "LOCKED",
+          "solvedProblemCount": 8,
+          "requiredMinTier": "G5",
+          "higherProblemTier": "G3",
+          "lastSolvedDate": "2025-09-25"
+        },
+        "locked_yn": true,
+        "excluded_yn": false,
+        "recommandation_yn": false
+      },
+      {
+        "tagId": 19,
+        "tagCode": "shortest_path",
+        "tagDisplayName": "최단 경로",
+        "requiredStat": {
+          "requiredMinTier": "G5",
+          "prevTags": [
+            {
+              "tagId": 18,
+              "tagCode": "bfs",
+              "tagDisplayName": "너비 우선 탐색",
+              "satisfiedYn": false
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "IMEDIATED",
+          "solvedProblemCount": 20,
+          "requiredMinTier": "G3",
+          "higherProblemTier": "P5"
+        },
+        "accountStat": {
+          "currentLevel": "LOCKED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": "G3",
+          "higherProblemTier": "P5",
+          "lastSolvedDate": "2025-09-28"
+        },
+        "locked_yn": true,
+        "excluded_yn": false,
+        "recommandation_yn": false
+      }
+    ]
+  },
+  "error": {}
+}

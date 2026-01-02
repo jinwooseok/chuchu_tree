@@ -1,13 +1,21 @@
-import { ThemeButton } from '@/shared/ui';
+'use client';
+
+import dynamic from 'next/dynamic';
+
+// 클라이언트 전용 렌더링 (hydration mismatch 방지)
+const BigCalendar = dynamic(() => import('@/features/calendar/ui/BigCalendar'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-full w-full items-center justify-center">
+      <div className="text-sm text-gray-400">Loading...</div>
+    </div>
+  ),
+});
 
 export default function MainCalendar() {
   return (
-    <div className="bg-innerground-white flex h-full items-center justify-center p-8">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold">캘린더 영역</h2>
-        <p className="text-muted-foreground mt-2">notion 스타일 캘린더 (준비중)</p>
-        <ThemeButton />
-      </div>
+    <div className="bg-innerground-white h-full w-full p-4">
+      <BigCalendar />
     </div>
   );
 }

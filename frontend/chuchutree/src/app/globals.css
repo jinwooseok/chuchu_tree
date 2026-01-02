@@ -184,3 +184,16 @@
     @apply bg-background text-foreground font-sans;
   }
 }
+
+/* react-big-calendar 텍스트 크기 12px */
+.calendar-12px .rbc-calendar,
+.calendar-12px .rbc-header,
+.calendar-12px .rbc-date-cell,
+.calendar-12px .rbc-event,
+.calendar-12px .rbc-event-label,
+.calendar-12px .rbc-event-content,
+.calendar-12px .rbc-day-slot,
+.calendar-12px .rbc-time-slot,
+.calendar-12px .rbc-show-more {
+  font-size: 12px;
+}
