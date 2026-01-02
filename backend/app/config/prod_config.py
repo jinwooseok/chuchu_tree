@@ -34,3 +34,16 @@ class ProdConfig(BaseConfig):
     STORAGE_BUCKET: str = Field(alias="LOCAL_STORAGE_BUCKET", description="스토리지 버킷명", default="")
     STORAGE_REGION: str = Field(alias="LOCAL_STORAGE_REGION", description="스토리지 리전", default="")
     STORAGE_PATH: str = Field(alias="PROD_STORAGE_PATH", description="로컬 스토리지 경로", default="")
+    
+    # ================================
+    # OAuth Providers
+    # ================================
+    KAKAO_CLIENT_ID: str = Field(alias="KAKAO_CLIENT_ID", default="", description="카카오 클라이언트 아이디")
+    KAKAO_CLIENT_SECRET: str = Field(alias="KAKAO_CLIENT_SECRET", default="", description="카카오 클라이언트 비밀키")
+    KAKAO_REDIRECT_URI: str = Field(alias="PROD_KAKAO_REDIRECT_URI", default="http://localhost:8000/api/auth/kakao/callback", description="카카오 리다이렉트 URI")
+    
+    NAVER_CLIENT_ID: str = Field(alias="PROD_NAVER_CLIENT_ID", default="", description="네이버 클라이언트 아이디")
+    NAVER_CLIENT_SECRET: str = Field(alias="PROD_NAVER_CLIENT_SECRET", default="", description="네이버 클라이언트 비밀키")
+    NAVER_REDIRECT_URI: str = Field(alias="PROD_NAVER_REDIRECT_URI", default="http://localhost:8000/api/auth/naver/callback", description="네이버 리다이렉트 URI")
+
+    FRONTEND_REDIRECT_URI: str = Field(alias="PROD_FRONTEND_REDIRECT_URI", default="https://chuchu-tree.duckdns.org", description="프론트엔드 리다이렉트 URI")

@@ -33,7 +33,7 @@ from app.common.domain.service.local_handler import LocalEventHandler
 # ============================================================================
 # Application Services
 # ============================================================================
-from app.common.application.service.auth_service import AuthService
+from app.common.application.service.auth_application_service import AuthApplicationService
 
 # ============================================================================
 # Domain Repositories (Interfaces - Implementations to be added)
@@ -163,9 +163,11 @@ class Container(containers.DeclarativeContainer):
     # ========================================================================
     # Application Services
     # ========================================================================
-    auth_service = providers.Singleton(
-        AuthService,
+    auth_application_service = providers.Singleton(
+        AuthApplicationService,
         token_service=token_service,
+        kakao_oauth_client=kakao_oauth_client,
+        naver_oauth_client=naver_oauth_client
     )
 
     # ========================================================================

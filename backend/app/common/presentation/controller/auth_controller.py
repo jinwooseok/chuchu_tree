@@ -1,6 +1,9 @@
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends, Request, Response
 from dependency_injector.wiring import inject, Provide
+from fastapi.responses import RedirectResponse
 
+from app.common.application.command.social_login_command import SocialLoginCommand
+from app.common.application.service.auth_application_service import AuthApplicationService
 from app.common.domain.vo.current_user import CurrentUser
 from app.common.presentation.dependency.auth_dependencies import get_current_member
 from app.core.containers import Container
@@ -8,12 +11,12 @@ from app.core.api_response import ApiResponse, ApiResponseSchema
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
-
 @router.get("/login/{provider}", response_model=ApiResponseSchema[dict])
 @inject
 async def social_login(
     provider: str,
-    # auth_service: AuthService = Depends(Provide[Container.auth_service])
+    frontend_redirect_url: str | None = None,
+    auth_application_service: AuthApplicationService = Depends(Provide[Container.auth_application_service])
 ):
     """
     소셜 로그인 요청 (네이버, 카카오, 구글, 깃허브)
@@ -24,14 +27,11 @@ async def social_login(
     Returns:
         쿠키에 access_token, refresh_token 설정
     """
-    # TODO: Implement OAuth login logic
-    # 1. Redirect to OAuth provider
-    # 2. Handle callback
-    # 3. Create/Update user account
-    # 4. Generate tokens
-    # 5. Set cookies
-
-    return ApiResponse(data={})
+    
+    login_url = auth_application_service.get_social_login_url(SocialLoginCommand(provider=provider, 
+                                                                                 frontend_redirect_url=frontend_redirect_url))
+    
+    return RedirectResponse(url=login_url, status_code=302)
 
 
 @router.post("/logout", response_model=ApiResponseSchema[dict])
@@ -60,7 +60,7 @@ async def logout(
 @inject
 async def refresh_token(
     # refresh_token: str = Cookie(None),
-    # auth_service: AuthService = Depends(Provide[Container.auth_service])
+    # auth_application_service: AuthApplicationService = Depends(Provide[Container.auth_application_service])
 ):
     """
     리프레시 토큰 재발급

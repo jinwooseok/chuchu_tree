@@ -8,13 +8,16 @@ from redis.asyncio import client
 from redis.asyncio.connection import ConnectionPool
 from redis.exceptions import ConnectionError, TimeoutError, RedisError
 
+from app.config.dev_config import DevConfig
+from app.config.local_config import LocalConfig
+from app.config.prod_config import ProdConfig
 from app.config.settings import get_settings
 
 logger = logging.getLogger(__name__)
 class AsyncRedisClient:
     """비동기 Redis 클라이언트 래퍼 클래스"""
     
-    def __init__(self, settings):
+    def __init__(self, settings: 'DevConfig | ProdConfig | LocalConfig'):
         self.settings = settings
         self._pool: Optional[ConnectionPool] = None
         self._pubsub_pool: Optional[ConnectionPool] = None  # PubSub 전용 풀
