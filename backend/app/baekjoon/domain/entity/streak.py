@@ -3,7 +3,7 @@
 from dataclasses import dataclass
 from datetime import datetime, date
 
-from app.common.domain.vo.identifiers import BaekjoonAccountId, StreakId
+from app.common.domain.vo.identifiers import BaekjoonAccountId, ProblemHistoryId, StreakId
 
 
 @dataclass
@@ -14,16 +14,19 @@ class Streak:
     streak_date: date
     solved_count: int
     created_at: datetime
+    problem_history_id: ProblemHistoryId | None = None
 
     @staticmethod
     def create(
         bj_account_id: BaekjoonAccountId,
         streak_date: date,
-        solved_count: int
+        solved_count: int,
+        problem_history_id: int|None = None
     ) -> 'Streak':
         return Streak(
             streak_id=None,  # DB에서 할당
             bj_account_id=bj_account_id,
+            problem_history_id=problem_history_id,
             streak_date=streak_date,
             solved_count=solved_count,
             created_at=datetime.now()

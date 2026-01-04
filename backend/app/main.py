@@ -20,7 +20,7 @@ from app.core.exception import (
 # Import routers
 from app.common.presentation.controller.auth_controller import router as auth_router
 from app.user.presentation.controller.user_controller import router as user_router, admin_router as admin_user_router
-from app.baekjoon.presentation.controller.baekjoon_controller import router as baekjoon_router, admin_router as admin_baekjoon_router
+from app.baekjoon.presentation.controller.baekjoon_controller import router as baekjoon_router
 from app.target.presentation.controller.target_controller import (
     router as target_router,
     user_router as target_user_router,
@@ -83,7 +83,6 @@ app.include_router(admin_user_router, prefix=API_V1_PREFIX)
 
 # Baekjoon routers
 app.include_router(baekjoon_router, prefix=API_V1_PREFIX)
-app.include_router(admin_baekjoon_router, prefix=API_V1_PREFIX)
 
 # Target routers
 app.include_router(target_router, prefix=API_V1_PREFIX)

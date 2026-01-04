@@ -2,9 +2,13 @@ import os
 from dependency_injector import containers, providers
 
 from app.baekjoon.application.usecase.link_bj_account_usecase import LinkBjAccountUsecase
+from app.baekjoon.application.usecase.get_baekjoon_me_usecase import GetBaekjoonMeUsecase
+from app.baekjoon.application.usecase.get_streaks_usecase import GetStreaksUsecase
 from app.baekjoon.infra.repository.baekjoon_account_repository_impl import BaekjoonAccountRepositoryImpl
+from app.baekjoon.infra.repository.streak_repository_impl import StreakRepositoryImpl
 from app.config.settings import get_settings
 from app.core.database import Database
+from app.tier.infra.repository.tier_repository_impl import TierRepositoryImpl
 
 # ============================================================================
 # Infrastructure - Clients
@@ -208,6 +212,14 @@ class Container(containers.DeclarativeContainer):
     )
     
     # ========================================================================
+    # Tier (티어 도메인)
+    # ========================================================================
+    tier_repository = providers.Singleton(
+        TierRepositoryImpl,
+        db=database,
+    )
+
+    # ========================================================================
     # BaekjoonAccount (백준 계정 도메인)
     # ========================================================================
 
@@ -216,6 +228,11 @@ class Container(containers.DeclarativeContainer):
     # ========================================================================
     baekjoon_account_repository = providers.Singleton(
         BaekjoonAccountRepositoryImpl,
+        db=database,
+    )
+
+    streak_repository = providers.Singleton(
+        StreakRepositoryImpl,
         db=database,
     )
 
@@ -228,6 +245,20 @@ class Container(containers.DeclarativeContainer):
         baekjoon_account_repository=baekjoon_account_repository,
         solvedac_gateway=solvedac_gateway,
         domain_event_bus=domain_event_bus
+    )
+
+    get_baekjoon_me_usecase = providers.Singleton(
+        GetBaekjoonMeUsecase,
+        baekjoon_account_repository=baekjoon_account_repository,
+        streak_repository=streak_repository,
+        tier_repository=tier_repository,
+        domain_event_bus=domain_event_bus
+    )
+
+    get_streaks_usecase = providers.Singleton(
+        GetStreaksUsecase,
+        streak_repository=streak_repository,
+        baekjoon_account_repository=baekjoon_account_repository
     )
     
     def init_resources(self):

@@ -106,7 +106,6 @@ class LinkBjAccountUsecase:
             # timestamp를 date로 변환
             try:
                 timestamp_str = history_item.timestamp
-                # ISO 8601 format: "2024-01-08T00:00:00Z"
                 streak_date = datetime.fromisoformat(timestamp_str.replace('Z', '+00:00')).date()
                 baekjoon_account.add_streak(
                     streak_date=streak_date,
