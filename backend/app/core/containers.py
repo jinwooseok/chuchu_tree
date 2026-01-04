@@ -23,17 +23,19 @@ from app.common.infra.security.fastapi_cookie_service import FastAPICookieServic
 # Infrastructure - Gateways
 # ============================================================================
 from app.common.infra.gateway.storage_gateway_impl import StorageGatewayImpl
+from app.common.infra.gateway.csrf_token_gateway_impl import CsrfTokenGatewayImpl
 
 # ============================================================================
 # Infrastructure - Events
 # ============================================================================
-from app.common.infra.event.in_memory_event_bus import InMemoryEventBus
-from app.common.domain.service.local_handler import LocalEventHandler
+from app.common.infra.event.in_memory_event_bus import get_event_bus
 
 # ============================================================================
 # Application Services
 # ============================================================================
-from app.common.application.service.auth_service import AuthService
+from app.common.application.service.auth_application_service import AuthApplicationService
+from app.user.application.service.user_account_application_service import UserAccountApplicationService
+from app.user.infra.repository.user_account_repository_impl import UserAccountRepositoryImpl
 
 # ============================================================================
 # Domain Repositories (Interfaces - Implementations to be added)
@@ -130,51 +132,81 @@ class Container(containers.DeclarativeContainer):
     )
 
     # ========================================================================
-    # Infrastructure - OAuth Clients
-    # ========================================================================
-    kakao_oauth_client = providers.Singleton(
-        KakaoOAuthClient,
-    )
-
-    naver_oauth_client = providers.Singleton(
-        NaverOAuthClient,
-    )
-
-    # ========================================================================
     # Infrastructure - Gateways (Singleton)
     # ========================================================================
+    csrf_token_gateway = providers.Singleton(
+        CsrfTokenGatewayImpl,
+        redis_client=redis_client,
+    )
+
     storage_gateway = providers.Singleton(
         StorageGatewayImpl,
         storage_client=storage_client,
     )
 
     # ========================================================================
-    # Infrastructure - Event Bus (Singleton)
+    # Infrastructure - OAuth Clients
     # ========================================================================
-    local_event_handler = providers.Singleton(
-        LocalEventHandler,
+    kakao_oauth_client = providers.Singleton(
+        KakaoOAuthClient,
+        csrf_gateway=csrf_token_gateway,
     )
 
-    event_bus = providers.Singleton(
-        InMemoryEventBus,
-        local_handler=local_event_handler,
+    naver_oauth_client = providers.Singleton(
+        NaverOAuthClient,
+        csrf_gateway=csrf_token_gateway,
+    )
+
+    # ========================================================================
+    # Infrastructure - Event Bus (전역 싱글톤)
+    # ========================================================================
+    domain_event_bus = providers.Singleton(
+        get_event_bus,
     )
 
     # ========================================================================
     # Application Services
     # ========================================================================
-    auth_service = providers.Singleton(
-        AuthService,
+    auth_application_service = providers.Singleton(
+        AuthApplicationService,
         token_service=token_service,
+        cookie_service=cookie_service,
+        domain_event_bus=domain_event_bus,
+        kakao_oauth_client=kakao_oauth_client,
+        naver_oauth_client=naver_oauth_client
     )
 
     # ========================================================================
-    # Domain Repositories (구현체가 생성되면 주석 해제)
+    # UserAccount (유저의 계정 도메인) 
     # ========================================================================
-    # user_account_repository = providers.Factory(
-    #     UserAccountRepositoryImpl,
-    #     db=database,
-    # )
+
+    # ========================================================================
+    # Infrastructure
+    # ========================================================================
+    user_account_repository = providers.Singleton(
+        UserAccountRepositoryImpl,
+        db=database,
+    )
+    
+    # ========================================================================
+    # Application Services
+    # ========================================================================
+    
+    user_account_application_service = providers.Singleton(
+        UserAccountApplicationService,
+        user_account_repository = user_account_repository
+    )
+    
+    def init_resources(self):
+        """앱 시작 시점에 싱글톤 객체들을 미리 생성"""
+        # 1. 인프라 클라이언트 (Redis, Storage 등)
+        self.redis_client()
+        self.storage_client()
+        
+        # 2. 이벤트 핸들러가 등록되어야 하는 서비스들
+        self.auth_application_service()
+        self.user_account_application_service()
+    
     #
     # baekjoon_account_repository = providers.Factory(
     #     BaekjoonAccountRepositoryImpl,
@@ -225,7 +257,3 @@ class Container(containers.DeclarativeContainer):
     #     password_hasher=password_hasher,
     #     event_bus=event_bus,
     # )
-
-
-# 전역 컨테이너 인스턴스
-container = Container()

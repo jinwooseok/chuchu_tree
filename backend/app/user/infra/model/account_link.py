@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class AccountLink(Base):
+class AccountLinkModel(Base):
     __tablename__ = "account_link"
     __table_args__ = (
         UniqueConstraint('user_account_id', 'bj_account_id', name='uk_user_bj_account'),

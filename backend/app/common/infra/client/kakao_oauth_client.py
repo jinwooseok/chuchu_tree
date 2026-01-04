@@ -1,5 +1,8 @@
-from typing import Any
+from urllib.parse import urlencode
+
 from app.common.domain.service.oauth_client import OAuthClient
+from app.common.domain.vo.oauth_token import OAuthToken
+from app.common.domain.vo.oauth_user_info import KakaoUserInfo
 
 
 class KakaoOAuthClient(OAuthClient):
@@ -7,7 +10,22 @@ class KakaoOAuthClient(OAuthClient):
     USER_INFO_URL = "https://kapi.kakao.com/v2/user/me"
     UNLINK_URL = "https://kapi.kakao.com/v1/user/unlink"
     
-    async def get_access_token(self, code: str) -> dict[str, Any]:
+    async def get_social_login_url(self, frontend_redirect_url: str | None) -> str:
+
+        encoded_state = await self.encode_redirect_url_to_state(frontend_redirect_url)
+
+        params = {
+            "client_id": self.settings.KAKAO_CLIENT_ID,
+            "redirect_uri": self.settings.KAKAO_REDIRECT_URI,
+            "response_type": "code",
+            "scope": "profile_nickname",
+            "state": encoded_state,
+        }
+
+        return f"https://kauth.kakao.com/oauth/authorize?{urlencode(params)}"
+    
+    async def get_access_token(self, code: str, state: str = "") -> OAuthToken:
+        """카카오 액세스 토큰 획득"""
         data = {
             "grant_type": "authorization_code",
             "client_id": self.settings.KAKAO_CLIENT_ID,
@@ -17,16 +35,28 @@ class KakaoOAuthClient(OAuthClient):
         }
         response = await self.client.post(self.TOKEN_URL, data=data)
         response.raise_for_status()
-        return response.json()
-    
-    async def get_user_info(self, access_token: str) -> dict[str, Any]:
+        token_data = response.json()
+
+        return OAuthToken(
+            access_token=token_data["access_token"],
+            token_type=token_data.get("token_type", "Bearer"),
+            refresh_token=token_data.get("refresh_token"),
+            expires_in=token_data.get("expires_in"),
+            scope=token_data.get("scope")
+        )
+
+    async def get_user_info(self, access_token: str) -> KakaoUserInfo:
+        """카카오 사용자 정보 조회"""
         headers = {"Authorization": f"Bearer {access_token}"}
         response = await self.client.get(self.USER_INFO_URL, headers=headers)
         response.raise_for_status()
-        return response.json()
-    
-    async def unlink(self, access_token: str) -> dict[str, Any]:
+        user_data = response.json()
+
+        return KakaoUserInfo.from_api_response(user_data)
+
+    async def unlink(self, access_token: str) -> bool:
+        """카카오 연동 해제"""
         headers = {"Authorization": f"Bearer {access_token}"}
         response = await self.client.post(self.UNLINK_URL, headers=headers)
         response.raise_for_status()
-        return response.json()
+        return True

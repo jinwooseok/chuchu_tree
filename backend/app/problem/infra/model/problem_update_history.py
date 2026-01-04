@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class ProblemUpdateHistory(Base):
+class ProblemUpdateHistoryModel(Base):
     __tablename__ = "problem_update_history"
     __table_args__ = {'comment': '문제 변경 정보'}
 

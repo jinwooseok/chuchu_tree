@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class TargetTag(Base):
+class TargetTagModel(Base):
     __tablename__ = "target_tag"
     __table_args__ = (
         UniqueConstraint('target_id', 'tag_id', name='uk_target_code'),

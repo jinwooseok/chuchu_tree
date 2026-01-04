@@ -1,70 +1,70 @@
 # Domain Models
 
 # User Domain
-from app.user.infra.model.user_account import UserAccount
-from app.user.infra.model.account_link import AccountLink
-from app.user.infra.model.user_target import UserTarget
+from app.user.infra.model.user_account import UserAccountModel
+from app.user.infra.model.account_link import AccountLinkModel
+from app.user.infra.model.user_target import UserTargetModel
 
 # Tier Domain
-from app.tier.infra.model.tier import Tier
+from app.tier.infra.model.tier import TierModel
 
 # Baekjoon Domain
-from app.baekjoon.infra.model.bj_account import BjAccount
-from app.baekjoon.infra.model.tier_history import TierHistory
-from app.baekjoon.infra.model.tag_skill_history import TagSkillHistory
+from app.baekjoon.infra.model.bj_account import BjAccountModel
+from app.baekjoon.infra.model.tier_history import TierHistoryModel
+from app.baekjoon.infra.model.tag_skill_history import TagSkillHistoryModel
 
 # Activity Domain
-from app.activity.infra.model.problem_record import ProblemRecord
-from app.activity.infra.model.problem_banned_record import ProblemBannedRecord
-from app.activity.infra.model.will_solve_problem import WillSolveProblem
-from app.activity.infra.model.tag_custom import TagCustom
+from app.activity.infra.model.problem_record import ProblemRecordModel
+from app.activity.infra.model.problem_banned_record import ProblemBannedRecordModel
+from app.activity.infra.model.will_solve_problem import WillSolveProblemModel
+from app.activity.infra.model.tag_custom import TagCustomModel
 
 # Tag Domain
-from app.tag.infra.model.tag import Tag
-from app.tag.infra.model.tag_relation import TagRelation
+from app.tag.infra.model.tag import TagModel
+from app.tag.infra.model.tag_relation import TagRelationModel
 
 # Target Domain
-from app.target.infra.model.target import Target
-from app.target.infra.model.target_tag import TargetTag
+from app.target.infra.model.target import TargetModel
+from app.target.infra.model.target_tag import TargetTagModel
 
 # Problem Domain
-from app.problem.infra.model.problem import Problem
-from app.problem.infra.model.problem_history import ProblemHistory
-from app.problem.infra.model.problem_update_history import ProblemUpdateHistory
-from app.problem.infra.model.problem_tag import ProblemTag
+from app.problem.infra.model.problem import ProblemModel
+from app.baekjoon.infra.model.problem_history import ProblemHistoryModel
+from app.problem.infra.model.problem_update_history import ProblemUpdateHistoryModel
+from app.problem.infra.model.problem_tag import ProblemTagModel
 
 # Recommendation Domain
-from app.recommendation.infra.model.problem_recommendation_level_filter import ProblemRecommendationLevelFilter
-from app.recommendation.infra.model.tag_skill import TagSkill
+from app.recommendation.infra.model.problem_recommendation_level_filter import ProblemRecommendationLevelFilterModel
+from app.recommendation.infra.model.tag_skill import TagSkillModel
 
 __all__ = [
     # User
-    "UserAccount",
-    "AccountLink",
-    "UserTarget",
+    "UserAccountModel",
+    "AccountLinkModel",
+    "UserTargetModel",
     # Tier
-    "Tier",
+    "TierModel",
     # Baekjoon
-    "BjAccount",
-    "TierHistory",
-    "TagSkillHistory",
+    "BjAccountModel",
+    "TierHistoryModel",
+    "TagSkillHistoryModel",
     # Activity
-    "ProblemRecord",
-    "ProblemBannedRecord",
-    "WillSolveProblem",
-    "TagCustom",
+    "ProblemRecordModel",
+    "ProblemBannedRecordModel",
+    "WillSolveProblemModel",
+    "TagCustomModel",
     # Tag
-    "Tag",
-    "TagRelation",
+    "TagModel",
+    "TagRelationModel",
     # Target
-    "Target",
-    "TargetTag",
+    "TargetModel",
+    "TargetTagModel",
     # Problem
-    "Problem",
-    "ProblemHistory",
-    "ProblemUpdateHistory",
-    "ProblemTag",
+    "ProblemModel",
+    "ProblemHistoryModel",
+    "ProblemUpdateHistoryModel",
+    "ProblemTagModel",
     # Recommendation
-    "ProblemRecommendationLevelFilter",
-    "TagSkill",
+    "ProblemRecommendationLevelFilterModel",
+    "TagSkillModel",
 ]

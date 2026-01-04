@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class TierHistory(Base):
+class TierHistoryModel(Base):
     __tablename__ = "tier_history"
     __table_args__ = {'comment': '티어 변경 히스토리'}
 

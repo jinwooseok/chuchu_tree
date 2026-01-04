@@ -14,7 +14,7 @@ class ProviderEnum(str, enum.Enum):
     NONE = "NONE"
 
 
-class UserAccount(Base):
+class UserAccountModel(Base):
     __tablename__ = "user_account"
     __table_args__ = (
         Index('idx_provider_id', 'provider', 'provider_id'),

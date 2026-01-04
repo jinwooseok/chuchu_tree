@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class Problem(Base):
+class ProblemModel(Base):
     __tablename__ = "problem"
     __table_args__ = (
         Index('idx_problem_tier_level', 'problem_tier_level'),

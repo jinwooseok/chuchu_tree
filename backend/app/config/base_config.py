@@ -37,19 +37,6 @@ class BaseConfig(BaseSettings):
     REDIS_HEALTH_CHECK_INTERVAL: int = Field(default=30, description="Redis 헬스체크 간격 (초)")
     REDIS_DATA_PATH: str = Field(default="./redis_data", description="Redis 데이터 경로")
 
-    # ================================
-    # OAuth Providers
-    # ================================
-    KAKAO_CLIENT_ID: str = Field(default="", description="카카오 클라이언트 아이디")
-    KAKAO_CLIENT_SECRET: str = Field(default="", description="카카오 클라이언트 비밀키")
-    KAKAO_REDIRECT_URI: str = Field(default="http://localhost:8000/api/auth/kakao/callback", description="카카오 리다이렉트 URI")
-    
-    NAVER_CLIENT_ID: str = Field(default="", description="네이버 클라이언트 아이디")
-    NAVER_CLIENT_SECRET: str = Field(default="", description="네이버 클라이언트 비밀키")
-    NAVER_REDIRECT_URI: str = Field(default="http://localhost:8000/api/auth/naver/callback", description="네이버 리다이렉트 URI")
-
-    FRONTEND_REDIRECT_URI: str = Field(default="https://adkick.co.kr", description="프론트엔드 리다이렉트 URI")
-
     model_config = SettingsConfigDict(
         env_file=str(BASE_DIR / ".env"),
         env_file_encoding="utf-8",
