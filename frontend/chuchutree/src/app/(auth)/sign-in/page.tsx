@@ -27,7 +27,7 @@ export default function SignIn() {
   return (
     <div className="bg-innerground-white flex h-full w-full flex-col rounded-xl p-4">
       <div className="flex items-center gap-2">
-        <Image src="/logo/test_logo.png" alt="logo" width={16} height={16} className="h-6 w-6" />
+        <Image src="/logo/logo.png" alt="logo" width={16} height={16} className="h-6 w-6" />
         <div>ChuChuTree</div>
       </div>
       <div className="flex flex-1 flex-col items-center justify-center">

@@ -52,23 +52,26 @@ export function AppSidebar() {
   return (
     <Sidebar variant="inset" collapsible="icon">
       {/* 메인 콘텐츠 */}
-      <SidebarContent>
+      <SidebarContent className="relative">
         {/* 그룹1 */}
         <SidebarGroup>
           {/* 그룹1/헤더 */}
-          <header>
+          <header className="">
             {/* 서비스아이콘 */}
-            <div className="mb-8 flex items-center gap-2">
-              <Image
-                src="/logo/test_logo.png"
-                alt="logo"
-                width={ICON_SIZE} // 필수: 실제 로고 크기에 맞게 조정
-                height={ICON_SIZE} // 필수: 실제 로고 크기에 맞게 조정
-              />
-              <h1 className={`text-md font-bold ${sidebarOpenState !== 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>ChuChuTree</h1>
+            <div className="mt-1 mb-8 flex items-center">
+              <div className="absolute top-2 left-3">
+                <Image
+                  src="/logo/logo.svg"
+                  alt="logo"
+                  width={ICON_SIZE} // 필수: 실제 로고 크기에 맞게 조정
+                  height={ICON_SIZE} // 필수: 실제 로고 크기에 맞게 조정
+                  className="h-8 w-6"
+                />
+              </div>
+              <h1 className={`text-md ml-9 font-bold ${sidebarOpenState !== 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>ChuChuTree</h1>
             </div>
             {/* 사이드 바 토글 (header) */}
-            <SidebarGroupAction>
+            <SidebarGroupAction title="메뉴 접기">
               <PanelLeft onClick={setSidebarOpenState} size={ICON_SIZE} className={`cursor-pointer`} /> <span className="sr-only">Toggle Sidebar OpenState</span>
             </SidebarGroupAction>
           </header>
