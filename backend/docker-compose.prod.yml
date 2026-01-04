@@ -85,7 +85,7 @@ services:
     restart: always
     network_mode: host
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      test: ["CMD", "redis-cli", "-p", "${PROD_REDIS_PORT}", "-a", "${REDIS_PASSWORD}", "ping"]
       timeout: 10s
       retries: 5
       start_period: 10s
