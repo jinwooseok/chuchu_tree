@@ -1,6 +1,8 @@
 import os
 from dependency_injector import containers, providers
 
+from app.baekjoon.application.usecase.link_bj_account_usecase import LinkBjAccountUsecase
+from app.baekjoon.infra.repository.baekjoon_account_repository_impl import BaekjoonAccountRepositoryImpl
 from app.config.settings import get_settings
 from app.core.database import Database
 
@@ -24,6 +26,7 @@ from app.common.infra.security.fastapi_cookie_service import FastAPICookieServic
 # ============================================================================
 from app.common.infra.gateway.storage_gateway_impl import StorageGatewayImpl
 from app.common.infra.gateway.csrf_token_gateway_impl import CsrfTokenGatewayImpl
+from app.baekjoon.infra.gateway.solvedac_gateway_impl import SolvedacGatewayImpl
 
 # ============================================================================
 # Infrastructure - Events
@@ -144,6 +147,12 @@ class Container(containers.DeclarativeContainer):
         storage_client=storage_client,
     )
 
+    solvedac_gateway = providers.Singleton(
+        SolvedacGatewayImpl,
+        request_delay=0.3,
+        concurrent_requests=5,  # 동시에 5개 페이지씩 요청
+    )
+
     # ========================================================================
     # Infrastructure - OAuth Clients
     # ========================================================================
@@ -194,7 +203,31 @@ class Container(containers.DeclarativeContainer):
     
     user_account_application_service = providers.Singleton(
         UserAccountApplicationService,
-        user_account_repository = user_account_repository
+        user_account_repository=user_account_repository,
+        domain_event_bus=domain_event_bus
+    )
+    
+    # ========================================================================
+    # BaekjoonAccount (백준 계정 도메인)
+    # ========================================================================
+
+    # ========================================================================
+    # Infrastructure
+    # ========================================================================
+    baekjoon_account_repository = providers.Singleton(
+        BaekjoonAccountRepositoryImpl,
+        db=database,
+    )
+
+    # ========================================================================
+    # Application Services
+    # ========================================================================
+
+    link_bj_account_usecase = providers.Singleton(
+        LinkBjAccountUsecase,
+        baekjoon_account_repository=baekjoon_account_repository,
+        solvedac_gateway=solvedac_gateway,
+        domain_event_bus=domain_event_bus
     )
     
     def init_resources(self):
@@ -202,10 +235,12 @@ class Container(containers.DeclarativeContainer):
         # 1. 인프라 클라이언트 (Redis, Storage 등)
         self.redis_client()
         self.storage_client()
-        
+
         # 2. 이벤트 핸들러가 등록되어야 하는 서비스들
         self.auth_application_service()
         self.user_account_application_service()
+        self.link_bj_account_usecase()
+    
     
     #
     # baekjoon_account_repository = providers.Factory(

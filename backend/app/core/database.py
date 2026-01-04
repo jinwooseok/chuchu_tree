@@ -134,10 +134,13 @@ def transactional(func: Callable[..., Awaitable]) -> Callable[..., Awaitable]:
             # 로컬/프로덕션 환경: 기존 세션 확인 후 새 세션 생성
             try:
                 current_session = database_instance.get_current_session()
-                return await func(*args, **kwargs)
             except (LookupError, APIException):
+                # 세션이 없으면 새 세션 생성
                 async with database_instance.session() as session:
                     return await func(*args, **kwargs)
+            else:
+                # 세션이 있으면 그냥 함수 실행
+                return await func(*args, **kwargs)
 
     return _wrapper
 

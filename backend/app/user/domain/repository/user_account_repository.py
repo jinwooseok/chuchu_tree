@@ -30,3 +30,8 @@ class UserAccountRepository(ABC):
     async def exists_by_id(self, user_id: UserAccountId) -> bool:
         """유저 존재 여부 확인"""
         pass
+
+    @abstractmethod
+    async def update(self, user_account: UserAccount) -> UserAccount:
+        """유저 업데이트"""
+        pass

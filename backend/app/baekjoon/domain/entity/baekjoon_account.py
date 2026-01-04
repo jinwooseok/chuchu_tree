@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from datetime import datetime, date
 
 from app.baekjoon.domain.entity.problem_history import ProblemHistory
+from app.baekjoon.domain.entity.streak import Streak
 from app.baekjoon.domain.entity.tag_skill_history import TagSkillHistory
 from app.baekjoon.domain.entity.tier_history import TierHistory
 from app.common.domain.vo.primitives import Rating
@@ -22,6 +23,7 @@ class BaekjoonAccount:
     tier_histories: list[TierHistory] = field(default_factory=list)
     tag_skill_histories: list[TagSkillHistory] = field(default_factory=list)
     problem_histories: list[ProblemHistory] = field(default_factory=list)
+    streaks: list[Streak] = field(default_factory=list)
     
     @staticmethod
     def create(
@@ -40,7 +42,8 @@ class BaekjoonAccount:
             deleted_at=None,
             tier_histories=[],
             tag_skill_histories=[],
-            problem_histories=[]
+            problem_histories=[],
+            streaks=[]
         )
     
     def update_tier(self, new_tier_id: TierId) -> None:
@@ -74,10 +77,16 @@ class BaekjoonAccount:
         self.rating = Rating(new_rating)
         self.updated_at = datetime.now()
     
-    def record_problem_solved(self, problem_id: ProblemId, solved_at: datetime) -> None:
-        """도메인 로직 - 문제 해결 기록"""
+    def record_problem_solved(self, problem_id: ProblemId) -> None:
+        """도메인 로직 - 문제 해결 기록 (시간 정보 없음)"""
         self.problem_histories.append(
-            ProblemHistory.create(self.bj_account_id, problem_id, solved_at)
+            ProblemHistory.create(self.bj_account_id, problem_id)
+        )
+
+    def add_streak(self, streak_date: date, solved_count: int) -> None:
+        """도메인 로직 - 스트릭 추가"""
+        self.streaks.append(
+            Streak.create(self.bj_account_id, streak_date, solved_count)
         )
     
     def update_tag_skill(

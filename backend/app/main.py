@@ -1,5 +1,7 @@
 from datetime import datetime
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from fastapi.concurrency import asynccontextmanager
 
@@ -7,6 +9,14 @@ from app.core.api_response import ApiResponse
 from app.core.containers import Container
 from app.core.loggers import setup_logging
 from app.core import database
+import app.core.database_models
+from app.core.exception import (
+    APIException,
+    custom_exception_handler,
+    http_exception_handler,
+    validation_exception_handler
+)
+
 # Import routers
 from app.common.presentation.controller.auth_controller import router as auth_router
 from app.user.presentation.controller.user_controller import router as user_router, admin_router as admin_user_router
@@ -55,6 +65,11 @@ app = AppWithContainer(
     default_response_class=ApiResponse,
     lifespan=lifespan
 )
+
+# Register exception handlers
+app.add_exception_handler(APIException, custom_exception_handler)
+app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
 
 # Register routers with /api/v1 prefix
 API_V1_PREFIX = "/api/v1"

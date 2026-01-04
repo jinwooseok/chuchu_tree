@@ -1,14 +1,17 @@
 from typing import override
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
-from app.common.domain.enums import Provider
 from app.common.domain.vo.identifiers import UserAccountId
+from app.common.domain.enums import Provider
 from app.core.database import Database
 from app.user.domain.entity.user_account import UserAccount
 from app.user.domain.repository.user_account_repository import UserAccountRepository
 from app.user.infra.mapper.user_account_mapper import UserAccountMapper
+from app.user.infra.mapper.account_link_mapper import AccountLinkMapper
 from app.user.infra.model.user_account import UserAccountModel
+from app.user.infra.model.account_link import AccountLinkModel
 
 class UserAccountRepositoryImpl(UserAccountRepository):
     """유저 계정 Repository"""
@@ -35,11 +38,17 @@ class UserAccountRepositoryImpl(UserAccountRepository):
     
     @override
     async def find_by_id(self, user_id: UserAccountId) -> UserAccount | None:
-        """ID로 유저 조회"""
-        stmt = select(UserAccountModel).where(
-            and_(
-                UserAccountModel.user_account_id == user_id.value,
-                UserAccountModel.deleted_at.is_(None)  # 삭제되지 않은 회원만
+        stmt = (
+            select(UserAccountModel)
+            .options(
+                selectinload(UserAccountModel.account_links),
+                selectinload(UserAccountModel.targets)
+            )
+            .where(
+                and_(
+                    UserAccountModel.user_account_id == user_id.value,
+                    UserAccountModel.deleted_at.is_(None)
+                )
             )
         )
         result = await self.session.execute(stmt)
@@ -77,5 +86,32 @@ class UserAccountRepositoryImpl(UserAccountRepository):
         )
         result = await self.session.execute(stmt)
         exists = result.scalar_one_or_none() is not None
-        
+
         return exists
+
+    @override
+    async def update(self, user_account: UserAccount) -> UserAccount:
+        """유저 업데이트"""
+        # 기존 유저 모델 조회
+        stmt = select(UserAccountModel).where(
+            UserAccountModel.user_account_id == user_account.user_account_id.value
+        )
+        result = await self.session.execute(stmt)
+        existing_model = result.scalar_one()
+
+        # 기본 정보 업데이트
+        existing_model.provider = user_account.provider
+        existing_model.provider_id = user_account.provider_id
+        existing_model.profile_image = user_account.profile_image
+        existing_model.registered_at = user_account.registered_at
+        existing_model.updated_at = user_account.updated_at
+        existing_model.deleted_at = user_account.deleted_at
+
+        # AccountLink 저장
+        for link in user_account.account_links:
+            link_model = AccountLinkMapper.to_model(link)
+            self.session.add(link_model)
+
+        await self.session.flush()
+
+        return UserAccountMapper.to_entity(existing_model)

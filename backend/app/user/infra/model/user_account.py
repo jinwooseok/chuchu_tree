@@ -1,11 +1,14 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 from sqlalchemy import String, DateTime, Enum as SQLEnum, Index
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 import enum
 
 from app.core.database import Base
 
+if TYPE_CHECKING:
+    from app.user.infra.model.account_link import AccountLinkModel
+    from app.user.infra.model.user_target import UserTargetModel
 
 class ProviderEnum(str, enum.Enum):
     KAKAO = "KAKAO"
@@ -29,3 +32,15 @@ class UserAccountModel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    
+    account_links: Mapped[list["AccountLinkModel"]] = relationship(
+        "AccountLinkModel", 
+        back_populates="user_account",
+        cascade="all, delete-orphan" 
+    )
+    
+    targets: Mapped[list["UserTargetModel"]] = relationship(
+        "UserTargetModel", 
+        back_populates="user_account",
+        cascade="all, delete-orphan"
+    )

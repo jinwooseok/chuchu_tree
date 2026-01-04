@@ -2,7 +2,12 @@
 
 import logging
 
+from app.common.domain.service.event_publisher import DomainEventBus
+from app.common.domain.vo.identifiers import BaekjoonAccountId, UserAccountId
 from app.common.infra.event.decorators import event_register_handlers, event_handler
+from app.core.error_codes import ErrorCode
+from app.core.exception import APIException
+from app.user.application.command.link_bj_account_command import LinkBjAccountCommand
 from app.user.application.command.user_account_command import CreateUserAccountCommand
 from app.user.application.query.user_account_query import CreateUserAccountQuery
 from app.user.domain.entity.user_account import UserAccount
@@ -18,8 +23,13 @@ class UserAccountApplicationService:
     User 도메인 Application Service
     """
 
-    def __init__(self, user_account_repository: UserAccountRepository):
+    def __init__(
+        self,
+        user_account_repository: UserAccountRepository,
+        domain_event_bus: DomainEventBus
+    ):
         self.user_account_repository = user_account_repository
+        self.domain_event_bus = domain_event_bus
 
     @event_handler("SOCIAL_LOGIN_SUCCESSED")
     async def create_or_find_user_account(
@@ -58,3 +68,33 @@ class UserAccountApplicationService:
             user_account_id=saved_user.user_account_id.value,
             new_user_yn=True
         )
+    
+    @event_handler("LINK_BAEKJOON_ACCOUNT_REQUESTED")
+    async def link_baekjoon_account(
+        self,
+        command: LinkBjAccountCommand
+    ) -> bool:
+        """
+        백준 계정 연동
+
+        Args:
+            user_account_id: 유저 계정 ID
+            bj_account_id: 백준 유저 ID (닉네임)
+
+        Returns:
+            bool: 연동 성공 여부
+        """
+
+        # 1. 유저 계정 조회
+        user_account = await self.user_account_repository.find_by_id(UserAccountId(command.user_account_id))
+        if not user_account:
+            raise APIException(ErrorCode.INVALID_REQUEST)
+
+        # 3. UserAccount 엔티티에 연동 정보 기록
+        bj_account_id = BaekjoonAccountId(command.bj_account_id)
+        user_account.link_baekjoon_account(bj_account_id)
+
+        # 4. 저장
+        await self.user_account_repository.update(user_account)
+
+        return True

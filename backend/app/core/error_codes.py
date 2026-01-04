@@ -136,3 +136,15 @@ class ErrorCode(Enum):
         message="CSRF 토큰 검증에 실패했습니다.",
         status_code=403
     )
+
+    EXTERNAL_API_ERROR = ErrorCodeInfo(
+        code="EXTERNAL_API_ERROR",
+        message="외부 API 호출 중 오류가 발생했습니다.",
+        status_code=502
+    )
+
+    BAEKJOON_USER_NOT_FOUND = ErrorCodeInfo(
+        code="BAEKJOON_USER_NOT_FOUND",
+        message="백준 유저를 찾을 수 없습니다.",
+        status_code=404
+    )
