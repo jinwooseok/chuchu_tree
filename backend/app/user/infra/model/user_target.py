@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class UserTarget(Base):
+class UserTargetModel(Base):
     __tablename__ = "user_target"
     __table_args__ = (
         UniqueConstraint('user_account_id', 'target_id', 'deleted_at', name='uk_user_target'),

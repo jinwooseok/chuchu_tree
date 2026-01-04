@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class ProblemBannedRecord(Base):
+class ProblemBannedRecordModel(Base):
     __tablename__ = "problem_banned_record"
     __table_args__ = {'comment': '유저의 문제 제외 기록'}
 

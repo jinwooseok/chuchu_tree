@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class ProblemRecommendationLevelFilter(Base):
+class ProblemRecommendationLevelFilterModel(Base):
     __tablename__ = "problem_recommendation_level_filter"
     __table_args__ = (
         UniqueConstraint('filter_code', name='uk_filter_code'),

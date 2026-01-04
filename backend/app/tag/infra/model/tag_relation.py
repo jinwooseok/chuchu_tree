@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class TagRelation(Base):
+class TagRelationModel(Base):
     __tablename__ = "tag_relation"
     __table_args__ = (
         UniqueConstraint('leading_tag_id', 'sub_tag_id', name='uk_tag_relation'),

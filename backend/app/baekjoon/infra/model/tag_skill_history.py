@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class TagSkillHistory(Base):
+class TagSkillHistoryModel(Base):
     __tablename__ = "tag_skill_history"
     __table_args__ = {'comment': '태그 숙련도 변경 히스토리'}
 

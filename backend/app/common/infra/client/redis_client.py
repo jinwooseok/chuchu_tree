@@ -24,7 +24,7 @@ class AsyncRedisClient:
         self._client: Optional[aioredis.Redis] = None
         self._pubsub_client: Optional[aioredis.Redis] = None  # PubSub 전용 클라이언트
         self.redis_url = f"redis://:{self.settings.REDIS_PASSWORD}@{self.settings.REDIS_HOST}:{self.settings.REDIS_BINDING_PORT}"
-        
+        print(self.redis_url)
     async def _initialize_client(self):
         """Redis 클라이언트 초기화"""
         try:
@@ -168,8 +168,7 @@ class AsyncRedisClient:
             return bool(result) if result is not None else False
 
         except RedisError as e:
-            logger.error(f"Redis SET 오류 - key: {key}, error: {e}")
-            return False
+            raise e
 
     async def get(self, key: str) -> Optional[Any]:
         """
@@ -197,7 +196,7 @@ class AsyncRedisClient:
 
         except RedisError as e:
             logger.error(f"Redis GET 오류 - key: {key}, error: {e}")
-            return None
+            raise e
 
     async def delete(self, *keys: str) -> int:
         """키 삭제 (비동기)"""
@@ -207,7 +206,7 @@ class AsyncRedisClient:
             return int(result) if result is not None else 0
         except RedisError as e:
             logger.error(f"Redis DELETE 오류 - keys: {keys}, error: {e}")
-            return 0
+            raise e
 
     async def exists(self, key: str) -> bool:
         """키 존재 여부 확인 (비동기)"""
@@ -227,7 +226,7 @@ class AsyncRedisClient:
             return bool(result) if result is not None else False
         except RedisError as e:
             logger.error(f"Redis EXPIRE 오류 - key: {key}, error: {e}")
-            return False
+            raise e
 
     async def ttl(self, key: str) -> int:
         """키의 남은 TTL 조회 (초) (비동기)"""

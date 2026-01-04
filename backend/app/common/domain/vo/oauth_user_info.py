@@ -5,16 +5,16 @@ from app.common.domain.enums import Provider
 class OAuthUserInfo:
     """OAuth 사용자 정보 Value Object (공통)"""
 
-    provider: Provider
-    provider_user_id: str
+    provider_id: str
     nickname: str | None
     profile_image_url: str | None
+    provider: Provider
 
 @dataclass(frozen=True)
 class NaverUserInfo(OAuthUserInfo):
     """네이버 사용자 정보 Value Object"""
 
-    provider: Provider
+    provider: Provider = Provider.NAVER
 
     @classmethod
     def from_api_response(cls, response: dict) -> "NaverUserInfo":
@@ -35,7 +35,7 @@ class NaverUserInfo(OAuthUserInfo):
         user_data = response.get("response", {})
 
         return cls(
-            provider_user_id=user_data.get("id", ""),
+            provider_id=user_data.get("id", ""),
             nickname=user_data.get("nickname"),
             profile_image_url=user_data.get("profile_image")
         )
@@ -44,7 +44,7 @@ class NaverUserInfo(OAuthUserInfo):
 class KakaoUserInfo(OAuthUserInfo):
     """카카오 사용자 정보 Value Object"""
 
-    provider: Provider
+    provider: Provider = Provider.KAKAO
 
     @classmethod
     def from_api_response(cls, response: dict) -> "KakaoUserInfo":
@@ -66,7 +66,7 @@ class KakaoUserInfo(OAuthUserInfo):
         profile = kakao_account.get("profile", {})
 
         return cls(
-            provider_user_id=str(response.get("id", "")),
+            provider_id=str(response.get("id", "")),
             nickname=profile.get("nickname"),
             profile_image_url=profile.get("profile_image_url")
         )

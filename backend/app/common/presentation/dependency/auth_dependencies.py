@@ -10,12 +10,12 @@ from app.core.containers import Container
 @inject
 def get_current_member(access_token: Optional[str] = Cookie(None),
                      auth_application_service: AuthApplicationService= Depends(Provide[Container.auth_application_service])) -> CurrentUser:
-    return auth_application_service.authenticate_member(access_token)
+    return auth_application_service.authenticate_user(access_token)
 
 @inject
 def get_current_member_or_none(access_token: Optional[str] = Cookie(None),
                      auth_application_service: AuthApplicationService= Depends(Provide[Container.auth_application_service])) -> CurrentUser | None:
     try:
-        return auth_application_service.authenticate_member(access_token)
+        return auth_application_service.authenticate_user(access_token)
     except:
         return None

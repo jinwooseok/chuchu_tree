@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class ProblemHistory(Base):
+class ProblemHistoryModel(Base):
     __tablename__ = "problem_history"
     __table_args__ = (
         Index('idx_solved_at', 'solved_at'),

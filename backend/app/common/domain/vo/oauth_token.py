@@ -6,10 +6,10 @@ class OAuthToken:
     """OAuth 액세스 토큰 Value Object"""
 
     access_token: str
-    token_type: str = "Bearer"
     refresh_token: str | None
     expires_in: int | None
-    scope: str | None
+    scope: str | None = None
+    token_type: str = "Bearer"
 
     @property
     def is_expired(self) -> bool:

@@ -8,7 +8,7 @@ class UserAccountRepository(ABC):
     """Repository 인터페이스"""
     
     @abstractmethod
-    async def save(self, user_account: UserAccount) -> UserAccount:
+    async def insert(self, user_account: UserAccount) -> UserAccount:
         """유저 저장"""
         pass
     

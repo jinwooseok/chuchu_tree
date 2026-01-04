@@ -5,7 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class ProblemTag(Base):
+class ProblemTagModel(Base):
     __tablename__ = "problem_tag"
     __table_args__ = (
         UniqueConstraint('problem_id', 'tag_id', name='uk_problem_tag'),

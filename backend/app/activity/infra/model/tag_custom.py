@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class TagCustom(Base):
+class TagCustomModel(Base):
     __tablename__ = "tag_custom"
     __table_args__ = (
         UniqueConstraint('user_account_id', 'tag_id', 'deleted_at', name='uk_user_tag'),
