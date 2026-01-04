@@ -72,6 +72,12 @@ export const metadata: Metadata = {
   icons: {
     icon: '/icon.svg',
   },
+  verification: {
+    google: 'uX2sSiFJCH4Ou0YrgWMwlhPga-av58R9NcPBEh78NZ8',
+    other: {
+      'naver-site-verification': 'e5832af048f20a958b40ba905763297546a02a90',
+    },
+  },
 };
 
 export default function RootLayout({
