@@ -74,7 +74,9 @@ export default function TagCard({ tag }: TagCardProps) {
         {/* 게이지 */}
         <div className="flex flex-1 items-center justify-center rounded border-2 border-dashed p-2">
           {excluded_yn ? (
-            <div className="">master rank but excluded</div>
+            <div className="text-excluded-text flex flex-col">
+              <p>제외된 유형입니다.</p>
+            </div>
           ) : !isLocked ? (
             <div className="bg-innerground-darkgray relative h-4 w-full rounded-sm">
               {/* 현재 레벨 라벨 */}

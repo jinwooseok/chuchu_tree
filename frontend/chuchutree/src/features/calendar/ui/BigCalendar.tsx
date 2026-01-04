@@ -10,6 +10,7 @@ import { transformToCalendarEvents, getDisplayTags } from '../lib/utils';
 import { CalendarEvent } from '@/shared/types/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { useCalendarStore } from '@/lib/store/calendar';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const locales = {
   ko: ko,
@@ -34,25 +35,18 @@ function CustomToolbar({ date, onNavigate }: ToolbarProps) {
 
       {/* 우측: 네비게이션 버튼 */}
       <div className="flex gap-2">
-        <button onClick={() => onNavigate('TODAY')} className="rounded bg-gray-200 px-3 py-1 text-xs hover:bg-gray-300">
+        <button onClick={() => onNavigate('TODAY')} className="hover:bg-background rounded border px-3 py-1 text-xs" title="오늘로 이동">
           오늘
         </button>
-        <button onClick={() => onNavigate('PREV')} className="rounded bg-gray-200 px-3 py-1 text-xs hover:bg-gray-300">
-          이전
+        <button onClick={() => onNavigate('PREV')} className="hover:bg-background rounded px-3 py-1 text-xs" title="지난달로 이동">
+          <ChevronUp className="h-4 w-4" />
         </button>
-        <button onClick={() => onNavigate('NEXT')} className="rounded bg-gray-200 px-3 py-1 text-xs hover:bg-gray-300">
-          다음
+        <button onClick={() => onNavigate('NEXT')} className="hover:bg-background rounded px-3 py-1 text-xs" title="다음 달로 이동">
+          <ChevronDown className="h-4 w-4" />
         </button>
       </div>
     </div>
   );
-}
-
-// 커스텀 MonthEvent 컴포넌트 (각 날짜 셀 내부에 표시되는 이벤트)
-function CustomMonthEvent({ event }: EventProps<CalendarEvent>) {
-  // 이 컴포넌트는 개별 이벤트를 렌더링하지 않음 (빈 div 반환)
-  // 대신 MonthDateHeader에서 모든 이벤트를 그룹핑해서 표시
-  return null;
 }
 
 // 커스텀 MonthDateHeader 컴포넌트 (각 날짜 셀의 날짜 숫자 부분)
@@ -127,6 +121,12 @@ export default function BigCalendar() {
         .rbc-event-label,
         .rbc-event-content {
           display: none !important;
+        }
+
+        /* 날짜 칸 클릭 시 애니메이션 */
+        .rbc-day-bg:active {
+          background-color: rgba(0, 0, 0, 0.05);
+          transition: background-color 0.1s ease;
         }
       `}</style>
       <Calendar

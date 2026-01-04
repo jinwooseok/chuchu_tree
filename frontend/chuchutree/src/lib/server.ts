@@ -4,10 +4,7 @@ import { ApiResponse } from '@/shared/types/api';
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
 // 서버 컴포넌트용 공통 fetch 함수
-export async function serverFetch<T>(
-  endpoint: string,
-  options?: RequestInit
-): Promise<T> {
+export async function serverFetch<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const cookieStore = await cookies();
 
   // access_token과 refresh_token 모두 가져오기
@@ -15,14 +12,9 @@ export async function serverFetch<T>(
   const refreshToken = cookieStore.get('refresh_token')?.value;
 
   // 쿠키 문자열 올바르게 구성 (세미콜론으로 구분)
-  const cookieString = [
-    accessToken && `access_token=${accessToken}`,
-    refreshToken && `refresh_token=${refreshToken}`,
-  ]
-    .filter(Boolean)
-    .join('; ');
+  const cookieString = [accessToken && `access_token=${accessToken}`, refreshToken && `refresh_token=${refreshToken}`].filter(Boolean).join('; ');
 
-  const response = await fetch(`${API_URL}${endpoint}`, {
+  const response = await fetch(`${API_URL}/api/v1/${endpoint}`, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -35,9 +27,7 @@ export async function serverFetch<T>(
   // 에러 처리 개선
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(
-      `API Error: ${response.status} - ${errorData.message || response.statusText}`
-    );
+    throw new Error(`API Error: ${response.status} - ${errorData.message || response.statusText}`);
   }
 
   // 응답 구조 처리

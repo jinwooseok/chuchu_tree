@@ -25,26 +25,26 @@ export const metadata: Metadata = {
   title: 'ChuChuTree | 알고리즘 캘린더',
   description: 'ChuChuTree Algorithm Calendar',
   keywords: ['ChuChuTree', 'Algorithm', '츄츄트리', '츄츄', '알고리즘 기록', '백준', 'solved.ac', '알고리즘 추천'],
-  metadataBase: new URL('https://www.#'),
+  metadataBase: new URL('https://chuchu-tree.duckdns.org'),
   alternates: {
     canonical: '/',
   },
   openGraph: {
     type: 'website',
     locale: 'ko_KR',
-    url: 'https://www.#',
+    url: 'https://chuchu-tree.duckdns.org',
     title: 'ChuChuTree',
     description: 'ChuChuTree Algorithm Calendar',
     siteName: 'ChuChuTree',
     images: [
       {
-        url: '/opengraph/test_opengraph_630.png',
+        url: '/opengraph/opengraph_630.png',
         width: 1200,
         height: 630,
         alt: 'ChuChuTree Algorithm Calendar open-graph 630',
       },
       {
-        url: '/opengraph/test_opengraph_1200.png',
+        url: '/opengraph/opengraph_1200.png',
         width: 1200,
         height: 1200,
         alt: 'ChuChuTree Algorithm Calendar open-graph 1200',
@@ -55,7 +55,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'ChuChuTree',
     description: 'ChuChuTree Algorithm Calendar',
-    images: ['/opengraph/test_opengraph_630.png'],
+    images: ['/opengraph/opengraph_630.png'],
   },
   robots: {
     index: true, // 검색결과에 포함
@@ -70,7 +70,7 @@ export const metadata: Metadata = {
     },
   },
   icons: {
-    icon: '/icon.png',
+    icon: '/icon.svg',
   },
 };
 
@@ -80,7 +80,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body className={`${paperlogy.variable} antialiased`}>
         <Providers>{children}</Providers>
       </body>
