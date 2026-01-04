@@ -7,7 +7,7 @@ type SocialWay = (typeof SocialWays)[number];
 
 const SocialLoginButton = (props: SocialWay) => {
   const handleLogin = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/login/${props.en}`;
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/login/${props.en}`;
   };
   const isDisabled = props.en === 'google' || props.en === 'github' ? true : false;
   return (

@@ -80,7 +80,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="ko">
       <body className={`${paperlogy.variable} antialiased`}>
         <Providers>{children}</Providers>
       </body>

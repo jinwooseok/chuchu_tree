@@ -8,7 +8,7 @@ if (!API_URL) {
 
 // 기본 Axios 인스턴스
 export const axiosInstance = axios.create({
-  baseURL: API_URL,
+  baseURL: `${API_URL}/api/v1`,
   timeout: 10000,
   withCredentials: true, // credentials: 'include' 역할
   headers: {
@@ -41,7 +41,7 @@ axiosInstance.interceptors.response.use(
 
       try {
         // Refresh 토큰으로 새 Access 토큰 발급
-        await axios.post(`${API_URL}/api/refresh`, {}, { withCredentials: true });
+        await axios.post(`${API_URL}/api/v1/refresh`, {}, { withCredentials: true });
 
         // 원래 요청 재시도
         return axiosInstance(originalRequest);
