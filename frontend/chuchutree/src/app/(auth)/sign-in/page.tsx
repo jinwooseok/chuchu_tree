@@ -1,13 +1,24 @@
+'use client';
+
 import { SocialWays } from '@/shared/constants/auth';
 import Image from 'next/image';
 
 type SocialWay = (typeof SocialWays)[number];
 
 const SocialLoginButton = (props: SocialWay) => {
+  const handleLogin = () => {
+    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/login/${props.en}`;
+  };
+  const isDisabled = props.en === 'google' || props.en === 'github' ? true : false;
   return (
-    <button className="hover:bg-background/50 border-innerground-darkgray relative flex w-80 cursor-pointer items-center justify-between rounded border px-2 py-2 text-sm">
+    <button
+      onClick={handleLogin}
+      className="hover:bg-background/50 border-innerground-darkgray relative flex w-80 cursor-pointer items-center justify-between rounded border px-2 py-2 text-sm"
+      disabled={isDisabled}
+    >
       <Image src={`/socialicon/${props.en}_light.svg`} alt={`social icon ${props.en}_light`} width={16} height={16} className="absolute left-2 h-6 w-6" />
       <div className="flex-1 text-center">{props.kr}로 시작하기</div>
+      {isDisabled && <div>⚠️(연동안됨)</div>}
     </button>
   );
 };

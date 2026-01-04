@@ -36,7 +36,7 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     // 401 에러이고, 재시도하지 않은 요청인 경우
-    if (error.response?.status === 401 && !originalRequest._retry) {
+    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/login')) {
       originalRequest._retry = true;
 
       try {
