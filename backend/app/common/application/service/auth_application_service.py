@@ -142,30 +142,20 @@ class AuthApplicationService:
         self.cookie_service.set_cookie(response, 
                                        "access_token", 
                                        access_token, 
-                                       max_age=6 * 60 * 60,
-                                       secure=True,
-                                       samesite="none")
+                                       max_age=6 * 60 * 60)
         
         self.cookie_service.set_cookie(response, 
                                        "refresh_token", 
                                        refresh_token, 
-                                       max_age=7 * 24 * 60 * 60,
-                                       secure=True,
-                                       samesite="none")
+                                       max_age=7 * 24 * 60 * 60)
     
     def _set_access_token_cookie(self, response: Response, access_token: str):
         self.cookie_service.set_cookie(response, 
                                      "access_token", 
                                      access_token, 
-                                     max_age=6 * 60 * 60,
-                                     secure=True,
-                                     samesite="none")
+                                     max_age=6 * 60 * 60)
     
     def _clear_auth_cookies(self, response: Response):
         # 설정할 때와 동일한 속성으로 삭제
-        self.cookie_service.delete_cookie(response, "access_token", 
-                                        secure=True, 
-                                        samesite="none")
-        self.cookie_service.delete_cookie(response, "refresh_token", 
-                                        secure=True, 
-                                        samesite="none")
+        self.cookie_service.delete_cookie(response, "access_token")
+        self.cookie_service.delete_cookie(response, "refresh_token")

@@ -9,8 +9,8 @@ def create_middlewares(app: FastAPI):
         allow_origins=[
             "http://localhost:5173",
             "https://localhost:5173",
-            "http://localhost:8080",  # 백엔드 자체
-            "https://localhost:8080",  # 백엔드 HTTPS
+            "http://localhost:8000",  # 백엔드 자체
+            "https://localhost:8000",  # 백엔드 HTTPS
             "https://chuchu-tree.duckdns.org",
         ],
         allow_credentials=True,
