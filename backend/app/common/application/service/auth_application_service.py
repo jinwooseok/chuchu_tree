@@ -106,10 +106,29 @@ class AuthApplicationService:
         user_account:FindUserAccountResultPayload = await self.domain_event_bus.publish(event)
                 
         # JWT 토큰 생성 및 쿠키 설정
-        print(user_account)
         self._create_and_set_tokens(command.response, user_account.user_account_id)
         
         return frontend_redirect_url
+    
+    @transactional
+    async def logout(self, response: Response):
+        self._clear_auth_cookies(response)
+        
+    @transactional
+    async def refresh_access_token(self, response: Response, refresh_token: Optional[str]):
+        if refresh_token is None:
+            raise APIException(ErrorCode.INVALID_TOKEN)
+        
+        payload = self.token_service.decode_token(refresh_token)
+        
+        new_access_token = self.token_service.create_token(
+            payload={
+                "user_account_id": payload["user_account_id"],
+            },
+            expires_delta=timedelta(hours=6)
+        )
+        
+        self._set_access_token_cookie(response, new_access_token)
 
     def _get_oauth_client(self, provider: Provider) -> OAuthClient:
         """Provider에 맞는 OAuth 클라이언트 반환"""
