@@ -60,29 +60,26 @@ services:
       "--innodb_lock_wait_timeout=120",
       "--max_allowed_packet=1G",
       "--tmp_table_size=256M",
-      "--max_heap_table_size=256M"
+      "--max_heap_table_size=256M",
+      "--port=${PROD_MYSQL_PORT}"
     ]
-    ports:
-      - "${PROD_MYSQL_PORT}:3306"
     volumes:
-      - /chuchu-db-data:/var/lib/mysql
+      - ./mysql-data:/var/lib/mysql
     network_mode: host
     restart: always
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-P", "${PROD_MYSQL_PORT}", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       timeout: 10s
       retries: 5
       start_period: 30s
       interval: 30s
   
-  redis:
+  chuchu-redis:
     container_name: chuchu-redis-prod
     image: redis:latest
-    ports:
-      - "${PROD_REDIS_PORT}:6379"
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
-    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    command: redis-server --port ${PROD_REDIS_PORT} --requirepass ${REDIS_PASSWORD} --appendonly yes
     volumes:
       - ${REDIS_DATA_PATH}:/data
     restart: always
