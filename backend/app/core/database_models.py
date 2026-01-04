@@ -29,7 +29,7 @@ from app.target.infra.model.target_tag import TargetTagModel
 
 # Problem Domain
 from app.problem.infra.model.problem import ProblemModel
-from app.problem.infra.model.problem_history import ProblemHistoryModel
+from app.baekjoon.infra.model.problem_history import ProblemHistoryModel
 from app.problem.infra.model.problem_update_history import ProblemUpdateHistoryModel
 from app.problem.infra.model.problem_tag import ProblemTagModel
 
