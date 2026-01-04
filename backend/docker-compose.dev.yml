@@ -68,6 +68,8 @@ services:
     ]
     ports:
       - "${DEV_MYSQL_PORT}:3306"
+    volumes:
+      - /chuchu-db-dev-data:/var/lib/mysql
     network_mode: host
     restart: always
     healthcheck:
