@@ -20,13 +20,22 @@ class FastAPICookieService(CookieService):
         )
         elif self.environment == "dev":
             response.set_cookie(
-            key=name,
-            value=value,
-            max_age=max_age,
-            httponly=kwargs.get('httponly', True),
-            secure=kwargs.get('secure', False),
-            samesite=kwargs.get('samesite', 'none')
-        )    
+                key=name,
+                value=value,
+                max_age=max_age,
+                httponly=kwargs.get('httponly', True),
+                secure=kwargs.get('secure', False),
+                samesite=kwargs.get('samesite', 'lax')
+            )
+        else:
+            response.set_cookie(
+                key=name,
+                value=value,
+                max_age=max_age,
+                httponly=kwargs.get('httponly', True),
+                secure=kwargs.get('secure', False),
+                samesite=kwargs.get('samesite', 'lax')
+            )
     
     def delete_cookie(self, response:Response, name: str, **kwargs):
         # 쿠키 삭제 시 설정할 때와 동일한 속성 사용
