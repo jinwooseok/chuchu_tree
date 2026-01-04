@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, Query
 from dependency_injector.wiring import inject, Provide
 
+from app.baekjoon.application.command.link_bj_account_command import LinkBjAccountCommand
+from app.baekjoon.application.usecase.link_bj_account_usecase import LinkBjAccountUsecase
 from app.common.domain.vo.current_user import CurrentUser
 from app.common.presentation.dependency.auth_dependencies import get_current_member
 from app.baekjoon.presentation.schema.request.baekjoon_request import (
@@ -23,7 +25,7 @@ router = APIRouter(prefix="/bj-accounts", tags=["bj-accounts"])
 async def link_baekjoon_account(
     request: LinkBaekjoonAccountRequest,
     current_user: CurrentUser = Depends(get_current_member),
-    # baekjoon_service = Depends(Provide[Container.baekjoon_service])
+    link_bj_account_usecase: LinkBjAccountUsecase = Depends(Provide[Container.link_bj_account_usecase])
 ):
     """
     백준 계정 연동
@@ -34,11 +36,11 @@ async def link_baekjoon_account(
     Returns:
         빈 데이터
     """
-    # TODO: Implement baekjoon account link logic
-    # 1. Validate baekjoon account exists
-    # 2. Link to user account
-    # 3. Fetch initial data from solved.ac API
-
+    
+    await link_bj_account_usecase.execute(LinkBjAccountCommand(
+        user_account_id=current_user.user_account_id, 
+        bj_account_id=request.bj_account))
+    
     return ApiResponse(data={})
 
 

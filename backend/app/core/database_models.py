@@ -12,6 +12,7 @@ from app.tier.infra.model.tier import TierModel
 from app.baekjoon.infra.model.bj_account import BjAccountModel
 from app.baekjoon.infra.model.tier_history import TierHistoryModel
 from app.baekjoon.infra.model.tag_skill_history import TagSkillHistoryModel
+from app.baekjoon.infra.model.streak import StreakModel
 
 # Activity Domain
 from app.activity.infra.model.problem_record import ProblemRecordModel
@@ -48,6 +49,7 @@ __all__ = [
     "BjAccountModel",
     "TierHistoryModel",
     "TagSkillHistoryModel",
+    "StreakModel",
     # Activity
     "ProblemRecordModel",
     "ProblemBannedRecordModel",

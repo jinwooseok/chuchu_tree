@@ -1,5 +1,6 @@
 from app.common.domain.vo.identifiers import UserAccountId
 from app.user.domain.entity.user_account import UserAccount
+from app.user.infra.mapper.account_link_mapper import AccountLinkMapper
 from app.user.infra.model.user_account import UserAccountModel
 
 
@@ -41,6 +42,10 @@ class UserAccountMapper:
             created_at=model.created_at,
             updated_at=model.updated_at,
             deleted_at=model.deleted_at,
-            account_links=[], 
-            targets=[]
+            account_links=[
+                AccountLinkMapper.to_entity(link) for link in getattr(model, "account_links", [])
+            ],
+            targets=[
+                # UserTargetMapper.to_entity(target) for target in getattr(model, "targets", [])
+            ]
         )
