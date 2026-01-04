@@ -21,7 +21,10 @@ services:
           memory: 1G
         reservations:
           memory: 512M
-
+    depends_on:
+      chuchu-mysql:
+        condition: service_healthy
+        
   # FastAPI 서버용 서비스
   chuchu-fastapi:
     environment:
@@ -35,6 +38,11 @@ services:
     network_mode: host
     volumes:
       - ./logs:/project/logs
+    depends_on:
+      chuchu-fastapi-migrate:
+        condition: service_completed_successfully
+      chuchu-redis:
+        condition: service_started
   
   chuchu-mysql:
     container_name: chuchu-mysql-prod

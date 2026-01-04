@@ -17,6 +17,9 @@ services:
       "
     network_mode: host
     restart: "no"
+    depends_on:
+      chuchu-mysql:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -39,6 +42,11 @@ services:
     network_mode: host
     volumes:
       - ./logs:/project/logs
+    depends_on:
+      chuchu-fastapi-migrate:
+        condition: service_completed_successfully
+      chuchu-redis:
+        condition: service_started
   
   chuchu-mysql:
     container_name: chuchu-mysql-dev
