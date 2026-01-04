@@ -1,6 +1,7 @@
 'use client';
 
 import { SocialWays } from '@/shared/constants/auth';
+import { ThemeButton } from '@/shared/ui';
 import Image from 'next/image';
 
 type SocialWay = (typeof SocialWays)[number];
@@ -26,9 +27,14 @@ const SocialLoginButton = (props: SocialWay) => {
 export default function SignIn() {
   return (
     <div className="bg-innerground-white flex h-full w-full flex-col rounded-xl p-4">
-      <div className="flex items-center gap-2">
-        <Image src="/logo/logo.png" alt="logo" width={16} height={16} className="h-6 w-6" />
-        <div>ChuChuTree</div>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Image src="/logo/logo.svg" alt="logo" width={16} height={16} className="h-6 w-6" />
+          <div>ChuChuTree</div>
+        </div>
+        <div className="min-w-22">
+          <ThemeButton />
+        </div>
       </div>
       <div className="flex flex-1 flex-col items-center justify-center">
         <div className="flex flex-col gap-2">
