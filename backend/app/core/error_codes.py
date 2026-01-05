@@ -148,3 +148,9 @@ class ErrorCode(Enum):
         message="백준 유저를 찾을 수 없습니다.",
         status_code=404
     )
+    
+    UNLINKED_USER = ErrorCodeInfo(
+        code="UNLINKED_USER",
+        message="백준 계정과 연동되지 않았습니다.",
+        status_code=404
+    )

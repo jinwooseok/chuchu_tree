@@ -23,8 +23,7 @@ from app.user.presentation.controller.user_controller import router as user_rout
 from app.baekjoon.presentation.controller.baekjoon_controller import router as baekjoon_router
 from app.target.presentation.controller.target_controller import (
     router as target_router,
-    user_router as target_user_router,
-    baekjoon_router as target_baekjoon_router
+    user_router as target_user_router
 )
 from app.activity.presentation.controller.activity_controller import router as activity_router
 from app.problem.presentation.controller.problem_controller import router as problem_router
@@ -87,7 +86,6 @@ app.include_router(baekjoon_router, prefix=API_V1_PREFIX)
 # Target routers
 app.include_router(target_router, prefix=API_V1_PREFIX)
 app.include_router(target_user_router, prefix=API_V1_PREFIX)
-app.include_router(target_baekjoon_router, prefix=API_V1_PREFIX)
 
 # Activity router
 app.include_router(activity_router, prefix=API_V1_PREFIX)
