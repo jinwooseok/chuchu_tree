@@ -3,6 +3,7 @@ from dependency_injector import containers, providers
 
 from app.baekjoon.application.usecase.link_bj_account_usecase import LinkBjAccountUsecase
 from app.baekjoon.application.usecase.get_baekjoon_me_usecase import GetBaekjoonMeUsecase
+# from app.baekjoon.application.usecase.get_monthly_problems_usecase import GetMonthlyProblemsUsecase
 from app.baekjoon.application.usecase.get_streaks_usecase import GetStreaksUsecase
 from app.baekjoon.infra.repository.baekjoon_account_repository_impl import BaekjoonAccountRepositoryImpl
 from app.baekjoon.infra.repository.streak_repository_impl import StreakRepositoryImpl
@@ -40,22 +41,21 @@ from app.common.infra.event.in_memory_event_bus import get_event_bus
 # ============================================================================
 # Application Services
 # ============================================================================
+# from app.activity.application.service.activity_application_service import ActivityApplicationService
 from app.common.application.service.auth_application_service import AuthApplicationService
+# from app.problem.application.service.problem_application_service import ProblemApplicationService
 from app.user.application.service.user_account_application_service import UserAccountApplicationService
 from app.user.infra.repository.user_account_repository_impl import UserAccountRepositoryImpl
 
 # ============================================================================
-# Domain Repositories (Interfaces - Implementations to be added)
+# Domain Repositories
 # ============================================================================
-# from app.user.infra.repository.user_account_repository_impl import UserAccountRepositoryImpl
-# from app.baekjoon.infra.repository.baekjoon_account_repository_impl import BaekjoonAccountRepositoryImpl
-# from app.problem.infra.repository.problem_repository_impl import ProblemRepositoryImpl
-# from app.tag.infra.repository.tag_repository_impl import TagRepositoryImpl
-# from app.target.infra.repository.target_repository_impl import TargetRepositoryImpl
-# from app.tier.infra.repository.tier_repository_impl import TierRepositoryImpl
 # from app.activity.infra.repository.user_activity_repository_impl import UserActivityRepositoryImpl
-# from app.recommendation.infra.repository.level_filter_repository_impl import LevelFilterRepositoryImpl
-# from app.recommendation.infra.repository.tag_skill_repository_impl import TagSkillRepositoryImpl
+# from app.problem.infra.repository.problem_repository_impl import ProblemRepositoryImpl
+from app.recommendation.infra.repository.tag_skill_repository_impl import TagSkillRepositoryImpl
+from app.tag.infra.repository.tag_repository_impl import TagRepositoryImpl
+from app.target.infra.repository.target_repository_impl import TargetRepositoryImpl
+from app.user.application.usecase.get_user_tags_usecase import GetUserTagsUsecase
 
 
 class Container(containers.DeclarativeContainer):
@@ -260,7 +260,80 @@ class Container(containers.DeclarativeContainer):
         streak_repository=streak_repository,
         baekjoon_account_repository=baekjoon_account_repository
     )
-    
+
+    # ========================================================================
+    # Activity domain
+    # ========================================================================
+    # user_activity_repository = providers.Singleton(
+    #     UserActivityRepositoryImpl,
+    #     db=database
+    # )
+
+    # activity_application_service = providers.Singleton(
+    #     ActivityApplicationService,
+    #     user_activity_repository=user_activity_repository
+    # )
+
+    # ========================================================================
+    # Problem domain
+    # ========================================================================
+    # problem_repository = providers.Singleton(
+    #     ProblemRepositoryImpl,
+    #     db=database
+    # )
+
+    # ========================================================================
+    # Tag domain
+    # ========================================================================
+    tag_repository = providers.Singleton(
+        TagRepositoryImpl,
+        db=database
+    )
+
+    # ========================================================================
+    # Recommendation domain
+    # ========================================================================
+    tag_skill_repository = providers.Singleton(
+        TagSkillRepositoryImpl,
+        db=database
+    )
+
+    # ========================================================================
+    # Target domain
+    # ========================================================================
+    target_repository = providers.Singleton(
+        TargetRepositoryImpl,
+        db=database
+    )
+
+    # problem_application_service = providers.Singleton(
+    #     ProblemApplicationService,
+    #     problem_repository=problem_repository,
+    #     tag_repository=tag_repository,
+    #     target_repository=target_repository,
+    #     tier_repository=tier_repository
+    # )
+
+    # ========================================================================
+    # Monthly Problems Usecase
+    # ========================================================================
+    # get_monthly_problems_usecase = providers.Singleton(
+    #     GetMonthlyProblemsUsecase,
+    #     baekjoon_account_repository=baekjoon_account_repository,
+    #     domain_event_bus=domain_event_bus
+    # )
+
+    # ========================================================================
+    # User Tags Usecase
+    # ========================================================================
+    get_user_tags_usecase = providers.Singleton(
+        GetUserTagsUsecase,
+        baekjoon_account_repository=baekjoon_account_repository,
+        tag_repository=tag_repository,
+        tag_skill_repository=tag_skill_repository,
+        tier_repository=tier_repository
+    )
+
     def init_resources(self):
         """앱 시작 시점에 싱글톤 객체들을 미리 생성"""
         # 1. 인프라 클라이언트 (Redis, Storage 등)
@@ -271,6 +344,8 @@ class Container(containers.DeclarativeContainer):
         self.auth_application_service()
         self.user_account_application_service()
         self.link_bj_account_usecase()
+        # self.activity_application_service()
+        # self.problem_application_service()
     
     
     #
