@@ -8,6 +8,7 @@ from app.baekjoon.application.query.baekjoon_account_info_query import (
     BaekjoonMeQuery
 )
 from app.baekjoon.presentation.schema.response.get_streaks_response import StreakItemResponse
+from app.user.application.query.user_tags_query import TargetQuery
 
 class BjAccountStatResponse(BaseModel):
     """백준 계정 통계 정보 응답"""
@@ -58,11 +59,32 @@ class BjAccountResponse(BaseModel):
             registered_at=query.registered_at.isoformat()
         )
 
+class TargetResponse(BaseModel):
+    """목표 정보 쿼리 (/me용)"""
+    target_id: int = Field(1, description="목표 ID")
+    target_code: str = Field("DAILY", description="목표 코드")
+    target_display_name: str = Field("DAILY", description="목표 표기")
+
+    model_config = ConfigDict(
+        alias_generator=to_camel,
+        populate_by_name=True
+    )
+
+    @classmethod
+    def from_query(cls, query: TargetQuery) -> "TargetResponse":
+        """Query 객체로부터 Response 생성"""
+        return cls(
+            target_id=query.target_id,
+            target_code=query.target_code,
+            target_display_name=query.target_display_name
+        )
+
 
 class UserAccountResponse(BaseModel):
     """유저 계정 정보 응답"""
     user_account_id: int = Field(..., description="유저 계정 ID")
     profile_image_url: str | None = Field(None, description="프로필 이미지 URL")
+    target: TargetResponse | None = Field(None, description="목표 정보")
     registered_at: str = Field(..., description="가입일")
 
     model_config = ConfigDict(
@@ -76,6 +98,7 @@ class UserAccountResponse(BaseModel):
         return cls(
             user_account_id=query.user_account_id,
             profile_image_url=query.profile_image_url,
+            target=TargetResponse.from_query(query.targets[0]) if query.targets else TargetResponse(),
             registered_at=query.registered_at.isoformat()
         )
 
