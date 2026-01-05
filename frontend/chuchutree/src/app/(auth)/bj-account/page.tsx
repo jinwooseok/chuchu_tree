@@ -3,10 +3,13 @@
 import { ThemeButton } from '@/shared/ui';
 import Image from 'next/image';
 import { useState } from 'react';
+import { useLinkBjAccount } from '@/entities/bj-account';
+import { useRouter } from 'next/navigation';
 
 export default function BjAccountRegistration() {
   const [bjHandle, setBjHandle] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const linkBjAccountMutation = useLinkBjAccount();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,12 +19,19 @@ export default function BjAccountRegistration() {
       return;
     }
 
-    setIsLoading(true);
-
-    // TODO: API 연동 (나중에 구현)
-    console.log('백준 아이디:', bjHandle);
-
-    setIsLoading(false);
+    linkBjAccountMutation.mutate(
+      { bjAccount: bjHandle.trim() },
+      {
+        onSuccess: () => {
+          alert('백준 계정이 성공적으로 등록되었습니다!');
+          router.push('/');
+        },
+        onError: (error: any) => {
+          const errorMessage = error?.response?.data?.message || '계정 등록에 실패했습니다. 다시 시도해주세요.';
+          alert(errorMessage);
+        },
+      },
+    );
   };
 
   return (
@@ -45,7 +55,7 @@ export default function BjAccountRegistration() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="bjHandle" className="mb-2 block text-sm font-medium">
-              백준 아이디 (Handle)
+              백준 아이디
             </label>
             <input
               id="bjHandle"
@@ -54,17 +64,17 @@ export default function BjAccountRegistration() {
               onChange={(e) => setBjHandle(e.target.value)}
               placeholder="백준 아이디를 입력하세요"
               className="focus:ring-primary w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:outline-none"
-              disabled={isLoading}
+              disabled={linkBjAccountMutation.isPending}
             />
             <p className="text-muted-foreground mt-2 text-xs">예: baekjoon (solved.ac 프로필의 Handle과 동일)</p>
           </div>
 
           <button
             type="submit"
-            disabled={isLoading}
+            disabled={linkBjAccountMutation.isPending}
             className="bg-primary hover:bg-primary/90 w-full rounded-lg px-4 py-2 text-white transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
           >
-            {isLoading ? '등록 중...' : '계정 등록'}
+            {linkBjAccountMutation.isPending ? '등록 중...' : '계정 등록'}
           </button>
         </form>
 
