@@ -4,10 +4,12 @@ from dependency_injector.wiring import inject, Provide
 
 from app.baekjoon.application.command.link_bj_account_command import LinkBjAccountCommand
 from app.baekjoon.application.command.get_baekjoon_me_command import GetBaekjoonMeCommand
+from app.baekjoon.application.command.get_monthly_problems_command import GetMonthlyProblemsCommand
 from app.baekjoon.application.command.get_streaks_command import GetStreaksCommand
 from app.baekjoon.application.query.baekjoon_account_info_query import BaekjoonMeQuery
 from app.baekjoon.application.usecase.link_bj_account_usecase import LinkBjAccountUsecase
 from app.baekjoon.application.usecase.get_baekjoon_me_usecase import GetBaekjoonMeUsecase
+from app.baekjoon.application.usecase.get_monthly_problems_usecase import GetMonthlyProblemsUsecase
 from app.baekjoon.application.usecase.get_streaks_usecase import GetStreaksUsecase
 from app.common.domain.vo.current_user import CurrentUser
 from app.common.presentation.dependency.auth_dependencies import get_current_member
@@ -16,6 +18,9 @@ from app.baekjoon.presentation.schema.request.baekjoon_request import (
 )
 from app.baekjoon.presentation.schema.response.get_baekjoon_me_response import (
     GetBaekjoonMeResponse
+)
+from app.baekjoon.presentation.schema.response.get_monthly_problems_response import (
+    GetMonthlyProblemsResponse
 )
 from app.baekjoon.presentation.schema.response.get_streaks_response import (
     GetStreaksResponse
@@ -131,32 +136,36 @@ async def get_baekjoon_streak(
     return ApiResponse(data=response_data)
 
 
-# @router.get("/me/problems", response_model=ApiResponseSchema[MonthlyProblemsResponse])
-# @inject
-# async def get_monthly_problems(
-#     month: int = Query(..., ge=1, le=12, description="월 (1-12)"),
-#     current_user: CurrentUser = Depends(get_current_member),
-#     # baekjoon_service = Depends(Provide[Container.baekjoon_service])
-# ):
-#     """
-#     월간 문제 상세 정보 조회 (SOLVED LIST, WILL SOLVED LIST)
+@router.get("/me/problems", response_model=ApiResponseSchema[GetMonthlyProblemsResponse])
+@inject
+async def get_monthly_problems(
+    year: int = Query(..., ge=2020, description="월 (1-12)"),
+    month: int = Query(..., ge=1, le=12, description="월 (1-12)"),
+    current_user: CurrentUser = Depends(get_current_member),
+    get_monthly_problems_usecase: GetMonthlyProblemsUsecase = Depends(Provide[Container.get_monthly_problems_usecase])
+):
+    """
+    월간 문제 상세 정보 조회 (SOLVED LIST, WILL SOLVED LIST)
 
-#     Args:
-#         month: 월 (1-12)
+    Args:
+        month: 월 (1-12)
 
-#     Returns:
-#         월간 문제 데이터
-#     """
-#     # TODO: Implement get monthly problems logic
-#     # 1. Get solved problems for the month
-#     # 2. Get will solve problems for the month
+    Returns:
+        월간 문제 데이터
+    """
+    # 월간 문제 조회
+    result = await get_monthly_problems_usecase.execute(
+        GetMonthlyProblemsCommand(
+            user_account_id=current_user.user_account_id,
+            year=year,
+            month=month
+        )
+    )
 
-#     response_data = MonthlyProblemsResponse(
-#         totalProblemCount=0,
-#         monthlyData=[]
-#     )
+    # Response 객체로 변환
+    response_data = GetMonthlyProblemsResponse.from_query(result)
 
-#     return ApiResponse(data=response_data.model_dump(by_alias=True))
+    return ApiResponse(data=response_data)
 
 
 # @router.post("/me/problem-update", response_model=ApiResponseSchema[dict])
