@@ -23,10 +23,10 @@ interface Stat {
 }
 
 interface Streaks {
-  problemHistoryId: 1;
-  solvedCount: 2;
+  problemHistoryId: number | null;
+  solvedCount: number;
   solvedLevel: number;
-  solvedDate: '2025-02-07';
+  streakDate: string;
 }
 
 interface BjAccount {
