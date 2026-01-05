@@ -8,7 +8,13 @@ type SocialWay = (typeof SocialWays)[number];
 
 const SocialLoginButton = (props: SocialWay) => {
   const handleLogin = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/api/v1/auth/login/${props.en}`;
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || '';
+    const loginPath = `/api/v1/auth/login/${props.en}`;
+
+    // 개발 환경에서는 localhost로 redirect되도록 설정
+    const redirectUrl = process.env.NODE_ENV === 'development' ? '?redirectUrl=http://localhost:3000' : '';
+
+    window.location.href = `${baseUrl}${loginPath}${redirectUrl}`;
   };
   const isDisabled = props.en === 'google' || props.en === 'github' ? true : false;
   return (

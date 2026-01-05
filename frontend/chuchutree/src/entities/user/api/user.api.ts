@@ -4,12 +4,7 @@ import { axiosInstance } from '@/lib/axios';
 
 export const userApi = {
   getMe: async (): Promise<User> => {
-    const { data } = await axiosInstance.get<ApiResponse<User>>('/api/user');
-    return data.data;
-  },
-
-  getUserById: async (id: string): Promise<User> => {
-    const { data } = await axiosInstance.get<ApiResponse<User>>(`/api/user/${id}`);
+    const { data } = await axiosInstance.get<ApiResponse<User>>('bj-accounts/me');
     return data.data;
   },
 };
