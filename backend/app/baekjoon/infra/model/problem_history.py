@@ -1,9 +1,12 @@
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 from sqlalchemy import String, DateTime, Integer, ForeignKey, Index
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+
+if TYPE_CHECKING:
+    from app.baekjoon.infra.model.streak import StreakModel
 
 
 class ProblemHistoryModel(Base):
@@ -18,3 +21,5 @@ class ProblemHistoryModel(Base):
     problem_id: Mapped[int] = mapped_column(Integer, ForeignKey('problem.problem_id'), nullable=False)
     streak_id: Mapped[Optional[int]] = mapped_column(Integer, ForeignKey('streak.streak_id'), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    
+    streak: Mapped["StreakModel"] = relationship("StreakModel", back_populates="problem_history")

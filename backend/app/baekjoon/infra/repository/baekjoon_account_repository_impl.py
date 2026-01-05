@@ -1,5 +1,6 @@
 """BaekjoonAccount Repository 구현"""
 
+from datetime import datetime
 from typing import override
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,10 +11,9 @@ from app.baekjoon.infra.mapper.baekjoon_account_mapper import BaekjoonAccountMap
 from app.baekjoon.infra.mapper.problem_history_mapper import ProblemHistoryMapper
 from app.baekjoon.infra.mapper.streak_mapper import StreakMapper
 from app.baekjoon.infra.model.bj_account import BjAccountModel
-from app.baekjoon.infra.model.problem_history import ProblemHistoryModel
-from app.baekjoon.infra.model.streak import StreakModel
 from app.common.domain.vo.identifiers import BaekjoonAccountId, UserAccountId
 from app.core.database import Database
+from app.user.infra.model.account_link import AccountLinkModel
 
 
 class BaekjoonAccountRepositoryImpl(BaekjoonAccountRepository):
@@ -64,6 +64,55 @@ class BaekjoonAccountRepositoryImpl(BaekjoonAccountRepository):
     @override
     async def find_by_user_id(self, user_id: UserAccountId) -> BaekjoonAccount | None:
         """유저 계정 ID로 백준 계정 조회 (AccountLink를 통해)"""
-        # TODO: AccountLink 테이블을 조인하여 조회하는 로직 구현
-        # 현재는 간단히 None 반환
-        return None
+        # AccountLink를 조인하여 백준 계정 조회
+        stmt = (
+            select(BjAccountModel)
+            .join(
+                AccountLinkModel,
+                BjAccountModel.bj_account_id == AccountLinkModel.bj_account_id
+            )
+            .where(
+                and_(
+                    AccountLinkModel.user_account_id == user_id.value,
+                    AccountLinkModel.deleted_at.is_(None),
+                    BjAccountModel.deleted_at.is_(None)
+                )
+            )
+        )
+
+        result = await self.session.execute(stmt)
+        model = result.scalar_one_or_none()
+
+        return BaekjoonAccountMapper.to_entity(model) if model else None
+
+    @override
+    async def find_by_user_id_with_link_date(
+        self, user_id: UserAccountId
+    ) -> tuple[BaekjoonAccount, datetime] | None:
+        """유저 계정 ID로 백준 계정과 연동 일자를 함께 조회"""
+        # AccountLink와 BjAccount를 조인하여 함께 조회
+        stmt = (
+            select(BjAccountModel, AccountLinkModel.created_at)
+            .join(
+                AccountLinkModel,
+                BjAccountModel.bj_account_id == AccountLinkModel.bj_account_id
+            )
+            .where(
+                and_(
+                    AccountLinkModel.user_account_id == user_id.value,
+                    AccountLinkModel.deleted_at.is_(None),
+                    BjAccountModel.deleted_at.is_(None)
+                )
+            )
+        )
+
+        result = await self.session.execute(stmt)
+        row = result.one_or_none()
+
+        if not row:
+            return None
+
+        bj_account_model, linked_at = row
+        bj_account = BaekjoonAccountMapper.to_entity(bj_account_model)
+
+        return (bj_account, linked_at)

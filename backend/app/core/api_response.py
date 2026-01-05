@@ -32,9 +32,9 @@ class ApiResponse(JSONResponse):
         if error_code and error_message:
             message = "failed"
             error = ErrorDetail(code=error_code, message=error_message)
-            data = {}
+            data = None
         else:
-            error = {}
+            error = None
             
         content = ApiResponseSchema(
             status=status_code,

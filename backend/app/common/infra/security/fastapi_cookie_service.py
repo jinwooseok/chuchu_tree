@@ -38,16 +38,5 @@ class FastAPICookieService(CookieService):
             )
     
     def delete_cookie(self, response:Response, name: str, **kwargs):
-        # 쿠키 삭제 시 설정할 때와 동일한 속성 사용
-        # 쿠키를 완전히 삭제하기 위해 만료된 값으로 덮어씀
-        response.set_cookie(
-            key=name,
-            value="",  # 빈 값
-            max_age=0,  # 즉시 만료
-            expires=0,  # 즉시 만료
-            httponly=kwargs.get('httponly', True),
-            secure=kwargs.get('secure', False),
-            samesite=kwargs.get('samesite', 'none'),
-            domain=kwargs.get('domain', None),
-            path=kwargs.get('path', "/")
-        )
+        response.delete_cookie(name)
+        response.delete_cookie(name)

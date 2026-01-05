@@ -55,21 +55,29 @@ class UserAccountRepositoryImpl(UserAccountRepository):
         model = result.scalar_one_or_none()
         
         return UserAccountMapper.to_entity(model) if model else None
-    
+
     @override
     async def find_by_provider(
         self, 
         provider: Provider, 
         provider_id: str
-    ) -> UserAccount|None:
-        """Provider 정보로 유저 조회"""
-        stmt = select(UserAccountModel).where(
-            and_(
-                UserAccountModel.provider == provider,
-                UserAccountModel.provider_id == provider_id,
-                UserAccountModel.deleted_at.is_(None)  # 삭제되지 않은 회원만
+    ) -> UserAccount | None:
+        """Provider 정보로 유저 조회 (연관된 account_links 포함)"""
+        stmt = (
+            select(UserAccountModel)
+            .options(
+                # Mapper에서 model.account_links에 접근하므로 미리 로드함
+                selectinload(UserAccountModel.account_links)
+            )
+            .where(
+                and_(
+                    UserAccountModel.provider == provider,
+                    UserAccountModel.provider_id == provider_id,
+                    UserAccountModel.deleted_at.is_(None)
+                )
             )
         )
+        
         result = await self.session.execute(stmt)
         model = result.scalar_one_or_none()
         

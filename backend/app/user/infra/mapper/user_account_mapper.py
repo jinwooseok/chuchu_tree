@@ -43,7 +43,7 @@ class UserAccountMapper:
             updated_at=model.updated_at,
             deleted_at=model.deleted_at,
             account_links=[
-                AccountLinkMapper.to_entity(link) for link in getattr(model, "account_links", [])
+                AccountLinkMapper.to_entity(link) for link in model.account_links
             ],
             targets=[
                 # UserTargetMapper.to_entity(target) for target in getattr(model, "targets", [])

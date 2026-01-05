@@ -9,7 +9,9 @@ from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
 from app.user.application.command.link_bj_account_command import LinkBjAccountCommand
 from app.user.application.command.user_account_command import CreateUserAccountCommand
+from app.user.application.command.get_user_account_info_command import GetUserAccountInfoCommand
 from app.user.application.query.user_account_query import CreateUserAccountQuery
+from app.user.application.query.user_account_info_query import GetUserAccountInfoQuery
 from app.user.domain.entity.user_account import UserAccount
 from app.user.domain.repository.user_account_repository import UserAccountRepository
 from app.common.domain.enums import Provider
@@ -98,3 +100,32 @@ class UserAccountApplicationService:
         await self.user_account_repository.update(user_account)
 
         return True
+
+    @event_handler("GET_USER_ACCOUNT_INFO_REQUESTED")
+    async def get_user_account_info(
+        self,
+        command: GetUserAccountInfoCommand
+    ) -> GetUserAccountInfoQuery:
+        """
+        유저 계정 정보 조회
+
+        Args:
+            command: 유저 계정 정보 조회 명령
+
+        Returns:
+            GetUserAccountInfoQuery: 유저 계정 정보
+        """
+        # 유저 계정 조회
+        user_account = await self.user_account_repository.find_by_id(
+            UserAccountId(command.user_account_id)
+        )
+
+        if not user_account:
+            raise APIException(ErrorCode.INVALID_REQUEST)
+
+        return GetUserAccountInfoQuery(
+            user_account_id=user_account.user_account_id.value,
+            provider=user_account.provider.value,
+            profile_image=user_account.profile_image,
+            registered_at=user_account.registered_at
+        )

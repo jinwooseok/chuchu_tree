@@ -1,18 +1,24 @@
+from datetime import date as date_type
 from fastapi import APIRouter, Depends, Query
 from dependency_injector.wiring import inject, Provide
 
 from app.baekjoon.application.command.link_bj_account_command import LinkBjAccountCommand
+from app.baekjoon.application.command.get_baekjoon_me_command import GetBaekjoonMeCommand
+from app.baekjoon.application.command.get_streaks_command import GetStreaksCommand
+from app.baekjoon.application.query.baekjoon_account_info_query import BaekjoonMeQuery
 from app.baekjoon.application.usecase.link_bj_account_usecase import LinkBjAccountUsecase
+from app.baekjoon.application.usecase.get_baekjoon_me_usecase import GetBaekjoonMeUsecase
+from app.baekjoon.application.usecase.get_streaks_usecase import GetStreaksUsecase
 from app.common.domain.vo.current_user import CurrentUser
 from app.common.presentation.dependency.auth_dependencies import get_current_member
 from app.baekjoon.presentation.schema.request.baekjoon_request import (
     LinkBaekjoonAccountRequest
 )
-from app.baekjoon.presentation.schema.response.baekjoon_response import (
-    BaekjoonMeResponse,
-    StreakResponse,
-    MonthlyProblemsResponse,
-    AdminBaekjoonAccountsResponse
+from app.baekjoon.presentation.schema.response.get_baekjoon_me_response import (
+    GetBaekjoonMeResponse
+)
+from app.baekjoon.presentation.schema.response.get_streaks_response import (
+    GetStreaksResponse
 )
 from app.core.containers import Container
 from app.core.api_response import ApiResponse, ApiResponseSchema
@@ -68,55 +74,36 @@ async def update_baekjoon_account_link(
     return ApiResponse(data={})
 
 
-@router.get("/me", response_model=ApiResponseSchema[BaekjoonMeResponse])
+@router.get("/me", response_model=ApiResponseSchema[GetBaekjoonMeResponse])
 @inject
 async def get_baekjoon_me(
     current_user: CurrentUser = Depends(get_current_member),
-    # baekjoon_service = Depends(Provide[Container.baekjoon_service])
+    get_baekjoon_me_usecase: GetBaekjoonMeUsecase = Depends(Provide[Container.get_baekjoon_me_usecase])
 ):
     """
-    유저(본인) 기본정보 조회 (정보 + 스트릭)
+    유저(본인) 기본정보 조회 (유저 정보 + 백준 정보)
 
     Returns:
-        유저 정보, 백준 정보, 스트릭
+        유저 정보, 백준 정보
     """
-    # TODO: Implement get baekjoon me logic
-    # 1. Get user account info
-    # 2. Get baekjoon account info
-    # 3. Get streak data
-
-    response_data = BaekjoonMeResponse(
-        userAccount={
-            "userAccountId": 1,
-            "profileImageUrl": None,
-            "registeredAt": "2025-02-07 00:00:00 TZ"
-        },
-        bjAccount={
-            "bjAccountId": 1,
-            "stat": {
-                "tierId": 1,
-                "tierName": "B5",
-                "longestStreak": 55,
-                "rating": 1800,
-                "class": 7,
-                "tierStartDate": "2055-02-07"
-            },
-            "streaks": [],
-            "registeredAt": "2025-02-07 00:00:00 TZ"
-        },
-        linkedAt="2025-02-07 00:00:00 TZ"
+    # 백준 내 정보 조회
+    result: BaekjoonMeQuery = await get_baekjoon_me_usecase.execute(
+        GetBaekjoonMeCommand(user_account_id=current_user.user_account_id)
     )
 
-    return ApiResponse(data=response_data.model_dump(by_alias=True))
+    # Response 객체로 변환
+    response_data = GetBaekjoonMeResponse.from_query(result)
+
+    return ApiResponse(data=response_data)
 
 
-@router.get("/me/streak", response_model=ApiResponseSchema[StreakResponse])
+@router.get("/me/streak", response_model=ApiResponseSchema[GetStreaksResponse])
 @inject
 async def get_baekjoon_streak(
-    start_date: str = Query(..., alias="startDate", description="시작 날짜 (YYYY-MM-DD)"),
-    end_date: str = Query(..., alias="endDate", description="끝 날짜 (YYYY-MM-DD)"),
+    start_date: date_type = Query(..., alias="startDate", description="시작 날짜 (YYYY-MM-DD)"),
+    end_date: date_type = Query(..., alias="endDate", description="끝 날짜 (YYYY-MM-DD)"),
     current_user: CurrentUser = Depends(get_current_member),
-    # baekjoon_service = Depends(Provide[Container.baekjoon_service])
+    get_streaks_usecase: GetStreaksUsecase = Depends(Provide[Container.get_streaks_usecase])
 ):
     """
     백준 스트릭 조회 (기간)
@@ -128,86 +115,93 @@ async def get_baekjoon_streak(
     Returns:
         스트릭 데이터
     """
-    # TODO: Implement get streak logic
-    # 1. Validate date range
-    # 2. Get streak data for the period
 
-    response_data = StreakResponse(streaks=[])
-
-    return ApiResponse(data=response_data.model_dump(by_alias=True))
-
-
-@router.get("/me/problems", response_model=ApiResponseSchema[MonthlyProblemsResponse])
-@inject
-async def get_monthly_problems(
-    month: int = Query(..., ge=1, le=12, description="월 (1-12)"),
-    current_user: CurrentUser = Depends(get_current_member),
-    # baekjoon_service = Depends(Provide[Container.baekjoon_service])
-):
-    """
-    월간 문제 상세 정보 조회 (SOLVED LIST, WILL SOLVED LIST)
-
-    Args:
-        month: 월 (1-12)
-
-    Returns:
-        월간 문제 데이터
-    """
-    # TODO: Implement get monthly problems logic
-    # 1. Get solved problems for the month
-    # 2. Get will solve problems for the month
-
-    response_data = MonthlyProblemsResponse(
-        totalProblemCount=0,
-        monthlyData=[]
+    # 스트릭 조회
+    result = await get_streaks_usecase.execute(
+        GetStreaksCommand(
+            user_account_id=current_user.user_account_id,
+            start_date=start_date,
+            end_date=end_date
+        )
     )
 
-    return ApiResponse(data=response_data.model_dump(by_alias=True))
+    # Response 객체로 변환
+    response_data = GetStreaksResponse.from_query(result)
+
+    return ApiResponse(data=response_data)
 
 
-@router.post("/me/problem-update", response_model=ApiResponseSchema[dict])
-@inject
-async def refresh_problem_data(
-    current_user: CurrentUser = Depends(get_current_member),
-    # baekjoon_service = Depends(Provide[Container.baekjoon_service])
-):
-    """
-    새로고침 (solved.ac에서 최신 데이터 가져오기)
+# @router.get("/me/problems", response_model=ApiResponseSchema[MonthlyProblemsResponse])
+# @inject
+# async def get_monthly_problems(
+#     month: int = Query(..., ge=1, le=12, description="월 (1-12)"),
+#     current_user: CurrentUser = Depends(get_current_member),
+#     # baekjoon_service = Depends(Provide[Container.baekjoon_service])
+# ):
+#     """
+#     월간 문제 상세 정보 조회 (SOLVED LIST, WILL SOLVED LIST)
 
-    Returns:
-        빈 데이터
-    """
-    # TODO: Implement problem data refresh logic
-    # 1. Fetch latest data from solved.ac API
-    # 2. Update database
+#     Args:
+#         month: 월 (1-12)
 
-    return ApiResponse(data={})
+#     Returns:
+#         월간 문제 데이터
+#     """
+#     # TODO: Implement get monthly problems logic
+#     # 1. Get solved problems for the month
+#     # 2. Get will solve problems for the month
+
+#     response_data = MonthlyProblemsResponse(
+#         totalProblemCount=0,
+#         monthlyData=[]
+#     )
+
+#     return ApiResponse(data=response_data.model_dump(by_alias=True))
 
 
-# Admin endpoints
-admin_router = APIRouter(prefix="/admin/bj-accounts", tags=["admin-bj-accounts"])
+# @router.post("/me/problem-update", response_model=ApiResponseSchema[dict])
+# @inject
+# async def refresh_problem_data(
+#     current_user: CurrentUser = Depends(get_current_member),
+#     # baekjoon_service = Depends(Provide[Container.baekjoon_service])
+# ):
+#     """
+#     새로고침 (solved.ac에서 최신 데이터 가져오기)
+
+#     Returns:
+#         빈 데이터
+#     """
+#     # TODO: Implement problem data refresh logic
+#     # 1. Fetch latest data from solved.ac API
+#     # 2. Update database
+
+#     return ApiResponse(data={})
 
 
-@admin_router.get("", response_model=ApiResponseSchema[AdminBaekjoonAccountsResponse])
-@inject
-async def get_all_baekjoon_accounts(
-    page: int = Query(1, ge=1, description="페이지 번호"),
-    current_user: CurrentUser = Depends(get_current_member),
-    # baekjoon_service = Depends(Provide[Container.baekjoon_service])
-):
-    """
-    모든 백준 계정 조회 (ADMIN)
+# # Admin endpoints
+# admin_router = APIRouter(prefix="/admin/bj-accounts", tags=["admin-bj-accounts"])
 
-    Args:
-        page: 페이지 번호
 
-    Returns:
-        백준 계정 목록
-    """
-    # TODO: Implement admin baekjoon accounts list logic
-    # 1. Check admin permission
-    # 2. Get paginated baekjoon accounts
+# @admin_router.get("", response_model=ApiResponseSchema[AdminBaekjoonAccountsResponse])
+# @inject
+# async def get_all_baekjoon_accounts(
+#     page: int = Query(1, ge=1, description="페이지 번호"),
+#     current_user: CurrentUser = Depends(get_current_member),
+#     # baekjoon_service = Depends(Provide[Container.baekjoon_service])
+# ):
+#     """
+#     모든 백준 계정 조회 (ADMIN)
 
-    response_data = AdminBaekjoonAccountsResponse(bjAccounts=[])
+#     Args:
+#         page: 페이지 번호
 
-    return ApiResponse(data=response_data.model_dump(by_alias=True))
+#     Returns:
+#         백준 계정 목록
+#     """
+#     # TODO: Implement admin baekjoon accounts list logic
+#     # 1. Check admin permission
+#     # 2. Get paginated baekjoon accounts
+
+#     response_data = AdminBaekjoonAccountsResponse(bjAccounts=[])
+
+#     return ApiResponse(data=response_data.model_dump(by_alias=True))

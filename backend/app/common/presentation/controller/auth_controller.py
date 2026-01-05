@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query, Request, Response
+from fastapi import APIRouter, Cookie, Depends, Query, Request, Response
 from dependency_injector.wiring import inject, Provide
 from fastapi.responses import RedirectResponse
 
@@ -79,8 +79,10 @@ async def social_login(
 @router.post("/logout", response_model=ApiResponseSchema[dict])
 @inject
 async def logout(
+    request: Request,
     response: Response,
-    current_user: CurrentUser = Depends(get_current_member)
+    current_user: CurrentUser = Depends(get_current_member),
+    auth_application_service: AuthApplicationService = Depends(Provide[Container.auth_application_service])
 ):
     """
     로그아웃
@@ -88,31 +90,23 @@ async def logout(
     Returns:
         쿠키 삭제
     """
-    # TODO: Implement logout logic
-    # 1. Clear cookies
-    # 2. Invalidate refresh token (if stored in DB/Redis)
-
-    response.delete_cookie(key="access_token")
-    response.delete_cookie(key="refresh_token")
-
-    return ApiResponse(data={})
-
+    response = ApiResponse({})
+    await auth_application_service.logout(response)
+    return response
 
 @router.post("/token/refresh", response_model=ApiResponseSchema[dict])
 @inject
 async def refresh_token(
-    # refresh_token: str = Cookie(None),
-    # auth_application_service: AuthApplicationService = Depends(Provide[Container.auth_application_service])
+    refresh_token: str = Cookie(None),
+    auth_application_service: AuthApplicationService = Depends(Provide[Container.auth_application_service])
 ):
     """
-    리프레시 토큰 재발급
+    액세스 토큰 재발급
 
     Returns:
         새로운 access_token, refresh_token
     """
-    # TODO: Implement token refresh logic
-    # 1. Validate refresh token
-    # 2. Generate new tokens
-    # 3. Set cookies
+    response = ApiResponse({})
+    await auth_application_service.refresh_access_token(response, refresh_token)
 
-    return ApiResponse(data={})
+    return response

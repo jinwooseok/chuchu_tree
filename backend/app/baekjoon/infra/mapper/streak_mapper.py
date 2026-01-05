@@ -39,3 +39,21 @@ class StreakMapper:
             solved_count=model.solved_count,
             created_at=model.created_at
         )
+    
+    @staticmethod
+    def to_entity_from_row(row) -> Streak:
+        """
+        SQL 계산 결과(Row)를 도메인 엔티티로 변환.
+        Window Function(LAG) 등을 사용해 daily_solved_count로 반환된 경우 처리.
+        """
+        streak_id_val = getattr(row, "streak_id", None)
+        
+        solved_count = getattr(row, "daily_solved_count", getattr(row, "solved_count", 0))
+
+        return Streak(
+            streak_id=StreakId(streak_id_val) if streak_id_val else None,
+            bj_account_id=BaekjoonAccountId(row.bj_account_id),
+            streak_date=row.streak_date,
+            solved_count=solved_count,
+            created_at=getattr(row, "created_at", None) 
+        )

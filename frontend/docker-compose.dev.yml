@@ -11,4 +11,6 @@ services:
     environment:
       - NODE_ENV=development
       - PORT=3334
+      - HOSTNAME=0.0.0.0
+    command: ["node", "server.js", "--port", "3334"] 
     restart: unless-stopped
