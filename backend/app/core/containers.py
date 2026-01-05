@@ -3,7 +3,7 @@ from dependency_injector import containers, providers
 
 from app.baekjoon.application.usecase.link_bj_account_usecase import LinkBjAccountUsecase
 from app.baekjoon.application.usecase.get_baekjoon_me_usecase import GetBaekjoonMeUsecase
-# from app.baekjoon.application.usecase.get_monthly_problems_usecase import GetMonthlyProblemsUsecase
+from app.baekjoon.application.usecase.get_monthly_problems_usecase import GetMonthlyProblemsUsecase
 from app.baekjoon.application.usecase.get_streaks_usecase import GetStreaksUsecase
 from app.baekjoon.infra.repository.baekjoon_account_repository_impl import BaekjoonAccountRepositoryImpl
 from app.baekjoon.infra.repository.streak_repository_impl import StreakRepositoryImpl
@@ -41,17 +41,17 @@ from app.common.infra.event.in_memory_event_bus import get_event_bus
 # ============================================================================
 # Application Services
 # ============================================================================
-# from app.activity.application.service.activity_application_service import ActivityApplicationService
+from app.activity.application.service.activity_application_service import ActivityApplicationService
 from app.common.application.service.auth_application_service import AuthApplicationService
-# from app.problem.application.service.problem_application_service import ProblemApplicationService
+from app.problem.application.service.problem_application_service import ProblemApplicationService
 from app.user.application.service.user_account_application_service import UserAccountApplicationService
 from app.user.infra.repository.user_account_repository_impl import UserAccountRepositoryImpl
 
 # ============================================================================
 # Domain Repositories
 # ============================================================================
-# from app.activity.infra.repository.user_activity_repository_impl import UserActivityRepositoryImpl
-# from app.problem.infra.repository.problem_repository_impl import ProblemRepositoryImpl
+from app.activity.infra.repository.user_activity_repository_impl import UserActivityRepositoryImpl
+from app.problem.infra.repository.problem_repository_impl import ProblemRepositoryImpl
 from app.recommendation.infra.repository.tag_skill_repository_impl import TagSkillRepositoryImpl
 from app.tag.infra.repository.tag_repository_impl import TagRepositoryImpl
 from app.target.infra.repository.target_repository_impl import TargetRepositoryImpl
@@ -264,23 +264,23 @@ class Container(containers.DeclarativeContainer):
     # ========================================================================
     # Activity domain
     # ========================================================================
-    # user_activity_repository = providers.Singleton(
-    #     UserActivityRepositoryImpl,
-    #     db=database
-    # )
+    user_activity_repository = providers.Singleton(
+        UserActivityRepositoryImpl,
+        db=database
+    )
 
-    # activity_application_service = providers.Singleton(
-    #     ActivityApplicationService,
-    #     user_activity_repository=user_activity_repository
-    # )
+    activity_application_service = providers.Singleton(
+        ActivityApplicationService,
+        user_activity_repository=user_activity_repository
+    )
 
     # ========================================================================
     # Problem domain
     # ========================================================================
-    # problem_repository = providers.Singleton(
-    #     ProblemRepositoryImpl,
-    #     db=database
-    # )
+    problem_repository = providers.Singleton(
+        ProblemRepositoryImpl,
+        db=database
+    )
 
     # ========================================================================
     # Tag domain
@@ -306,22 +306,22 @@ class Container(containers.DeclarativeContainer):
         db=database
     )
 
-    # problem_application_service = providers.Singleton(
-    #     ProblemApplicationService,
-    #     problem_repository=problem_repository,
-    #     tag_repository=tag_repository,
-    #     target_repository=target_repository,
-    #     tier_repository=tier_repository
-    # )
+    problem_application_service = providers.Singleton(
+        ProblemApplicationService,
+        problem_repository=problem_repository,
+        tag_repository=tag_repository,
+        target_repository=target_repository,
+        tier_repository=tier_repository
+    )
 
     # ========================================================================
     # Monthly Problems Usecase
     # ========================================================================
-    # get_monthly_problems_usecase = providers.Singleton(
-    #     GetMonthlyProblemsUsecase,
-    #     baekjoon_account_repository=baekjoon_account_repository,
-    #     domain_event_bus=domain_event_bus
-    # )
+    get_monthly_problems_usecase = providers.Singleton(
+        GetMonthlyProblemsUsecase,
+        baekjoon_account_repository=baekjoon_account_repository,
+        domain_event_bus=domain_event_bus
+    )
 
     # ========================================================================
     # User Tags Usecase
@@ -344,8 +344,8 @@ class Container(containers.DeclarativeContainer):
         self.auth_application_service()
         self.user_account_application_service()
         self.link_bj_account_usecase()
-        # self.activity_application_service()
-        # self.problem_application_service()
+        self.activity_application_service()
+        self.problem_application_service()
     
     
     #
