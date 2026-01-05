@@ -20,10 +20,10 @@ user_router = APIRouter(prefix="/user-accounts/me", tags=["user-targets"])
 async def set_target(
     request: SetTargetRequest,
     current_user: CurrentUser = Depends(get_current_member),
-    # target_service = Depends(Provide[Container.target_service])
+    # target_application_service = Depends(Provide[Container.target_application_service])
 ):
     """
-    목표 설정
+    유저의 목표 설정
 
     Args:
         request: 목표 코드 (CT, DAILY, BEGINNER)
@@ -37,19 +37,14 @@ async def set_target(
 
     return ApiResponse(data={})
 
-
-# Baekjoon target endpoints
-baekjoon_router = APIRouter(prefix="/bj-accounts/me", tags=["bj-targets"])
-
-
-@baekjoon_router.get("/targets", response_model=ApiResponseSchema[UserTargetsResponse])
+@user_router.get("/target", response_model=ApiResponseSchema[UserTargetsResponse])
 @inject
 async def get_user_targets(
     current_user: CurrentUser = Depends(get_current_member),
     # target_service = Depends(Provide[Container.target_service])
 ):
     """
-    유저 목표 조회
+    유저의 모든 목표 조회
 
     Returns:
         유저의 목표 목록
@@ -69,7 +64,7 @@ router = APIRouter(prefix="/targets", tags=["targets"])
 @router.get("", response_model=ApiResponseSchema[AllTargetsResponse])
 @inject
 async def get_all_targets(
-    # target_service = Depends(Provide[Container.target_service])
+    # target_application_service = Depends(Provide[Container.target_application_service])
 ):
     """
     모든 목표 조회 (인증 불필요)
