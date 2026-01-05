@@ -19,7 +19,12 @@ class TagRepository(ABC):
     async def find_by_ids(self, tag_ids: list[TagId]) -> list[Tag]:
         """여러 ID로 조회"""
         pass
-
+        
+    @abstractmethod
+    async def find_by_ids_and_active(self, tag_ids: list[TagId]) -> list[Tag]:
+        """여러 ID로 조회"""
+        pass    
+    
     @abstractmethod
     async def find_by_code(self, code: str) -> Tag|None:
         pass
@@ -31,3 +36,5 @@ class TagRepository(ABC):
     @abstractmethod
     async def find_active_tags(self) -> list[Tag]:
         pass
+    
+    

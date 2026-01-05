@@ -18,7 +18,7 @@ class PrevTagQuery:
 @dataclass
 class RequiredStatQuery:
     """태그 해금 요구사항"""
-    required_min_tier: str
+    required_min_tier: int
     prev_tags: list[PrevTagQuery]
 
 
@@ -27,8 +27,8 @@ class NextLevelStatQuery:
     """다음 레벨 요구사항"""
     next_level: str
     solved_problem_count: int
-    required_min_tier: str
-    higher_problem_tier: str
+    required_min_tier: int
+    higher_problem_tier: int
 
 
 @dataclass
@@ -36,8 +36,8 @@ class AccountStatQuery:
     """유저의 태그별 통계"""
     current_level: str
     solved_problem_count: int
-    required_min_tier: str | None
-    higher_problem_tier: str | None
+    required_min_tier: int | None
+    higher_problem_tier: int | None
     last_solved_date: date | None
 
 

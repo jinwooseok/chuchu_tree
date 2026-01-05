@@ -3,8 +3,36 @@ from app.common.domain.enums import ExcludedReason, TagLevel
 from app.common.domain.vo.identifiers import TagId, TierId
 from app.common.domain.vo.primitives import TierRange
 from app.tag.domain.entity.tag import Tag
+from app.tag.domain.entity.tag_relation import TagRelation
 from app.tag.domain.vo.tag_exclusion import TagExclusion
 from app.tag.infra.model.tag import TagModel
+from app.tag.infra.model.tag_relation import TagRelationModel
+
+
+class TagRelationMapper:
+    @staticmethod
+    def to_entity(model: TagRelationModel) -> TagRelation:
+        return TagRelation(
+            tag_relation_id=model.tag_relation_id,
+            leading_tag_id=TagId(model.leading_tag_id),
+            sub_tag_id=TagId(model.sub_tag_id),
+            active=model.active_yn,
+            created_at=model.created_at,
+            updated_at=model.updated_at,
+            deleted_at=model.deleted_at,
+        )
+
+    @staticmethod
+    def to_model(entity: TagRelation) -> TagRelationModel:
+        return TagRelationModel(
+            tag_relation_id=entity.tag_relation_id,
+            leading_tag_id=entity.leading_tag_id.value,
+            sub_tag_id=entity.sub_tag_id.value,
+            active_yn=entity.active,
+            created_at=entity.created_at,
+            updated_at=entity.updated_at,
+            deleted_at=entity.deleted_at,
+        )
 
 
 class TagMapper:
@@ -25,13 +53,24 @@ class TagMapper:
         tier_range = TierRange(min_tier_id, max_tier_id)
 
         # Aliases 처리 (JSON -> list[str])
-        aliases = model.aliases if model.aliases else []
-        if isinstance(aliases, dict):
-            aliases = list(aliases.values()) if aliases else []
+        aliases: list[str] = []
+
+        if model.aliases:
+            if isinstance(model.aliases, list):
+                aliases = [item for item in model.aliases]
+        
+        print(aliases)        
+        # Sub-tags 처리
+        parent_tag_relations = [
+            TagRelationMapper.to_entity(parent_model)
+            for parent_model in model.parent_tag_relations
+        ] if hasattr(model, 'parent_tag_relations') and model.parent_tag_relations else []
+
 
         return Tag(
-            tag_id=TagId(model.tag_id),
+            tag_id=TagId(model.tag_id) if model.tag_id else None,
             code=model.tag_code,
+            tag_display_name=model.tag_display_name,
             level=TagLevel(model.tag_level),
             exclusion=exclusion,
             applicable_tier_range=tier_range,
@@ -41,19 +80,18 @@ class TagMapper:
             created_at=model.created_at,
             updated_at=model.updated_at,
             deleted_at=model.deleted_at,
-            sub_tags=[]
+            parent_tag_relations=parent_tag_relations
         )
 
     @staticmethod
     def to_model(entity: Tag) -> TagModel:
         """Entity -> Model"""
-        # Aliases 처리 (list[str] -> JSON)
         aliases_json = {f"alias_{i}": alias for i, alias in enumerate(entity.aliases)}
 
-        return TagModel(
+        model = TagModel(
             tag_id=entity.tag_id.value if entity.tag_id else None,
             tag_code=entity.code,
-            tag_display_name=entity.code,  # display_name이 있다면 사용
+            tag_display_name=entity.tag_display_name,
             tag_level=entity.level.value,
             excluded_yn=entity.exclusion.is_excluded,
             excluded_reason=entity.exclusion.reason.value if entity.exclusion.reason else None,
@@ -66,3 +104,4 @@ class TagMapper:
             updated_at=entity.updated_at,
             deleted_at=entity.deleted_at
         )
+        return model

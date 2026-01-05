@@ -3,7 +3,7 @@ import logging
 
 from app.baekjoon.domain.event.get_problems_info_payload import GetProblemsInfoPayload
 from app.common.domain.vo.identifiers import ProblemId, TagId, TargetId
-from app.common.infra.event.decorators import event_handler
+from app.common.infra.event.decorators import event_handler, event_register_handlers
 from app.core.database import transactional
 from app.problem.application.query.problems_info_query import (
     ProblemInfoQuery,
@@ -19,7 +19,7 @@ from app.tier.domain.repository.tier_repository import TierRepository
 
 logger = logging.getLogger(__name__)
 
-
+@event_register_handlers()
 class ProblemApplicationService:
     """Problem Application Service"""
 
@@ -63,27 +63,19 @@ class ProblemApplicationService:
 
         # 3. 태그 정보 조회
         tag_ids = list(tag_ids_set)
-        tags = await self.tag_repository.find_by_ids(tag_ids) if tag_ids else []
+        tags = await self.tag_repository.find_by_ids_and_active(tag_ids) if tag_ids else []
         tag_map = {tag.tag_id.value: tag for tag in tags}
-
-        # 4. 태그별 타겟 ID 수집
-        target_ids_set = set()
-        for tag in tags:
-            # Tag의 sub_tags나 다른 관계에서 target 정보를 가져올 수 있다면 추가
-            # 현재 구조상 Target -> Tag 관계이므로, 모든 타겟을 조회해서 필터링해야 함
-            pass
 
         # 5. 모든 타겟 조회 (태그별 필터링을 위해)
         all_targets = await self.target_repository.find_all_active()
-
+        
         # 6. 태그별 타겟 매핑 생성
         tag_targets_map = {}  # tag_id -> list[Target]
         for target in all_targets:
             for target_tag in target.required_tags:
-                if target_tag.active and target_tag.deleted_at is None:
-                    if target_tag.tag_id.value not in tag_targets_map:
-                        tag_targets_map[target_tag.tag_id.value] = []
-                    tag_targets_map[target_tag.tag_id.value].append(target)
+                if target_tag.tag_id.value not in tag_targets_map:
+                    tag_targets_map[target_tag.tag_id.value] = []
+                tag_targets_map[target_tag.tag_id.value].append(target)
 
         # 7. Tier 정보 조회 (tier_level -> tier_name 매핑)
         tier_map = {}
@@ -118,7 +110,7 @@ class ProblemApplicationService:
                     tag_queries.append(TagInfoQuery(
                         tag_id=tag.tag_id.value,
                         tag_code=tag.code,
-                        tag_display_name=tag.code,  # display_name이 있다면 사용
+                        tag_display_name=tag.tag_display_name,
                         tag_aliases=tag_aliases,
                         tag_targets=tag_target_queries
                     ))
