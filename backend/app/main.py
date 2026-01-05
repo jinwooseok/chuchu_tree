@@ -16,6 +16,7 @@ from app.core.exception import (
     http_exception_handler,
     validation_exception_handler
 )
+from app.middlewares import create_middlewares
 
 # Import routers
 from app.common.presentation.controller.auth_controller import router as auth_router
@@ -64,6 +65,9 @@ app = AppWithContainer(
     default_response_class=ApiResponse,
     lifespan=lifespan
 )
+
+# Register middlewares (CORS 등)
+create_middlewares(app)
 
 # Register exception handlers
 app.add_exception_handler(APIException, custom_exception_handler)
