@@ -126,6 +126,7 @@ class UserAccountApplicationService:
         return GetUserAccountInfoQuery(
             user_account_id=user_account.user_account_id.value,
             provider=user_account.provider.value,
+            targets=user_account.targets,
             profile_image=user_account.profile_image,
             registered_at=user_account.registered_at
         )
