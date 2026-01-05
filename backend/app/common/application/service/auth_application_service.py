@@ -104,10 +104,10 @@ class AuthApplicationService:
         )
 
         user_account:FindUserAccountResultPayload = await self.domain_event_bus.publish(event)
-                
+
         # JWT 토큰 생성 및 쿠키 설정
-        self._create_and_set_tokens(command.response, user_account.user_account_id)
-        
+        self._create_and_set_tokens(command.response, user_account.user_account_id, frontend_redirect_url)
+
         return frontend_redirect_url
     
     @transactional
@@ -139,7 +139,7 @@ class AuthApplicationService:
         else:
             raise APIException(ErrorCode.INVALID_PROVIDER)
         
-    def _create_and_set_tokens(self, response: Response, user_account_id: int):
+    def _create_and_set_tokens(self, response: Response, user_account_id: int, frontend_redirect_url: Optional[str] = None):
         """JWT 토큰 생성 및 쿠키 설정"""
         access_token = self.token_service.create_token(
             payload={
@@ -147,26 +147,28 @@ class AuthApplicationService:
             },
             expires_delta=timedelta(hours=6)
         )
-        
+
         refresh_token = self.token_service.create_token(
             payload={
                 "user_account_id": user_account_id
             },
             expires_delta=timedelta(days=7)
         )
-        
-        self._set_auth_cookies(response, access_token, refresh_token)
-        
-    def _set_auth_cookies(self, response: Response, access_token: str, refresh_token: str):
-        self.cookie_service.set_cookie(response, 
-                                       "access_token", 
-                                       access_token, 
-                                       max_age=6 * 60 * 60)
-        
-        self.cookie_service.set_cookie(response, 
-                                       "refresh_token", 
-                                       refresh_token, 
-                                       max_age=7 * 24 * 60 * 60)
+
+        self._set_auth_cookies(response, access_token, refresh_token, frontend_redirect_url)
+
+    def _set_auth_cookies(self, response: Response, access_token: str, refresh_token: str, frontend_redirect_url: Optional[str] = None):
+        self.cookie_service.set_cookie(response,
+                                       "access_token",
+                                       access_token,
+                                       max_age=6 * 60 * 60,
+                                       frontend_redirect_url=frontend_redirect_url)
+
+        self.cookie_service.set_cookie(response,
+                                       "refresh_token",
+                                       refresh_token,
+                                       max_age=7 * 24 * 60 * 60,
+                                       frontend_redirect_url=frontend_redirect_url)
     
     def _set_access_token_cookie(self, response: Response, access_token: str):
         self.cookie_service.set_cookie(response, 
