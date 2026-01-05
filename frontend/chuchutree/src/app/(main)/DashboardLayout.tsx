@@ -35,7 +35,7 @@ export default function DashboardLayout() {
   const topInnerHeight = displayTopSection === 'tierbar' ? 'min-h-[80px]' : displayTopSection === 'streak' ? 'min-h-[240px]' : '';
 
   // 하단 영역 높이 계산
-  const bottomHeight = bottomSection === 'recommend' ? 'h-1/3 ' : 'h-0';
+  const bottomHeight = bottomSection === 'recommend' ? 'h-1/3 mt-2' : 'h-0';
   const bottomInnerHeight = displayBottomSection === 'recommend' ? 'min-h-[240px]' : '';
 
   // translate 계산 (슬라이드 애니메이션)

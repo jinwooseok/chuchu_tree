@@ -1,7 +1,7 @@
 'use client';
 
 import { Calendar, dateFnsLocalizer, ToolbarProps, EventProps } from 'react-big-calendar';
-import { format, parse, startOfWeek, getDay, isSameDay } from 'date-fns';
+import { format, parse, startOfWeek, getDay, isSameDay, isToday } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { ComponentType, useMemo } from 'react';
@@ -62,11 +62,13 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
 
   const { displayTags, hasMore, moreCount } = getDisplayTags(dayEvents);
 
+  const today = isToday(date);
+
   return (
     <div className="flex h-full flex-col">
       {/* 날짜 숫자 */}
-      <div className="text-right text-sm" suppressHydrationWarning>
-        {label}
+      <div className="mt-1 text-right text-sm" suppressHydrationWarning>
+        {today ? <span className="bg-primary inline-flex h-6 w-6 items-center justify-center rounded text-white">{label}</span> : label}
       </div>
 
       {/* 태그 목록 */}
@@ -81,7 +83,7 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
             const bgColorClass = isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300';
 
             return (
-              <div key={`${event.resource.problem.problemId}-${tagCode}-${index}`} className={`rounded px-2 py-0.5 text-xs ${bgColorClass}`}>
+              <div key={`${event.resource.problem.problemId}-${tagCode}-${index}`} className={`rounded px-2 py-0.5 text-xs ${bgColorClass} text-gray-800`}>
                 {event.title}
               </div>
             );
@@ -127,6 +129,20 @@ export default function BigCalendar() {
         .rbc-day-bg:active {
           background-color: rgba(0, 0, 0, 0.05);
           transition: background-color 0.1s ease;
+        }
+        .rbc-off-range-bg {
+          background-color: transparent;
+        }
+        /* 캘린더 그리드 border 설정 */
+
+        .rbc-header {
+          border-left: transparent !important;
+        }
+        .rbc-month-view {
+          border: transparent !important;
+        }
+        .rbc-today {
+          background-color: transparent !important;
         }
       `}</style>
       <Calendar

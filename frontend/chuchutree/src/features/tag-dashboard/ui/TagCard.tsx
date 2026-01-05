@@ -49,24 +49,26 @@ export default function TagCard({ tag }: TagCardProps) {
   const isSuccessBest = TIER_TO_NUM[accountStat.higherProblemTier] >= TIER_TO_NUM[nextLevelStat.higherProblemTier];
 
   return (
-    <div className={`${!excluded_yn ? 'bg-background' : 'bg-excluded-bg'} flex h-40 flex-col gap-2 rounded-lg p-4 text-xs`}>
+    <div className={`bg-background flex h-40 flex-col gap-2 rounded-lg p-4 text-xs`}>
       {/* 카드 헤더 */}
       <div className="flex items-center justify-between">
-        <div className={`text-sm font-semibold ${!excluded_yn ? 'text-foreground' : 'text-innerground-white'}`}>{tagDisplayName}</div>
+        <div className={`text-foreground text-sm font-semibold`}>{tagDisplayName}</div>
         <div className="flex h-full items-center justify-center gap-2">
-          <div className={`${!excluded_yn ? 'text-muted-foreground' : 'text-innerground-white'} flex flex-col gap-0.5`}>
-            <button
-              className={`hover:bg-excluded-bg hover:text-innerground-white rounded border px-2 text-center transition-colors ${!excluded_yn ? 'border-innerground-darkgray' : 'border-excluded-text bg-innerground-darkgray text-excluded-text'}`}
-            >
+          <div className={`text-muted-foreground flex flex-col gap-0.5`}>
+            <button className={`hover:bg-excluded-bg hover:text-innerground-white border-innerground-darkgray rounded border px-2 text-center transition-colors`}>
               {recommandation_yn ? '추천 포함됨' : '추천리스트 등록'}
             </button>
             <div className="flex gap-0.5">
               <p>마지막 풀이</p>
-              <p className={`${!excluded_yn ? 'text-primary' : 'text-innerground-white'} font-semibold`}>{daysAgo}</p>
+              <p className={`text-primary font-semibold`}>{daysAgo}</p>
               <p>일 전</p>
             </div>
           </div>
-          <div className={`${currentLevelColors.bg} ${currentLevelColors.text} flex h-full items-center rounded px-2 font-semibold`}>{!excluded_yn ? currentLevel : 'EXCLUDED'}</div>
+          <div
+            className={`${!excluded_yn ? currentLevelColors.bg : 'bg-excluded-bg'} ${!excluded_yn ? currentLevelColors.text : 'text-innerground-white'} flex h-full items-center rounded px-2 font-semibold`}
+          >
+            {!excluded_yn ? currentLevel : 'EXCLUDED'}
+          </div>
         </div>
       </div>
       {/* 카드 바디 */}
@@ -74,8 +76,9 @@ export default function TagCard({ tag }: TagCardProps) {
         {/* 게이지 */}
         <div className="flex flex-1 items-center justify-center rounded border-2 border-dashed p-2">
           {excluded_yn ? (
-            <div className="text-excluded-text flex flex-col">
-              <p>제외된 유형입니다.</p>
+            <div className="flex flex-col gap-1">
+              <span className="text-excluded-text text-sm font-bold">제외된 유형입니다.</span>
+              <span className="text-muted-foreground text-xs">현재 {currentLevel} 상태</span>
             </div>
           ) : !isLocked ? (
             <div className="bg-innerground-darkgray relative h-4 w-full rounded-sm">
