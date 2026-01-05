@@ -74,7 +74,7 @@ class GetBaekjoonMeUsecase:
 
         if not account_with_link:
             logger.error(f"[GetBaekjoonMeUsecase] 백준 계정 연동 정보를 찾을 수 없음: {command.user_account_id}")
-            raise APIException(ErrorCode.INVALID_REQUEST)
+            raise APIException(ErrorCode.UNLINKED_USER)
 
         bj_account, linked_at = account_with_link
 
