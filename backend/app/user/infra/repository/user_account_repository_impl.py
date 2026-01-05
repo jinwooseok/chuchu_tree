@@ -1,7 +1,7 @@
 from typing import override
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
+from sqlalchemy.orm import joinedload
 
 from app.common.domain.vo.identifiers import UserAccountId
 from app.common.domain.enums import Provider
@@ -41,8 +41,8 @@ class UserAccountRepositoryImpl(UserAccountRepository):
         stmt = (
             select(UserAccountModel)
             .options(
-                selectinload(UserAccountModel.account_links),
-                selectinload(UserAccountModel.targets)
+                joinedload(UserAccountModel.account_links),
+                joinedload(UserAccountModel.targets)
             )
             .where(
                 and_(
@@ -52,7 +52,7 @@ class UserAccountRepositoryImpl(UserAccountRepository):
             )
         )
         result = await self.session.execute(stmt)
-        model = result.scalar_one_or_none()
+        model = result.unique().scalars().one_or_none()
         
         return UserAccountMapper.to_entity(model) if model else None
 
@@ -67,7 +67,8 @@ class UserAccountRepositoryImpl(UserAccountRepository):
             select(UserAccountModel)
             .options(
                 # Mapper에서 model.account_links에 접근하므로 미리 로드함
-                selectinload(UserAccountModel.account_links)
+                joinedload(UserAccountModel.account_links),
+                joinedload(UserAccountModel.targets),
             )
             .where(
                 and_(
@@ -79,7 +80,7 @@ class UserAccountRepositoryImpl(UserAccountRepository):
         )
         
         result = await self.session.execute(stmt)
-        model = result.scalar_one_or_none()
+        model = result.unique().scalars().one_or_none()
         
         return UserAccountMapper.to_entity(model) if model else None
     
@@ -101,11 +102,16 @@ class UserAccountRepositoryImpl(UserAccountRepository):
     async def update(self, user_account: UserAccount) -> UserAccount:
         """유저 업데이트"""
         # 기존 유저 모델 조회
-        stmt = select(UserAccountModel).where(
-            UserAccountModel.user_account_id == user_account.user_account_id.value
+        stmt = (
+            select(UserAccountModel)
+            .options(
+                joinedload(UserAccountModel.account_links),
+                joinedload(UserAccountModel.targets)
+            )
+            .where(UserAccountModel.user_account_id == user_account.user_account_id.value)
         )
         result = await self.session.execute(stmt)
-        existing_model = result.scalar_one()
+        existing_model = result.unique().scalars().one_or_none()
 
         # 기본 정보 업데이트
         existing_model.provider = user_account.provider

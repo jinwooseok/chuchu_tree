@@ -21,11 +21,17 @@ class BjAccountQuery(BaseModel):
     streaks: list[StreakItemQuery] = Field(..., description="스트릭 목록 (최근 365일)")
     registered_at: datetime = Field(..., description="등록일")
 
-
+class TargetQuery(BaseModel):
+    """목표 정보 쿼리 (/me용)"""
+    target_id: int = Field(..., description="목표 ID")
+    target_code: str = Field(..., description="목표 코드")
+    target_display_name: str = Field(..., description="목표 표기")
+    
 class UserAccountQuery(BaseModel):
     """유저 계정 정보 쿼리 (/me용)"""
     user_account_id: int = Field(..., description="유저 계정 ID")
     profile_image_url: str | None = Field(None, description="프로필 이미지 URL")
+    targets: list[TargetQuery] = Field([], description="목표 목록")
     registered_at: datetime = Field(..., description="가입일")
 
 

@@ -21,7 +21,6 @@ from app.core.database import transactional
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
 from app.tier.domain.repository.tier_repository import TierRepository
-from app.user.application.query.user_account_info_query import GetUserAccountInfoQuery
 
 logger = logging.getLogger(__name__)
 
@@ -58,7 +57,7 @@ class GetBaekjoonMeUsecase:
         event = DomainEvent(
             event_type="GET_USER_ACCOUNT_INFO_REQUESTED",
             data=GetUserAccountInfoPayload(user_account_id=command.user_account_id),
-            result_type=GetUserAccountInfoQuery
+            result_type=UserAccountQuery
         )
 
         user_account_info = await self.domain_event_bus.publish(event)
@@ -94,8 +93,9 @@ class GetBaekjoonMeUsecase:
         # 5. Query 객체로 변환
         user_account_query = UserAccountQuery(
             user_account_id=user_account_info.user_account_id,
-            profile_image_url=user_account_info.profile_image,
-            registered_at=user_account_info.registered_at
+            profile_image_url=user_account_info.profile_image_url,
+            registered_at=user_account_info.registered_at,
+            targets=user_account_info.targets
         )
 
         stat_query = BjAccountStatQuery(
