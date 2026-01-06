@@ -11,6 +11,7 @@ from app.baekjoon.application.usecase.link_bj_account_usecase import LinkBjAccou
 from app.baekjoon.application.usecase.get_baekjoon_me_usecase import GetBaekjoonMeUsecase
 from app.baekjoon.application.usecase.get_monthly_problems_usecase import GetMonthlyProblemsUsecase
 from app.baekjoon.application.usecase.get_streaks_usecase import GetStreaksUsecase
+from app.baekjoon.application.usecase.update_bj_account_usecase import UpdateBjAccountUsecase
 from app.common.domain.vo.current_user import CurrentUser
 from app.common.presentation.dependency.auth_dependencies import get_current_member
 from app.baekjoon.presentation.schema.request.baekjoon_request import (
@@ -168,11 +169,11 @@ async def get_monthly_problems(
     return ApiResponse(data=response_data)
 
 
-@router.post("/me/problem-update", response_model=ApiResponseSchema[dict])
+@router.post("/me/refresh", response_model=ApiResponseSchema[dict])
 @inject
 async def refresh_problem_data(
     current_user: CurrentUser = Depends(get_current_member),
-    update_bj_account_usecase = Depends(Provide[Container.update_bj_account_usecase])
+    update_bj_account_usecase:UpdateBjAccountUsecase = Depends(Provide[Container.update_bj_account_usecase])
 ):
     """
     새로고침 (solved.ac에서 최신 데이터 가져오기)
