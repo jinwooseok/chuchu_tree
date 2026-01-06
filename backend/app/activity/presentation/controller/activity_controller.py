@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from dependency_injector.wiring import inject, Provide
 
+from app.activity.application.command.update_will_solve_problems import UpdateWillSolveProblemsCommand
 from app.activity.application.service.activity_application_service import ActivityApplicationService
 from app.common.domain.vo.current_user import CurrentUser
 from app.common.presentation.dependency.auth_dependencies import get_current_member
@@ -35,7 +36,7 @@ async def update_will_solve_problems(
     Returns:
         빈 데이터
     """
-    await activity_application_service.update_will_solve_problems(UpdateSolvedProblemsRequest(user_account_id = current_user.user_account_id, 
+    await activity_application_service.update_will_solve_problems(UpdateWillSolveProblemsCommand(user_account_id = current_user.user_account_id, 
                                                                                               solved_date = request.date, 
                                                                                               problem_ids = request.problem_ids))
 

@@ -29,6 +29,7 @@ class WillSolveProblem:
             user_account_id=user_account_id,
             problem_id=problem_id,
             solved=False,
+            order=0,
             marked_date=marked_date,
             created_at=now,
             updated_at=now,

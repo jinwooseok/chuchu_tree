@@ -45,7 +45,24 @@ class ProblemHistoryRepository(ABC):
             문제 풀이 기록 목록 (날짜 오름차순)
         """
         pass
+    
+    @abstractmethod
+    async def find_solved_ids_in_list(
+        self,
+        bj_account_id: BaekjoonAccountId,
+        problem_ids: list[int]
+    ) -> set[int]:
+        """
+        백준 계정 ID와 날짜 범위로 문제 풀이 기록 조회
 
+        Args:
+            bj_account_id: 백준 계정 ID
+
+        Returns:
+            문제 풀이 기록 목록 (날짜 오름차순)
+        """
+        pass
+    
     @abstractmethod
     async def find_by_account_and_month_with_streak(
         self,

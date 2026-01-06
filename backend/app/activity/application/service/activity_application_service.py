@@ -4,7 +4,7 @@ from calendar import monthrange
 from collections import defaultdict
 from datetime import date
 
-from app.activity.application.command.update_will_solve_problems import UpdateWillSolveProblemCommand
+from app.activity.application.command.update_will_solve_problems import UpdateWillSolveProblemsCommand
 from app.activity.application.query.monthly_activity_data_query import (
     DailyActivityQuery,
     MonthlyActivityDataQuery
@@ -97,7 +97,7 @@ class ActivityApplicationService:
     @transactional
     async def update_will_solve_problems(
         self,
-        command: UpdateWillSolveProblemCommand
+        command: UpdateWillSolveProblemsCommand
     ):
         
         # 1. 입력값 정합성 검증 (순서 및 중복 체크)
@@ -144,7 +144,7 @@ class ActivityApplicationService:
         # 4. Repository를 통해 일괄 저장
         await self.user_activity_repository.save_all_will_solve_problems(processed_entities)
         
-    def _validate_order_consistency(problem_ids: list[int]):
+    def _validate_order_consistency(self, problem_ids: list[int]):
         # 중복된 ID가 포함되어 있는지 체크
         if len(problem_ids) != len(set(problem_ids)):
             raise APIException(ErrorCode.DUPLICATED_ORDER)
