@@ -5,7 +5,7 @@ from datetime import date as date_
 class UpdateWillSolveProblemsRequest(BaseModel):
     """풀 문제 업데이트 요청"""
     date: date_ = Field(..., description="날짜 (YYYY-MM-DD)")
-    problem_ids: list[int] = Field(..., alias="problemId", description="문제 ID 목록")
+    problem_ids: list[int] = Field(..., alias="problemIds", description="문제 ID 목록")
 
     class Config:
         populate_by_name = True
