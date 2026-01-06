@@ -11,34 +11,34 @@ export function transformToCalendarEvents(monthlyDataArray: MonthlyData[]): Cale
 
     // solved 문제들을 이벤트로 변환
     dayData.solvedProblems.forEach((problem: SolvedProblems) => {
-      problem.tags.forEach((tag) => {
+      if (problem.tags.length > 0) {
         events.push({
-          title: tag.tagDisplayName,
+          title: problem.tags[0].tagDisplayName,
           start: date,
           end: date,
           resource: {
             type: 'solved',
             problem,
-            tagCode: tag.tagCode,
+            tagCode: problem.tags[0].tagCode,
           },
         });
-      });
+      }
     });
 
     // will solve 문제들을 이벤트로 변환
     dayData.willSolveProblems.forEach((problem: WillSolveProblems) => {
-      problem.tags.forEach((tag) => {
+      if (problem.tags.length > 0) {
         events.push({
-          title: tag.tagDisplayName,
+          title: problem.tags[0].tagDisplayName,
           start: date,
           end: date,
           resource: {
             type: 'willSolve',
             problem,
-            tagCode: tag.tagCode,
+            tagCode: problem.tags[0].tagCode,
           },
         });
-      });
+      }
     });
   });
   console.log('events', events);
@@ -59,10 +59,10 @@ export function getDisplayTags(events: CalendarEvent[]) {
   const willSolveEvents = events.filter((e) => e.resource.type === 'willSolve');
 
   // 중복 제거 (같은 tagCode는 한 번만 표시)
-  const uniqueSolved = Array.from(new Map(solvedEvents.map((e) => [e.resource.tagCode, e])).values());
-  const uniqueWillSolve = Array.from(new Map(willSolveEvents.map((e) => [e.resource.tagCode, e])).values());
+  // const uniqueSolved = Array.from(new Map(solvedEvents.map((e) => [e.resource.tagCode, e])).values());
+  // const uniqueWillSolve = Array.from(new Map(willSolveEvents.map((e) => [e.resource.tagCode, e])).values());
 
-  const allTags = [...uniqueSolved, ...uniqueWillSolve];
+  const allTags = [...solvedEvents, ...willSolveEvents];
   const totalCount = allTags.length;
 
   if (totalCount === 0) {

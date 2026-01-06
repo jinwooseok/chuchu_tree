@@ -13,7 +13,7 @@ export const calendarApi = {
     return data.data;
   },
   updateWillSolveProblems: async (data: UpdateProblemsData): Promise<void> => {
-    await axiosInstance.post('/user-accounts/me/problems/will-solve-broblems', data);
+    await axiosInstance.post('/user-accounts/me/problems/will-solve-problems', data);
   },
   updateSolvedProblems: async (data: UpdateProblemsData): Promise<void> => {
     await axiosInstance.post('/user-accounts/me/problems/solved-problems', data);
