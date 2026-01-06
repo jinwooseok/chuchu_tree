@@ -12,6 +12,7 @@ from app.baekjoon.infra.repository.streak_repository_impl import StreakRepositor
 from app.baekjoon.infra.scheduler.metric_scheduler import BjAccountUpdateScheduler
 from app.config.settings import get_settings
 from app.core.database import Database
+from app.target.application.service.target_application_service import TargetApplicationService
 from app.tier.infra.repository.tier_repository_impl import TierRepositoryImpl
 
 # ============================================================================
@@ -272,6 +273,7 @@ class Container(containers.DeclarativeContainer):
     update_bj_account_usecase = providers.Singleton(
         UpdateBjAccountUsecase,
         baekjoon_account_repository=baekjoon_account_repository,
+        problem_history_repository=problem_history_repository,
         solvedac_gateway=solvedac_gateway
     )
 
@@ -303,6 +305,10 @@ class Container(containers.DeclarativeContainer):
     tag_repository = providers.Singleton(
         TagRepositoryImpl,
         db=database
+    )
+    
+    target_application_service = providers.Singleton(
+        TargetApplicationService
     )
 
     # ========================================================================
