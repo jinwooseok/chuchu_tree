@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer';
 import { Calendar } from '@/entities/calendar';
 
 interface MonthlyData {
-  date: string;
+  targetDate: string;
   solvedProblemCount: number;
   willSolveProblemCount: number;
   solvedProblems: any[];
@@ -81,7 +81,7 @@ const calendarStoreInternal = create(
           addProblemToWillSolve: (date: Date, problem: Problem) => {
             const dateString = formatDateString(date);
             set((state) => {
-              const dataIndex = state.monthlyData.findIndex((data) => data.date === dateString);
+              const dataIndex = state.monthlyData.findIndex((data) => data.targetDate === dateString);
               if (dataIndex !== -1) {
                 state.monthlyData[dataIndex].willSolveProblems.push(problem);
                 state.monthlyData[dataIndex].willSolveProblemCount += 1;
@@ -93,7 +93,7 @@ const calendarStoreInternal = create(
           removeProblemFromWillSolve: (date: Date, problemId: number) => {
             const dateString = formatDateString(date);
             set((state) => {
-              const dataIndex = state.monthlyData.findIndex((data) => data.date === dateString);
+              const dataIndex = state.monthlyData.findIndex((data) => data.targetDate === dateString);
               if (dataIndex !== -1) {
                 state.monthlyData[dataIndex].willSolveProblems = state.monthlyData[dataIndex].willSolveProblems.filter(
                   (p: Problem) => p.problemId !== problemId
@@ -110,18 +110,18 @@ const calendarStoreInternal = create(
         // Selectors
         getDataByDate: (date: Date) => {
           const dateString = formatDateString(date);
-          return get().monthlyData.find((data) => data.date === dateString);
+          return get().monthlyData.find((data) => data.targetDate === dateString);
         },
 
         getSolvedProblemsByDate: (date: Date) => {
           const dateString = formatDateString(date);
-          const data = get().monthlyData.find((data) => data.date === dateString);
+          const data = get().monthlyData.find((data) => data.targetDate === dateString);
           return data?.solvedProblems || [];
         },
 
         getWillSolveProblemsByDate: (date: Date) => {
           const dateString = formatDateString(date);
-          const data = get().monthlyData.find((data) => data.date === dateString);
+          const data = get().monthlyData.find((data) => data.targetDate === dateString);
           return data?.willSolveProblems || [];
         },
       }))

@@ -25,7 +25,8 @@ function ProblemCard({ problem, isSolved }: { problem: Problem; isSolved: boolea
     <div className="bg-background flex items-center justify-between rounded-md p-2 text-xs">
       {/* 문제기본정보 */}
       <div className="mr-4 flex shrink-0 flex-col gap-1 text-center">
-        <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300'}`}>{firstTag.tagDisplayName}</div>
+        {firstTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300'}`}>{firstTag.tagDisplayName}</div>}
+        {!firstTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300'}`}>Undefined</div>}
         <div className="flex items-center gap-1">
           <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
           <span>{problem.problemId}</span>
@@ -43,7 +44,6 @@ export default function CalendarSidebar() {
   // selectedDate가 null일 경우 빈 배열 반환
   const solvedProblems = selectedDate ? getSolvedProblemsByDate(selectedDate) : [];
   const willSolveProblems = selectedDate ? getWillSolveProblemsByDate(selectedDate) : [];
-
   return (
     <div className="flex h-full flex-col gap-8 overflow-y-auto p-4">
       {/* 미니 캘린더 */}

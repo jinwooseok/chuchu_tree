@@ -1,19 +1,34 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Calendar from 'react-calendar';
 import 'react-calendar/dist/Calendar.css';
 import { useCalendarStore } from '@/lib/store/calendar';
+import { useCalendar } from '@/entities/calendar';
 import { isSameDay, isSameMonth, format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { ChevronUp, ChevronDown, Undo2 } from 'lucide-react';
 
 export default function SmallCalendar() {
   const { selectedDate, monthlyData, actions } = useCalendarStore();
-  const setSelectedDate = actions.setSelectedDate;
+  const { setSelectedDate, setCalendarData } = actions;
 
   // 현재 표시중인 월 관리 (selectedDate가 null이면 오늘 날짜 사용)
   const [activeStartDate, setActiveStartDate] = useState<Date>(selectedDate || new Date());
+
+  // 현재 표시 중인 월의 year/month
+  const year = activeStartDate.getFullYear();
+  const month = activeStartDate.getMonth() + 1;
+
+  // 해당 월의 calendar 데이터 fetch
+  const { data: calendarData } = useCalendar(year, month);
+
+  // 데이터가 로드되면 store에 저장
+  useEffect(() => {
+    if (calendarData) {
+      setCalendarData(calendarData);
+    }
+  }, [calendarData, setCalendarData]);
 
   // 날짜 클릭 핸들러
   const handleDateChange = (value: Date | null) => {
@@ -49,14 +64,14 @@ export default function SmallCalendar() {
   // 특정 날짜에 solved 문제가 있는지 확인
   const hasSolvedProblems = (date: Date) => {
     const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    const dayData = monthlyData.find((data) => data.date === dateString);
+    const dayData = monthlyData.find((data) => data.targetDate === dateString);
     return dayData && dayData.solvedProblemCount > 0;
   };
 
   // 특정 날짜에 will solve 문제만 있는지 확인
   const hasOnlyWillSolveProblems = (date: Date) => {
     const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    const dayData = monthlyData.find((data) => data.date === dateString);
+    const dayData = monthlyData.find((data) => data.targetDate === dateString);
     return dayData && dayData.solvedProblemCount === 0 && dayData.willSolveProblemCount > 0;
   };
 

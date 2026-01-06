@@ -4,10 +4,10 @@ import { Calendar, dateFnsLocalizer, ToolbarProps, EventProps } from 'react-big-
 import { format, parse, startOfWeek, getDay, isSameDay, isToday } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { ComponentType, useMemo } from 'react';
+import { ComponentType, useMemo, useState, useEffect } from 'react';
 
 import { transformToCalendarEvents, getDisplayTags } from '../lib/utils';
-import { CalendarEvent } from '@/entities/calendar';
+import { CalendarEvent, useCalendar } from '@/entities/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -24,8 +24,17 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-// 커스텀 툴바
-function CustomToolbar({ date, onNavigate }: ToolbarProps) {
+// 커스텀 툴바 (외부에서 onNavigate를 받음)
+interface CustomToolbarPropsWithHandler extends ToolbarProps {
+  onNavigateCustom: (action: 'PREV' | 'NEXT' | 'TODAY') => void;
+}
+
+function CustomToolbar({ date, onNavigate, onNavigateCustom }: CustomToolbarPropsWithHandler) {
+  const handleClick = (action: 'PREV' | 'NEXT' | 'TODAY') => {
+    onNavigate(action); // react-big-calendar의 내부 상태 업데이트
+    onNavigateCustom(action); // 우리의 커스텀 핸들러 (API 요청)
+  };
+
   return (
     <div className="mb-4 flex items-center justify-between">
       {/* 좌측: 년/월 표시 */}
@@ -35,13 +44,13 @@ function CustomToolbar({ date, onNavigate }: ToolbarProps) {
 
       {/* 우측: 네비게이션 버튼 */}
       <div className="flex gap-2">
-        <button onClick={() => onNavigate('TODAY')} className="hover:bg-background rounded border px-3 py-1 text-xs" title="오늘로 이동">
+        <button onClick={() => handleClick('TODAY')} className="hover:bg-background rounded border px-3 py-1 text-xs" title="오늘로 이동">
           오늘
         </button>
-        <button onClick={() => onNavigate('PREV')} className="hover:bg-background rounded px-3 py-1 text-xs" title="지난달로 이동">
+        <button onClick={() => handleClick('PREV')} className="hover:bg-background rounded px-3 py-1 text-xs" title="지난달로 이동">
           <ChevronUp className="h-4 w-4" />
         </button>
-        <button onClick={() => onNavigate('NEXT')} className="hover:bg-background rounded px-3 py-1 text-xs" title="다음 달로 이동">
+        <button onClick={() => handleClick('NEXT')} className="hover:bg-background rounded px-3 py-1 text-xs" title="다음 달로 이동">
           <ChevronDown className="h-4 w-4" />
         </button>
       </div>
@@ -98,7 +107,22 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
 export default function BigCalendar() {
   // Zustand 스토어에서 데이터 가져오기
   const { monthlyData, actions } = useCalendarStore();
-  const setSelectedDate = actions.setSelectedDate;
+  const { setSelectedDate, setCalendarData } = actions;
+
+  // 현재 표시 중인 월 관리 (초기값: 오늘 날짜)
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const year = currentDate.getFullYear();
+  const month = currentDate.getMonth() + 1;
+
+  // 해당 월의 calendar 데이터 fetch
+  const { data: calendarData, isLoading } = useCalendar(year, month);
+
+  // 데이터가 로드되면 store에 저장
+  useEffect(() => {
+    if (calendarData) {
+      setCalendarData(calendarData);
+    }
+  }, [calendarData, setCalendarData]);
 
   // calendar 데이터를 react-big-calendar 이벤트로 변환
   const events = useMemo(() => {
@@ -114,6 +138,22 @@ export default function BigCalendar() {
   // 날짜 클릭 핸들러
   const handleSelectSlot = ({ start }: { start: Date }) => {
     setSelectedDate(start);
+  };
+
+  // 월 네비게이션 핸들러
+  const handleNavigate = (action: 'PREV' | 'NEXT' | 'TODAY') => {
+    const newDate = new Date(currentDate);
+
+    if (action === 'PREV') {
+      newDate.setMonth(newDate.getMonth() - 1);
+    } else if (action === 'NEXT') {
+      newDate.setMonth(newDate.getMonth() + 1);
+    } else if (action === 'TODAY') {
+      setCurrentDate(new Date());
+      return;
+    }
+
+    setCurrentDate(newDate);
   };
 
   return (
@@ -154,10 +194,12 @@ export default function BigCalendar() {
         culture="ko"
         views={['month']}
         defaultView="month"
+        date={currentDate}
+        onNavigate={(newDate) => setCurrentDate(newDate)}
         selectable
         onSelectSlot={handleSelectSlot}
         components={{
-          toolbar: CustomToolbar as ComponentType<ToolbarProps>,
+          toolbar: ((props: ToolbarProps) => <CustomToolbar {...props} onNavigateCustom={handleNavigate} />) as ComponentType<ToolbarProps>,
           month: {
             dateHeader: CustomMonthDateHeaderWrapper as ComponentType<any>,
           },

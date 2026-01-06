@@ -47,7 +47,7 @@ export interface WillSolveProblems {
 export type Problem = SolvedProblems | WillSolveProblems;
 
 export interface MonthlyData {
-  date: string;
+  targetDate: string;
   solvedProblemCount: number;
   willSolveProblemCount: number;
   solvedProblems: SolvedProblems[];

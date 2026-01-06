@@ -7,7 +7,7 @@ export function transformToCalendarEvents(monthlyDataArray: MonthlyData[]): Cale
   const events: CalendarEvent[] = [];
 
   monthlyDataArray.forEach((dayData: MonthlyData) => {
-    const date = new Date(dayData.date);
+    const date = new Date(dayData.targetDate);
 
     // solved 문제들을 이벤트로 변환
     dayData.solvedProblems.forEach((problem: SolvedProblems) => {
@@ -41,6 +41,7 @@ export function transformToCalendarEvents(monthlyDataArray: MonthlyData[]): Cale
       });
     });
   });
+  console.log('events', events);
 
   return events;
 }
