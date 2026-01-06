@@ -11,12 +11,12 @@ from app.activity.application.query.monthly_activity_data_query import (
 from app.activity.domain.repository.user_activity_repository import UserActivityRepository
 from app.baekjoon.domain.event.get_monthly_activity_data_payload import GetMonthlyActivityDataPayload
 from app.common.domain.vo.identifiers import UserAccountId
-from app.common.infra.event.decorators import event_handler
+from app.common.infra.event.decorators import event_handler, event_register_handlers
 from app.core.database import transactional
 
 logger = logging.getLogger(__name__)
 
-
+@event_register_handlers()
 class ActivityApplicationService:
     """Activity Application Service"""
 

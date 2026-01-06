@@ -6,6 +6,7 @@ from app.baekjoon.application.usecase.get_baekjoon_me_usecase import GetBaekjoon
 from app.baekjoon.application.usecase.get_monthly_problems_usecase import GetMonthlyProblemsUsecase
 from app.baekjoon.application.usecase.get_streaks_usecase import GetStreaksUsecase
 from app.baekjoon.infra.repository.baekjoon_account_repository_impl import BaekjoonAccountRepositoryImpl
+from app.baekjoon.infra.repository.problem_history_repository_impl import ProblemHistoryRepositoryImpl
 from app.baekjoon.infra.repository.streak_repository_impl import StreakRepositoryImpl
 from app.config.settings import get_settings
 from app.core.database import Database
@@ -236,6 +237,11 @@ class Container(containers.DeclarativeContainer):
         db=database,
     )
 
+    problem_history_repository = providers.Singleton(
+        ProblemHistoryRepositoryImpl,
+        db=database,
+    )
+
     # ========================================================================
     # Application Services
     # ========================================================================
@@ -320,6 +326,7 @@ class Container(containers.DeclarativeContainer):
     get_monthly_problems_usecase = providers.Singleton(
         GetMonthlyProblemsUsecase,
         baekjoon_account_repository=baekjoon_account_repository,
+        problem_history_repository=problem_history_repository,
         domain_event_bus=domain_event_bus
     )
 
@@ -331,7 +338,8 @@ class Container(containers.DeclarativeContainer):
         baekjoon_account_repository=baekjoon_account_repository,
         tag_repository=tag_repository,
         tag_skill_repository=tag_skill_repository,
-        tier_repository=tier_repository
+        tier_repository=tier_repository,
+        target_repository=target_repository
     )
 
     def init_resources(self):
@@ -346,55 +354,5 @@ class Container(containers.DeclarativeContainer):
         self.link_bj_account_usecase()
         self.activity_application_service()
         self.problem_application_service()
+        
     
-    
-    #
-    # baekjoon_account_repository = providers.Factory(
-    #     BaekjoonAccountRepositoryImpl,
-    #     db=database,
-    # )
-    #
-    # problem_repository = providers.Factory(
-    #     ProblemRepositoryImpl,
-    #     db=database,
-    # )
-    #
-    # tag_repository = providers.Factory(
-    #     TagRepositoryImpl,
-    #     db=database,
-    # )
-    #
-    # target_repository = providers.Factory(
-    #     TargetRepositoryImpl,
-    #     db=database,
-    # )
-    #
-    # tier_repository = providers.Factory(
-    #     TierRepositoryImpl,
-    #     db=database,
-    # )
-    #
-    # user_activity_repository = providers.Factory(
-    #     UserActivityRepositoryImpl,
-    #     db=database,
-    # )
-    #
-    # level_filter_repository = providers.Factory(
-    #     LevelFilterRepositoryImpl,
-    #     db=database,
-    # )
-    #
-    # tag_skill_repository = providers.Factory(
-    #     TagSkillRepositoryImpl,
-    #     db=database,
-    # )
-
-    # ========================================================================
-    # Use Cases / Application Services (구현되면 추가)
-    # ========================================================================
-    # user_registration_use_case = providers.Factory(
-    #     UserRegistrationUseCase,
-    #     user_repository=user_account_repository,
-    #     password_hasher=password_hasher,
-    #     event_bus=event_bus,
-    # )

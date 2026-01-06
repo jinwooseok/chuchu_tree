@@ -3,6 +3,7 @@ from typing import override
 
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from app.common.domain.enums import TagLevel
 from app.common.domain.vo.identifiers import TagId
@@ -25,13 +26,28 @@ class TagRepositoryImpl(TagRepository):
 
     @override
     async def save(self, tag: Tag) -> Tag:
-        """태그 저장 (구현 필요)"""
-        raise NotImplementedError()
+        """태그 저장"""
+        model = TagMapper.to_model(tag)
+        self.session.add(model)
+        await self.session.flush()
+        return TagMapper.to_entity(model)
 
     @override
     async def find_by_id(self, tag_id: TagId) -> Tag | None:
-        """태그 ID로 조회 (구현 필요)"""
-        raise NotImplementedError()
+        """태그 ID로 조회"""
+        stmt = (
+            select(TagModel)
+            .options(joinedload(TagModel.parent_tag_relations))
+            .where(
+                and_(
+                    TagModel.tag_id == tag_id.value,
+                    TagModel.deleted_at.is_(None)
+                )
+            )
+        )
+        result = await self.session.execute(stmt)
+        model = result.unique().scalars().one_or_none()
+        return TagMapper.to_entity(model) if model else None
 
     @override
     async def find_by_ids(self, tag_ids: list[TagId]) -> list[Tag]:
@@ -42,6 +58,7 @@ class TagRepositoryImpl(TagRepository):
         tag_id_values = [tid.value for tid in tag_ids]
         stmt = (
             select(TagModel)
+            .options(joinedload(TagModel.parent_tag_relations))
             .where(
                 and_(
                     TagModel.tag_id.in_(tag_id_values),
@@ -51,21 +68,83 @@ class TagRepositoryImpl(TagRepository):
         )
 
         result = await self.session.execute(stmt)
-        models = result.scalars().all()
+        models = result.unique().scalars().fetchall()
 
         return [TagMapper.to_entity(model) for model in models]
+    
+    @override
+    async def find_by_ids_and_active(self, tag_ids: list[TagId]) -> list[Tag]:
+        """여러 ID로 조회"""
+        if not tag_ids:
+            return []
 
+        tag_id_values = [tid.value for tid in tag_ids]
+        stmt = (
+            select(TagModel)
+            .options(joinedload(TagModel.parent_tag_relations))
+            .where(
+                and_(
+                    TagModel.tag_id.in_(tag_id_values),
+                    TagModel.excluded_yn == False,
+                    TagModel.deleted_at.is_(None)
+                )
+            )
+        )
+
+        result = await self.session.execute(stmt)
+        models = result.unique().scalars().fetchall()
+
+        return [TagMapper.to_entity(model) for model in models]
+    
     @override
     async def find_by_code(self, code: str) -> Tag | None:
-        """코드로 조회 (구현 필요)"""
-        raise NotImplementedError()
+        """코드로 조회"""
+        stmt = (
+            select(TagModel)
+            .options(joinedload(TagModel.parent_tag_relations))
+            .where(
+                and_(
+                    TagModel.tag_code == code,
+                    TagModel.deleted_at.is_(None)
+                )
+            )
+        )
+        result = await self.session.execute(stmt)
+        model = result.unique().scalars().one_or_none()
+        return TagMapper.to_entity(model) if model else None
 
     @override
     async def find_by_level(self, level: TagLevel) -> list[Tag]:
-        """레벨로 조회 (구현 필요)"""
-        raise NotImplementedError()
+        """레벨로 조회"""
+        stmt = (
+            select(TagModel)
+            .options(joinedload(TagModel.parent_tag_relations))
+            .where(
+                and_(
+                    TagModel.tag_level == level.value,
+                    TagModel.deleted_at.is_(None)
+                )
+            )
+            .order_by(TagModel.tag_id.asc())
+        )
+        result = await self.session.execute(stmt)
+        models = result.unique().scalars().fetchall()
+        return [TagMapper.to_entity(model) for model in models]
 
     @override
     async def find_active_tags(self) -> list[Tag]:
-        """활성 태그 조회 (구현 필요)"""
-        raise NotImplementedError()
+        """활성 태그 조회"""
+        stmt = (
+            select(TagModel)
+            .options(joinedload(TagModel.parent_tag_relations))
+            .where(
+                and_(
+                    TagModel.excluded_yn == False,
+                    TagModel.deleted_at.is_(None)
+                )
+            )
+            .order_by(TagModel.tag_id.asc())
+        )
+        result = await self.session.execute(stmt)
+        models = result.unique().scalars().fetchall()
+        return [TagMapper.to_entity(model) for model in models]

@@ -17,8 +17,4 @@ class TagExclusion:
     @staticmethod
     def is_excluded(reason: ExcludedReason) -> 'TagExclusion':
         return TagExclusion(excluded=True, reason=reason)
-    
-    def __post_init__(self):
-        if not self.excluded:
-            raise APIException(ErrorCode.INVALID_INPUT_VALUE)
 
