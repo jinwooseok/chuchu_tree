@@ -30,3 +30,13 @@ class ProblemRepository(ABC):
     @abstractmethod
     async def find_by_tags(self, tag_ids: list[TagId]) -> list[Problem]:
         pass
+    
+    @abstractmethod
+    async def find_by_id_prefix(self, prefix: str, limit: int = 5) -> list[Problem]:
+        """문제 ID가 특정 문자열로 시작하는 문제들을 조회"""
+        pass
+
+    @abstractmethod
+    async def find_by_title_keyword(self, keyword: str, limit: int = 5) -> list[Problem]:
+        """문제 제목에 키워드가 포함된 문제들을 조회"""
+        pass

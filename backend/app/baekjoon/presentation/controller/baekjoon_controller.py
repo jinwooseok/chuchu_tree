@@ -168,23 +168,21 @@ async def get_monthly_problems(
     return ApiResponse(data=response_data)
 
 
-# @router.post("/me/problem-update", response_model=ApiResponseSchema[dict])
-# @inject
-# async def refresh_problem_data(
-#     current_user: CurrentUser = Depends(get_current_member),
-#     # baekjoon_service = Depends(Provide[Container.baekjoon_service])
-# ):
-#     """
-#     새로고침 (solved.ac에서 최신 데이터 가져오기)
+@router.post("/me/problem-update", response_model=ApiResponseSchema[dict])
+@inject
+async def refresh_problem_data(
+    current_user: CurrentUser = Depends(get_current_member),
+    update_bj_account_usecase = Depends(Provide[Container.update_bj_account_usecase])
+):
+    """
+    새로고침 (solved.ac에서 최신 데이터 가져오기)
 
-#     Returns:
-#         빈 데이터
-#     """
-#     # TODO: Implement problem data refresh logic
-#     # 1. Fetch latest data from solved.ac API
-#     # 2. Update database
+    Returns:
+        빈 데이터
+    """
+    await update_bj_account_usecase.execute(current_user.user_account_id)
 
-#     return ApiResponse(data={})
+    return ApiResponse(data={})
 
 
 # # Admin endpoints

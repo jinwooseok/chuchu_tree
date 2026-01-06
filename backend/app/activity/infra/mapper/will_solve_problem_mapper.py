@@ -14,8 +14,9 @@ class WillSolveProblemMapper:
             will_solve_problem_id=model.will_solve_problem_id,
             user_account_id=UserAccountId(model.user_account_id),
             problem_id=ProblemId(model.problem_id),
-            solved=not model.marked_yn,  # marked_yn이 True면 아직 안 푼 것
+            solved=model.solved,
             marked_date=model.marked_date,
+            order=model.order,
             created_at=model.created_at,
             updated_at=model.updated_at,
             deleted_at=model.deleted_at
@@ -28,8 +29,9 @@ class WillSolveProblemMapper:
             will_solve_problem_id=entity.will_solve_problem_id,
             user_account_id=entity.user_account_id.value,
             problem_id=entity.problem_id.value,
-            marked_yn=not entity.solved,  # solved가 False면 marked_yn은 True
+            solved=entity.solved,
             marked_date=entity.marked_date,
+            order=entity.order,
             created_at=entity.created_at,
             updated_at=entity.updated_at,
             deleted_at=entity.deleted_at

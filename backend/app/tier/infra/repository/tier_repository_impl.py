@@ -67,3 +67,21 @@ class TierRepositoryImpl(TierRepository):
         result = await self.session.execute(stmt)
         models = result.scalars().all()
         return [TierMapper.to_entity(model) for model in models]
+    
+    @override
+    async def find_by_levels(self, tier_levels: list[int]) -> list[Tier]:
+        """여러 티어 레벨로 한 번에 조회 (IN 절 사용)"""
+        if not tier_levels:
+            return []
+
+        # 중복 제거 (필요한 경우)
+        unique_levels = list(set(tier_levels))
+
+        stmt = select(TierModel).where(
+            TierModel.tier_level.in_(unique_levels)
+        )
+        
+        result = await self.session.execute(stmt)
+        models = result.scalars().all()
+        
+        return [TierMapper.to_entity(model) for model in models]

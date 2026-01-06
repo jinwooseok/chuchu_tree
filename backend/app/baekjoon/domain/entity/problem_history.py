@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 
 from app.common.domain.vo.identifiers import BaekjoonAccountId, ProblemHistoryId, ProblemId, StreakId
 
@@ -12,11 +12,13 @@ class ProblemHistory:
     problem_id: ProblemId
     streak_id: StreakId | None  # 나중에 연동
     created_at: datetime
+    solved_date: date | None = None
 
     @staticmethod
     def create(
         bj_account_id: BaekjoonAccountId,
-        problem_id: ProblemId
+        problem_id: ProblemId,
+        solved_date: date | None = None
     ) -> 'ProblemHistory':
         """문제 풀이 기록 생성 (처음엔 시간 정보 없음)"""
         return ProblemHistory(
@@ -24,6 +26,7 @@ class ProblemHistory:
             bj_account_id=bj_account_id,
             problem_id=problem_id,
             streak_id=None,  # 나중에 연동
+            solved_date=solved_date,
             created_at=datetime.now()
         )
 

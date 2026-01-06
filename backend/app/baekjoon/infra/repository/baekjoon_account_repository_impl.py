@@ -1,6 +1,6 @@
 """BaekjoonAccount Repository 구현"""
 
-from datetime import datetime
+from datetime import date, datetime
 from typing import override
 from sqlalchemy import and_, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -29,7 +29,6 @@ class BaekjoonAccountRepositoryImpl(BaekjoonAccountRepository):
     @property
     def session(self) -> AsyncSession:
         return self.db.get_current_session()
-
     @override
     async def save(self, account: BaekjoonAccount) -> BaekjoonAccount:
         """백준 계정 저장"""
@@ -46,9 +45,50 @@ class BaekjoonAccountRepositoryImpl(BaekjoonAccountRepository):
         for streak in account.streaks:
             streak_model = StreakMapper.to_model(streak)
             self.session.add(streak_model)
+            
+    @override
+    async def update_stat(self, account: BaekjoonAccount) -> BaekjoonAccount:
+        # 1. 계정 정보 업데이트 (객체 속성 복사)
+        stmt = select(BjAccountModel).where(BjAccountModel.bj_account_id == account.bj_account_id.value)
+        result = await self.session.execute(stmt)
+        existing_model = result.scalar_one_or_none()
 
-        await self.session.flush()  # ID 생성을 위해 flush
+        if existing_model:
+            # 기존 모델의 값들을 엔티티 값으로 덮어씌움 (필드별 매칭 필요)
+            existing_model.tier_id = account.current_tier_id.value
+            existing_model.rating = account.rating.value
+            existing_model.class_ = account.statistics.class_level # 필드명 확인 필요
+            existing_model.updated_at = datetime.now()
+            model = existing_model
+        else:
+            model = BaekjoonAccountMapper.to_model(account)
+            self.session.add(model)
 
+        # 2. 스트릭 저장 (중복 방지)
+        date_to_streak_id = {}
+        for streak in account.streaks:
+            # 중복 체크: 이미 해당 날짜의 스트릭 모델이 세션에 있는지 혹은 DB에 있는지 확인
+            # 간단하게는 merge()를 사용하는 것이 가장 안전합니다.
+            streak_model = await self.session.merge(StreakMapper.to_model(streak))
+            date_to_streak_id[streak.streak_date] = streak_model
+
+        await self.session.flush()
+
+        # 3. 문제 히스토리 저장 (중복 방지)
+        today = date.today() 
+        for history in account.problem_histories:
+            # 이미 존재하는 history는 skip하거나 merge해야 함
+            # Mapper가 problem_history_id(PK)를 포함한다면 merge가 알아서 처리함
+            history_model = ProblemHistoryMapper.to_model(history)
+            
+            if history.streak_id is None:
+                target_streak_model = date_to_streak_id.get(today) # 또는 history.solved_date
+                if target_streak_model:
+                    history_model.streak_id = target_streak_model.streak_id
+            
+            await self.session.merge(history_model)
+
+        await self.session.flush()
         return BaekjoonAccountMapper.to_entity(model)
 
     @override
@@ -120,6 +160,23 @@ class BaekjoonAccountRepositoryImpl(BaekjoonAccountRepository):
         bj_account = BaekjoonAccountMapper.to_entity(bj_account_model)
 
         return (bj_account, linked_at)
+    
+    @override
+    async def find_all_ids(self) -> list[str]:
+        """모든 id 조회"""
+        stmt = (
+            select(BjAccountModel)
+            .where(
+                and_(
+                    BjAccountModel.deleted_at.is_(None)
+                )
+            )
+        )
+
+        result = await self.session.execute(stmt)
+        models = result.unique().scalars().fetchall()
+
+        return [model.bj_account_id for model in models]
 
     @override
     async def get_tag_stats(self, account_id: BaekjoonAccountId) -> list[TagAccountStat]:
@@ -153,3 +210,4 @@ class BaekjoonAccountRepositoryImpl(BaekjoonAccountRepository):
             ))
 
         return stats
+    
