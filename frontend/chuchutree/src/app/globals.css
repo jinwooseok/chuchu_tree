@@ -117,7 +117,7 @@
   --sidebar-foreground: oklch(0.145 0 0);
   --sidebar-primary: oklch(0.205 0 0);
   --sidebar-primary-foreground: #f3f0f0;
-  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent: #e7d8cb;
   --sidebar-accent-foreground: oklch(0.205 0 0);
   --sidebar-border: oklch(0.922 0 0);
   --sidebar-ring: oklch(0.708 0 0);
@@ -126,8 +126,8 @@
 .dark {
   --background: oklch(0.205 0 0);
   --foreground: #f3f0f0;
-  --innerground-white: oklch(31.317% 0.00004 271.152);
-  --innerground-darkgray: oklch(21.779% 0.00002 271.152);
+  --innerground-white: #2b2a28;
+  --innerground-darkgray: oklch(33.289% 0.00004 271.152);
   --tier-undefined: #2d2d2d;
   --tier-bronze: #ad5600;
   --tier-silver: #435f7a;
@@ -144,7 +144,7 @@
   --locked-bg: #e4e4e4;
   --locked-text: #303030;
   --excluded-bg: #ed6e6e;
-  --excluded-text: #5d1111;
+  --excluded-text: #ed6e6e;
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);

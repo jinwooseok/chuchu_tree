@@ -2,6 +2,7 @@
 
 import { Calendar, ChevronUp, Dices, Gem, Leaf, LibraryBig, PanelLeft, User2 } from 'lucide-react';
 import { useLayoutStore } from '@/lib/store/layout';
+import { useUser } from '@/lib/store/user';
 
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -14,6 +15,7 @@ const ICON_SIZE = 32;
 export function AppSidebar() {
   const { state: sidebarOpenState, toggleSidebar: setSidebarOpenState } = useSidebar();
   const { topSection, centerSection, bottomSection, toggleTopSection, setCenterSection, toggleBottomSection } = useLayoutStore();
+  const { user } = useUser();
 
   // Menu items.
   const items = [
@@ -110,7 +112,7 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton>
-                  <User2 /> Username
+                  <User2 /> {user?.bjAccount.bjAccountId ?? 'Guest'}
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>

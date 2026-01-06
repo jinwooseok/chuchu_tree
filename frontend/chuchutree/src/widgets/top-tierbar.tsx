@@ -1,15 +1,18 @@
+import { useUser } from '@/lib/store/user';
 import { TIER_INFO } from '@/shared/constants/tierSystem';
 type TierKey = keyof typeof TIER_INFO;
 
-const MockUserInfoTierId = '17';
-const MockUserInfoRating = '1859';
+const masterId: number = 31;
 
 export default function TopTierbar() {
-  const masterId: string = '31';
-  const nextTierId: TierKey = MockUserInfoTierId === masterId ? MockUserInfoTierId : ((Number(MockUserInfoTierId) + 1).toString() as TierKey);
+  const { user } = useUser();
+  const MockUserInfoTierId = user?.bjAccount.stat.tierId || 17;
+  const MockUserInfoRating = user?.bjAccount.stat.rating || '1859';
+  const nextTierId: TierKey = MockUserInfoTierId === masterId ? MockUserInfoTierId : ((MockUserInfoTierId + 1) as TierKey);
   const ratingToNext = TIER_INFO[nextTierId].rating - Number(MockUserInfoRating);
   const totalRatingForNextTier = TIER_INFO[nextTierId].rating - TIER_INFO[MockUserInfoTierId].rating;
   const tierRatio = ((totalRatingForNextTier - ratingToNext) / totalRatingForNextTier) * 100;
+
   return (
     <div className="bg-innerground-white flex h-full flex-col items-center justify-center gap-2 p-6">
       <div className="flex w-full justify-between">
