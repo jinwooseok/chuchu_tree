@@ -51,11 +51,6 @@ class UpdateBjAccountUsecase:
         already_solved_ids = {p.problem_id.value for p in existing_account.problem_histories}
         new_problems = [p for p in user_data.problems if p.problem_id not in already_solved_ids]
         
-        # 5. 스트릭 업데이트 (데이터가 없어도 스트릭 정보는 갱신될 수 있음)
-        for history_item in user_data.history:
-            s_date = datetime.fromisoformat(history_item.timestamp.replace('Z', '+00:00')).date()
-            existing_account.add_or_update_streak(s_date, history_item.solved_count)
-
         # 6. 신규 문제 매칭
         if new_problems:
             # 어떤 날짜의 스트릭에 매칭할지 결정 (휴리스틱: API의 최신 날짜)
