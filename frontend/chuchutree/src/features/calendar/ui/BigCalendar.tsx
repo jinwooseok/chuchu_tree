@@ -158,33 +158,6 @@ export default function BigCalendar() {
 
   return (
     <div className="calendar-12px h-full w-full">
-      <style jsx global>{`
-        .rbc-event,
-        .rbc-event-label,
-        .rbc-event-content {
-          display: none !important;
-        }
-
-        /* 날짜 칸 클릭 시 애니메이션 */
-        .rbc-day-bg:active {
-          background-color: rgba(0, 0, 0, 0.05);
-          transition: background-color 0.1s ease;
-        }
-        .rbc-off-range-bg {
-          background-color: transparent;
-        }
-        /* 캘린더 그리드 border 설정 */
-
-        .rbc-header {
-          border-left: transparent !important;
-        }
-        .rbc-month-view {
-          border: transparent !important;
-        }
-        .rbc-today {
-          background-color: transparent !important;
-        }
-      `}</style>
       <Calendar
         localizer={localizer}
         events={events}
