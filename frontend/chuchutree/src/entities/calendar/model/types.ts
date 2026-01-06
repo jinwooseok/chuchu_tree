@@ -70,3 +70,10 @@ export interface CalendarEvent {
     tagCode: string;
   };
 }
+
+// 풀문제 업데이트, 푼문제 업데이트 request data
+
+export interface UpdateProblemsData {
+  date: string;
+  problemIds: number[];
+}

@@ -11,15 +11,6 @@ interface MonthlyData {
   willSolveProblems: any[];
 }
 
-interface Problem {
-  problemId: number;
-  problemTitle: string;
-  problemTierLevel: number;
-  problemTierName: string;
-  problemClassLevel: number;
-  tags: any[];
-}
-
 type State = {
   selectedDate: Date | null;
   monthlyData: MonthlyData[];
@@ -76,35 +67,6 @@ const calendarStoreInternal = create(
               state.isInitialized = false;
             });
           },
-
-          // will solve에 문제 추가 (향후 API 연동)
-          addProblemToWillSolve: (date: Date, problem: Problem) => {
-            const dateString = formatDateString(date);
-            set((state) => {
-              const dataIndex = state.monthlyData.findIndex((data) => data.targetDate === dateString);
-              if (dataIndex !== -1) {
-                state.monthlyData[dataIndex].willSolveProblems.push(problem);
-                state.monthlyData[dataIndex].willSolveProblemCount += 1;
-              }
-            });
-          },
-
-          // will solve에서 문제 삭제 (향후 API 연동)
-          removeProblemFromWillSolve: (date: Date, problemId: number) => {
-            const dateString = formatDateString(date);
-            set((state) => {
-              const dataIndex = state.monthlyData.findIndex((data) => data.targetDate === dateString);
-              if (dataIndex !== -1) {
-                state.monthlyData[dataIndex].willSolveProblems = state.monthlyData[dataIndex].willSolveProblems.filter(
-                  (p: Problem) => p.problemId !== problemId
-                );
-                state.monthlyData[dataIndex].willSolveProblemCount = Math.max(
-                  0,
-                  state.monthlyData[dataIndex].willSolveProblemCount - 1
-                );
-              }
-            });
-          },
         },
 
         // Selectors
@@ -149,14 +111,4 @@ export const useSetSelectedDate = () => {
 export const useClearCalendarData = () => {
   const clearCalendarData = calendarStoreInternal((s) => s.actions.clearCalendarData);
   return clearCalendarData;
-};
-
-export const useAddProblemToWillSolve = () => {
-  const addProblemToWillSolve = calendarStoreInternal((s) => s.actions.addProblemToWillSolve);
-  return addProblemToWillSolve;
-};
-
-export const useRemoveProblemFromWillSolve = () => {
-  const removeProblemFromWillSolve = calendarStoreInternal((s) => s.actions.removeProblemFromWillSolve);
-  return removeProblemFromWillSolve;
 };

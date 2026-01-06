@@ -1,5 +1,5 @@
 import { ApiResponse } from '@/shared/types/api';
-import { Calendar } from '../model/types';
+import { Calendar, UpdateProblemsData } from '../model/types';
 import { axiosInstance } from '@/lib/axios';
 
 export const calendarApi = {
@@ -11,5 +11,11 @@ export const calendarApi = {
       },
     });
     return data.data;
+  },
+  updateWillSolveProblems: async (data: UpdateProblemsData): Promise<void> => {
+    await axiosInstance.post('/user-accounts/me/problems/will-solve-broblems', data);
+  },
+  updateSolvedProblems: async (data: UpdateProblemsData): Promise<void> => {
+    await axiosInstance.post('/user-accounts/me/problems/solved-problems', data);
   },
 };

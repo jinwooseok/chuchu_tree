@@ -34,6 +34,7 @@ function ProblemCard({ problem, isSolved }: { problem: Problem; isSolved: boolea
       </div>
       {/* 문제이름 */}
       <div className="line-clamp-2">{problem.problemTitle}</div>
+      {!isSolved && <button>삭제</button>}
     </div>
   );
 }
