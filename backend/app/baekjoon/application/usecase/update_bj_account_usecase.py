@@ -1,10 +1,14 @@
 from datetime import datetime
 from fastapi import logger
 from app.baekjoon.domain.entity.baekjoon_account import BaekjoonAccount
+from app.baekjoon.domain.entity.problem_history import ProblemHistory
+from app.baekjoon.domain.entity.streak import Streak
 from app.baekjoon.domain.gateway.solvedac_gateway import SolvedacGateway
 from app.baekjoon.domain.repository.baekjoon_account_repository import BaekjoonAccountRepository
+from app.baekjoon.domain.repository.problem_history_repository import ProblemHistoryRepository
+from app.baekjoon.domain.repository.streak_repository import StreakRepository
 from app.baekjoon.infra.repository.problem_history_repository_impl import ProblemHistoryRepositoryImpl
-from app.common.domain.vo.identifiers import BaekjoonAccountId, ProblemId, TierId, UserAccountId
+from app.common.domain.vo.identifiers import BaekjoonAccountId, ProblemId, StreakId, TierId, UserAccountId
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
@@ -21,12 +25,14 @@ class UpdateBjAccountUsecase:
     def __init__(
         self,
         baekjoon_account_repository: BaekjoonAccountRepository,
-        problem_history_repository: ProblemHistoryRepositoryImpl,
+        problem_history_repository: ProblemHistoryRepository,
+        streak_repository: StreakRepository,
         solvedac_gateway: SolvedacGateway
     ):
         self.baekjoon_account_repository = baekjoon_account_repository
         self.solvedac_gateway = solvedac_gateway
         self.problem_history_repository = problem_history_repository
+        self.streak_repository = streak_repository
 
     @transactional
     async def execute(self, user_account_id: int) -> None:
@@ -53,19 +59,37 @@ class UpdateBjAccountUsecase:
         # 4. 새로운 문제 필터링
         new_problems = [p for p in user_data.problems if p.problem_id not in existing_problem_history_ids]
         
+        # 5. 스트릭 업데이트 (데이터가 없어도 스트릭 정보는 갱신될 수 있음)
+        
+        streak_data_list = [
+            Streak.create(
+                bj_account_id=existing_account.bj_account_id, 
+                   streak_date=datetime.fromisoformat(h.timestamp.replace('Z', '+00:00')).date(),
+                   solved_count=h.solved_count,
+                   problem_history_id=None)
+            for h in user_data.history
+        ]
+        
+        date_to_streak_id: list[int] = await self.streak_repository.save_unlinked_streaks_and_get_ids(
+            bj_account_id=existing_account.bj_account_id,
+            streaks=streak_data_list
+        )
+        
         # 6. 신규 문제 매칭
+        print(new_problems)
         if new_problems:
             # 어떤 날짜의 스트릭에 매칭할지 결정 (휴리스틱: API의 최신 날짜)
-            latest_history = max(user_data.history, key=lambda x: x.timestamp)
-            latest_date = datetime.fromisoformat(latest_history.timestamp.replace('Z', '+00:00')).date()
-            
-            for p in new_problems:
+            for p, s in zip(new_problems, date_to_streak_id):
                 # record_problem_solved는 streak_id 없이 문제 정보만 history에 추가
                 # 단, 필요하다면 history 엔티티 내부에 solved_date 필드를 두어 나중에 매칭 포인트로 활용
-                existing_account.record_problem_solved(
-                    problem_id=ProblemId(p.problem_id),
-                    solved_date=latest_date  # 이 날짜 정보가 매칭의 Key가 됨
-                )
+                new_history_entities = [
+                    ProblemHistory.create(
+                        bj_account_id=existing_account.bj_account_id,
+                        problem_id=ProblemId(p.problem_id),
+                        streak_id=StreakId(s)
+                    ) for p in new_problems
+                ]
+            await self.problem_history_repository.save_all(new_history_entities)
 
         await self.baekjoon_account_repository.update_stat(existing_account)
         

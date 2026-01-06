@@ -18,14 +18,15 @@ class ProblemHistory:
     def create(
         bj_account_id: BaekjoonAccountId,
         problem_id: ProblemId,
-        solved_date: date | None = None
+        solved_date: date | None = None,
+        streak_id: StreakId | None = None
     ) -> 'ProblemHistory':
         """문제 풀이 기록 생성 (처음엔 시간 정보 없음)"""
         return ProblemHistory(
             problem_history_id=None,  # DB에서 할당
             bj_account_id=bj_account_id,
             problem_id=problem_id,
-            streak_id=None,  # 나중에 연동
+            streak_id=streak_id,  
             solved_date=solved_date,
             created_at=datetime.now()
         )

@@ -9,7 +9,14 @@ from app.common.domain.vo.identifiers import BaekjoonAccountId
 
 class ProblemHistoryRepository(ABC):
     """문제 풀이 기록 Repository 인터페이스"""
-
+    
+    @abstractmethod
+    async def save_all(
+        self,
+        problem_histories: list[ProblemHistory]
+    ) -> None:
+        pass
+    
     @abstractmethod
     async def find_by_account_id(
         self,

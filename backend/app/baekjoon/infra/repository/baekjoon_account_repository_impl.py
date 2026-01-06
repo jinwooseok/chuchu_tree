@@ -64,30 +64,6 @@ class BaekjoonAccountRepositoryImpl(BaekjoonAccountRepository):
             model = BaekjoonAccountMapper.to_model(account)
             self.session.add(model)
 
-        # 2. 스트릭 저장 (중복 방지)
-        date_to_streak_id = {}
-        for streak in account.streaks:
-            # 중복 체크: 이미 해당 날짜의 스트릭 모델이 세션에 있는지 혹은 DB에 있는지 확인
-            # 간단하게는 merge()를 사용하는 것이 가장 안전합니다.
-            streak_model = await self.session.merge(StreakMapper.to_model(streak))
-            date_to_streak_id[streak.streak_date] = streak_model
-
-        await self.session.flush()
-
-        # 3. 문제 히스토리 저장 (중복 방지)
-        today = date.today() 
-        for history in account.problem_histories:
-            # 이미 존재하는 history는 skip하거나 merge해야 함
-            # Mapper가 problem_history_id(PK)를 포함한다면 merge가 알아서 처리함
-            history_model = ProblemHistoryMapper.to_model(history)
-            
-            if history.streak_id is None:
-                target_streak_model = date_to_streak_id.get(today) # 또는 history.solved_date
-                if target_streak_model:
-                    history_model.streak_id = target_streak_model.streak_id
-            
-            await self.session.merge(history_model)
-
         await self.session.flush()
         return BaekjoonAccountMapper.to_entity(model)
 

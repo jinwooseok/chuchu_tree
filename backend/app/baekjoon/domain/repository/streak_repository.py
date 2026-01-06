@@ -29,3 +29,7 @@ class StreakRepository(ABC):
             스트릭 목록 (날짜 오름차순)
         """
         pass
+    
+    @abstractmethod
+    async def save_unlinked_streaks_and_get_ids(self, bj_account_id: int, streaks: list[Streak]) -> list[int]:
+        pass

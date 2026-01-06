@@ -274,6 +274,7 @@ class Container(containers.DeclarativeContainer):
         UpdateBjAccountUsecase,
         baekjoon_account_repository=baekjoon_account_repository,
         problem_history_repository=problem_history_repository,
+        streak_repository=streak_repository,
         solvedac_gateway=solvedac_gateway
     )
 
