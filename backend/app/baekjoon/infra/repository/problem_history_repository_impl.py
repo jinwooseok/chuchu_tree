@@ -99,3 +99,27 @@ class ProblemHistoryRepositoryImpl(ProblemHistoryRepository):
 
         # {problem_id: streak_date} 딕셔너리로 반환
         return {row.problem_id: row.streak_date for row in rows}
+
+    @override
+    async def find_solved_ids_in_list(
+        self,
+        bj_account_id: BaekjoonAccountId,
+        problem_ids: list[int]
+    ) -> set[int]:
+        """주어진 문제 목록 중 유저가 한 번이라도 푼 적 있는 ID들만 조회"""
+        if not problem_ids:
+            return set()
+
+        stmt = (
+            select(ProblemHistoryModel.problem_id)
+            .where(
+                and_(
+                    ProblemHistoryModel.bj_account_id == bj_account_id.value,
+                    # IN 절을 통해 계획된 문제 리스트 중 실제 이력에 있는 것들만 필터링
+                    ProblemHistoryModel.problem_id.in_(problem_ids)
+                )
+            )
+        )
+
+        result = await self.session.execute(stmt)
+        return set(result.scalars().all())

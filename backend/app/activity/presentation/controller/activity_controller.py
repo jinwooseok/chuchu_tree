@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Depends, Query
 from dependency_injector.wiring import inject, Provide
 
+from app.activity.application.command.update_will_solve_problems import UpdateWillSolveProblemsCommand
+from app.activity.application.service.activity_application_service import ActivityApplicationService
 from app.common.domain.vo.current_user import CurrentUser
 from app.common.presentation.dependency.auth_dependencies import get_current_member
 from app.activity.presentation.schema.request.activity_request import (
@@ -18,13 +20,12 @@ from app.core.api_response import ApiResponse, ApiResponseSchema
 
 router = APIRouter(prefix="/user-accounts/me", tags=["activity"])
 
-
 @router.post("/problems/will-solve-problems", response_model=ApiResponseSchema[dict])
 @inject
 async def update_will_solve_problems(
     request: UpdateWillSolveProblemsRequest,
     current_user: CurrentUser = Depends(get_current_member),
-    # activity_service = Depends(Provide[Container.activity_service])
+    activity_application_service: ActivityApplicationService = Depends(Provide[Container.activity_application_service])
 ):
     """
     풀 문제 업데이트 (날짜 단위)
@@ -35,16 +36,16 @@ async def update_will_solve_problems(
     Returns:
         빈 데이터
     """
-    # TODO: Implement update will solve problems logic
-    # 1. Validate problem IDs
-    # 2. Update will solve problems for the date
+    await activity_application_service.update_will_solve_problems(UpdateWillSolveProblemsCommand(user_account_id = current_user.user_account_id, 
+                                                                                              solved_date = request.date, 
+                                                                                              problem_ids = request.problem_ids))
 
     return ApiResponse(data={})
 
 
 @router.post("/problems/solved-problems", response_model=ApiResponseSchema[dict])
 @inject
-async def update_solved_problems(
+async def update_solved_problems_order(
     request: UpdateSolvedProblemsRequest,
     current_user: CurrentUser = Depends(get_current_member),
     # activity_service = Depends(Provide[Container.activity_service])

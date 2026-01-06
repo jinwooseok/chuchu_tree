@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 from dependency_injector.wiring import inject, Provide
 
+from app.problem.application.query.problems_info_query import ProblemsInfoQuery
+from app.problem.application.service.problem_application_service import ProblemApplicationService
 from app.problem.presentation.schema.response.problem_response import (
     ProblemSearchResponse,
     ProblemSearchResults
@@ -15,7 +17,7 @@ router = APIRouter(prefix="/problems", tags=["problems"])
 @inject
 async def search_problems(
     keyword: str = Query(..., description="검색 키워드"),
-    # problem_service = Depends(Provide[Container.problem_service])
+    problem_application_service: ProblemApplicationService = Depends(Provide[Container.problem_application_service])
 ):
     """
     문제 검색 (문제 이름, ID 각 5개)
@@ -27,18 +29,9 @@ async def search_problems(
         ID 기반 검색 결과 (최대 5개)
         제목 기반 검색 결과 (최대 5개)
     """
-    # TODO: Implement problem search logic
-    # 1. Search problems by ID (if keyword is numeric)
-    # 2. Search problems by title
-    # 3. Return up to 5 results for each
+    
+    queries: list[ProblemsInfoQuery] = await problem_application_service.search_problem_by_keyword(keyword)
 
-    response_data = ProblemSearchResponse(
-        problems=ProblemSearchResults(
-            idBaseTotalCount=0,
-            titleBaseTotalCount=0,
-            idBase=[],
-            titleBase=[]
-        )
-    )
+    response_data = ProblemSearchResponse.from_queries(queries[0], queries[1])
 
     return ApiResponse(data=response_data.model_dump(by_alias=True))

@@ -154,3 +154,9 @@ class ErrorCode(Enum):
         message="백준 계정과 연동되지 않았습니다.",
         status_code=404
     )
+    
+    DUPLICATED_ORDER = ErrorCodeInfo(
+        code="DUPLICATED_ORDER",
+        message="순서가 중복입니다.",
+        status_code=400
+    )

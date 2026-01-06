@@ -1,11 +1,11 @@
 from pydantic import BaseModel, Field
 from typing import List
-
+from datetime import date as date_
 
 class UpdateWillSolveProblemsRequest(BaseModel):
     """풀 문제 업데이트 요청"""
-    date: str = Field(..., description="날짜 (YYYY-MM-DD)")
-    problem_id: List[int] = Field(..., alias="problemId", description="문제 ID 목록")
+    date: date_ = Field(..., description="날짜 (YYYY-MM-DD)")
+    problem_ids: list[int] = Field(..., alias="problemId", description="문제 ID 목록")
 
     class Config:
         populate_by_name = True
@@ -14,7 +14,7 @@ class UpdateWillSolveProblemsRequest(BaseModel):
 class UpdateSolvedProblemsRequest(BaseModel):
     """풀었던 문제 업데이트 요청"""
     date: str = Field(..., description="날짜 (YYYY-MM-DD)")
-    problem_id: List[int] = Field(..., alias="problemId", description="문제 ID 목록")
+    problem_ids: List[int] = Field(..., alias="problemId", description="문제 ID 목록")
 
     class Config:
         populate_by_name = True

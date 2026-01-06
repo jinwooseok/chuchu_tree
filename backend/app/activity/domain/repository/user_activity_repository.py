@@ -10,14 +10,6 @@ class UserActivityRepository(ABC):
     """Repository 인터페이스"""
 
     @abstractmethod
-    async def save(self, activity: UserActivity) -> UserActivity:
-        pass
-
-    @abstractmethod
-    async def find_by_user_id(self, user_id: 'UserAccountId') -> UserActivity|None:
-        pass
-
-    @abstractmethod
     async def find_will_solve_problems_by_date(
         self,
         user_id: 'UserAccountId',
@@ -43,4 +35,8 @@ class UserActivityRepository(ABC):
         month: int
     ) -> list[WillSolveProblem]:
         """월간 풀 예정 문제 조회"""
+        pass
+    
+    @abstractmethod
+    async def save_all_will_solve_problems(self, will_solve_problems: list['WillSolveProblem']) -> None:
         pass

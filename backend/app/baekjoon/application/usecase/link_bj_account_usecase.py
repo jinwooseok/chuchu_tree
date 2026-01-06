@@ -75,7 +75,7 @@ class LinkBjAccountUsecase:
 
         # 2-2. 존재하지 않으면 solved.ac에서 데이터 수집
         logger.info(f"[LinkBjAccountUsecase] solved.ac에서 데이터 수집 시작: {command.bj_account_id}")
-        user_data = await self.solvedac_gateway.fetch_user_data(command.bj_account_id)
+        user_data = await self.solvedac_gateway.fetch_user_data_first(command.bj_account_id)
 
         if user_data is None:
             logger.error(f"[LinkBjAccountUsecase] solved.ac에서 데이터를 찾을 수 없음: {command.bj_account_id}")

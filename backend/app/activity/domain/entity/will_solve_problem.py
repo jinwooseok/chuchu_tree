@@ -12,6 +12,7 @@ class WillSolveProblem:
     problem_id: ProblemId
     solved: bool
     marked_date: date
+    order: int
     created_at: datetime
     updated_at: datetime
     deleted_at: datetime|None = None
@@ -28,13 +29,25 @@ class WillSolveProblem:
             user_account_id=user_account_id,
             problem_id=problem_id,
             solved=False,
+            order=0,
             marked_date=marked_date,
             created_at=now,
             updated_at=now,
             deleted_at=None
         )
     
-    def unmark(self) -> None:
+    def delete(self) -> None:
         """마킹 해제"""
-        self.marked = False
         self.updated_at = datetime.now()
+        self.deleted_at = datetime.now()
+    
+    def restore(self) -> None:
+        """삭제되었던 문제를 다시 추가할 경우 복구"""
+        self.deleted_at = None
+        self.updated_at = datetime.now()
+    
+    def change_order(self, new_order: int) -> None:
+        """순서 변경: 순서가 실제로 다를 때만 업데이트 수행"""
+        if self.order != new_order:
+            self.order = new_order
+            self.updated_at = datetime.now()

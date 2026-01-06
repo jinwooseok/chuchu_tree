@@ -20,6 +20,10 @@ class TierRepository(ABC):
         pass
     
     @abstractmethod
+    async def find_by_levels(self, tier_levels: list[int]) -> list[Tier]:
+        pass
+    
+    @abstractmethod
     async def find_by_code(self, tier_code: str) -> Tier | None:
         pass
     

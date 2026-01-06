@@ -5,9 +5,11 @@ from app.baekjoon.application.usecase.link_bj_account_usecase import LinkBjAccou
 from app.baekjoon.application.usecase.get_baekjoon_me_usecase import GetBaekjoonMeUsecase
 from app.baekjoon.application.usecase.get_monthly_problems_usecase import GetMonthlyProblemsUsecase
 from app.baekjoon.application.usecase.get_streaks_usecase import GetStreaksUsecase
+from app.baekjoon.application.usecase.update_bj_account_usecase import UpdateBjAccountUsecase
 from app.baekjoon.infra.repository.baekjoon_account_repository_impl import BaekjoonAccountRepositoryImpl
 from app.baekjoon.infra.repository.problem_history_repository_impl import ProblemHistoryRepositoryImpl
 from app.baekjoon.infra.repository.streak_repository_impl import StreakRepositoryImpl
+from app.baekjoon.infra.scheduler.metric_scheduler import BjAccountUpdateScheduler
 from app.config.settings import get_settings
 from app.core.database import Database
 from app.tier.infra.repository.tier_repository_impl import TierRepositoryImpl
@@ -266,6 +268,13 @@ class Container(containers.DeclarativeContainer):
         streak_repository=streak_repository,
         baekjoon_account_repository=baekjoon_account_repository
     )
+    
+    update_bj_account_usecase = providers.Singleton(
+        UpdateBjAccountUsecase,
+        baekjoon_account_repository=baekjoon_account_repository,
+        solvedac_gateway=solvedac_gateway
+    )
+
 
     # ========================================================================
     # Activity domain
@@ -341,6 +350,14 @@ class Container(containers.DeclarativeContainer):
         tier_repository=tier_repository,
         target_repository=target_repository
     )
+    
+    # ========================================================================
+    # Scheduler (스케줄러)
+    # ========================================================================
+    bj_account_update_scheduler = providers.Singleton(
+        BjAccountUpdateScheduler,
+        update_bj_account_use_case=update_bj_account_usecase
+    )
 
     def init_resources(self):
         """앱 시작 시점에 싱글톤 객체들을 미리 생성"""
@@ -354,5 +371,9 @@ class Container(containers.DeclarativeContainer):
         self.link_bj_account_usecase()
         self.activity_application_service()
         self.problem_application_service()
+        
+        # 3. 스케줄러 시작 (추가)
+        scheduler = self.bj_account_update_scheduler()
+        scheduler.start()
         
     

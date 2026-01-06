@@ -77,10 +77,10 @@ class BaekjoonAccount:
         self.rating = Rating(new_rating)
         self.updated_at = datetime.now()
     
-    def record_problem_solved(self, problem_id: ProblemId) -> None:
+    def record_problem_solved(self, problem_id: ProblemId, solved_date: date | None = None) -> None:
         """도메인 로직 - 문제 해결 기록 (시간 정보 없음)"""
         self.problem_histories.append(
-            ProblemHistory.create(self.bj_account_id, problem_id)
+            ProblemHistory.create(self.bj_account_id, problem_id, solved_date)
         )
 
     def add_streak(self, streak_date: date, solved_count: int) -> None:
@@ -104,3 +104,20 @@ class BaekjoonAccount:
                 prev_skill_id
             )
         )
+        
+    def add_or_update_streak(self, streak_date: date, solved_count: int) -> None:
+        """기존 스트릭이 있으면 업데이트, 없으면 추가"""
+        existing = next((s for s in self.streaks if s.streak_date == streak_date), None)
+        if existing:
+            existing.update_solved_count(solved_count)
+        else:
+            self.streaks.append(Streak.create(self.bj_account_id, streak_date, solved_count))
+
+    def record_problem_with_streak(self, problem_id: ProblemId, streak: 'Streak') -> None:
+        """문제와 스트릭을 연결하여 기록"""
+        history = ProblemHistory.create(self.bj_account_id, problem_id)
+        
+        # Heuristic: 전달받은 스트릭 객체를 참조
+        # 나중에 Repository에서 save할 때, streak의 ID가 생성된 후 history의 streak_id로 들어감
+        history.link_to_streak(streak) 
+        self.problem_histories.append(history)

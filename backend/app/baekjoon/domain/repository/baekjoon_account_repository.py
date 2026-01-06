@@ -11,13 +11,21 @@ class BaekjoonAccountRepository(ABC):
     @abstractmethod
     async def save(self, account: BaekjoonAccount) -> BaekjoonAccount:
         pass
-
+    
+    @abstractmethod
+    async def update_stat(self, account: BaekjoonAccount) -> BaekjoonAccount:
+        pass
+    
     @abstractmethod
     async def find_by_id(self, account_id: BaekjoonAccountId) -> BaekjoonAccount|None:
         pass
 
     @abstractmethod
     async def find_by_user_id(self, user_id: UserAccountId) -> BaekjoonAccount|None:
+        pass
+    
+    @abstractmethod
+    async def find_all_ids(self) -> list[str]:
         pass
 
     @abstractmethod
@@ -31,3 +39,4 @@ class BaekjoonAccountRepository(ABC):
     async def get_tag_stats(self, account_id: BaekjoonAccountId) -> list[TagAccountStat]:
         """백준 계정의 모든 태그별 통계 조회 (영속성 없이 계산)"""
         pass
+    

@@ -4,15 +4,19 @@ from calendar import monthrange
 from collections import defaultdict
 from datetime import date
 
+from app.activity.application.command.update_will_solve_problems import UpdateWillSolveProblemsCommand
 from app.activity.application.query.monthly_activity_data_query import (
     DailyActivityQuery,
     MonthlyActivityDataQuery
 )
+from app.activity.domain.entity.will_solve_problem import WillSolveProblem
 from app.activity.domain.repository.user_activity_repository import UserActivityRepository
 from app.baekjoon.domain.event.get_monthly_activity_data_payload import GetMonthlyActivityDataPayload
-from app.common.domain.vo.identifiers import UserAccountId
+from app.common.domain.vo.identifiers import ProblemId, UserAccountId
 from app.common.infra.event.decorators import event_handler, event_register_handlers
 from app.core.database import transactional
+from app.core.error_codes import ErrorCode
+from app.core.exception import APIException
 
 logger = logging.getLogger(__name__)
 
@@ -89,3 +93,58 @@ class ActivityApplicationService:
             daily_activities=daily_activities,
             total_problem_count=len(total_problem_ids)
         )
+    
+    @transactional
+    async def update_will_solve_problems(
+        self,
+        command: UpdateWillSolveProblemsCommand
+    ):
+        
+        # 1. 입력값 정합성 검증 (순서 및 중복 체크)
+        self._validate_order_consistency(command.problem_ids)
+    
+        user_id = UserAccountId(command.user_account_id)
+        
+        # 1. 해당 날짜의 모든 데이터(삭제된 것 포함)를 가져옵니다. 
+        # (나중에 복구를 위해 deleted_at 포함 조회를 권장)
+        existing_problems = await self.user_activity_repository.find_will_solve_problems_by_date(
+            user_id, command.solved_date
+        )
+        
+        existing_map = {p.problem_id.value: p for p in existing_problems}
+        new_problem_ids = command.problem_ids
+        processed_entities = []
+
+        # 2. 요청된 순서(index)대로 처리
+        for index, p_id in enumerate(new_problem_ids):
+            if p_id in existing_map:
+                target = existing_map.pop(p_id)
+                # 만약 삭제되었던 문제라면 복구
+                if target.deleted_at:
+                    target.restore()
+                # 순서 변경 (메서드 내부에서 변경 여부 체크)
+                target.change_order(index)
+                processed_entities.append(target)
+            else:
+                # 신규 생성
+                new_item: WillSolveProblem = WillSolveProblem.create(
+                    user_account_id=user_id,
+                    problem_id=ProblemId(p_id),
+                    marked_date=command.solved_date
+                )
+                new_item.change_order(index)
+                processed_entities.append(new_item)
+
+        # 3. 요청 리스트에 없는데 기존 DB에 살아있는(deleted_at is None) 데이터들은 삭제 처리
+        for leftover in existing_map.values():
+            if leftover.deleted_at is None:
+                leftover.delete()
+                processed_entities.append(leftover)
+
+        # 4. Repository를 통해 일괄 저장
+        await self.user_activity_repository.save_all_will_solve_problems(processed_entities)
+        
+    def _validate_order_consistency(self, problem_ids: list[int]):
+        # 중복된 ID가 포함되어 있는지 체크
+        if len(problem_ids) != len(set(problem_ids)):
+            raise APIException(ErrorCode.DUPLICATED_ORDER)
