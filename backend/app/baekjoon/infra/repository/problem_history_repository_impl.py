@@ -123,3 +123,22 @@ class ProblemHistoryRepositoryImpl(ProblemHistoryRepository):
 
         result = await self.session.execute(stmt)
         return set(result.scalars().all())
+    
+    @override
+    async def find_solved_ids_by_bj_account_id(
+        self,
+        bj_account_id: BaekjoonAccountId
+    ) -> set[int]:
+        """유저가 한 번이라도 푼 적 있는 ID들만 조회"""
+
+        stmt = (
+            select(ProblemHistoryModel.problem_id)
+            .where(
+                and_(
+                    ProblemHistoryModel.bj_account_id == bj_account_id.value,
+                )
+            )
+        )
+
+        result = await self.session.execute(stmt)
+        return set(result.scalars().all())

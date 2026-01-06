@@ -3,6 +3,7 @@ from fastapi import logger
 from app.baekjoon.domain.entity.baekjoon_account import BaekjoonAccount
 from app.baekjoon.domain.gateway.solvedac_gateway import SolvedacGateway
 from app.baekjoon.domain.repository.baekjoon_account_repository import BaekjoonAccountRepository
+from app.baekjoon.infra.repository.problem_history_repository_impl import ProblemHistoryRepositoryImpl
 from app.common.domain.vo.identifiers import BaekjoonAccountId, ProblemId, TierId, UserAccountId
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
@@ -20,20 +21,22 @@ class UpdateBjAccountUsecase:
     def __init__(
         self,
         baekjoon_account_repository: BaekjoonAccountRepository,
+        problem_history_repository: ProblemHistoryRepositoryImpl,
         solvedac_gateway: SolvedacGateway
     ):
         self.baekjoon_account_repository = baekjoon_account_repository
         self.solvedac_gateway = solvedac_gateway
+        self.problem_history_repository = problem_history_repository
 
     @transactional
     async def execute(self, user_account_id: int) -> None:
         # 1. 기존 데이터 로드
         existing_account = await self.baekjoon_account_repository.find_by_user_id(UserAccountId(user_account_id))
+        existing_problem_history_ids = await self.problem_history_repository.find_solved_ids_by_bj_account_id(existing_account.bj_account_id)
         
         # 2. solved.ac 데이터 수집
-        print(existing_account)
         user_data = await self.solvedac_gateway.fetch_user_data_first(existing_account.bj_account_id.value)
-        
+   
         if user_data is None:
             raise APIException(ErrorCode.BAEKJOON_USER_NOT_FOUND)
 
@@ -48,8 +51,7 @@ class UpdateBjAccountUsecase:
         )
         
         # 4. 새로운 문제 필터링
-        already_solved_ids = {p.problem_id.value for p in existing_account.problem_histories}
-        new_problems = [p for p in user_data.problems if p.problem_id not in already_solved_ids]
+        new_problems = [p for p in user_data.problems if p.problem_id not in existing_problem_history_ids]
         
         # 6. 신규 문제 매칭
         if new_problems:

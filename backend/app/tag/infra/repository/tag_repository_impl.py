@@ -85,7 +85,6 @@ class TagRepositoryImpl(TagRepository):
             .where(
                 and_(
                     TagModel.tag_id.in_(tag_id_values),
-                    TagModel.excluded_yn == False,
                     TagModel.deleted_at.is_(None)
                 )
             )
