@@ -1,0 +1,57 @@
+{
+	"status": 200,
+	"message": "ok",
+	"data": {
+		"totalProblemCount": 10,
+		"monthlyData": [
+			{
+				"date": "2025-12-10",
+				"solvedProblemCount": 2,
+				"willSolveProblemCount": 1,
+				"solvedProblems": [
+					{
+						"problemId": 1100,
+						"realSolvedYn": true,
+						"problemTitle": "asdf",
+						"problemTierLevel": 1,
+						"problemTierName": "B1",
+						"problemClassLevel": 7,
+						"tags": [
+							{
+								"tagId": 1, 
+								"tagCode": "TAG_CODE", 
+								"tagDisplayName":"sadfasd", 
+								"tagTargets": [
+									{
+										"targetId": 1, 
+										"targetCode": "CT", 
+										"targetDisplayName": "뭐시기"
+									}
+								],
+								"tagAliases":[{"alias":"asdf"}, {"alias":"asdf"}]
+							}
+						]
+					}
+				],
+				"willSolveProblems" : [
+					{
+						"problemId": 1100,
+						"problemTitle": "asdf",
+						"problemTierLevel": 1,
+						"problemTierName": "B1",
+						"problemClassLevel": 7,
+						"tags": [
+							{
+								"tagId": 1, 
+								"tagCode": "TAG_CODE", 
+								"tagDisplayName":"sadfasd", 
+								"tagAliases":[{"alias":"asdf"}, {"alias":"asdf"}]
+							}
+						]
+					}
+				]
+			}
+		]
+	},
+	"error": {}
+}

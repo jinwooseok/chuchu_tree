@@ -81,7 +81,7 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {/* 사이드바 토글버튼 (inside) */}
-              <div className={`overflow-hidden transition-all duration-200 ease-in-out ${sidebarOpenState === 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>
+              <div className={`transition-all duration-200 ease-in-out ${sidebarOpenState === 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>
                 <SidebarMenuItem key="toggleSidebarOpenState">
                   <SidebarMenuButton asChild>
                     <div>

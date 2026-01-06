@@ -7,7 +7,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { ComponentType, useMemo } from 'react';
 
 import { transformToCalendarEvents, getDisplayTags } from '../lib/utils';
-import { CalendarEvent } from '@/shared/types/calendar';
+import { CalendarEvent } from '@/entities/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -97,10 +97,10 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
 
 export default function BigCalendar() {
   // Zustand 스토어에서 데이터 가져오기
-  const monthlyData = useCalendarStore((state) => state.monthlyData);
-  const setSelectedDate = useCalendarStore((state) => state.setSelectedDate);
+  const { monthlyData, actions } = useCalendarStore();
+  const setSelectedDate = actions.setSelectedDate;
 
-  // mock 데이터를 react-big-calendar 이벤트로 변환
+  // calendar 데이터를 react-big-calendar 이벤트로 변환
   const events = useMemo(() => {
     return transformToCalendarEvents(monthlyData);
   }, [monthlyData]);

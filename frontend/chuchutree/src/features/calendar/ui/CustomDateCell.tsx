@@ -1,4 +1,4 @@
-import { CalendarEvent } from '@/shared/types/calendar';
+import { CalendarEvent } from '@/entities/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { getDisplayTags } from '../lib/utils';
 import { DateCellWrapperProps } from 'react-big-calendar';

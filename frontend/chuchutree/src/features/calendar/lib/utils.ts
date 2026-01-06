@@ -1,19 +1,16 @@
-import { CalendarApiResponse, CalendarEvent, MonthlyData, Problem } from '@/shared/types/calendar';
+import { CalendarEvent, MonthlyData, SolvedProblems, WillSolveProblems } from '@/entities/calendar';
 
 /**
- * API 응답 데이터 또는 MonthlyData 배열을 react-big-calendar 이벤트 형식으로 변환
+ * MonthlyData 배열을 react-big-calendar 이벤트 형식으로 변환
  */
-export function transformToCalendarEvents(data: CalendarApiResponse | MonthlyData[]): CalendarEvent[] {
+export function transformToCalendarEvents(monthlyDataArray: MonthlyData[]): CalendarEvent[] {
   const events: CalendarEvent[] = [];
-
-  // CalendarApiResponse인지 MonthlyData[]인지 확인
-  const monthlyDataArray = Array.isArray(data) ? data : data.data.monthlyData;
 
   monthlyDataArray.forEach((dayData: MonthlyData) => {
     const date = new Date(dayData.date);
 
     // solved 문제들을 이벤트로 변환
-    dayData.solvedProblems.forEach((problem: Problem) => {
+    dayData.solvedProblems.forEach((problem: SolvedProblems) => {
       problem.tags.forEach((tag) => {
         events.push({
           title: tag.tagDisplayName,
@@ -29,7 +26,7 @@ export function transformToCalendarEvents(data: CalendarApiResponse | MonthlyDat
     });
 
     // will solve 문제들을 이벤트로 변환
-    dayData.willSolveProblem.forEach((problem: Problem) => {
+    dayData.willSolveProblems.forEach((problem: WillSolveProblems) => {
       problem.tags.forEach((tag) => {
         events.push({
           title: tag.tagDisplayName,

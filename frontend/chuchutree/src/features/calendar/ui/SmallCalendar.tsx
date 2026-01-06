@@ -9,12 +9,11 @@ import { ko } from 'date-fns/locale';
 import { ChevronUp, ChevronDown, Undo2 } from 'lucide-react';
 
 export default function SmallCalendar() {
-  const selectedDate = useCalendarStore((state) => state.selectedDate);
-  const setSelectedDate = useCalendarStore((state) => state.setSelectedDate);
-  const monthlyData = useCalendarStore((state) => state.monthlyData);
+  const { selectedDate, monthlyData, actions } = useCalendarStore();
+  const setSelectedDate = actions.setSelectedDate;
 
-  // 현재 표시중인 월 관리
-  const [activeStartDate, setActiveStartDate] = useState<Date>(selectedDate);
+  // 현재 표시중인 월 관리 (selectedDate가 null이면 오늘 날짜 사용)
+  const [activeStartDate, setActiveStartDate] = useState<Date>(selectedDate || new Date());
 
   // 날짜 클릭 핸들러
   const handleDateChange = (value: Date | null) => {
@@ -82,7 +81,7 @@ export default function SmallCalendar() {
       }
 
       // 선택된 날짜
-      if (isSameDay(date, selectedDate)) {
+      if (selectedDate && isSameDay(date, selectedDate)) {
         classes.push('selected-tile');
       }
 
@@ -227,7 +226,7 @@ export default function SmallCalendar() {
 
       <Calendar
         onChange={(value) => handleDateChange(value as Date)}
-        value={selectedDate}
+        value={selectedDate || new Date()}
         activeStartDate={activeStartDate}
         onActiveStartDateChange={({ activeStartDate }) => activeStartDate && setActiveStartDate(activeStartDate)}
         locale="ko-KR"

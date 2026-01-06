@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
-import { Problem } from '@/shared/types/calendar';
+import { Problem } from '@/entities/calendar';
 import Image from 'next/image';
 
 // 클라이언트 전용 렌더링 (hydration mismatch 방지)
@@ -38,12 +38,11 @@ function ProblemCard({ problem, isSolved }: { problem: Problem; isSolved: boolea
 }
 
 export default function CalendarSidebar() {
-  const selectedDate = useCalendarStore((state) => state.selectedDate);
-  const getSolvedProblems = useCalendarStore((state) => state.getSolvedProblemsByDate);
-  const getWillSolveProblems = useCalendarStore((state) => state.getWillSolveProblemsByDate);
+  const { selectedDate, getSolvedProblemsByDate, getWillSolveProblemsByDate } = useCalendarStore();
 
-  const solvedProblems = getSolvedProblems(selectedDate);
-  const willSolveProblems = getWillSolveProblems(selectedDate);
+  // selectedDate가 null일 경우 빈 배열 반환
+  const solvedProblems = selectedDate ? getSolvedProblemsByDate(selectedDate) : [];
+  const willSolveProblems = selectedDate ? getWillSolveProblemsByDate(selectedDate) : [];
 
   return (
     <div className="flex h-full flex-col gap-8 overflow-y-auto p-4">

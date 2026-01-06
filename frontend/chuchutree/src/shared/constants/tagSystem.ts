@@ -58,3 +58,5 @@ export const TAG_INFO = {
   scc: { kr: '강한 연결 요소', bgColor: 'bg-violet-300' },
   convex_hull: { kr: '볼록 껍질', bgColor: 'bg-fuchsia-300' },
 };
+
+export type TagKey = keyof typeof TAG_INFO;
