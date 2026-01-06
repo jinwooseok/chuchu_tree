@@ -142,3 +142,15 @@ class ProblemHistoryRepositoryImpl(ProblemHistoryRepository):
 
         result = await self.session.execute(stmt)
         return set(result.scalars().all())
+    
+    @override
+    async def save_all(
+        self,
+        problem_histories: list[ProblemHistory]
+    ) -> None:
+        models = [ProblemHistoryMapper.to_model(problem_history) for problem_history in problem_histories]
+        
+        self.session.add_all(models)
+
+        # 모든 merge가 끝나면 한 번에 flush하여 DB에 반영
+        await self.session.flush()

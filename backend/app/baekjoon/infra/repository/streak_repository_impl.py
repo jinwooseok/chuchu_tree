@@ -3,7 +3,7 @@
 from datetime import date
 from typing import override
 
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, func, select, tuple_
 from sqlalchemy.orm import aliased
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -83,4 +83,43 @@ class StreakRepositoryImpl(StreakRepository):
         rows = result.all()
 
         return [StreakMapper.to_entity_from_row(row) for row in rows]
-            
+    
+    @override
+    async def save_unlinked_streaks_and_get_ids(self, bj_account_id: int, streaks: list[Streak]) -> list[int]:
+        if not streaks:
+            return []
+
+        input_map = { (s.streak_date, s.solved_count): s for s in streaks }
+        unique_keys = list(input_map.keys())
+        
+        stmt = select(StreakModel).where(
+            StreakModel.bj_account_id == bj_account_id,
+            tuple_(StreakModel.streak_date, StreakModel.solved_count).in_(unique_keys)
+        )
+        result = await self.session.execute(stmt)
+        
+        # DB에 이미 있는 애들은 이 맵에 담김 (날짜, 카운트) -> streak_id
+        existing_id_map = { (s.streak_date, s.solved_count): s.streak_id for s in result.scalars().all() }
+
+        # 3. [차집합 추출] 맵의 키들 중 DB 맵에 없는 녀석들만 '진짜 추가할 놈'들임
+        final_id_results = {} # 최종 결과를 담을 맵
+
+        new_models = []
+        for key in unique_keys:
+            if key in existing_id_map:
+                # 이미 있으면 기존 ID 그대로 사용
+                final_id_results[key] = existing_id_map[key]
+            else:
+                # 없으면 추가 대상 리스트에 넣기
+                new_model = StreakMapper.to_model(input_map[key])
+                new_models.append(new_model)
+
+        # 4. [벌크 추가] 없는 놈들만 모아서 한 번에 INSERT
+        if new_models:
+            self.session.add_all(new_models)
+            await self.session.flush() # ID 생성을 위해 실행
+            for m in new_models:
+                final_id_results[(m.streak_date, m.solved_count)] = m.streak_id
+
+        # 5. [순서 보장] 원래 들어온 streaks 리스트 순서대로 ID만 뽑아서 반환
+        return [final_id_results[(s.streak_date, s.solved_count)] for s in streaks]
