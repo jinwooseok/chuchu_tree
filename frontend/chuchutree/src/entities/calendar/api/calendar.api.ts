@@ -1,5 +1,5 @@
 import { ApiResponse } from '@/shared/types/api';
-import { Calendar, UpdateProblemsData } from '../model/types';
+import { Calendar, UpdateProblemsData, SearchProblems } from '../model/calendar.types';
 import { axiosInstance } from '@/lib/axios';
 
 export const calendarApi = {
@@ -17,5 +17,13 @@ export const calendarApi = {
   },
   updateSolvedProblems: async (data: UpdateProblemsData): Promise<void> => {
     await axiosInstance.post('/user-accounts/me/problems/solved-problems', data);
+  },
+  getSearchProblems: async ({ keyword }: { keyword: string }): Promise<SearchProblems> => {
+    const { data } = await axiosInstance.get<ApiResponse<SearchProblems>>('problems/search', {
+      params: {
+        keyword,
+      },
+    });
+    return data.data;
   },
 };

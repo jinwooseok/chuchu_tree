@@ -72,8 +72,17 @@ export interface CalendarEvent {
 }
 
 // 풀문제 업데이트, 푼문제 업데이트 request data
-
 export interface UpdateProblemsData {
   date: string;
   problemIds: number[];
+}
+
+// 문제 검색
+export interface SearchProblems {
+  problems: {
+    idBaseTotalCount: number;
+    titleBaseTotalCount: number;
+    idBase: WillSolveProblems[];
+    titleBase: WillSolveProblems[];
+  };
 }

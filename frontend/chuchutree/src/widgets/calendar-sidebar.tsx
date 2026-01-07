@@ -3,13 +3,13 @@
 import dynamic from 'next/dynamic';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
-import { Problem, useUpdateWillSolveProblems, useUpdateSolvedProblems } from '@/entities/calendar';
+import { Problem, useUpdateWillSolveProblems, useUpdateSolvedProblems, useSearchProblems, WillSolveProblems } from '@/entities/calendar';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, X } from 'lucide-react';
+import { GripVertical, X, Search } from 'lucide-react';
 
 // 클라이언트 전용 렌더링 (hydration mismatch 방지)
 const SmallCalendar = dynamic(() => import('@/features/calendar/ui/SmallCalendar'), {
@@ -72,13 +72,49 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
   );
 }
 
+// 검색 결과 문제 카드 (클릭 가능)
+function SearchResultCard({ problem, onClick }: { problem: WillSolveProblems; onClick: () => void }) {
+  const firstTag = problem.tags[0];
+  const tagInfo = TAG_INFO[firstTag?.tagCode as keyof typeof TAG_INFO];
+
+  return (
+    <button onClick={onClick} className="bg-background hover:bg-accent flex w-full items-center gap-2 rounded-md p-2 text-left text-xs transition-colors">
+      {/* 문제 기본정보 */}
+      <div className="flex shrink-0 flex-col gap-1 text-center">
+        {firstTag && <div className={`rounded px-2 py-0.5 ${tagInfo ? tagInfo.bgColor : 'bg-gray-300'}`}>{firstTag.tagDisplayName}</div>}
+        {!firstTag && <div className="rounded bg-gray-300 px-2 py-0.5">Undefined</div>}
+        <div className="flex items-center gap-1">
+          <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
+          <span>{problem.problemId}</span>
+        </div>
+      </div>
+
+      {/* 문제이름 */}
+      <div className="line-clamp-2 flex-1 text-end">{problem.problemTitle}</div>
+    </button>
+  );
+}
+
 export default function CalendarSidebar() {
   const { selectedDate, getSolvedProblemsByDate, getWillSolveProblemsByDate } = useCalendarStore();
   const [showAddInput, setShowAddInput] = useState(false);
-  const [newProblemId, setNewProblemId] = useState('');
+  const [searchKeyword, setSearchKeyword] = useState('');
+  const [debouncedKeyword, setDebouncedKeyword] = useState('');
 
   const updateWillSolve = useUpdateWillSolveProblems();
   const updateSolved = useUpdateSolvedProblems();
+
+  // Debounce 로직 (400ms)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedKeyword(searchKeyword);
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [searchKeyword]);
+
+  // 검색 API 호출
+  const { data: searchResults, isLoading: isSearching } = useSearchProblems(debouncedKeyword);
 
   // selectedDate가 null일 경우 빈 배열 반환
   const solvedProblems = selectedDate ? getSolvedProblemsByDate(selectedDate) : [];
@@ -132,14 +168,9 @@ export default function CalendarSidebar() {
     });
   };
 
-  // WillSolve 문제 추가
-  const handleAddProblem = () => {
-    const problemId = parseInt(newProblemId.trim(), 10);
-
-    if (!problemId || isNaN(problemId) || !selectedDate) {
-      alert('올바른 문제 번호를 입력해주세요.');
-      return;
-    }
+  // WillSolve 문제 추가 (검색 결과 클릭 시)
+  const handleAddProblemFromSearch = (problemId: number) => {
+    if (!selectedDate) return;
 
     // 기존 문제들 + 새 문제
     const problemIds = [...willSolveProblems.map((p) => p.problemId), problemId];
@@ -151,7 +182,7 @@ export default function CalendarSidebar() {
       },
       {
         onSuccess: () => {
-          setNewProblemId('');
+          setSearchKeyword('');
           setShowAddInput(false);
         },
         onError: () => {
@@ -172,6 +203,12 @@ export default function CalendarSidebar() {
       problemIds,
     });
   };
+
+  // 검색 결과 병합 (idBase + titleBase)
+  const allSearchResults = searchResults ? [...searchResults.problems.idBase, ...searchResults.problems.titleBase] : [];
+
+  // 중복 제거 (problemId 기준)
+  const uniqueSearchResults = Array.from(new Map(allSearchResults.map((p) => [p.problemId, p])).values());
 
   return (
     <div className="hide-scrollbar flex h-full flex-col gap-8 overflow-y-auto p-4">
@@ -225,33 +262,56 @@ export default function CalendarSidebar() {
 
         {/* 문제 추가하기 */}
         {!showAddInput ? (
-          <button onClick={() => setShowAddInput(true)} className="hover:bg-background text-muted-foreground mb-4 cursor-pointer rounded px-2 py-2 text-start text-sm">
+          <button onClick={() => setShowAddInput(true)} className="hover:bg-background text-muted-foreground my-4 cursor-pointer rounded px-2 py-2 text-start text-sm">
             + 오늘 풀 문제 등록하기
           </button>
         ) : (
-          <div className="mb-4 flex gap-2">
-            <input
-              type="text"
-              value={newProblemId}
-              onChange={(e) => setNewProblemId(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') handleAddProblem();
-                if (e.key === 'Escape') {
-                  setShowAddInput(false);
-                  setNewProblemId('');
-                }
-              }}
-              placeholder="문제 번호 입력"
-              className="border-input bg-background focus:ring-ring flex-1 rounded border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
-              autoFocus
-            />
-            <button onClick={handleAddProblem} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-3 py-2 text-sm">
-              추가
-            </button>
+          <div className="my-4 flex flex-col gap-2">
+            {/* 검색창 */}
+            <div className="relative">
+              <Search className="text-muted-foreground absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2" />
+              <input
+                type="text"
+                value={searchKeyword}
+                onChange={(e) => setSearchKeyword(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    setShowAddInput(false);
+                    setSearchKeyword('');
+                  }
+                }}
+                placeholder="문제 검색..."
+                className="border-input bg-background focus:ring-ring w-full rounded border py-2 pr-3 pl-8 text-sm focus:ring-2 focus:outline-none"
+                autoFocus
+              />
+            </div>
+
+            {/* 검색 결과 */}
+            {searchKeyword.trim().length > 0 && (
+              <div className="border-input hide-scrollbar max-h-60 overflow-y-auto rounded border">
+                {isSearching ? (
+                  <div className="p-4 text-center text-xs text-gray-400">검색 중...</div>
+                ) : uniqueSearchResults.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-gray-400">검색 결과가 없습니다</div>
+                ) : (
+                  <div>
+                    <div className="pt-2 pl-2 text-xs font-semibold">문제 ({uniqueSearchResults.length})</div>
+
+                    <div className="flex flex-col gap-1 p-2">
+                      {uniqueSearchResults.map((problem) => (
+                        <SearchResultCard key={problem.problemId} problem={problem} onClick={() => handleAddProblemFromSearch(problem.problemId)} />
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 취소 버튼 */}
             <button
               onClick={() => {
                 setShowAddInput(false);
-                setNewProblemId('');
+                setSearchKeyword('');
               }}
               className="bg-secondary text-secondary-foreground hover:bg-secondary/80 rounded px-3 py-2 text-sm"
             >
