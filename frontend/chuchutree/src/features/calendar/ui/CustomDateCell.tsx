@@ -1,4 +1,4 @@
-import { CalendarEvent } from '@/shared/types/calendar';
+import { CalendarEvent } from '@/entities/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { getDisplayTags } from '../lib/utils';
 import { DateCellWrapperProps } from 'react-big-calendar';
@@ -12,11 +12,7 @@ export default function CustomDateCell({ children, value, events }: CustomDateCe
   const dayEvents = events.filter((event) => {
     const eventDate = new Date(event.start);
     const cellDate = new Date(value);
-    return (
-      eventDate.getFullYear() === cellDate.getFullYear() &&
-      eventDate.getMonth() === cellDate.getMonth() &&
-      eventDate.getDate() === cellDate.getDate()
-    );
+    return eventDate.getFullYear() === cellDate.getFullYear() && eventDate.getMonth() === cellDate.getMonth() && eventDate.getDate() === cellDate.getDate();
   });
 
   const { displayTags, hasMore, moreCount } = getDisplayTags(dayEvents);
@@ -40,9 +36,7 @@ export default function CustomDateCell({ children, value, events }: CustomDateCe
               </div>
             );
           })}
-          {hasMore && (
-            <div className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">+{moreCount}개 더보기</div>
-          )}
+          {hasMore && <div className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">+{moreCount}개 더보기</div>}
         </div>
       )}
     </div>

@@ -1,6 +1,7 @@
 import { redirect } from 'next/navigation';
 import { isAuthenticated, ApiResponseError } from '@/lib/server';
 import { userServerApi } from '@/entities/user/api/user.server';
+import { calendarServerApi } from '@/entities/calendar/api/calendar.server';
 import { MainLayoutClient } from './MainLayoutClient';
 
 export default async function MainLayout({
@@ -47,5 +48,30 @@ export default async function MainLayout({
     redirect('/sign-in');
   }
 
-  return <MainLayoutClient initialUserData={initialUserData}>{children}</MainLayoutClient>;
+  // 3단계: 오늘 날짜 기준 calendar 데이터 fetch
+  let initialCalendarData = null;
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = today.getMonth() + 1; // 0-based → 1-based
+
+  try {
+    console.log('[MainLayout] Fetching calendar data...', { year, month });
+    initialCalendarData = await calendarServerApi.getCalendar({ year, month });
+    console.log('[MainLayout] Calendar data fetched successfully:', {
+      totalProblemCount: initialCalendarData?.totalProblemCount,
+      monthlyDataCount: initialCalendarData?.monthlyData?.length,
+    });
+  } catch (error) {
+    console.error('[MainLayout] Failed to fetch calendar data:', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      errorCode: error instanceof ApiResponseError ? error.errorCode : undefined,
+    });
+    // Calendar 데이터는 선택적이므로 null로 처리
+  }
+
+  return (
+    <MainLayoutClient initialUserData={initialUserData} initialCalendarData={initialCalendarData}>
+      {children}
+    </MainLayoutClient>
+  );
 }

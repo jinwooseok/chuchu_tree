@@ -1,49 +1,47 @@
-import { CalendarApiResponse, CalendarEvent, MonthlyData, Problem } from '@/shared/types/calendar';
+import { CalendarEvent, MonthlyData, SolvedProblems, WillSolveProblems } from '@/entities/calendar';
 
 /**
- * API 응답 데이터 또는 MonthlyData 배열을 react-big-calendar 이벤트 형식으로 변환
+ * MonthlyData 배열을 react-big-calendar 이벤트 형식으로 변환
  */
-export function transformToCalendarEvents(data: CalendarApiResponse | MonthlyData[]): CalendarEvent[] {
+export function transformToCalendarEvents(monthlyDataArray: MonthlyData[]): CalendarEvent[] {
   const events: CalendarEvent[] = [];
 
-  // CalendarApiResponse인지 MonthlyData[]인지 확인
-  const monthlyDataArray = Array.isArray(data) ? data : data.data.monthlyData;
-
   monthlyDataArray.forEach((dayData: MonthlyData) => {
-    const date = new Date(dayData.date);
+    const date = new Date(dayData.targetDate);
 
     // solved 문제들을 이벤트로 변환
-    dayData.solvedProblems.forEach((problem: Problem) => {
-      problem.tags.forEach((tag) => {
+    dayData.solvedProblems.forEach((problem: SolvedProblems) => {
+      if (problem.tags.length > 0) {
         events.push({
-          title: tag.tagDisplayName,
+          title: problem.tags[0].tagDisplayName,
           start: date,
           end: date,
           resource: {
             type: 'solved',
             problem,
-            tagCode: tag.tagCode,
+            tagCode: problem.tags[0].tagCode,
           },
         });
-      });
+      }
     });
 
     // will solve 문제들을 이벤트로 변환
-    dayData.willSolveProblem.forEach((problem: Problem) => {
-      problem.tags.forEach((tag) => {
+    dayData.willSolveProblems.forEach((problem: WillSolveProblems) => {
+      if (problem.tags.length > 0) {
         events.push({
-          title: tag.tagDisplayName,
+          title: problem.tags[0].tagDisplayName,
           start: date,
           end: date,
           resource: {
             type: 'willSolve',
             problem,
-            tagCode: tag.tagCode,
+            tagCode: problem.tags[0].tagCode,
           },
         });
-      });
+      }
     });
   });
+  console.log('events', events);
 
   return events;
 }
@@ -61,10 +59,10 @@ export function getDisplayTags(events: CalendarEvent[]) {
   const willSolveEvents = events.filter((e) => e.resource.type === 'willSolve');
 
   // 중복 제거 (같은 tagCode는 한 번만 표시)
-  const uniqueSolved = Array.from(new Map(solvedEvents.map((e) => [e.resource.tagCode, e])).values());
-  const uniqueWillSolve = Array.from(new Map(willSolveEvents.map((e) => [e.resource.tagCode, e])).values());
+  // const uniqueSolved = Array.from(new Map(solvedEvents.map((e) => [e.resource.tagCode, e])).values());
+  // const uniqueWillSolve = Array.from(new Map(willSolveEvents.map((e) => [e.resource.tagCode, e])).values());
 
-  const allTags = [...uniqueSolved, ...uniqueWillSolve];
+  const allTags = [...solvedEvents, ...willSolveEvents];
   const totalCount = allTags.length;
 
   if (totalCount === 0) {

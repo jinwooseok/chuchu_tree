@@ -1,24 +1,22 @@
 import { create } from 'zustand';
-import { MonthlyData, Problem } from '@/shared/types/calendar';
-import mockData from '@/features/calendar/mockdata/mock_calendar_data.json';
+import { combine, devtools } from 'zustand/middleware';
+import { immer } from 'zustand/middleware/immer';
+import { Calendar } from '@/entities/calendar';
 
-interface CalendarStore {
-  // 상태
-  selectedDate: Date;
-  monthlyData: MonthlyData[];
-
-  // 액션
-  setSelectedDate: (date: Date) => void;
-
-  // 셀렉터 (특정 날짜의 데이터 가져오기)
-  getDataByDate: (date: Date) => MonthlyData | undefined;
-  getSolvedProblemsByDate: (date: Date) => Problem[];
-  getWillSolveProblemsByDate: (date: Date) => Problem[];
-
-  // 문제 추가/삭제 (향후 구현)
-  addProblemToWillSolve: (date: Date, problem: Problem) => void;
-  removeProblemFromWillSolve: (date: Date, problemId: number) => void;
+interface MonthlyData {
+  targetDate: string;
+  solvedProblemCount: number;
+  willSolveProblemCount: number;
+  solvedProblems: any[];
+  willSolveProblems: any[];
 }
+
+type State = {
+  selectedDate: Date | null;
+  monthlyData: MonthlyData[];
+  totalProblemCount: number;
+  isInitialized: boolean;
+};
 
 // 날짜를 YYYY-MM-DD 형식 문자열로 변환
 const formatDateString = (date: Date): string => {
@@ -28,71 +26,89 @@ const formatDateString = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
-// mock 데이터의 첫 번째 날짜를 초기 선택 날짜로 사용 (hydration mismatch 방지)
-const getInitialDate = (): Date => {
-  const firstDateString = mockData.data.monthlyData[0]?.date || '2025-12-10';
-  return new Date(firstDateString);
+const initialState: State = {
+  selectedDate: null,
+  monthlyData: [],
+  totalProblemCount: 0,
+  isInitialized: false,
 };
 
-export const useCalendarStore = create<CalendarStore>((set, get) => ({
-  // 초기 상태
-  selectedDate: getInitialDate(),
-  monthlyData: mockData.data.monthlyData as MonthlyData[],
+const calendarStoreInternal = create(
+  devtools(
+    immer(
+      combine(initialState, (set, get) => ({
+        actions: {
+          // Calendar 데이터 설정
+          setCalendarData: (calendar: Calendar) => {
+            set((state) => {
+              state.monthlyData = calendar.monthlyData;
+              state.totalProblemCount = calendar.totalProblemCount;
+              state.isInitialized = true;
+              // selectedDate가 없으면 오늘 날짜로 설정
+              if (!state.selectedDate) {
+                state.selectedDate = new Date();
+              }
+            });
+          },
 
-  // 날짜 선택
-  setSelectedDate: (date: Date) => {
-    set({ selectedDate: date });
-  },
+          // 선택된 날짜 설정
+          setSelectedDate: (date: Date) => {
+            set((state) => {
+              state.selectedDate = date;
+            });
+          },
 
-  // 특정 날짜의 전체 데이터 가져오기
-  getDataByDate: (date: Date) => {
-    const dateString = formatDateString(date);
-    return get().monthlyData.find((data) => data.date === dateString);
-  },
+          // Calendar 데이터 초기화
+          clearCalendarData: () => {
+            set((state) => {
+              state.selectedDate = null;
+              state.monthlyData = [];
+              state.totalProblemCount = 0;
+              state.isInitialized = false;
+            });
+          },
+        },
 
-  // 특정 날짜의 solved 문제들 가져오기
-  getSolvedProblemsByDate: (date: Date) => {
-    const data = get().getDataByDate(date);
-    return data?.solvedProblems || [];
-  },
+        // Selectors
+        getDataByDate: (date: Date) => {
+          const dateString = formatDateString(date);
+          return get().monthlyData.find((data) => data.targetDate === dateString);
+        },
 
-  // 특정 날짜의 will solve 문제들 가져오기
-  getWillSolveProblemsByDate: (date: Date) => {
-    const data = get().getDataByDate(date);
-    return data?.willSolveProblem || [];
-  },
+        getSolvedProblemsByDate: (date: Date) => {
+          const dateString = formatDateString(date);
+          const data = get().monthlyData.find((data) => data.targetDate === dateString);
+          return data?.solvedProblems || [];
+        },
 
-  // will solve에 문제 추가 (임시 구현 - 나중에 API 연동 시 수정)
-  addProblemToWillSolve: (date: Date, problem: Problem) => {
-    const dateString = formatDateString(date);
-    set((state) => ({
-      monthlyData: state.monthlyData.map((data) => {
-        if (data.date === dateString) {
-          return {
-            ...data,
-            willSolveProblem: [...data.willSolveProblem, problem],
-            willSolveProblemCount: data.willSolveProblemCount + 1,
-          };
-        }
-        return data;
-      }),
-    }));
-  },
+        getWillSolveProblemsByDate: (date: Date) => {
+          const dateString = formatDateString(date);
+          const data = get().monthlyData.find((data) => data.targetDate === dateString);
+          return data?.willSolveProblems || [];
+        },
+      }))
+    ),
+    { name: 'CalendarStore' }
+  )
+);
 
-  // will solve에서 문제 삭제 (임시 구현 - 나중에 API 연동 시 수정)
-  removeProblemFromWillSolve: (date: Date, problemId: number) => {
-    const dateString = formatDateString(date);
-    set((state) => ({
-      monthlyData: state.monthlyData.map((data) => {
-        if (data.date === dateString) {
-          return {
-            ...data,
-            willSolveProblem: data.willSolveProblem.filter((p) => p.problemId !== problemId),
-            willSolveProblemCount: Math.max(0, data.willSolveProblemCount - 1),
-          };
-        }
-        return data;
-      }),
-    }));
-  },
-}));
+// Selectors
+export const useCalendarStore = () => {
+  const store = calendarStoreInternal();
+  return store as typeof store & State;
+};
+
+export const useSetCalendarData = () => {
+  const setCalendarData = calendarStoreInternal((s) => s.actions.setCalendarData);
+  return setCalendarData;
+};
+
+export const useSetSelectedDate = () => {
+  const setSelectedDate = calendarStoreInternal((s) => s.actions.setSelectedDate);
+  return setSelectedDate;
+};
+
+export const useClearCalendarData = () => {
+  const clearCalendarData = calendarStoreInternal((s) => s.actions.clearCalendarData);
+  return clearCalendarData;
+};
