@@ -43,9 +43,9 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
   const tagInfo = TAG_INFO[firstTag?.tagCode as keyof typeof TAG_INFO];
 
   return (
-    <div ref={setNodeRef} style={style} className="bg-background flex items-center gap-2 rounded-md p-2 text-xs">
+    <div ref={setNodeRef} style={style} className="bg-background relative flex items-center rounded-md px-1 py-2 text-xs">
       {/* 드래그 핸들 */}
-      <button {...attributes} {...listeners} className="text-muted-foreground hover:text-foreground cursor-grab active:cursor-grabbing">
+      <button {...attributes} {...listeners} className="text-muted-foreground hover:text-foreground mr-1 cursor-grab active:cursor-grabbing">
         <GripVertical className="h-4 w-4" />
       </button>
 
@@ -60,11 +60,11 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
       </div>
 
       {/* 문제이름 */}
-      <div className="line-clamp-2 flex-1">{problem.problemTitle}</div>
+      <div className="line-clamp-2 flex-1 pr-4 text-end">{problem.problemTitle}</div>
 
       {/* 삭제 버튼 (willSolve만) */}
       {!isSolved && onDelete && (
-        <button onClick={onDelete} className="text-muted-foreground hover:text-destructive shrink-0 rounded p-1 transition-colors" title="삭제">
+        <button onClick={onDelete} className="text-muted-foreground hover:text-destructive absolute top-0 right-0 shrink-0 rounded p-1 transition-colors" title="삭제하기">
           <X className="h-4 w-4" />
         </button>
       )}
@@ -93,7 +93,7 @@ export default function CalendarSidebar() {
     }),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
 
   // Solved 문제 순서 변경
@@ -157,7 +157,7 @@ export default function CalendarSidebar() {
         onError: () => {
           alert('문제 추가에 실패했습니다.');
         },
-      }
+      },
     );
   };
 
@@ -174,7 +174,7 @@ export default function CalendarSidebar() {
   };
 
   return (
-    <div className="flex h-full flex-col gap-8 overflow-y-auto p-4">
+    <div className="hide-scrollbar flex h-full flex-col gap-8 overflow-y-auto p-4">
       {/* 미니 캘린더 */}
       <div>
         <SmallCalendar />
@@ -242,7 +242,7 @@ export default function CalendarSidebar() {
                 }
               }}
               placeholder="문제 번호 입력"
-              className="border-input bg-background focus:ring-ring flex-1 rounded border px-3 py-2 text-sm focus:outline-none focus:ring-2"
+              className="border-input bg-background focus:ring-ring flex-1 rounded border px-3 py-2 text-sm focus:ring-2 focus:outline-none"
               autoFocus
             />
             <button onClick={handleAddProblem} className="bg-primary text-primary-foreground hover:bg-primary/90 rounded px-3 py-2 text-sm">

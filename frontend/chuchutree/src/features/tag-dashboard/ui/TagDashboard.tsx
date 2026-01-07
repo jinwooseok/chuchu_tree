@@ -49,7 +49,7 @@ export default function TagDashboard() {
   }, [tags, searchQuery, sortBy, selectedTagId]);
 
   return (
-    <div className="grid h-full w-full grid-cols-2 content-start gap-4 overflow-y-auto lg:grid-cols-3">
+    <div className="hide-scrollbar grid h-full w-full grid-cols-2 content-start gap-4 overflow-y-auto lg:grid-cols-3">
       {filteredAndSortedTags.length > 0 ? (
         filteredAndSortedTags.map((tag) => <TagCard key={tag.tagId} tag={tag} />)
       ) : (

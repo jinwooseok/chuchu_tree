@@ -176,6 +176,16 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* 스크롤바 숨기기 (기능은 유지) */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;  /* Chrome, Safari, Opera*/
+}
+
 @layer base {
   * {
     @apply border-border outline-ring/50;
