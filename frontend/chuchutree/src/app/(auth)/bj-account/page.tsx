@@ -5,33 +5,33 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { useLinkBjAccount } from '@/entities/bj-account';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 export default function BjAccountRegistration() {
   const [bjHandle, setBjHandle] = useState('');
   const router = useRouter();
-  const linkBjAccountMutation = useLinkBjAccount();
+  const { mutate: linkBjAccount, isPending: isLinkBjAccountPending } = useLinkBjAccount({
+    onSuccess: () => {
+      toast.success('계정이 등록되었습니다.', {
+        position: 'top-center',
+      });
+      router.push('/');
+    },
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || '계정 등록에 실패했습니다. 다시 시도해주세요.';
+      toast.error(errorMessage, {
+        position: 'top-center',
+      });
+    },
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!bjHandle.trim()) {
       alert('백준 아이디를 입력해주세요.');
       return;
     }
-
-    linkBjAccountMutation.mutate(
-      { bjAccount: bjHandle.trim() },
-      {
-        onSuccess: () => {
-          alert('백준 계정이 성공적으로 등록되었습니다!');
-          router.push('/');
-        },
-        onError: (error: any) => {
-          const errorMessage = error?.response?.data?.message || '계정 등록에 실패했습니다. 다시 시도해주세요.';
-          alert(errorMessage);
-        },
-      },
-    );
+    linkBjAccount({ bjAccount: bjHandle.trim() });
   };
 
   return (
@@ -64,17 +64,17 @@ export default function BjAccountRegistration() {
               onChange={(e) => setBjHandle(e.target.value)}
               placeholder="백준 아이디를 입력하세요"
               className="focus:ring-primary w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:outline-none"
-              disabled={linkBjAccountMutation.isPending}
+              disabled={isLinkBjAccountPending}
             />
-            <p className="text-muted-foreground mt-2 text-xs">예: baekjoon (solved.ac 프로필의 Handle과 동일)</p>
+            <p className="text-muted-foreground mt-2 text-xs">예: baekjoon (solved.ac 프로필의 아이디와 동일)</p>
           </div>
 
           <button
             type="submit"
-            disabled={linkBjAccountMutation.isPending}
+            disabled={isLinkBjAccountPending}
             className="bg-primary hover:bg-primary/90 w-full rounded-lg px-4 py-2 text-white transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
           >
-            {linkBjAccountMutation.isPending ? '등록 중...' : '계정 등록'}
+            {isLinkBjAccountPending ? '등록 중...' : '계정 등록'}
           </button>
         </form>
 
