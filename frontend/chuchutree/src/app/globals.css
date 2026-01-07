@@ -12,6 +12,7 @@
   /* >>>>>>>>>>>커스텀>>>>>>>>>>> */
   --color-innerground-white: var(--innerground-white);
   --color-innerground-darkgray: var(--innerground-darkgray);
+  --color-logo: var(--logo);
   --color-tier-undefined: var(--tier-undefined);
   --color-tier-bronze: var(--tier-bronze);
   --color-tier-silver: var(--tier-silver);
@@ -75,6 +76,7 @@
   --foreground: oklch(0.145 0 0);
   --innerground-white: oklch(1 0 0);
   --innerground-darkgray: #e4e4e4;
+  --logo: #e7d8cb;
   --tier-undefined: #2d2d2d;
   --tier-bronze: #ad5600;
   --tier-silver: #435f7a;
@@ -128,6 +130,7 @@
   --foreground: #f3f0f0;
   --innerground-white: #2b2a28;
   --innerground-darkgray: oklch(33.289% 0.00004 271.152);
+  --logo: #e7d8cb;
   --tier-undefined: #2d2d2d;
   --tier-bronze: #ad5600;
   --tier-silver: #435f7a;
@@ -178,12 +181,12 @@
 
 /* 스크롤바 숨기기 (기능은 유지) */
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .hide-scrollbar::-webkit-scrollbar {
-  display: none;  /* Chrome, Safari, Opera*/
+  display: none; /* Chrome, Safari, Opera*/
 }
 
 @layer base {
@@ -347,4 +350,3 @@
 .small-calendar-wrapper .react-calendar__tile--now {
   background: transparent;
 }
-
