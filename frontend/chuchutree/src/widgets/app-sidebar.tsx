@@ -58,94 +58,91 @@ export function AppSidebar() {
   return (
     <>
       <Sidebar variant="inset" collapsible="icon">
-      {/* 메인 콘텐츠 */}
-      <SidebarContent className="relative">
-        {/* 그룹1 */}
-        <SidebarGroup>
-          {/* 그룹1/헤더 */}
-          <header className="">
-            {/* 서비스아이콘 */}
-            <div className="mt-1 mb-8 flex items-center">
-              <div className="absolute top-2 left-3">
-                <Image
-                  src="/logo/logo.svg"
-                  alt="logo"
-                  width={ICON_SIZE} // 필수: 실제 로고 크기에 맞게 조정
-                  height={ICON_SIZE} // 필수: 실제 로고 크기에 맞게 조정
-                  className="h-8 w-6"
-                />
+        {/* 메인 콘텐츠 */}
+        <SidebarContent className="relative">
+          {/* 그룹1 */}
+          <SidebarGroup>
+            {/* 그룹1/헤더 */}
+            <header className="">
+              {/* 서비스아이콘 */}
+              <div className="mt-1 mb-8 flex items-center">
+                <div className="absolute top-2 left-3">
+                  <Image
+                    src="/logo/logo.svg"
+                    alt="logo"
+                    width={ICON_SIZE} // 필수: 실제 로고 크기에 맞게 조정
+                    height={ICON_SIZE} // 필수: 실제 로고 크기에 맞게 조정
+                    className="h-8 w-6"
+                  />
+                </div>
+                <h1 className={`text-md ml-9 font-bold ${sidebarOpenState !== 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>ChuChuTree</h1>
               </div>
-              <h1 className={`text-md ml-9 font-bold ${sidebarOpenState !== 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>ChuChuTree</h1>
-            </div>
-            {/* 사이드 바 토글 (header) */}
-            <SidebarGroupAction title="메뉴 접기">
-              <PanelLeft onClick={setSidebarOpenState} size={ICON_SIZE} className={`cursor-pointer`} /> <span className="sr-only">Toggle Sidebar OpenState</span>
-            </SidebarGroupAction>
-          </header>
-          {/* link list */}
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {/* 사이드바 토글버튼 (inside) */}
-              <div className={`transition-all duration-200 ease-in-out ${sidebarOpenState === 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>
-                <SidebarMenuItem key="toggleSidebarOpenState">
-                  <SidebarMenuButton asChild>
-                    <div>
-                      <PanelLeft onClick={setSidebarOpenState} size={ICON_SIZE} className="cursor-pointer" /> <span className="sr-only">Toggle Sidebar OpenState in Sidebar</span>
-                    </div>
+              {/* 사이드 바 토글 (header) */}
+              <SidebarGroupAction title="메뉴 접기">
+                <PanelLeft onClick={setSidebarOpenState} size={ICON_SIZE} className={`cursor-pointer`} /> <span className="sr-only">Toggle Sidebar OpenState</span>
+              </SidebarGroupAction>
+            </header>
+            {/* link list */}
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {/* 사이드바 토글버튼 (inside) */}
+                <div className={`transition-all duration-200 ease-in-out ${sidebarOpenState === 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <SidebarMenuItem key="toggleSidebarOpenState">
+                    <SidebarMenuButton asChild>
+                      <div>
+                        <PanelLeft onClick={setSidebarOpenState} size={ICON_SIZE} className="cursor-pointer" /> <span className="sr-only">Toggle Sidebar OpenState in Sidebar</span>
+                      </div>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                </div>
+                {/* 나머지 link */}
+                {items.map((item) => (
+                  <SidebarMenuItem key={item.title}>
+                    <SidebarMenuButton asChild isActive={item.isActive}>
+                      <div onClick={item.action} className="cursor-pointer">
+                        <item.icon size={ICON_SIZE} />
+                        <span>{item.title}</span>
+                      </div>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+        {/* footer */}
+        <SidebarFooter>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton>
+                    <User2 /> {user?.bjAccount.bjAccountId ?? 'Guest'}
+                    <ChevronUp className="ml-auto" />
                   </SidebarMenuButton>
-                </SidebarMenuItem>
-              </div>
-              {/* 나머지 link */}
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={item.isActive}>
-                    <div onClick={item.action} className="cursor-pointer">
-                      <item.icon size={ICON_SIZE} />
-                      <span>{item.title}</span>
-                    </div>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-      </SidebarContent>
-      {/* footer */}
-      <SidebarFooter>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <SidebarMenuButton>
-                  <User2 /> {user?.bjAccount.bjAccountId ?? 'Guest'}
-                  <ChevronUp className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
-                <ThemeButton />
-                <DropdownMenuItem>
-                  <span>연동 계정 재설정</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onSelect={(e) => {
-                    e.preventDefault();
-                    openModal(
-                      'target-change',
-                      <TargetChangeDialog currentTarget={user?.userAccount?.target?.targetCode as TargetCode} onClose={() => closeModal('target-change')} />,
-                    );
-                  }}
-                >
-                  <span>목표 변경</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
-                  <span>로그아웃</span>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarFooter>
-    </Sidebar>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
+                  <ThemeButton />
+                  <DropdownMenuItem>
+                    <span>연동 계정 재설정</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      openModal('target-change', <TargetChangeDialog currentTarget={user?.userAccount?.target?.targetCode as TargetCode} onClose={() => closeModal('target-change')} />);
+                    }}
+                  >
+                    <span>목표 변경</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <span>로그아웃</span>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+      </Sidebar>
     </>
   );
 }

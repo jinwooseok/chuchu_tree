@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useState, useCallback, ReactNode } from 'react';
+import { createContext, useContext, useState, useCallback, useSyncExternalStore, ReactNode } from 'react';
 import { createPortal } from 'react-dom';
 
 interface Modal {
@@ -16,8 +16,18 @@ interface ModalContextType {
 
 const ModalContext = createContext<ModalContextType | undefined>(undefined);
 
+// useSyncExternalStore를 위한 빈 subscribe 함수
+const subscribe = () => () => {};
+
 export function ModalProvider({ children }: { children: ReactNode }) {
   const [modals, setModals] = useState<Modal[]>([]);
+
+  // SSR 안전한 mounted 상태 체크
+  const mounted = useSyncExternalStore(
+    subscribe,
+    () => true, // 클라이언트에서는 항상 true
+    () => false, // 서버에서는 항상 false
+  );
 
   const openModal = useCallback((id: string, component: ReactNode) => {
     setModals((prev) => {
@@ -41,7 +51,7 @@ export function ModalProvider({ children }: { children: ReactNode }) {
   return (
     <ModalContext.Provider value={{ openModal, closeModal, closeAll }}>
       {children}
-      {typeof window !== 'undefined' &&
+      {mounted &&
         createPortal(
           <div id="modal-root">
             {modals.map((modal) => (
