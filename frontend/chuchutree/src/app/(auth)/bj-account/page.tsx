@@ -4,18 +4,56 @@ import { ThemeButton } from '@/shared/ui';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useLinkBjAccount } from '@/entities/bj-account';
+import { usePostTarget } from '@/entities/user';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import { TargetCode } from '@/shared/constants/tagSystem';
+
+const TARGET_OPTIONS = [
+  {
+    code: 'BEGINNER' as TargetCode,
+    label: '입문자',
+    description: '알고리즘을 이제 막 시작한 초보자',
+  },
+  {
+    code: 'DAILY' as TargetCode,
+    label: '데일리',
+    description: '1일 1알고리즘, 점수 올리기, 취미 등',
+  },
+  {
+    code: 'CT' as TargetCode,
+    label: '코테 준비',
+    description: '코딩테스트를 준비하는 취준생',
+  },
+];
 
 export default function BjAccountRegistration() {
   const [bjHandle, setBjHandle] = useState('');
+  const [selectedTarget, setSelectedTarget] = useState<TargetCode>('DAILY');
   const router = useRouter();
+
+  const { mutate: postTarget, isPending: isPostTargetPending } = usePostTarget();
+
   const { mutate: linkBjAccount, isPending: isLinkBjAccountPending } = useLinkBjAccount({
     onSuccess: () => {
-      toast.success('계정이 등록되었습니다.', {
-        position: 'top-center',
-      });
-      router.push('/');
+      // 백준 계정 등록 성공 후 목표 설정
+      postTarget(
+        { targetCode: selectedTarget },
+        {
+          onSuccess: () => {
+            toast.success('계정이 등록되었습니다.', {
+              position: 'top-center',
+            });
+            router.push('/');
+          },
+          onError: () => {
+            toast.warning('계정은 등록되었으나 목표 설정에 실패했습니다.', {
+              position: 'top-center',
+            });
+            router.push('/');
+          },
+        },
+      );
     },
     onError: (error: any) => {
       const errorMessage = error?.response?.data?.message || '계정 등록에 실패했습니다. 다시 시도해주세요.';
@@ -25,10 +63,14 @@ export default function BjAccountRegistration() {
     },
   });
 
+  const isPending = isLinkBjAccountPending || isPostTargetPending;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!bjHandle.trim()) {
-      alert('백준 아이디를 입력해주세요.');
+      toast.info('백준 아이디를 입력해주세요.', {
+        position: 'top-center',
+      });
       return;
     }
     linkBjAccount({ bjAccount: bjHandle.trim() });
@@ -54,7 +96,7 @@ export default function BjAccountRegistration() {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="bjHandle" className="mb-2 block text-sm font-medium">
+            <label htmlFor="bjHandle" className="mb-2 block text-sm">
               백준 아이디
             </label>
             <input
@@ -63,18 +105,48 @@ export default function BjAccountRegistration() {
               value={bjHandle}
               onChange={(e) => setBjHandle(e.target.value)}
               placeholder="백준 아이디를 입력하세요"
-              className="focus:ring-primary w-full rounded-lg border border-gray-300 px-4 py-2 focus:border-transparent focus:ring-2 focus:outline-none"
-              disabled={isLinkBjAccountPending}
+              className="focus:ring-primary border-innerground-darkgray w-full rounded-lg border px-4 py-2 focus:border-transparent focus:ring-2 focus:outline-none"
+              disabled={isPending}
             />
             <p className="text-muted-foreground mt-2 text-xs">예: baekjoon (solved.ac 프로필의 아이디와 동일)</p>
           </div>
 
+          <div>
+            <label className="mb-3 block text-sm">학습 목표</label>
+            <div className="space-y-3">
+              {TARGET_OPTIONS.map((option) => (
+                <label
+                  key={option.code}
+                  className={`flex cursor-pointer items-start gap-3 rounded-lg border-2 p-4 transition-all ${
+                    selectedTarget === option.code
+                      ? 'border-primary bg-primary/5'
+                      : 'border-innerground-darkgray hover:border-primary/50'
+                  } ${isPending ? 'cursor-not-allowed opacity-50' : ''}`}
+                >
+                  <input
+                    type="radio"
+                    name="target"
+                    value={option.code}
+                    checked={selectedTarget === option.code}
+                    onChange={(e) => setSelectedTarget(e.target.value as TargetCode)}
+                    disabled={isPending}
+                    className="mt-1 h-4 w-4 text-primary focus:ring-primary"
+                  />
+                  <div className="flex-1">
+                    <div className="font-medium">{option.label}</div>
+                    <div className="text-muted-foreground text-xs">{option.description}</div>
+                  </div>
+                </label>
+              ))}
+            </div>
+          </div>
+
           <button
             type="submit"
-            disabled={isLinkBjAccountPending}
-            className="bg-primary hover:bg-primary/90 w-full rounded-lg px-4 py-2 text-white transition-colors disabled:cursor-not-allowed disabled:bg-gray-300"
+            disabled={isPending}
+            className="bg-primary hover:bg-primary/90 disabled:bg-muted-foreground w-full rounded-lg px-4 py-2 text-white transition-colors disabled:cursor-not-allowed"
           >
-            {isLinkBjAccountPending ? '등록 중...' : '계정 등록'}
+            {isPending ? '등록 중...' : '계정 등록'}
           </button>
         </form>
 

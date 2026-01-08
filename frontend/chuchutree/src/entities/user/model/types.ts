@@ -1,4 +1,5 @@
-import { TIER_INFO, TierKey, TierNumKey } from '@/shared/constants/tierSystem';
+import { TargetCode } from '@/shared/constants/tagSystem';
+import { TierKey, TierNumKey } from '@/shared/constants/tierSystem';
 
 interface Target {
   targetId: number;
@@ -14,7 +15,7 @@ interface UserAccount {
 }
 
 interface Stat {
-  tierId: TierNumKey
+  tierId: TierNumKey;
   tierName: TierKey;
   longestStreak: number;
   rating: number;
@@ -40,4 +41,10 @@ export interface User {
   userAccount: UserAccount;
   bjAccount: BjAccount;
   linkedAt: string;
+}
+
+// 목표 설정/변경
+
+export interface PostTargetType {
+  targetCode: TargetCode;
 }
