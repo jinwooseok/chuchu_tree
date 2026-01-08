@@ -4,6 +4,7 @@ from calendar import monthrange
 from collections import defaultdict
 from datetime import date
 
+from app.activity.application.command.tag_custom_command import TagCustomCommand
 from app.activity.application.command.update_will_solve_problems import UpdateWillSolveProblemsCommand
 from app.activity.application.query.monthly_activity_data_query import (
     DailyActivityQuery,
@@ -143,7 +144,17 @@ class ActivityApplicationService:
 
         # 4. Repository를 통해 일괄 저장
         await self.user_activity_repository.save_all_will_solve_problems(processed_entities)
-        
+    
+    @transactional
+    async def ban_tag(command: TagCustomCommand):
+        # tag code를 받았는데 tag 정보가 필요함.
+        pass
+
+    @transactional
+    async def unban_tag(command: TagCustomCommand):
+        # tag code를 받았는데 tag 정보 필요함.
+        pass
+    
     def _validate_order_consistency(self, problem_ids: list[int]):
         # 중복된 ID가 포함되어 있는지 체크
         if len(problem_ids) != len(set(problem_ids)):

@@ -14,6 +14,6 @@ class TargetQuery:
     def from_entity(targets: list[Target]):
         return [TargetQuery(
             target_id=target.target_id,
-            target_id=target.code,
+            target_code=target.code,
             target_display_name=target.display_name
         ) for target in targets]

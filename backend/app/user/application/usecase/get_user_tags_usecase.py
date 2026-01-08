@@ -17,7 +17,7 @@ from app.tag.domain.repository.tag_repository import TagRepository
 from app.target.domain.repository.target_repository import TargetRepository
 from app.tier.domain.entity.tier import Tier
 from app.tier.domain.repository.tier_repository import TierRepository
-from app.user.application.command.update_user_target_command import GetUserTagsCommand
+from app.user.application.command.get_user_tags_command import GetUserTagsCommand
 from app.user.application.query.user_tags_query import (
     AccountStatQuery,
     CategoryQuery,

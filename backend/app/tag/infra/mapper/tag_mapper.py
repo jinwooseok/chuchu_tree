@@ -59,8 +59,6 @@ class TagMapper:
             if isinstance(model.aliases, list):
                 aliases = [item for item in model.aliases]
         
-        print(aliases)        
-        # Sub-tags 처리
         parent_tag_relations = [
             TagRelationMapper.to_entity(parent_model)
             for parent_model in model.parent_tag_relations

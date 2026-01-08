@@ -6,7 +6,6 @@ from app.common.presentation.dependency.auth_dependencies import get_current_mem
 from app.target.application.service.target_application_service import TargetApplicationService
 from app.target.presentation.schema.request.target_request import SetTargetRequest
 from app.target.presentation.schema.response.target_response import (
-    UserTargetsResponse,
     AllTargetsResponse
 )
 from app.core.containers import Container

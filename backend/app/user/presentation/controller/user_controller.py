@@ -3,7 +3,8 @@ from dependency_injector.wiring import inject, Provide
 
 from app.common.domain.vo.current_user import CurrentUser
 from app.common.presentation.dependency.auth_dependencies import get_current_member
-from app.user.application.command.update_user_target_command import GetUserTagsCommand, UpdateUserTargetCommand
+from app.user.application.command.get_user_tags_command import GetUserTagsCommand
+from app.user.application.command.update_user_target_command import UpdateUserTargetCommand
 from app.user.application.service.user_account_application_service import UserAccountApplicationService
 from app.user.application.usecase.get_user_tags_usecase import GetUserTagsUsecase
 from app.user.presentation.schema.request.user_target_request import UpdateUserTargetRequest
