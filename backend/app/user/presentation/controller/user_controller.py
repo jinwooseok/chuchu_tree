@@ -4,12 +4,15 @@ from dependency_injector.wiring import inject, Provide
 from app.common.domain.vo.current_user import CurrentUser
 from app.common.presentation.dependency.auth_dependencies import get_current_member
 from app.user.application.command.get_user_tags_command import GetUserTagsCommand
+from app.user.application.command.update_user_target_command import UpdateUserTargetCommand
+from app.user.application.service.user_account_application_service import UserAccountApplicationService
 from app.user.application.usecase.get_user_tags_usecase import GetUserTagsUsecase
+from app.user.presentation.schema.request.user_target_request import UpdateUserTargetRequest
 from app.user.presentation.schema.response.user_response import (
     ProfileImageResponse,
     AdminUserAccountsResponse
 )
-from app.user.presentation.schema.response.user_tag_response import UserTagsResponse
+from app.user.presentation.schema.response.user_tag_response import TargetResponse, UserTagsResponse
 from app.core.containers import Container
 from app.core.api_response import ApiResponse, ApiResponseSchema
 
@@ -117,3 +120,40 @@ async def get_user_tags(
     response_data = UserTagsResponse.from_query(query)
 
     return ApiResponse(data=response_data.model_dump(by_alias=True))
+
+@router.get("/me/targets", response_model=ApiResponseSchema[UserTagsResponse])
+@inject
+async def get_user_targets(
+    current_user: CurrentUser = Depends(get_current_member),
+    user_account_application_service: UserAccountApplicationService = Depends(Provide[Container.user_account_application_service])
+):
+    """
+    유저의 목표 조회
+
+    Returns:
+        유저의 목표 조회
+    """
+    query = await user_account_application_service.get_user_target(current_user.user_account_id)
+
+    # Query를 Response로 변환 (from_query 사용)
+    response_data = TargetResponse.from_query(query)
+
+    return ApiResponse(data=response_data.model_dump(by_alias=True))
+
+@router.post("/me/targets", response_model=ApiResponseSchema[UserTagsResponse])
+@inject
+async def update_user_target(
+    request: UpdateUserTargetRequest,
+    current_user: CurrentUser = Depends(get_current_member),
+    user_account_application_service: UserAccountApplicationService = Depends(Provide[Container.user_account_application_service])
+):
+    """
+    유저의 목표 변경
+
+    Returns:
+    
+    """
+    await user_account_application_service.update_user_target(UpdateUserTargetCommand(user_account_id=current_user.user_account_id, 
+                                                                                target_code=request.target_code))
+
+    return ApiResponse(data={})

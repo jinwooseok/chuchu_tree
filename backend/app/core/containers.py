@@ -12,6 +12,7 @@ from app.baekjoon.infra.repository.streak_repository_impl import StreakRepositor
 from app.baekjoon.infra.scheduler.metric_scheduler import BjAccountUpdateScheduler
 from app.config.settings import get_settings
 from app.core.database import Database
+from app.tag.application.service.tag_application_service import TagApplicationService
 from app.target.application.service.target_application_service import TargetApplicationService
 from app.tier.infra.repository.tier_repository_impl import TierRepositoryImpl
 
@@ -289,15 +290,8 @@ class Container(containers.DeclarativeContainer):
 
     activity_application_service = providers.Singleton(
         ActivityApplicationService,
-        user_activity_repository=user_activity_repository
-    )
-
-    # ========================================================================
-    # Problem domain
-    # ========================================================================
-    problem_repository = providers.Singleton(
-        ProblemRepositoryImpl,
-        db=database
+        user_activity_repository=user_activity_repository,
+        domain_event_bus=domain_event_bus
     )
 
     # ========================================================================
@@ -308,8 +302,9 @@ class Container(containers.DeclarativeContainer):
         db=database
     )
     
-    target_application_service = providers.Singleton(
-        TargetApplicationService
+    tag_application_service = providers.Singleton(
+        TagApplicationService,
+        tag_repository=tag_repository
     )
 
     # ========================================================================
@@ -327,7 +322,20 @@ class Container(containers.DeclarativeContainer):
         TargetRepositoryImpl,
         db=database
     )
+    
+    target_application_service = providers.Singleton(
+        TargetApplicationService,
+        target_repository=target_repository
+    )
 
+    # ========================================================================
+    # Problem domain
+    # ========================================================================
+    problem_repository = providers.Singleton(
+        ProblemRepositoryImpl,
+        db=database
+    )
+    
     problem_application_service = providers.Singleton(
         ProblemApplicationService,
         problem_repository=problem_repository,
@@ -336,6 +344,7 @@ class Container(containers.DeclarativeContainer):
         tier_repository=tier_repository
     )
 
+    
     # ========================================================================
     # Monthly Problems Usecase
     # ========================================================================
@@ -378,6 +387,8 @@ class Container(containers.DeclarativeContainer):
         self.link_bj_account_usecase()
         self.activity_application_service()
         self.problem_application_service()
+        self.tag_application_service()
+        self.target_application_service()
         
         # 3. 스케줄러 시작 (추가)
         scheduler = self.bj_account_update_scheduler()

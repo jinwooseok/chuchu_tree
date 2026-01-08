@@ -160,3 +160,15 @@ class ErrorCode(Enum):
         message="순서가 중복입니다.",
         status_code=400
     )
+    
+    TAG_NOT_FOUND = ErrorCodeInfo(
+        code="TAG_NOT_FOUND",
+        message="태그 정보를 찾을 수 없습니다.",
+        status_code=400
+    )
+    
+    LINK_COOLDOWN_PERIOD = ErrorCodeInfo(
+        code="LINK_COOLDOWN_PERIOD",
+        message="마지막 계정 변경 이후 7일이 지나지 않았습니다.",
+        status_code=400
+    )

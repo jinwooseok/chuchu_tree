@@ -32,12 +32,30 @@ class TargetRepositoryImpl(TargetRepository):
     @override
     async def find_by_id(self, target_id: TargetId) -> Target | None:
         """ID로 목표 조회 (구현 필요)"""
-        raise NotImplementedError()
+        stmt = select(TargetModel).where(
+            and_(
+                TargetModel.target_id == target_id.value,
+                TargetModel.deleted_at.is_(None)
+            )
+        )
+        result = await self.session.execute(stmt)
+        model = result.scalar_one_or_none()
+
+        return TargetMapper.to_entity(model) if model else None
 
     @override
     async def find_by_code(self, code: str) -> Target | None:
         """코드로 목표 조회 (구현 필요)"""
-        raise NotImplementedError()
+        stmt = select(TargetModel).where(
+            and_(
+                TargetModel.target_code == code,
+                TargetModel.deleted_at.is_(None)
+            )
+        )
+        result = await self.session.execute(stmt)
+        model = result.scalar_one_or_none()
+
+        return TargetMapper.to_entity(model) if model else None
 
     @override
     async def find_all_active(self) -> list[Target]:

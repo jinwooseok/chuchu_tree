@@ -98,34 +98,12 @@ class UserAccountRepositoryImpl(UserAccountRepository):
 
         return exists
 
-    @override
-    async def update(self, user_account: UserAccount) -> UserAccount:
-        """유저 업데이트"""
-        # 기존 유저 모델 조회
-        stmt = (
-            select(UserAccountModel)
-            .options(
-                joinedload(UserAccountModel.account_links),
-                joinedload(UserAccountModel.targets)
-            )
-            .where(UserAccountModel.user_account_id == user_account.user_account_id.value)
-        )
-        result = await self.session.execute(stmt)
-        existing_model = result.unique().scalars().one_or_none()
-
-        # 기본 정보 업데이트
-        existing_model.provider = user_account.provider
-        existing_model.provider_id = user_account.provider_id
-        existing_model.profile_image = user_account.profile_image
-        existing_model.registered_at = user_account.registered_at
-        existing_model.updated_at = user_account.updated_at
-        existing_model.deleted_at = user_account.deleted_at
-
-        # AccountLink 저장
-        for link in user_account.account_links:
-            link_model = AccountLinkMapper.to_model(link)
-            self.session.add(link_model)
-
+    async def update(self, user_account: UserAccount) -> None:
+        # 1. 엔티티를 (자식이 포함된) 모델로 변환
+        model = UserAccountMapper.to_model(user_account)
+        
+        # 2. 세션에 병합
+        await self.session.merge(model)
+        
+        # 3. 변경사항 확정
         await self.session.flush()
-
-        return UserAccountMapper.to_entity(existing_model)

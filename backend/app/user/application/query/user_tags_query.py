@@ -50,9 +50,9 @@ class TagAliasQuery:
 @dataclass
 class TargetQuery:
     """목표 정보"""
-    target_id: int
-    target_code: str
-    target_display_name: str
+    target_id: int = 1
+    target_code: str = "DAILY"
+    target_display_name: str = "DAILY"
 
 
 @dataclass

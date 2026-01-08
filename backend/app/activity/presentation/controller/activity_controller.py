@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Query
 from dependency_injector.wiring import inject, Provide
 
+from app.activity.application.command.tag_custom_command import TagCustomCommand
 from app.activity.application.command.update_will_solve_problems import UpdateWillSolveProblemsCommand
 from app.activity.application.service.activity_application_service import ActivityApplicationService
 from app.common.domain.vo.current_user import CurrentUser
@@ -121,7 +122,7 @@ async def get_problem_record(
 async def ban_problem(
     request: BanProblemRequest,
     current_user: CurrentUser = Depends(get_current_member),
-    # activity_service = Depends(Provide[Container.activity_service])
+    activity_application_service: ActivityApplicationService = Depends(Provide[Container.activity_application_service])
 ):
     """
     문제 밴
@@ -132,8 +133,6 @@ async def ban_problem(
     Returns:
         빈 데이터
     """
-    # TODO: Implement ban problem logic
-    # 1. Add problem to banned list
 
     return ApiResponse(data={})
 
@@ -165,7 +164,7 @@ async def unban_problem(
 async def ban_tag(
     request: BanTagRequest,
     current_user: CurrentUser = Depends(get_current_member),
-    # activity_service = Depends(Provide[Container.activity_service])
+    activity_application_service:ActivityApplicationService = Depends(Provide[Container.activity_application_service])
 ):
     """
     태그 밴
@@ -176,8 +175,12 @@ async def ban_tag(
     Returns:
         빈 데이터
     """
-    # TODO: Implement ban tag logic
-    # 1. Add tag to banned list
+    await activity_application_service.ban_tag(TagCustomCommand(
+            user_account_id=current_user.user_account_id,
+            tag_code=request.tag_code,
+            tag_ban_yn=True
+        )
+    )
 
     return ApiResponse(data={})
 
@@ -187,7 +190,7 @@ async def ban_tag(
 async def unban_tag(
     tag_code: str = Query(..., alias="tagCode", description="태그 코드"),
     current_user: CurrentUser = Depends(get_current_member),
-    # activity_service = Depends(Provide[Container.activity_service])
+    activity_application_service:ActivityApplicationService = Depends(Provide[Container.activity_application_service])
 ):
     """
     태그 밴 해제
@@ -198,7 +201,10 @@ async def unban_tag(
     Returns:
         빈 데이터
     """
-    # TODO: Implement unban tag logic
-    # 1. Remove tag from banned list
+    await activity_application_service.unban_tag(TagCustomCommand(
+        user_account_id=current_user.user_account_id,
+        tag_code=tag_code,
+        tag_ban_yn=False
+    ))
 
     return ApiResponse(data={})

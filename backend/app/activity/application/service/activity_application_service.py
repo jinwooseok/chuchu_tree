@@ -4,15 +4,21 @@ from calendar import monthrange
 from collections import defaultdict
 from datetime import date
 
+from app.activity.application.command.tag_custom_command import TagCustomCommand
 from app.activity.application.command.update_will_solve_problems import UpdateWillSolveProblemsCommand
 from app.activity.application.query.monthly_activity_data_query import (
     DailyActivityQuery,
     MonthlyActivityDataQuery
 )
+from app.activity.domain.entity.user_activity import UserActivity
 from app.activity.domain.entity.will_solve_problem import WillSolveProblem
+from app.activity.domain.event.payloads import GetTagSummaryPayload, GetTagSummaryResultPayload
 from app.activity.domain.repository.user_activity_repository import UserActivityRepository
 from app.baekjoon.domain.event.get_monthly_activity_data_payload import GetMonthlyActivityDataPayload
-from app.common.domain.vo.identifiers import ProblemId, UserAccountId
+from app.common.domain.entity.domain_event import DomainEvent
+from app.common.domain.enums import ExcludedReason
+from app.common.domain.service.event_publisher import DomainEventBus
+from app.common.domain.vo.identifiers import ProblemId, TagId, UserAccountId
 from app.common.infra.event.decorators import event_handler, event_register_handlers
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
@@ -26,9 +32,11 @@ class ActivityApplicationService:
 
     def __init__(
         self,
-        user_activity_repository: UserActivityRepository
+        user_activity_repository: UserActivityRepository,
+        domain_event_bus: DomainEventBus
     ):
         self.user_activity_repository = user_activity_repository
+        self.domain_event_bus = domain_event_bus
 
     @event_handler("GET_MONTHLY_ACTIVITY_DATA_REQUESTED")
     @transactional
@@ -143,6 +151,55 @@ class ActivityApplicationService:
 
         # 4. Repository를 통해 일괄 저장
         await self.user_activity_repository.save_all_will_solve_problems(processed_entities)
+
+    @transactional
+    async def ban_tag(self, command: TagCustomCommand):
+        # 1. tag code로 tag 정보 요청
+        event = DomainEvent(
+            event_type="GET_TAG_INFO_REQUESTED",
+            data=GetTagSummaryPayload(tag_code=command.tag_code),
+            result_type=GetTagSummaryResultPayload
+        )
+        tag_info: GetTagSummaryResultPayload = await self.domain_event_bus.publish(event)
+        
+        # 3. 사용자 활동 애그리거트 로드
+        user_id = UserAccountId(command.user_account_id)
+        activity: UserActivity = await self.user_activity_repository.find_only_tag_custom_by_user_account_id(user_id)
+        print(activity.customize_tag)
+        # 4. 도메인 로직 실행
+        activity.customize_tag(
+            tag_id=TagId(tag_info.tag_id), 
+            exclude=True,
+            reason=ExcludedReason.INSIGNIFICANT 
+        )
+        
+        # 5. 변경된 애그리거트 저장
+        await self.user_activity_repository.save_tag_custom(activity)
+        
+    @transactional
+    async def unban_tag(self, command: TagCustomCommand):
+        
+        # 1. tag code로 tag 정보 요청
+        event = DomainEvent(
+            event_type="GET_TAG_INFO_REQUESTED",
+            data=GetTagSummaryPayload(tag_code=command.tag_code),
+            result_type=GetTagSummaryResultPayload
+        )
+        tag_info: GetTagSummaryResultPayload | None = await self.domain_event_bus.publish(event)
+        
+        # 2. 태그 정보가 없으면 예외 처리
+        if not tag_info:
+            raise APIException(ErrorCode.TAG_NOT_FOUND, f"Tag with code {command.tag_code} not found.")
+
+        # 3. 사용자 활동 애그리거트 로드
+        user_id = UserAccountId(command.user_account_id)
+        activity: UserActivity = await self.user_activity_repository.find_only_tag_custom_by_user_account_id(user_id)
+
+        # 4. 도메인 로직 실행: 태그 커스터마이징 제거
+        activity.remove_tag_customization(tag_id=TagId(tag_info.tag_id))
+        
+        # 5. 변경된 애그리거트 저장
+        await self.user_activity_repository.save_tag_custom(activity)
         
     def _validate_order_consistency(self, problem_ids: list[int]):
         # 중복된 ID가 포함되어 있는지 체크

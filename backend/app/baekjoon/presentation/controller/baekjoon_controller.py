@@ -61,7 +61,7 @@ async def link_baekjoon_account(
 async def update_baekjoon_account_link(
     request: LinkBaekjoonAccountRequest,
     current_user: CurrentUser = Depends(get_current_member),
-    # baekjoon_service = Depends(Provide[Container.baekjoon_service])
+    link_bj_account_usecase: LinkBjAccountUsecase = Depends(Provide[Container.link_bj_account_usecase])
 ):
     """
     백준 계정 연동 변경 (최초 1회 가능 + 7일)
@@ -72,11 +72,10 @@ async def update_baekjoon_account_link(
     Returns:
         빈 데이터
     """
-    # TODO: Implement baekjoon account update logic
-    # 1. Check if update is allowed (first time or 7 days passed)
-    # 2. Update linked account
-    # 3. Fetch data from solved.ac API
-
+    await link_bj_account_usecase.execute(LinkBjAccountCommand(
+        user_account_id=current_user.user_account_id, 
+        bj_account_id=request.bj_account))
+    
     return ApiResponse(data={})
 
 
