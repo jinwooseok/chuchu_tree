@@ -8,24 +8,7 @@ import { usePostTarget } from '@/entities/user';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { TargetCode } from '@/shared/constants/tagSystem';
-
-const TARGET_OPTIONS = [
-  {
-    code: 'BEGINNER' as TargetCode,
-    label: '입문자',
-    description: '알고리즘을 이제 막 시작한 초보자',
-  },
-  {
-    code: 'DAILY' as TargetCode,
-    label: '데일리',
-    description: '1일 1알고리즘, 점수 올리기, 취미 등',
-  },
-  {
-    code: 'CT' as TargetCode,
-    label: '코테 준비',
-    description: '코딩테스트를 준비하는 취준생',
-  },
-];
+import { TARGET_OPTIONS } from '@/shared/constants/target';
 
 export default function BjAccountRegistration() {
   const [bjHandle, setBjHandle] = useState('');
