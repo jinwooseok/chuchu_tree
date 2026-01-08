@@ -4,14 +4,14 @@ import { useMemo } from 'react';
 import TagCard from '@/features/tag-dashboard/ui/TagCard';
 import mockData from '@/features/tag-dashboard/mockdata/mock_tag_dashboard_data.json';
 import { TagDetail } from '@/shared/types/tagDashboard';
-import { useTagDashboardStore } from '@/lib/store/tagDashboard';
+import { useTagDashboardSidebarStore } from '@/lib/store/tagDashboard';
 
 export default function TagDashboard() {
   // mock 데이터에서 태그 목록 가져오기
   const tags = mockData.data.tags as TagDetail[];
 
   // store에서 필터/정렬 상태 가져오기
-  const { searchQuery, sortBy, selectedTagId } = useTagDashboardStore();
+  const { searchQuery, sortBy, selectedTagId } = useTagDashboardSidebarStore();
 
   // 필터링 및 정렬된 태그 목록
   const filteredAndSortedTags = useMemo(() => {

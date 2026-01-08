@@ -4,13 +4,13 @@ import { useState } from 'react';
 import { Search, ChevronDown, ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
-import { useTagDashboardStore, SortBy } from '@/lib/store/tagDashboard';
+import { useTagDashboardSidebarStore, SortBy } from '@/lib/store/tagDashboard';
 import mockData from '@/features/tag-dashboard/mockdata/mock_tag_dashboard_data.json';
 import { Category, TagLevel } from '@/shared/types/tagDashboard';
 import { getLevelColorClasses } from '@/features/tag-dashboard/lib/utils';
 
 export default function TagSidebar() {
-  const { searchQuery, sortBy, selectedTagId, setSearchQuery, setSortBy, setSelectedTagId } = useTagDashboardStore();
+  const { searchQuery, sortBy, selectedTagId, setSearchQuery, setSortBy, setSelectedTagId } = useTagDashboardSidebarStore();
 
   // 카테고리별 열림/닫힘 상태
   const [openCategories, setOpenCategories] = useState<Record<TagLevel, boolean>>({

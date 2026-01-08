@@ -59,4 +59,7 @@ export const TAG_INFO = {
   convex_hull: { kr: '볼록 껍질', bgColor: 'bg-fuchsia-300' },
 };
 
+export type CategoryName = 'IMEDIATED' | 'ADVANCED' | 'MASTER' | 'EXCLUDED' | 'LOCKED';
+export type TargetCode = 'DAILY' | 'BEGINNER' | 'CT';
+
 export type TagKey = keyof typeof TAG_INFO;

@@ -68,4 +68,5 @@ export const TIER_TO_NUM = {
   M1: 31,
 } as const;
 
+export type TierNumKey = keyof typeof TIER_INFO;
 export type TierKey = keyof typeof TIER_TO_NUM;

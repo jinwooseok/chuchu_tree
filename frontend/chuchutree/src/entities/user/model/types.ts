@@ -1,4 +1,4 @@
-import { TIER_INFO, TierKey } from '@/shared/constants/tierSystem';
+import { TIER_INFO, TierKey, TierNumKey } from '@/shared/constants/tierSystem';
 
 interface Target {
   targetId: number;
@@ -14,7 +14,7 @@ interface UserAccount {
 }
 
 interface Stat {
-  tierId: keyof typeof TIER_INFO;
+  tierId: TierNumKey
   tierName: TierKey;
   longestStreak: number;
   rating: number;
