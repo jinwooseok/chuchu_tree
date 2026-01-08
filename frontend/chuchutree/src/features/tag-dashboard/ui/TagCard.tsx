@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import { BadgeCheck } from 'lucide-react';
 import { CategoryTags, usePostTagBan, useDeleteTagBan } from '@/entities/tag-dashboard';
 import { getLevelColorClasses, getLevelColorValue, getDaysAgo, calculateProgress, calculatePeekPosition, calculateBoxPosition, calculateMasterProgress } from '../lib/utils';
@@ -9,27 +8,19 @@ import { TIER_TO_NUM } from '@/shared/constants/tierSystem';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid'; // filled
 import { CheckCircleIcon as CheckCircleIconOutline } from '@heroicons/react/24/outline'; // outline
 import { CategoryName } from '@/shared/constants/tagSystem';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog';
 import { toast } from 'sonner';
+import { useModal } from '@/lib/providers/modal-provider';
+import { TagBanAlertDialog } from './TagBanAlertDialog';
 
 export default function TagCard({ tag }: { tag: CategoryTags }) {
   const { tagCode, tagDisplayName, accountStat, nextLevelStat, lockedYn, excludedYn, recommendationYn, requiredStat } = tag;
-  const [isAlertOpen, setIsAlertOpen] = useState(false);
+  const { openModal, closeModal } = useModal();
 
   // Tag Ban mutations
   const { mutate: postTagBan, isPending: isPostPending } = usePostTagBan({
     onSuccess: () => {
       toast.success('추천 목록에서 제외되었습니다.', { position: 'top-center' });
-      setIsAlertOpen(false);
+      closeModal('tag-ban-alert');
     },
     onError: () => {
       toast.error('제외 처리에 실패했습니다.', { position: 'top-center' });
@@ -39,7 +30,7 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
   const { mutate: deleteTagBan, isPending: isDeletePending } = useDeleteTagBan({
     onSuccess: () => {
       toast.success('추천 목록에 추가되었습니다.', { position: 'top-center' });
-      setIsAlertOpen(false);
+      closeModal('tag-ban-alert');
     },
     onError: () => {
       toast.error('추가 처리에 실패했습니다.', { position: 'top-center' });
@@ -47,10 +38,6 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
   });
 
   const isPending = isPostPending || isDeletePending;
-
-  const handleTagBanClick = () => {
-    setIsAlertOpen(true);
-  };
 
   const handleConfirm = () => {
     if (recommendationYn) {
@@ -60,6 +47,13 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
       // 현재 제외 중이면 추가 (Ban 삭제)
       deleteTagBan({ tagCode });
     }
+  };
+
+  const handleTagBanClick = () => {
+    openModal(
+      'tag-ban-alert',
+      <TagBanAlertDialog tagDisplayName={tagDisplayName} recommendationYn={recommendationYn} isPending={isPending} onConfirm={handleConfirm} onClose={() => closeModal('tag-ban-alert')} />,
+    );
   };
 
   // 현재 레벨과 다음 레벨
@@ -212,28 +206,6 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
           </div>
         </div>
       </div>
-
-      {/* Tag Ban Alert Dialog */}
-      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              {recommendationYn ? '추천 목록에서 제외하시겠습니까?' : '추천 목록에 추가하시겠습니까?'}
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              {recommendationYn
-                ? `"${tagDisplayName}" 유형을 추천 목록에서 제외합니다. 제외된 유형은 문제 추천 시 포함되지 않습니다.`
-                : `"${tagDisplayName}" 유형을 추천 목록에 추가합니다. 이 유형의 문제가 추천될 수 있습니다.`}
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isPending}>취소</AlertDialogCancel>
-            <AlertDialogAction onClick={handleConfirm} disabled={isPending}>
-              {isPending ? '처리 중...' : recommendationYn ? '제외하기' : '추가하기'}
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
     </div>
   );
 }

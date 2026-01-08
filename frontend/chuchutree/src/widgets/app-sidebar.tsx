@@ -9,9 +9,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useSidebar } from '@/components/ui/sidebar';
 import Image from 'next/image';
 import { ThemeButton } from '@/shared/ui';
-import { useState } from 'react';
 import { TargetChangeDialog } from '@/features/target-change';
 import { TargetCode } from '@/shared/constants/tagSystem';
+import { useModal } from '@/lib/providers/modal-provider';
 
 const ICON_SIZE = 32;
 
@@ -19,7 +19,7 @@ export function AppSidebar() {
   const { state: sidebarOpenState, toggleSidebar: setSidebarOpenState } = useSidebar();
   const { topSection, centerSection, bottomSection, toggleTopSection, setCenterSection, toggleBottomSection } = useLayoutStore();
   const { user } = useUser();
-  const [isTargetDialogOpen, setIsTargetDialogOpen] = useState(false);
+  const { openModal, closeModal } = useModal();
 
   // Menu items.
   const items = [
@@ -129,7 +129,10 @@ export function AppSidebar() {
                 <DropdownMenuItem
                   onSelect={(e) => {
                     e.preventDefault();
-                    setIsTargetDialogOpen(true);
+                    openModal(
+                      'target-change',
+                      <TargetChangeDialog currentTarget={user?.userAccount?.target?.targetCode as TargetCode} onClose={() => closeModal('target-change')} />,
+                    );
                   }}
                 >
                   <span>목표 변경</span>
@@ -143,13 +146,6 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
-
-    {/* 목표 변경 Dialog */}
-    <TargetChangeDialog
-      open={isTargetDialogOpen}
-      onOpenChange={setIsTargetDialogOpen}
-      currentTarget={user?.userAccount?.target?.targetCode as TargetCode}
-    />
     </>
   );
 }
