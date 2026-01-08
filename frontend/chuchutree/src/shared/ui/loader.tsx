@@ -11,18 +11,12 @@ export function Loader({ size = 'md', text, fullScreen = false }: LoaderProps) {
     lg: 'h-12 w-12 border-4',
   };
 
-  const containerClasses = fullScreen
-    ? 'flex min-h-screen w-full flex-col items-center justify-center gap-4'
-    : 'flex w-full flex-col items-center justify-center gap-4 p-8';
+  const containerClasses = fullScreen ? 'flex min-h-screen w-full flex-col items-center justify-center gap-4' : 'flex w-full flex-col items-center justify-center gap-4 p-8';
 
   return (
     <div className={containerClasses}>
-      <div
-        className={`${sizeClasses[size]} animate-spin rounded-full border-primary border-t-transparent`}
-        role="status"
-        aria-label="로딩 중"
-      />
-      {text && <p className="text-sm text-muted-foreground">{text}</p>}
+      <div className={`${sizeClasses[size]} border-primary animate-spin rounded-full border-t-transparent`} role="status" aria-label="로딩 중" />
+      {text && <p className="text-muted-foreground text-sm">{text}</p>}
     </div>
   );
 }
@@ -35,11 +29,11 @@ export function PageLoader({ text }: { text?: string }) {
 // 스켈레톤 로더 (카드형)
 export function SkeletonCard() {
   return (
-    <div className="w-full animate-pulse space-y-4 rounded-lg border bg-card p-6">
-      <div className="h-4 w-3/4 rounded bg-muted" />
+    <div className="bg-card w-full animate-pulse space-y-4 rounded-lg border p-6">
+      <div className="bg-muted h-4 w-3/4 rounded" />
       <div className="space-y-2">
-        <div className="h-3 w-full rounded bg-muted" />
-        <div className="h-3 w-5/6 rounded bg-muted" />
+        <div className="bg-muted h-3 w-full rounded" />
+        <div className="bg-muted h-3 w-5/6 rounded" />
       </div>
     </div>
   );
@@ -50,11 +44,11 @@ export function SkeletonList({ count = 3 }: { count?: number }) {
   return (
     <div className="w-full space-y-3">
       {Array.from({ length: count }).map((_, i) => (
-        <div key={i} className="flex animate-pulse items-center gap-4 rounded-lg border bg-card p-4">
-          <div className="h-12 w-12 rounded-full bg-muted" />
+        <div key={i} className="bg-card flex animate-pulse items-center gap-4 rounded-lg border p-4">
+          <div className="bg-muted h-12 w-12 rounded-full" />
           <div className="flex-1 space-y-2">
-            <div className="h-4 w-1/2 rounded bg-muted" />
-            <div className="h-3 w-3/4 rounded bg-muted" />
+            <div className="bg-muted h-4 w-1/2 rounded" />
+            <div className="bg-muted h-3 w-3/4 rounded" />
           </div>
         </div>
       ))}
@@ -70,11 +64,5 @@ export function Spinner({ size = 'sm' }: { size?: 'sm' | 'md' | 'lg' }) {
     lg: 'h-8 w-8 border-3',
   };
 
-  return (
-    <div
-      className={`${sizeClasses[size]} inline-block animate-spin rounded-full border-current border-t-transparent`}
-      role="status"
-      aria-label="로딩 중"
-    />
-  );
+  return <div className={`${sizeClasses[size]} inline-block animate-spin rounded-full border-current border-t-transparent`} role="status" aria-label="로딩 중" />;
 }

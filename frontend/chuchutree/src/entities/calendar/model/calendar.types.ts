@@ -1,5 +1,5 @@
 import { TagKey } from '@/shared/constants/tagSystem';
-import { TIER_INFO, TierKey } from '@/shared/constants/tierSystem';
+import { TIER_INFO, TierKey, TierNumKey } from '@/shared/constants/tierSystem';
 
 export interface TagTargets {
   targetId: number;
@@ -28,7 +28,7 @@ export interface SolvedProblems {
   problemId: number;
   realSolvedYn: boolean;
   problemTitle: string;
-  problemTierLevel: keyof typeof TIER_INFO;
+  problemTierLevel: TierNumKey
   problemTierName: TierKey;
   problemClassLevel: number;
   tags: Tags[];
@@ -37,7 +37,7 @@ export interface SolvedProblems {
 export interface WillSolveProblems {
   problemId: number;
   problemTitle: string;
-  problemTierLevel: keyof typeof TIER_INFO;
+  problemTierLevel: TierNumKey
   problemTierName: TierKey;
   problemClassLevel: number;
   tags: Tags[];
@@ -72,8 +72,17 @@ export interface CalendarEvent {
 }
 
 // 풀문제 업데이트, 푼문제 업데이트 request data
-
 export interface UpdateProblemsData {
   date: string;
   problemIds: number[];
+}
+
+// 문제 검색
+export interface SearchProblems {
+  problems: {
+    idBaseTotalCount: number;
+    titleBaseTotalCount: number;
+    idBase: WillSolveProblems[];
+    titleBase: WillSolveProblems[];
+  };
 }

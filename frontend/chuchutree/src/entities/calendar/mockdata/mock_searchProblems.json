@@ -1,0 +1,70 @@
+{
+  "status": 200,
+  "message": "string",
+  "data": {
+    "problems": {
+      "idBaseTotalCount": 0,
+      "titleBaseTotalCount": 0,
+      "idBase": [
+        {
+          "problemId": 0,
+          "problemTitle": "string",
+          "problemTierLevel": 0,
+          "problemTierName": "string",
+          "problemClassLevel": 0,
+          "tags": [
+            {
+              "tagId": 0,
+              "tagCode": "string",
+              "tagDisplayName": "string",
+              "tagTarget": [
+                {
+                  "targetId": 0,
+                  "targetCode": "string",
+                  "targetDisplayName": "string"
+                }
+              ],
+              "tagAliases": [
+                {
+                  "alias": "string"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "titleBase": [
+        {
+          "problemId": 0,
+          "problemTitle": "string",
+          "problemTierLevel": 0,
+          "problemTierName": "string",
+          "problemClassLevel": 0,
+          "tags": [
+            {
+              "tagId": 0,
+              "tagCode": "string",
+              "tagDisplayName": "string",
+              "tagTarget": [
+                {
+                  "targetId": 0,
+                  "targetCode": "string",
+                  "targetDisplayName": "string"
+                }
+              ],
+              "tagAliases": [
+                {
+                  "alias": "string"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "error": {
+    "code": "string",
+    "message": "string"
+  }
+}

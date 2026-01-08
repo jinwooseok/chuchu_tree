@@ -2,12 +2,14 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { calendarApi } from '../api/calendar.api';
-import { UpdateProblemsData } from './types';
+import { UpdateProblemsData } from './calendar.types';
 
 export const calendarKeys = {
   all: ['calendar'],
   lists: () => [...calendarKeys.all, 'list'],
   list: (year: number, month: number) => [...calendarKeys.lists(), { year, month }],
+  searches: () => [...calendarKeys.all, 'search'],
+  search: (keyword: string) => [...calendarKeys.searches(), { keyword }],
 };
 
 export const useCalendar = (year: number, month: number) => {
@@ -15,6 +17,19 @@ export const useCalendar = (year: number, month: number) => {
     queryKey: calendarKeys.list(year, month),
     queryFn: () => calendarApi.getCalendar({ year, month }),
     staleTime: 5 * 60 * 1000,
+  });
+};
+
+// 문제 검색
+export const useSearchProblems = (keyword: string) => {
+  return useQuery({
+    queryKey: calendarKeys.search(keyword),
+    queryFn: () => calendarApi.getSearchProblems({ keyword }),
+    enabled: keyword.trim().length > 0, // 키워드가 있을 때만 요청
+    staleTime: Infinity, // 공격적 캐싱
+    gcTime: 60 * 60 * 1000, // 공격적 캐싱
+    refetchOnWindowFocus: false, // 공격적 캐싱
+    refetchOnMount: false, // 공격적 캐싱
   });
 };
 

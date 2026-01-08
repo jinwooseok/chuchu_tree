@@ -9,6 +9,9 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { useSidebar } from '@/components/ui/sidebar';
 import Image from 'next/image';
 import { ThemeButton } from '@/shared/ui';
+import { useState } from 'react';
+import { TargetChangeDialog } from '@/features/target-change';
+import { TargetCode } from '@/shared/constants/tagSystem';
 
 const ICON_SIZE = 32;
 
@@ -16,6 +19,7 @@ export function AppSidebar() {
   const { state: sidebarOpenState, toggleSidebar: setSidebarOpenState } = useSidebar();
   const { topSection, centerSection, bottomSection, toggleTopSection, setCenterSection, toggleBottomSection } = useLayoutStore();
   const { user } = useUser();
+  const [isTargetDialogOpen, setIsTargetDialogOpen] = useState(false);
 
   // Menu items.
   const items = [
@@ -52,7 +56,8 @@ export function AppSidebar() {
   ];
 
   return (
-    <Sidebar variant="inset" collapsible="icon">
+    <>
+      <Sidebar variant="inset" collapsible="icon">
       {/* 메인 콘텐츠 */}
       <SidebarContent className="relative">
         {/* 그룹1 */}
@@ -121,7 +126,12 @@ export function AppSidebar() {
                 <DropdownMenuItem>
                   <span>연동 계정 재설정</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  onSelect={(e) => {
+                    e.preventDefault();
+                    setIsTargetDialogOpen(true);
+                  }}
+                >
                   <span>목표 변경</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem>
@@ -133,5 +143,13 @@ export function AppSidebar() {
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
+
+    {/* 목표 변경 Dialog */}
+    <TargetChangeDialog
+      open={isTargetDialogOpen}
+      onOpenChange={setIsTargetDialogOpen}
+      currentTarget={user?.userAccount?.target?.targetCode as TargetCode}
+    />
+    </>
   );
 }

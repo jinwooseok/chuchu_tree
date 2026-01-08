@@ -1,8 +1,9 @@
 import { redirect } from 'next/navigation';
 import { isAuthenticated, ApiResponseError } from '@/lib/server';
+import { MainLayoutClient } from './MainLayoutClient';
 import { userServerApi } from '@/entities/user/api/user.server';
 import { calendarServerApi } from '@/entities/calendar/api/calendar.server';
-import { MainLayoutClient } from './MainLayoutClient';
+import { TagDashboardServerApi } from '@/entities/tag-dashboard/api/tagDashboard.server';
 
 export default async function MainLayout({
   children,
@@ -69,8 +70,21 @@ export default async function MainLayout({
     // Calendar 데이터는 선택적이므로 null로 처리
   }
 
+  // 4단계: TagDashboard 데이터 fetch
+  let initialTagDashboard = null;
+  try {
+    console.log('[MainLayout] Fetching TagDashboard...');
+    initialTagDashboard = await TagDashboardServerApi.getTagDashboard();
+    console.log('[MainLayout] TagDashboard data fetched successfully');
+  } catch (error) {
+    console.log('[MainLayout] Failed to fetch TagDashboard data', {
+      message: error instanceof Error ? error.message : 'Unknown error',
+      errorCode: error instanceof ApiResponseError ? error.errorCode : undefined,
+    });
+  }
+
   return (
-    <MainLayoutClient initialUserData={initialUserData} initialCalendarData={initialCalendarData}>
+    <MainLayoutClient initialUserData={initialUserData} initialCalendarData={initialCalendarData} initialTagDashboard={initialTagDashboard}>
       {children}
     </MainLayoutClient>
   );

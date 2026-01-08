@@ -1,6 +1,5 @@
 import { useUser } from '@/lib/store/user';
-import { TIER_INFO } from '@/shared/constants/tierSystem';
-type TierKey = keyof typeof TIER_INFO;
+import { TIER_INFO, TierNumKey } from '@/shared/constants/tierSystem';
 
 const masterId: number = 31;
 
@@ -8,7 +7,7 @@ export default function TopTierbar() {
   const { user } = useUser();
   const MockUserInfoTierId = user?.bjAccount.stat.tierId || 17;
   const MockUserInfoRating = user?.bjAccount.stat.rating || '1859';
-  const nextTierId: TierKey = MockUserInfoTierId === masterId ? MockUserInfoTierId : ((MockUserInfoTierId + 1) as TierKey);
+  const nextTierId: TierNumKey = MockUserInfoTierId === masterId ? MockUserInfoTierId : ((MockUserInfoTierId + 1) as TierNumKey);
   const ratingToNext = TIER_INFO[nextTierId].rating - Number(MockUserInfoRating);
   const totalRatingForNextTier = TIER_INFO[nextTierId].rating - TIER_INFO[MockUserInfoTierId].rating;
   const tierRatio = ((totalRatingForNextTier - ratingToNext) / totalRatingForNextTier) * 100;

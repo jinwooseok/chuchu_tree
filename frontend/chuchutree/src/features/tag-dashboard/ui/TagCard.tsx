@@ -1,20 +1,17 @@
 import { BadgeCheck } from 'lucide-react';
-import { TagDetail, TagLevel } from '@/shared/types/tagDashboard';
+import { CategoryTags } from '@/entities/tag-dashboard';
 import { getLevelColorClasses, getLevelColorValue, getDaysAgo, calculateProgress, calculatePeekPosition, calculateBoxPosition, calculateMasterProgress } from '../lib/utils';
 import Image from 'next/image';
 import { TIER_TO_NUM } from '@/shared/constants/tierSystem';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid'; // filled
 import { CheckCircleIcon as CheckCircleIconOutline } from '@heroicons/react/24/outline'; // outline
+import { CategoryName } from '@/shared/constants/tagSystem';
 
-interface TagCardProps {
-  tag: TagDetail;
-}
-
-export default function TagCard({ tag }: TagCardProps) {
-  const { tagDisplayName, accountStat, nextLevelStat, locked_yn, excluded_yn, recommandation_yn, requiredStat } = tag;
+export default function TagCard({ tag }: { tag: CategoryTags }) {
+  const { tagDisplayName, accountStat, nextLevelStat, lockedYn, excludedYn, recommendationYn, requiredStat } = tag;
 
   // 현재 레벨과 다음 레벨
-  const currentLevel = accountStat.currentLevel as TagLevel;
+  const currentLevel = accountStat.currentLevel as CategoryName;
   const nextLevel = nextLevelStat.nextLevel;
 
   // 색상 클래스
@@ -42,11 +39,11 @@ export default function TagCard({ tag }: TagCardProps) {
   const daysAgo = getDaysAgo(accountStat.lastSolvedDate);
 
   // LOCKED/EXCLUDED 상태 체크
-  const isLocked = locked_yn;
+  const isLocked = lockedYn;
 
   const isSuccessClear = accountStat.solvedProblemCount >= nextLevelStat.solvedProblemCount;
-  const isSuccessTier = TIER_TO_NUM[accountStat.requiredMinTier] >= TIER_TO_NUM[nextLevelStat.requiredMinTier];
-  const isSuccessBest = TIER_TO_NUM[accountStat.higherProblemTier] >= TIER_TO_NUM[nextLevelStat.higherProblemTier];
+  const isSuccessTier = accountStat.requiredMinTier >= nextLevelStat.requiredMinTier;
+  const isSuccessBest = accountStat.higherProblemTier >= nextLevelStat.higherProblemTier;
 
   return (
     <div className={`bg-background flex h-40 flex-col gap-2 rounded-lg p-4 text-xs`}>
@@ -56,7 +53,7 @@ export default function TagCard({ tag }: TagCardProps) {
         <div className="flex h-full items-center justify-center gap-2">
           <div className={`text-muted-foreground flex flex-col gap-0.5`}>
             <button className={`hover:bg-excluded-bg hover:text-innerground-white border-innerground-darkgray rounded border px-2 text-center transition-colors`}>
-              {recommandation_yn ? '추천 포함됨' : '추천리스트 등록'}
+              {recommendationYn ? '추천 포함됨' : '추천리스트 등록'}
             </button>
             <div className="flex gap-0.5">
               <p>마지막 풀이</p>
@@ -65,9 +62,9 @@ export default function TagCard({ tag }: TagCardProps) {
             </div>
           </div>
           <div
-            className={`${!excluded_yn ? currentLevelColors.bg : 'bg-excluded-bg'} ${!excluded_yn ? currentLevelColors.text : 'text-innerground-white'} flex h-full items-center rounded px-2 font-semibold`}
+            className={`${!excludedYn ? currentLevelColors.bg : 'bg-excluded-bg'} ${!excludedYn ? currentLevelColors.text : 'text-innerground-white'} flex h-full items-center rounded px-2 font-semibold`}
           >
-            {!excluded_yn ? currentLevel : 'EXCLUDED'}
+            {!excludedYn ? currentLevel : 'EXCLUDED'}
           </div>
         </div>
       </div>
@@ -75,7 +72,7 @@ export default function TagCard({ tag }: TagCardProps) {
       <div className="flex flex-1 gap-2">
         {/* 게이지 */}
         <div className="flex flex-1 items-center justify-center rounded border-2 border-dashed p-2">
-          {excluded_yn ? (
+          {excludedYn ? (
             <div className="flex flex-col gap-1">
               <span className="text-excluded-text text-sm font-bold">제외된 유형입니다.</span>
               <span className="text-muted-foreground text-xs">현재 {currentLevel} 상태</span>
@@ -133,7 +130,7 @@ export default function TagCard({ tag }: TagCardProps) {
         <div className="flex flex-col gap-2 rounded border-2 border-dashed px-1 py-2">
           <div className="flex items-center justify-between gap-4">
             <div>Clear</div>
-            <div className={`${excluded_yn ? 'text-excluded-text' : isSuccessClear ? 'text-advanced-bg font-semibold' : 'text-muted-foreground'} flex items-center justify-center`}>
+            <div className={`${excludedYn ? 'text-excluded-text' : isSuccessClear ? 'text-advanced-bg font-semibold' : 'text-muted-foreground'} flex items-center justify-center`}>
               <p>{accountStat.solvedProblemCount}</p>
               <p>/</p>
               <p>{nextLevelStat.solvedProblemCount}</p>
@@ -142,14 +139,14 @@ export default function TagCard({ tag }: TagCardProps) {
           </div>
           <div className="flex items-center justify-between gap-4">
             <div>Tier</div>
-            <div className={`${excluded_yn ? 'text-excluded-text' : isSuccessTier ? 'text-advanced-bg font-semibold' : 'text-muted-foreground'} flex items-center justify-center`}>
+            <div className={`${excludedYn ? 'text-excluded-text' : isSuccessTier ? 'text-advanced-bg font-semibold' : 'text-muted-foreground'} flex items-center justify-center`}>
               <p>{nextLevelStat.requiredMinTier}</p>
               <div className="ml-2">{isSuccessTier ? <CheckCircleIconSolid height={12} width={12} /> : <CheckCircleIconOutline height={12} width={12} />}</div>
             </div>
           </div>
           <div className="flex items-center justify-between gap-4">
             <div>Best</div>
-            <div className={`${excluded_yn ? 'text-excluded-text' : isSuccessBest ? 'text-advanced-bg font-semibold' : 'text-muted-foreground'} flex items-center justify-center`}>
+            <div className={`${excludedYn ? 'text-excluded-text' : isSuccessBest ? 'text-advanced-bg font-semibold' : 'text-muted-foreground'} flex items-center justify-center`}>
               <p>{accountStat.higherProblemTier}</p>
               <p>/</p>
               <p>{nextLevelStat.higherProblemTier}</p>

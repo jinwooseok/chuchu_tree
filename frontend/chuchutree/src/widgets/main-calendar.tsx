@@ -1,5 +1,6 @@
 'use client';
 
+import RefreshButton from '@/features/refresh/ui/RefreshButton';
 import dynamic from 'next/dynamic';
 
 // 클라이언트 전용 렌더링 (hydration mismatch 방지)
@@ -14,8 +15,11 @@ const BigCalendar = dynamic(() => import('@/features/calendar/ui/BigCalendar'), 
 
 export default function MainCalendar() {
   return (
-    <div className="bg-innerground-white h-full w-full p-4">
+    <div className="bg-innerground-white relative h-full w-full p-4">
       <BigCalendar />
+      <div className="absolute right-16 bottom-16">
+        <RefreshButton />
+      </div>
     </div>
   );
 }

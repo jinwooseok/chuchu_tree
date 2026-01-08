@@ -9,3 +9,10 @@ export interface ApiError {
   code?: string;
   message?: string;
 }
+
+export type UseMutationCallback = {
+  onSuccess?: () => void;
+  onError?: (error: Error) => void;
+  onMutate?: () => void;
+  onSettled?: () => void;
+};

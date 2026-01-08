@@ -1,3 +1,3 @@
 export { UserProfile } from './ui/UserProfile';
-export { useUser } from './model/queries';
-export type { User } from './model/types';
+export { useUser, usePostTarget } from './model/queries';
+export type { User, PostTargetType } from './model/types';

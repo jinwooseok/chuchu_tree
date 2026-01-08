@@ -4,16 +4,16 @@ import { useState } from 'react';
 import { Search, ChevronDown, ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
-import { useTagDashboardStore, SortBy } from '@/lib/store/tagDashboard';
-import mockData from '@/features/tag-dashboard/mockdata/mock_tag_dashboard_data.json';
-import { Category, TagLevel } from '@/shared/types/tagDashboard';
+import { useTagDashboardSidebarStore, useTagDashboardStore, SortBy } from '@/lib/store/tagDashboard';
+import { CategoryName } from '@/shared/constants/tagSystem';
 import { getLevelColorClasses } from '@/features/tag-dashboard/lib/utils';
 
 export default function TagSidebar() {
-  const { searchQuery, sortBy, selectedTagId, setSearchQuery, setSortBy, setSelectedTagId } = useTagDashboardStore();
+  const { searchQuery, sortBy, selectedTagId, setSearchQuery, setSortBy, setSelectedTagId } = useTagDashboardSidebarStore();
+  const { categories, isInitialized } = useTagDashboardStore();
 
   // 카테고리별 열림/닫힘 상태
-  const [openCategories, setOpenCategories] = useState<Record<TagLevel, boolean>>({
+  const [openCategories, setOpenCategories] = useState<Record<CategoryName, boolean>>({
     IMEDIATED: true,
     ADVANCED: true,
     MASTER: true,
@@ -21,11 +21,8 @@ export default function TagSidebar() {
     EXCLUDED: false,
   });
 
-  // 카테고리 데이터
-  const categories = mockData.data.categories as Category[];
-
   // 카테고리 토글
-  const toggleCategory = (categoryName: TagLevel) => {
+  const toggleCategory = (categoryName: CategoryName) => {
     setOpenCategories((prev) => ({ ...prev, [categoryName]: !prev[categoryName] }));
   };
 
@@ -38,18 +35,27 @@ export default function TagSidebar() {
     }
   };
 
+  // 로딩 상태
+  if (!isInitialized) {
+    return (
+      <div className="flex h-full items-center justify-center p-4">
+        <p className="text-muted-foreground text-sm">로딩 중...</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex h-full flex-col gap-4 overflow-y-auto p-4 text-sm">
+    <div className="hide-scrollbar flex h-full flex-col gap-4 overflow-y-auto p-4 text-sm">
       {/* 제목 */}
       <div className="text-lg font-semibold">알고리즘 Dashboard</div>
 
       {/* 정렬 드롭다운 */}
       <div className="flex flex-col gap-2">
-        <label className="text-xs text-muted-foreground">정렬 기준</label>
+        <label className="text-muted-foreground text-xs">정렬 기준</label>
         <select
           value={sortBy}
           onChange={(e) => setSortBy(e.target.value as SortBy)}
-          className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1"
+          className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:outline-none"
         >
           <option value="default">기본순</option>
           <option value="name">이름순</option>
@@ -60,14 +66,8 @@ export default function TagSidebar() {
 
       {/* 검색 입력 */}
       <div className="relative">
-        <Search className="text-muted-foreground absolute left-2 top-1/2 h-4 w-4 -translate-y-1/2" />
-        <Input
-          type="text"
-          placeholder="태그 검색..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="pl-8"
-        />
+        <Search className="text-muted-foreground absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2" />
+        <Input type="text" placeholder="태그 검색..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-8" />
       </div>
 
       {/* 카테고리별 태그 리스트 */}
@@ -91,7 +91,7 @@ export default function TagSidebar() {
                   <button
                     key={tag.tagId}
                     onClick={() => handleTagClick(tag.tagId)}
-                    className={`text-left text-xs transition-colors hover:text-primary ${selectedTagId === tag.tagId ? 'text-primary font-semibold' : 'text-muted-foreground'}`}
+                    className={`hover:text-primary text-left text-xs transition-colors ${selectedTagId === tag.tagId ? 'text-primary font-semibold' : 'text-muted-foreground'}`}
                   >
                     {tag.tagDisplayName}
                   </button>
