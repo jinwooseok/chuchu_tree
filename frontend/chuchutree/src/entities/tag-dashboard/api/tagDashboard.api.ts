@@ -7,7 +7,7 @@ export const tagDashboardApi = {
     const { data } = await axiosInstance.get<ApiResponse<TagDashboard>>('user-accounts/me/tags');
     return data.data;
   },
-  postTagBan: async (data: { tagCode: TagBan }): Promise<void> => {
+  postTagBan: async (data: TagBan): Promise<void> => {
     await axiosInstance.post('user-accounts/me/tags/banned-list', data);
   },
   deleteTagBan: async ({ tagCode }: TagBan): Promise<void> => {

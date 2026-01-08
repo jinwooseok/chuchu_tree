@@ -1,14 +1,66 @@
+'use client';
+
+import { useState } from 'react';
 import { BadgeCheck } from 'lucide-react';
-import { CategoryTags } from '@/entities/tag-dashboard';
+import { CategoryTags, usePostTagBan, useDeleteTagBan } from '@/entities/tag-dashboard';
 import { getLevelColorClasses, getLevelColorValue, getDaysAgo, calculateProgress, calculatePeekPosition, calculateBoxPosition, calculateMasterProgress } from '../lib/utils';
 import Image from 'next/image';
 import { TIER_TO_NUM } from '@/shared/constants/tierSystem';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid'; // filled
 import { CheckCircleIcon as CheckCircleIconOutline } from '@heroicons/react/24/outline'; // outline
 import { CategoryName } from '@/shared/constants/tagSystem';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
+import { toast } from 'sonner';
 
 export default function TagCard({ tag }: { tag: CategoryTags }) {
-  const { tagDisplayName, accountStat, nextLevelStat, lockedYn, excludedYn, recommendationYn, requiredStat } = tag;
+  const { tagCode, tagDisplayName, accountStat, nextLevelStat, lockedYn, excludedYn, recommendationYn, requiredStat } = tag;
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
+
+  // Tag Ban mutations
+  const { mutate: postTagBan, isPending: isPostPending } = usePostTagBan({
+    onSuccess: () => {
+      toast.success('추천 목록에서 제외되었습니다.', { position: 'top-center' });
+      setIsAlertOpen(false);
+    },
+    onError: () => {
+      toast.error('제외 처리에 실패했습니다.', { position: 'top-center' });
+    },
+  });
+
+  const { mutate: deleteTagBan, isPending: isDeletePending } = useDeleteTagBan({
+    onSuccess: () => {
+      toast.success('추천 목록에 추가되었습니다.', { position: 'top-center' });
+      setIsAlertOpen(false);
+    },
+    onError: () => {
+      toast.error('추가 처리에 실패했습니다.', { position: 'top-center' });
+    },
+  });
+
+  const isPending = isPostPending || isDeletePending;
+
+  const handleTagBanClick = () => {
+    setIsAlertOpen(true);
+  };
+
+  const handleConfirm = () => {
+    if (recommendationYn) {
+      // 현재 추천 중이면 제외 (Ban 추가)
+      postTagBan({ tagCode });
+    } else {
+      // 현재 제외 중이면 추가 (Ban 삭제)
+      deleteTagBan({ tagCode });
+    }
+  };
 
   // 현재 레벨과 다음 레벨
   const currentLevel = accountStat.currentLevel as CategoryName;
@@ -53,7 +105,11 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
         <div className="flex h-full items-center justify-center gap-2">
           <div className={`text-muted-foreground flex flex-col gap-0.5`}>
             {/* Tag Ban */}
-            <button className={`hover:bg-excluded-bg hover:text-innerground-white border-innerground-darkgray rounded border px-2 text-center transition-colors`}>
+            <button
+              onClick={handleTagBanClick}
+              disabled={isPending}
+              className={`hover:bg-excluded-bg hover:text-innerground-white border-innerground-darkgray rounded border px-2 text-center transition-colors disabled:cursor-not-allowed disabled:opacity-50`}
+            >
               {recommendationYn ? '추천 포함됨' : '추천리스트 등록'}
             </button>
             <div className="flex gap-0.5">
@@ -156,6 +212,28 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
           </div>
         </div>
       </div>
+
+      {/* Tag Ban Alert Dialog */}
+      <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              {recommendationYn ? '추천 목록에서 제외하시겠습니까?' : '추천 목록에 추가하시겠습니까?'}
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              {recommendationYn
+                ? `"${tagDisplayName}" 유형을 추천 목록에서 제외합니다. 제외된 유형은 문제 추천 시 포함되지 않습니다.`
+                : `"${tagDisplayName}" 유형을 추천 목록에 추가합니다. 이 유형의 문제가 추천될 수 있습니다.`}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>취소</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirm} disabled={isPending}>
+              {isPending ? '처리 중...' : recommendationYn ? '제외하기' : '추가하기'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
