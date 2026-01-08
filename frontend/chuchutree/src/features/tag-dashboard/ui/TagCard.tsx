@@ -52,6 +52,7 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
         <div className={`text-foreground text-sm font-semibold`}>{tagDisplayName}</div>
         <div className="flex h-full items-center justify-center gap-2">
           <div className={`text-muted-foreground flex flex-col gap-0.5`}>
+            {/* Tag Ban */}
             <button className={`hover:bg-excluded-bg hover:text-innerground-white border-innerground-darkgray rounded border px-2 text-center transition-colors`}>
               {recommendationYn ? '추천 포함됨' : '추천리스트 등록'}
             </button>
