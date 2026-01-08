@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from app.common.domain.vo.identifiers import BaekjoonAccountId, TargetId, UserAccountId
 from app.core.error_codes import ErrorCode
@@ -40,12 +40,35 @@ class UserAccount:
     
     def link_baekjoon_account(self, bj_account_id: BaekjoonAccountId) -> None:
         """도메인 로직 - 백준 계정 연동"""
-        if self._is_already_linked(bj_account_id):
+        now = datetime.now()
+        
+        # 1. 동일한 계정이 이미 '활성화' 상태인지 확인 (중복 연동 방지)
+        active_link = next(
+            (link for link in self.account_links 
+             if link.bj_account_id.value == bj_account_id.value and link.deleted_at is None), 
+            None
+        )
+        if active_link:
             raise APIException(ErrorCode.IS_ALREALY_LINKED)
         
-        self.account_links.append(
-            AccountLink.create(self.user_account_id, bj_account_id)
-        )
+        # 2. 7일 제한 정책 확인 (삭제된 이력 포함 가장 최근 연동 시도 시점 기준)
+        if self.account_links:
+            # 모든 링크(삭제된 것 포함) 중 가장 최근 생성일 찾기
+            last_link_time = max(link.created_at for link in self.account_links)
+            
+            # 현재 시간과 비교 (7일이 경과했는지 확인)
+            if datetime.now() < last_link_time + timedelta(days=7):
+                # 남은 일수 계산 등을 에러 메시지에 포함할 수도 있습니다.
+                raise APIException(ErrorCode.LINK_COOLDOWN_PERIOD)
+        
+        for link in self.account_links:
+            if link.deleted_at is None:
+                link.deleted_at = now
+        
+        # 4. 새로운 연동 정보 추가
+        new_link = AccountLink.create(self.user_account_id, bj_account_id)
+        self.account_links.append(new_link)
+        
         self.updated_at = datetime.now()
         
     def unlink_baekjoon_account(self, bj_account_id: BaekjoonAccountId) -> None:
