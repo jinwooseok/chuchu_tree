@@ -2,17 +2,23 @@
 
 import logging
 
+from app.common.domain.entity.domain_event import DomainEvent
 from app.common.domain.service.event_publisher import DomainEventBus
-from app.common.domain.vo.identifiers import BaekjoonAccountId, UserAccountId
+from app.common.domain.vo.identifiers import BaekjoonAccountId, TargetId, UserAccountId
 from app.common.infra.event.decorators import event_register_handlers, event_handler
+from app.core.database import transactional
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
 from app.user.application.command.link_bj_account_command import LinkBjAccountCommand
+from app.user.application.command.update_user_target_command import UpdateUserTargetCommand
 from app.user.application.command.user_account_command import CreateUserAccountCommand
 from app.user.application.command.get_user_account_info_command import GetUserAccountInfoCommand
 from app.user.application.query.user_account_query import CreateUserAccountQuery
 from app.user.application.query.user_account_info_query import GetUserAccountInfoQuery
+from app.user.application.query.user_tags_query import TargetQuery
 from app.user.domain.entity.user_account import UserAccount
+from app.user.domain.entity.user_target import UserTarget
+from app.user.domain.event.payloads import GetTargetInfoPayload
 from app.user.domain.repository.user_account_repository import UserAccountRepository
 from app.common.domain.enums import Provider
 
@@ -130,3 +136,32 @@ class UserAccountApplicationService:
             profile_image=user_account.profile_image,
             registered_at=user_account.registered_at
         )
+    
+    @transactional
+    async def get_user_target(self, user_account_id: int):
+        user_account = await self.user_account_repository.find_by_id(
+            UserAccountId(user_account_id)
+        )
+        
+        return TargetQuery(user_account.targets[0]) if user_account.targets else TargetQuery() 
+    
+    @transactional
+    async def update_user_target(self, command: UpdateUserTargetCommand):
+        user_account = await self.user_account_repository.find_by_id(
+            UserAccountId(command.user_account_id)
+        )
+        if not user_account:
+            raise APIException(ErrorCode.INVALID_REQUEST)
+        
+        # 받은 목표 코드의 정보를 이벤트로 요청함.
+        event = DomainEvent(
+            event_type="GET_TARGET_INFO_REQUESTED",
+            data=GetTargetInfoPayload(target_code=command.target_code),
+            result_type=TargetQuery
+        )
+
+        target_info: TargetQuery = await self.domain_event_bus.publish(event)
+        
+        user_account.set_target(TargetId(value=target_info.target_id))
+        
+        await self.user_account_repository.update(user_account)

@@ -1,5 +1,7 @@
-from pydantic import BaseModel, Field
-from typing import List
+from pydantic import BaseModel, ConfigDict, Field
+from pydantic.alias_generators import to_camel
+
+from app.target.application.query.target_query import TargetQuery
 
 
 class TargetItem(BaseModel):
@@ -11,18 +13,21 @@ class TargetItem(BaseModel):
     class Config:
         populate_by_name = True
 
-
-class UserTargetsResponse(BaseModel):
-    """유저 목표 조회 응답"""
-    targets: List[TargetItem]
-
-    class Config:
-        populate_by_name = True
-
-
 class AllTargetsResponse(BaseModel):
     """모든 목표 조회 응답"""
-    targets: List[TargetItem]
+    targets: list[TargetItem]
 
-    class Config:
-        populate_by_name = True
+    model_config = ConfigDict(
+        alias_generator=to_camel,
+        populate_by_name=True
+    )
+        
+    @staticmethod
+    def from_queries(queries: list[TargetQuery])-> 'AllTargetsResponse':
+        return AllTargetsResponse(
+            targets = [TargetItem(
+                target_id = query.target_id,
+                target_code = query.target_code,
+                target_display_name = query.target_display_name
+            ) for query in queries]
+        )

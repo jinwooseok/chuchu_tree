@@ -57,10 +57,18 @@ class UserAccount:
         self.updated_at = datetime.now()
         
     def set_target(self, target_id: TargetId) -> None:
-        """도메인 로직 - 목표 설정"""
-        if self._has_target(target_id):
-            raise ValueError(f"이미 설정된 목표입니다: {target_id.value}")
+        """도메인 로직 - 목표 설정 (기존 활성 목표가 있다면 삭제 후 신규 등록)"""
         
+        # 1. 이미 동일한 타겟이 활성화되어 있는지 확인
+        if self._has_target(target_id):
+            return  # 혹은 raise APIException
+
+        # 2. 기존에 존재하던 모든 활성 목표를 Soft Delete 처리
+        for target in self.targets:
+            if target.deleted_at is None:
+                target.mark_as_deleted()
+
+        # 3. 새로운 목표 추가
         self.targets.append(UserTarget.create(self.user_account_id, target_id))
         self.updated_at = datetime.now()
     

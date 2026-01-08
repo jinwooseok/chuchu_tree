@@ -10,24 +10,26 @@ class UserAccountMapper:
     
     @staticmethod
     def to_model(entity: UserAccount) -> UserAccountModel:
-        """도메인 엔티티를 SQLAlchemy 모델로 변환"""
-        
         model = UserAccountModel()
         
-        # ID
         if entity.user_account_id is not None:
             model.user_account_id = entity.user_account_id.value
         
-        # 기본 정보
         model.provider = entity.provider
         model.provider_id = entity.provider_id
         model.profile_image = entity.profile_image
         model.registered_at = entity.registered_at
-        
-        # 메타데이터
         model.created_at = entity.created_at
         model.updated_at = entity.updated_at
         model.deleted_at = entity.deleted_at
+
+        # 핵심: 자식 엔티티들도 모델로 변환하여 할당
+        model.account_links = [
+            AccountLinkMapper.to_model(link) for link in entity.account_links
+        ]
+        model.targets = [
+            UserTargetMapper.to_model(target) for target in entity.targets
+        ]
         
         return model
     
