@@ -1,8 +1,8 @@
-import { TIER_TO_NUM, TierKey } from '@/shared/constants/tierSystem';
-import { TagLevel } from '@/shared/types/tagDashboard';
+import { TIER_TO_NUM, TierKey, TierNumKey } from '@/shared/constants/tierSystem';
+import { CategoryName } from '@/shared/constants/tagSystem';
 
 // 레벨별 색상 클래스 반환
-export function getLevelColorClasses(level: TagLevel): { bg: string; text: string } {
+export function getLevelColorClasses(level: CategoryName): { bg: string; text: string } {
   switch (level) {
     case 'IMEDIATED':
       return { bg: 'bg-imediated-bg', text: 'text-imediated-text' };
@@ -20,7 +20,7 @@ export function getLevelColorClasses(level: TagLevel): { bg: string; text: strin
 }
 
 // 레벨별 색상 값 반환 (inline style용)
-export function getLevelColorValue(level: TagLevel): string {
+export function getLevelColorValue(level: CategoryName): string {
   switch (level) {
     case 'IMEDIATED':
       return '#f9b473';
@@ -57,15 +57,15 @@ export function calculateProgress({
 }: {
   solvedCnt: number;
   requireSolveCnt: number;
-  userTier: TierKey;
-  requireTier: TierKey;
-  highest: TierKey;
-  requireHighest: TierKey;
+  userTier: TierNumKey;
+  requireTier: TierNumKey;
+  highest: TierNumKey;
+  requireHighest: TierNumKey;
 }) {
   const solvedPoint = Math.min(60, Math.round((solvedCnt / requireSolveCnt) * 60));
-  const userTierNum = Math.max(0, TIER_TO_NUM[requireTier] - TIER_TO_NUM[userTier]);
+  const userTierNum = Math.max(0, requireTier - userTier);
   const userTierPoint = userTierNum >= 3 ? 0 : userTierNum === 2 ? 10 : userTierNum === 1 ? 20 : 30;
-  const highestPoint = TIER_TO_NUM[requireHighest] <= TIER_TO_NUM[highest] ? 10 : 0;
+  const highestPoint = requireHighest <= highest ? 10 : 0;
   return solvedPoint + userTierPoint + highestPoint;
 }
 

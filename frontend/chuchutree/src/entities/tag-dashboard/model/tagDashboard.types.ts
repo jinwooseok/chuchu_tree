@@ -18,7 +18,7 @@ interface PrevTags {
   satisfiedYn: boolean;
 }
 
-interface CategoryTags {
+export interface CategoryTags {
   tagId: number;
   tagCode: TagKey;
   tagDisplayName: string;

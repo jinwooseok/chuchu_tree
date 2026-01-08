@@ -2,13 +2,11 @@
 
 import { useMemo } from 'react';
 import TagCard from '@/features/tag-dashboard/ui/TagCard';
-import mockData from '@/features/tag-dashboard/mockdata/mock_tag_dashboard_data.json';
-import { TagDetail } from '@/shared/types/tagDashboard';
-import { useTagDashboardSidebarStore } from '@/lib/store/tagDashboard';
+import { useTagDashboardSidebarStore, useTagDashboardStore } from '@/lib/store/tagDashboard';
 
 export default function TagDashboard() {
-  // mock 데이터에서 태그 목록 가져오기
-  const tags = mockData.data.tags as TagDetail[];
+  // store에서 태그 목록 가져오기
+  const { tags, isInitialized } = useTagDashboardStore();
 
   // store에서 필터/정렬 상태 가져오기
   const { searchQuery, sortBy, selectedTagId } = useTagDashboardSidebarStore();
@@ -41,12 +39,21 @@ export default function TagDashboard() {
         break;
       case 'default':
       default:
-        // 기본순은 mock 데이터 순서 유지
+        // 기본순은 API 응답 순서 유지
         break;
     }
 
     return result;
   }, [tags, searchQuery, sortBy, selectedTagId]);
+
+  // 데이터 로딩 중
+  if (!isInitialized) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <p className="text-muted-foreground">로딩 중...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="hide-scrollbar grid h-full w-full grid-cols-2 content-start gap-4 overflow-y-auto lg:grid-cols-3">

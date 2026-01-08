@@ -4,16 +4,16 @@ import { useState } from 'react';
 import { Search, ChevronDown, ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
-import { useTagDashboardSidebarStore, SortBy } from '@/lib/store/tagDashboard';
-import mockData from '@/features/tag-dashboard/mockdata/mock_tag_dashboard_data.json';
-import { Category, TagLevel } from '@/shared/types/tagDashboard';
+import { useTagDashboardSidebarStore, useTagDashboardStore, SortBy } from '@/lib/store/tagDashboard';
+import { CategoryName } from '@/shared/constants/tagSystem';
 import { getLevelColorClasses } from '@/features/tag-dashboard/lib/utils';
 
 export default function TagSidebar() {
   const { searchQuery, sortBy, selectedTagId, setSearchQuery, setSortBy, setSelectedTagId } = useTagDashboardSidebarStore();
+  const { categories, isInitialized } = useTagDashboardStore();
 
   // 카테고리별 열림/닫힘 상태
-  const [openCategories, setOpenCategories] = useState<Record<TagLevel, boolean>>({
+  const [openCategories, setOpenCategories] = useState<Record<CategoryName, boolean>>({
     IMEDIATED: true,
     ADVANCED: true,
     MASTER: true,
@@ -21,11 +21,8 @@ export default function TagSidebar() {
     EXCLUDED: false,
   });
 
-  // 카테고리 데이터
-  const categories = mockData.data.categories as Category[];
-
   // 카테고리 토글
-  const toggleCategory = (categoryName: TagLevel) => {
+  const toggleCategory = (categoryName: CategoryName) => {
     setOpenCategories((prev) => ({ ...prev, [categoryName]: !prev[categoryName] }));
   };
 
@@ -37,6 +34,15 @@ export default function TagSidebar() {
       setSelectedTagId(tagId);
     }
   };
+
+  // 로딩 상태
+  if (!isInitialized) {
+    return (
+      <div className="flex h-full items-center justify-center p-4">
+        <p className="text-muted-foreground text-sm">로딩 중...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="hide-scrollbar flex h-full flex-col gap-4 overflow-y-auto p-4 text-sm">
