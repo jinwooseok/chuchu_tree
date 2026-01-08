@@ -18,7 +18,7 @@ from app.user.application.query.user_account_info_query import GetUserAccountInf
 from app.user.application.query.user_tags_query import TargetQuery
 from app.user.domain.entity.user_account import UserAccount
 from app.user.domain.entity.user_target import UserTarget
-from app.user.domain.event.payloads import GetTargetInfoPayload
+from app.user.domain.event.payloads import GetTargetInfoPayload, GetTargetInfoResultPayload
 from app.user.domain.repository.user_account_repository import UserAccountRepository
 from app.common.domain.enums import Provider
 
@@ -142,14 +142,31 @@ class UserAccountApplicationService:
         user_account = await self.user_account_repository.find_by_id(
             UserAccountId(user_account_id)
         )
-        
-        return TargetQuery(user_account.targets[0]) if user_account.targets else TargetQuery() 
+        if user_account.targets:
+            event = DomainEvent(
+                event_type="GET_TARGET_INFO_REQUESTED",
+                data=GetTargetInfoPayload(target_id=user_account.targets[0].target_id.value),
+                result_type=GetTargetInfoResultPayload
+            )
+            
+            target_info: TargetQuery = await self.domain_event_bus.publish(event)
+            
+            query = TargetQuery(
+                target_id=target_info.target_id,
+                target_code=target_info.target_code,
+                target_display_name=target_info.target_display_name
+            )
+            
+        else:
+            query = TargetQuery()
+        return query
     
     @transactional
     async def update_user_target(self, command: UpdateUserTargetCommand):
         user_account = await self.user_account_repository.find_by_id(
             UserAccountId(command.user_account_id)
         )
+    
         if not user_account:
             raise APIException(ErrorCode.INVALID_REQUEST)
         
@@ -157,11 +174,11 @@ class UserAccountApplicationService:
         event = DomainEvent(
             event_type="GET_TARGET_INFO_REQUESTED",
             data=GetTargetInfoPayload(target_code=command.target_code),
-            result_type=TargetQuery
+            result_type=GetTargetInfoResultPayload
         )
 
         target_info: TargetQuery = await self.domain_event_bus.publish(event)
-        
+        print(user_account.targets)
         user_account.set_target(TargetId(value=target_info.target_id))
-        
+        print(user_account.targets)
         await self.user_account_repository.update(user_account)

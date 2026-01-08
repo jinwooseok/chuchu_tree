@@ -76,7 +76,6 @@ class UpdateBjAccountUsecase:
         )
         
         # 6. 신규 문제 매칭
-        print(new_problems)
         if new_problems:
             # 어떤 날짜의 스트릭에 매칭할지 결정 (휴리스틱: API의 최신 날짜)
             for p, s in zip(new_problems, date_to_streak_id):

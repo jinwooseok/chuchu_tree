@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, datetime
 
 from app.activity.domain.entity.problem_banned_record import ProblemBannedRecord
 from app.activity.domain.entity.problem_record import ProblemRecord
@@ -35,20 +35,25 @@ class UserActivity:
     def mark_problem_to_solve(self, problem_id: ProblemId) -> None:
         """도메인 로직 - 풀 문제로 마킹"""
         if self._is_problem_banned(problem_id):
-            raise APIException(ErrorCode.INVALID_INPUT_VALUE)
+            raise APIException(ErrorCode.INVALID_INPUT_VALUE, message="Banned problem cannot be marked.")
         
         if self._is_already_marked(problem_id):
-            raise APIException(ErrorCode.INVALID_INPUT_VALUE)
+            # Or restore if it was deleted
+            for problem in self.will_solve_problems:
+                if problem.problem_id.value == problem_id.value:
+                    problem.restore()
+                    return
         
         self.will_solve_problems.append(
             WillSolveProblem.create(self.user_account_id, problem_id, date.today())
         )
     
     def unmark_problem(self, problem_id: 'ProblemId') -> None:
-        """도메인 로직 - 문제 마킹 해제"""
+        """도메인 로직 - 문제 마킹 해제 (논리적 삭제)"""
         for problem in self.will_solve_problems:
-            if problem.problem_id.value == problem_id.value and problem.marked:
-                problem.unmark()
+            if problem.problem_id.value == problem_id.value and problem.deleted_at is None:
+                problem.delete()
+                break
     
     def ban_problem(self, problem_id: 'ProblemId') -> None:
         """도메인 로직 - 문제 제외"""
@@ -76,17 +81,39 @@ class UserActivity:
         exclude: bool,
         reason: ExcludedReason|None = None
     ) -> None:
-        """도메인 로직 - 태그 커스터마이징"""
-        # 기존 커스터마이징 제거
-        self.tag_customizations = [
-            tc for tc in self.tag_customizations
-            if tc.tag_id.value != tag_id.value or tc.deleted_at is not None
-        ]
+        """도메인 로직 - 태그 커스터마이징 (Update or Create)"""
         
-        # 새 커스터마이징 추가
-        self.tag_customizations.append(
-            TagCustomization.create(self.user_account_id, tag_id, exclude, reason)
-        )
+        existing_customization: TagCustomization | None = None
+        for tc in self.tag_customizations:
+            if tc.tag_id.value == tag_id.value and tc.deleted_at is None:
+                existing_customization = tc
+                break
+        
+        if existing_customization:
+            existing_customization.excluded = exclude
+            existing_customization.reason = reason
+            existing_customization.updated_at = datetime.now()
+        else:
+            new_customization = TagCustomization.create(
+                user_account_id=self.user_account_id,
+                tag_id=tag_id,
+                excluded=exclude,
+                reason=reason
+            )
+            self.tag_customizations.append(new_customization)
+            
+    def remove_tag_customization(self, tag_id: TagId) -> None:
+        """도메인 로직 - 태그 커스터마이징 제거 (논리적 삭제)"""
+        
+        existing_customization: TagCustomization | None = None
+        for tc in self.tag_customizations:
+            if tc.tag_id.value == tag_id.value and tc.deleted_at is None:
+                existing_customization = tc
+                break
+        
+        if existing_customization:
+            existing_customization.deleted_at = datetime.now()
+            existing_customization.updated_at = datetime.now()
     
     def get_excluded_tag_ids(self) -> list['TagId']:
         """제외된 태그 ID 목록 조회"""
@@ -103,7 +130,7 @@ class UserActivity:
     
     def _is_already_marked(self, problem_id: 'ProblemId') -> bool:
         return any(
-            problem.problem_id.value == problem_id.value and problem.marked
+            problem.problem_id.value == problem_id.value and problem.deleted_at is None
             for problem in self.will_solve_problems
         )
     
@@ -116,4 +143,5 @@ class UserActivity:
     def _remove_from_will_solve(self, problem_id: 'ProblemId') -> None:
         for problem in self.will_solve_problems:
             if problem.problem_id.value == problem_id.value:
-                problem.unmark()
+                problem.delete()
+                break

@@ -1,7 +1,6 @@
-from dataclasses import dataclass
+from pydantic import BaseModel, Field
 
 
-@dataclass
-class GetTagInfoCommand:
-    tag_id: int | None = None
-    tag_code: str | None = None
+class GetTagInfoCommand(BaseModel):
+    tag_id: int | None = Field(None)
+    tag_code: str | None = Field(None)

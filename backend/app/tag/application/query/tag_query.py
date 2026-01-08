@@ -12,7 +12,7 @@ class TagSummaryQuery(BaseModel):
     @classmethod
     def from_entity(cls, tag:Tag) -> 'TagSummaryQuery':
         return cls(
-            tag_id=tag.tag_id,
+            tag_id=tag.tag_id.value,
             tag_code=tag.code,
             tag_display_name=tag.tag_display_name
         )

@@ -133,7 +133,7 @@ async def get_user_targets(
     Returns:
         유저의 목표 조회
     """
-    query = user_account_application_service.get_user_target(current_user.user_account_id)
+    query = await user_account_application_service.get_user_target(current_user.user_account_id)
 
     # Query를 Response로 변환 (from_query 사용)
     response_data = TargetResponse.from_query(query)
@@ -153,7 +153,7 @@ async def update_user_target(
     Returns:
     
     """
-    user_account_application_service.update_user_target(UpdateUserTargetCommand(user_account_id=current_user.user_account_id, 
+    await user_account_application_service.update_user_target(UpdateUserTargetCommand(user_account_id=current_user.user_account_id, 
                                                                                 target_code=request.target_code))
 
     return ApiResponse(data={})

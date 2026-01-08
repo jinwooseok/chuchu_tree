@@ -175,12 +175,11 @@ async def ban_tag(
     Returns:
         빈 데이터
     """
-    activity_application_service.ban_tag(
-        activity_application_service.unban_tag(TagCustomCommand(
+    await activity_application_service.ban_tag(TagCustomCommand(
             user_account_id=current_user.user_account_id,
             tag_code=request.tag_code,
             tag_ban_yn=True
-        ))
+        )
     )
 
     return ApiResponse(data={})
@@ -202,7 +201,7 @@ async def unban_tag(
     Returns:
         빈 데이터
     """
-    activity_application_service.unban_tag(TagCustomCommand(
+    await activity_application_service.unban_tag(TagCustomCommand(
         user_account_id=current_user.user_account_id,
         tag_code=tag_code,
         tag_ban_yn=False

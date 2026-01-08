@@ -1,7 +1,5 @@
-from dataclasses import dataclass
+from pydantic import BaseModel, Field
 
-
-@dataclass
-class GetTargetInfoCommand:
-    target_id: int | None = None
-    target_code: str | None = None
+class GetTargetInfoCommand(BaseModel):
+    target_id: int | None = Field(None)
+    target_code: str | None = Field(None)

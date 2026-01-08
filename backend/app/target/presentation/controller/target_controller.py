@@ -24,7 +24,7 @@ async def get_all_targets(
     Returns:
         모든 목표 목록
     """
-    queries = target_application_service.get_all_targets()
+    queries = await target_application_service.get_all_targets()
     response_data = AllTargetsResponse.from_queries(queries)
 
     return ApiResponse(data=response_data.model_dump(by_alias=True))

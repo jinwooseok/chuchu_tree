@@ -65,8 +65,7 @@ class ProblemApplicationService:
         # 3. 결과 매핑
         id_base_queries = [details_map[m.problem_id.value] for m in id_models if m.problem_id.value in details_map]
         title_base_queries = [details_map[m.problem_id.value] for m in title_models if m.problem_id.value in details_map]
-        print(id_base_queries)
-        print(title_base_queries)
+
         return [id_base_queries, title_base_queries]
 
     # --- [Internal Business Logic: No Decorators] ---

@@ -14,6 +14,9 @@ from app.activity.infra.mapper.problem_record_mapper import ProblemRecordMapper
 from app.activity.infra.mapper.will_solve_problem_mapper import WillSolveProblemMapper
 from app.activity.infra.model.problem_record import ProblemRecordModel
 from app.activity.infra.model.will_solve_problem import WillSolveProblemModel
+from app.activity.infra.mapper.tag_customization_mapper import TagCustomizationMapper
+from app.activity.infra.mapper.user_activity_mapper import UserActivityMapper
+from app.activity.infra.model.tag_custom import TagCustomModel
 from app.common.domain.vo.identifiers import UserAccountId
 from app.core.database import Database
 
@@ -125,12 +128,35 @@ class UserActivityRepositoryImpl(UserActivityRepository):
             return
 
         for entity in will_solve_problems:
-            # 엔티티를 모델로 변환
             model = WillSolveProblemMapper.to_model(entity)
-            
-            # merge는 PK를 기준으로 기존 데이터가 있으면 UPDATE, 없으면 INSERT를 수행합니다.
-            # 또한 세션에 모델을 등록하는 역할도 겸합니다.
+            await self.session.merge(model)
+        await self.session.flush()
+
+    @override
+    async def find_only_tag_custom_by_user_account_id(
+        self, user_account_id: UserAccountId
+    ) -> UserActivity:
+        stmt = select(TagCustomModel).where(
+            and_(
+                TagCustomModel.user_account_id == user_account_id.value,
+                TagCustomModel.deleted_at.is_(None),
+            )
+        )
+        result = await self.session.execute(stmt)
+        tag_custom_models = result.scalars().all()
+
+        return UserActivityMapper.to_entity(
+            user_account_id=user_account_id,
+            tag_custom_models=tag_custom_models,
+        )
+
+    @override
+    async def save_tag_custom(self, activity: UserActivity) -> None:
+        if not activity.tag_customizations:
+            return
+
+        for entity in activity.tag_customizations:
+            model = TagCustomizationMapper.to_model(entity)
             await self.session.merge(model)
 
-        # 모든 merge가 끝나면 한 번에 flush하여 DB에 반영
-        await self.session.flush()
+        await self.session.flush()    
