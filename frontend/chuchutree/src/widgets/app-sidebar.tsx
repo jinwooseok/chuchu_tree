@@ -10,8 +10,10 @@ import { useSidebar } from '@/components/ui/sidebar';
 import Image from 'next/image';
 import { ThemeButton } from '@/shared/ui';
 import { TargetChangeDialog } from '@/features/target-change';
+import { BjAccountChangeDialog } from '@/features/bj-account-change';
 import { TargetCode } from '@/shared/constants/tagSystem';
 import { useModal } from '@/lib/providers/modal-provider';
+import { toast } from 'sonner';
 
 const ICON_SIZE = 32;
 
@@ -20,6 +22,30 @@ export function AppSidebar() {
   const { topSection, centerSection, bottomSection, toggleTopSection, setCenterSection, toggleBottomSection } = useLayoutStore();
   const { user } = useUser();
   const { openModal, closeModal } = useModal();
+
+  // 7일 체크 함수
+  const canChangeAccount = () => {
+    if (!user?.linkedAt) return false;
+    const linkedDate = new Date(user.linkedAt);
+    const now = new Date();
+    const diffInDays = Math.floor((now.getTime() - linkedDate.getTime()) / (1000 * 60 * 60 * 24));
+    return diffInDays >= 7;
+  };
+
+  const handleAccountChange = () => {
+    if (!canChangeAccount()) {
+      const linkedDate = new Date(user?.linkedAt || '');
+      const availableDate = new Date(linkedDate);
+      availableDate.setDate(availableDate.getDate() + 7);
+      const dateString = availableDate.toLocaleDateString().split('.').slice(1);
+      const dateStringKr = `${dateString[0]}월${dateString[1]}일` || '';
+      toast.error(`계정 재설정은 7일에 한 번만 가능합니다. ${dateStringKr} 이후에 다시 시도해주세요.`, {
+        position: 'top-center',
+      });
+      return;
+    }
+    openModal('bj-account-change', <BjAccountChangeDialog currentBjAccountId={user?.bjAccount?.bjAccountId || ''} onClose={() => closeModal('bj-account-change')} />);
+  };
 
   // Menu items.
   const items = [
@@ -123,7 +149,12 @@ export function AppSidebar() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
                   <ThemeButton />
-                  <DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      handleAccountChange();
+                    }}
+                  >
                     <span>연동 계정 재설정</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
