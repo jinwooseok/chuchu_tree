@@ -1,21 +1,21 @@
-import { TIER_TO_NUM, TierKey, TierNumKey } from '@/shared/constants/tierSystem';
+import { TierNumKey } from '@/shared/constants/tierSystem';
 import { CategoryName } from '@/shared/constants/tagSystem';
 
 // 레벨별 색상 클래스 반환
-export function getLevelColorClasses(level: CategoryName): { bg: string; text: string } {
+export function getLevelColorClasses(level: CategoryName): { bg: string; text: string; border: string; short: string } {
   switch (level) {
     case 'IMEDIATED':
-      return { bg: 'bg-imediated-bg', text: 'text-imediated-text' };
+      return { bg: 'bg-imediated-bg', text: 'text-imediated-text', border: 'border-imediated-bg', short: 'I' };
     case 'ADVANCED':
-      return { bg: 'bg-advanced-bg', text: 'text-advanced-text' };
+      return { bg: 'bg-advanced-bg', text: 'text-advanced-text', border: 'border-advanced-bg', short: 'A' };
     case 'MASTER':
-      return { bg: 'bg-master-bg', text: 'text-master-text' };
+      return { bg: 'bg-master-bg', text: 'text-master-text', border: 'border-master-bg', short: 'M' };
     case 'LOCKED':
-      return { bg: 'bg-locked-bg', text: 'text-locked-text' };
+      return { bg: 'bg-locked-bg', text: 'text-locked-text', border: 'border-locked-bg', short: 'L' };
     case 'EXCLUDED':
-      return { bg: 'bg-excluded-bg', text: 'text-excluded-text' };
+      return { bg: 'bg-excluded-bg', text: 'text-excluded-text', border: 'border-excluded-bg', short: 'EX' };
     default:
-      return { bg: 'bg-gray-300', text: 'text-gray-700' };
+      return { bg: 'bg-gray-300', text: 'text-gray-700', border: 'border-gray-300', short: 'D' };
   }
 }
 

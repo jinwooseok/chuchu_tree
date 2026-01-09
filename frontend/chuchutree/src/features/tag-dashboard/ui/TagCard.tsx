@@ -4,7 +4,6 @@ import { BadgeCheck } from 'lucide-react';
 import { CategoryTags, usePostTagBan, useDeleteTagBan } from '@/entities/tag-dashboard';
 import { getLevelColorClasses, getLevelColorValue, getDaysAgo, calculateProgress, calculatePeekPosition, calculateBoxPosition, calculateMasterProgress } from '../lib/utils';
 import Image from 'next/image';
-import { TIER_TO_NUM } from '@/shared/constants/tierSystem';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid'; // filled
 import { CheckCircleIcon as CheckCircleIconOutline } from '@heroicons/react/24/outline'; // outline
 import { CategoryName } from '@/shared/constants/tagSystem';
@@ -92,7 +91,17 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
   const isSuccessBest = accountStat.higherProblemTier >= nextLevelStat.higherProblemTier;
 
   return (
-    <div className={`bg-background flex h-40 flex-col gap-2 rounded-lg p-4 text-xs`}>
+    <div
+      className={`bg-background flex h-40 flex-col gap-2 rounded-lg border-3 ${!excludedYn ? currentLevelColors.border : 'border-excluded-bg'} group relative overflow-hidden p-4 text-xs transition-all duration-100 ease-in-out hover:shadow-md`}
+    >
+      {/* 우상단 */}
+      <div className="absolute top-0 right-0 overflow-hidden">
+        <div
+          className={`${!excludedYn ? currentLevelColors.bg : 'bg-excluded-bg'} text-innerground-white translate-x-full rounded-bl-lg px-2 text-center font-semibold transition-transform duration-300 ease-out group-hover:translate-x-0`}
+        >
+          {!excludedYn ? currentLevel : 'EXCLUDED'}
+        </div>
+      </div>
       {/* 카드 헤더 */}
       <div className="flex items-center justify-between">
         <div className={`text-foreground text-sm font-semibold`}>{tagDisplayName}</div>
@@ -125,11 +134,6 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
                 <p>풀이</p>
               </div>
             )}
-          </div>
-          <div
-            className={`${!excludedYn ? currentLevelColors.bg : 'bg-excluded-bg'} ${!excludedYn ? currentLevelColors.text : 'text-innerground-white'} flex h-full items-center rounded px-2 font-semibold`}
-          >
-            {!excludedYn ? currentLevel : 'EXCLUDED'}
           </div>
         </div>
       </div>
@@ -205,7 +209,7 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
           <div className="flex items-center justify-between gap-4">
             <div>Tier</div>
             <div className={`${excludedYn ? 'text-excluded-text' : isSuccessTier ? 'text-advanced-bg font-semibold' : 'text-muted-foreground'} flex items-center justify-center`}>
-              <p>{nextLevelStat.requiredMinTier}</p>
+              <Image src={`/tiers/tier_${nextLevelStat.requiredMinTier}.svg`} alt={`Tier ${nextLevelStat.requiredMinTier}`} width={12} height={12} className="h-4 w-4" />
               <div className="ml-2">{isSuccessTier ? <CheckCircleIconSolid height={12} width={12} /> : <CheckCircleIconOutline height={12} width={12} />}</div>
             </div>
           </div>
