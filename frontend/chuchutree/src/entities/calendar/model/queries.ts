@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { calendarApi } from '../api/calendar.api';
 import { UpdateProblemsData } from './calendar.types';
+import { UseMutationCallback } from '@/shared/types/api';
 
 export const calendarKeys = {
   all: ['calendar'],
@@ -34,7 +35,7 @@ export const useSearchProblems = (keyword: string) => {
 };
 
 // Will Solve 문제 업데이트 mutation
-export const useUpdateWillSolveProblems = () => {
+export const useUpdateWillSolveProblems = (callbacks?: UseMutationCallback) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -45,12 +46,16 @@ export const useUpdateWillSolveProblems = () => {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       queryClient.invalidateQueries({ queryKey: calendarKeys.list(year, month) });
+      if (callbacks?.onSuccess) callbacks.onSuccess();
+    },
+    onError: (error) => {
+      if (callbacks?.onError) callbacks.onError(error);
     },
   });
 };
 
 // Solved 문제 업데이트 mutation
-export const useUpdateSolvedProblems = () => {
+export const useUpdateSolvedProblems = (callbacks?: UseMutationCallback) => {
   const queryClient = useQueryClient();
 
   return useMutation({
@@ -61,6 +66,10 @@ export const useUpdateSolvedProblems = () => {
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       queryClient.invalidateQueries({ queryKey: calendarKeys.list(year, month) });
+      if (callbacks?.onSuccess) callbacks.onSuccess();
+    },
+    onError: (error) => {
+      if (callbacks?.onError) callbacks.onError(error);
     },
   });
 };

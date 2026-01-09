@@ -10,6 +10,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, X, Search } from 'lucide-react';
+import { toast } from 'sonner';
 
 // 클라이언트 전용 렌더링 (hydration mismatch 방지)
 const SmallCalendar = dynamic(() => import('@/features/calendar/ui/SmallCalendar'), {
@@ -101,7 +102,14 @@ export default function CalendarSidebar() {
   const [searchKeyword, setSearchKeyword] = useState('');
   const [debouncedKeyword, setDebouncedKeyword] = useState('');
 
-  const updateWillSolve = useUpdateWillSolveProblems();
+  const updateWillSolve = useUpdateWillSolveProblems({
+    onError: (error: any) => {
+      const errorMessage = error?.response?.data?.message || '업데이트에 실패했습니다.';
+      toast.error(errorMessage, {
+        position: 'top-center',
+      });
+    },
+  });
   const updateSolved = useUpdateSolvedProblems();
 
   // Debounce 로직 (400ms)
@@ -184,9 +192,9 @@ export default function CalendarSidebar() {
         onSuccess: () => {
           setSearchKeyword('');
           setShowAddInput(false);
-        },
-        onError: () => {
-          alert('문제 추가에 실패했습니다.');
+          toast.success('문제 추가 완료!', {
+            position: 'top-center',
+          });
         },
       },
     );
@@ -198,10 +206,19 @@ export default function CalendarSidebar() {
 
     const problemIds = willSolveProblems.filter((p) => p.problemId !== problemId).map((p) => p.problemId);
 
-    updateWillSolve.mutate({
-      date: formatDateString(selectedDate),
-      problemIds,
-    });
+    updateWillSolve.mutate(
+      {
+        date: formatDateString(selectedDate),
+        problemIds,
+      },
+      {
+        onSuccess: () => {
+          toast.success('문제 삭제 완료!', {
+            position: 'top-center',
+          });
+        },
+      },
+    );
   };
 
   // 검색 결과 병합 (idBase + titleBase)
