@@ -106,11 +106,25 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
             >
               {recommendationYn ? '추천 포함됨' : '추천리스트 등록'}
             </button>
-            <div className="flex gap-0.5">
-              <p>마지막 풀이</p>
-              <p className={`text-primary font-semibold`}>{daysAgo}</p>
-              <p>일 전</p>
-            </div>
+            {accountStat.lastSolvedDate !== null ? (
+              <div className="flex gap-0.5">
+                <p>마지막 풀이</p>
+                <p className={`text-primary font-semibold`}>{daysAgo}</p>
+                <p>일 전</p>
+              </div>
+            ) : accountStat.solvedProblemCount === 0 ? (
+              <div className="flex gap-0.5">
+                <p>풀어본 적</p>
+                <p className={`text-primary font-semibold`}>없는</p>
+                <p>유형</p>
+              </div>
+            ) : (
+              <div className="flex gap-0.5">
+                <p>가입</p>
+                <p className={`text-primary font-semibold`}>전</p>
+                <p>풀이</p>
+              </div>
+            )}
           </div>
           <div
             className={`${!excludedYn ? currentLevelColors.bg : 'bg-excluded-bg'} ${!excludedYn ? currentLevelColors.text : 'text-innerground-white'} flex h-full items-center rounded px-2 font-semibold`}
@@ -172,7 +186,7 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
               </div>
               <div className="flex h-full flex-col items-center justify-start">
                 <p className="mb-2 font-semibold">최소 달성 티어</p>
-                <Image src={`/tiers/tier_${TIER_TO_NUM[requiredStat.requiredMinTier]}.svg`} alt={`Tier ${TIER_TO_NUM[requiredStat.requiredMinTier]}`} width={24} height={24} className="h-8 w-8" />
+                <Image src={`/tiers/tier_${requiredStat.requiredMinTier}.svg`} alt={`Tier ${requiredStat.requiredMinTier}`} width={24} height={24} className="h-8 w-8" />
               </div>
             </div>
           )}

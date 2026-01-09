@@ -25,7 +25,7 @@ export interface CategoryTags {
   tagTargets: TagTargets[];
   tagAliases: TagAliases[];
   requiredStat: {
-    requiredMinTier: TierKey;
+    requiredMinTier: TierNumKey;
     prevTags: PrevTags[];
   };
   nextLevelStat: {

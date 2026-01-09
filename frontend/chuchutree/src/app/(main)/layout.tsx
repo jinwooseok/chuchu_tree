@@ -4,6 +4,8 @@ import { MainLayoutClient } from './MainLayoutClient';
 import { userServerApi } from '@/entities/user/api/user.server';
 import { calendarServerApi } from '@/entities/calendar/api/calendar.server';
 import { TagDashboardServerApi } from '@/entities/tag-dashboard/api/tagDashboard.server';
+import mockTagDashboard from '@/entities/tag-dashboard/mockdata/mock_tagDashboard.json';
+import { TagDashboard } from '@/entities/tag-dashboard';
 
 export default async function MainLayout({
   children,
@@ -77,10 +79,12 @@ export default async function MainLayout({
     initialTagDashboard = await TagDashboardServerApi.getTagDashboard();
     console.log('[MainLayout] TagDashboard data fetched successfully');
   } catch (error) {
-    console.log('[MainLayout] Failed to fetch TagDashboard data', {
+    console.log('[MainLayout] Failed to fetch TagDashboard data, using mock data', {
       message: error instanceof Error ? error.message : 'Unknown error',
       errorCode: error instanceof ApiResponseError ? error.errorCode : undefined,
     });
+    // Use mock data for testing when API fails
+    initialTagDashboard = mockTagDashboard.data as TagDashboard;
   }
 
   return (
