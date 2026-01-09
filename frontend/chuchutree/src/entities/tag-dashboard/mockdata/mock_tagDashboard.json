@@ -2772,6 +2772,70 @@
     ],
     "tags": [
       {
+        "tagId": 15,
+        "tagCode": "segtree",
+        "tagDisplayName": "세그먼트 트리",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "DAILY"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "CT"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "구간트리"
+          },
+          {
+            "alias": "세그트리"
+          },
+          {
+            "alias": "fenwick"
+          },
+          {
+            "alias": "펜윅"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 20,
+          "prevTags": [
+            {
+              "tagId": 13,
+              "tagCode": "trees",
+              "tagDisplayName": "트리",
+              "satisfiedYn": false
+            },
+            {
+              "tagId": 41,
+              "tagCode": "stack",
+              "tagDisplayName": "스택",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "INTERMEDIATE",
+          "solvedProblemCount": 7,
+          "requiredMinTier": 16,
+          "higherProblemTier": 13
+        },
+        "accountStat": {
+          "currentLevel": "LOCKED",
+          "solvedProblemCount": 1,
+          "requiredMinTier": 16,
+          "higherProblemTier": 11,
+          "lastSolvedDate": "2026-01-05"
+        },
+        "lockedYn": true,
+        "excludedYn": false,
+        "recommendationYn": false
+      },
+      {
         "tagId": 1,
         "tagCode": "math",
         "tagDisplayName": "수학",
@@ -2806,8 +2870,8 @@
           "lastSolvedDate": "2026-01-05"
         },
         "lockedYn": false,
-        "excludedYn": false,
-        "recommendationYn": true
+        "excludedYn": true,
+        "recommendationYn": false
       },
       {
         "tagId": 2,
@@ -2843,10 +2907,95 @@
         },
         "accountStat": {
           "currentLevel": "MASTER",
-          "solvedProblemCount": 93,
+          "solvedProblemCount": 15,
+          "requiredMinTier": 15,
+          "higherProblemTier": 3,
+          "lastSolvedDate": "2026-01-07"
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 11,
+        "tagCode": "ad_hoc",
+        "tagDisplayName": "애드 혹",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "DAILY"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "CT"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 8,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 27,
+          "requiredMinTier": 22,
+          "higherProblemTier": 13
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 26,
+          "requiredMinTier": 22,
+          "higherProblemTier": 14,
+          "lastSolvedDate": "2026-01-05"
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 13,
+        "tagCode": "trees",
+        "tagDisplayName": "트리",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "DAILY"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "CT"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "BEGINNER"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "trees"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 13,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 15,
+          "requiredMinTier": 15,
+          "higherProblemTier": 3
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 14,
           "requiredMinTier": 16,
           "higherProblemTier": 16,
-          "lastSolvedDate": "2026-01-07"
+          "lastSolvedDate": "2026-01-05"
         },
         "lockedYn": false,
         "excludedYn": false,
@@ -2894,6 +3043,98 @@
           "solvedProblemCount": 37,
           "requiredMinTier": 19,
           "higherProblemTier": 19,
+          "lastSolvedDate": "2026-01-05"
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 12,
+        "tagCode": "geometry",
+        "tagDisplayName": "기하학",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "DAILY"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "BEGINNER"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 7,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 21,
+          "higherProblemTier": 12
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 0,
+          "requiredMinTier": 1,
+          "higherProblemTier": 1,
+          "lastSolvedDate": "2026-01-05"
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 32,
+        "tagCode": "disjoint_set",
+        "tagDisplayName": "분리 집합",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "DAILY"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "CT"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "union"
+          },
+          {
+            "alias": "find"
+          },
+          {
+            "alias": "유니온"
+          },
+          {
+            "alias": "파인드"
+          },
+          {
+            "alias": "dsu"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 13,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 16,
+          "higherProblemTier": 4
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 0,
+          "requiredMinTier": 9,
+          "higherProblemTier": 1,
           "lastSolvedDate": "2026-01-05"
         },
         "lockedYn": false,
@@ -3094,129 +3335,7 @@
         "excludedYn": false,
         "recommendationYn": true
       },
-      {
-        "tagId": 11,
-        "tagCode": "ad_hoc",
-        "tagDisplayName": "애드 혹",
-        "tagTargets": [
-          {
-            "targetId": 1,
-            "targetCode": "DAILY",
-            "targetDisplayName": "DAILY"
-          },
-          {
-            "targetId": 2,
-            "targetCode": "CT",
-            "targetDisplayName": "CT"
-          }
-        ],
-        "tagAliases": [],
-        "requiredStat": {
-          "requiredMinTier": 8,
-          "prevTags": []
-        },
-        "nextLevelStat": {
-          "nextLevel": "ADVANCED",
-          "solvedProblemCount": 7,
-          "requiredMinTier": 22,
-          "higherProblemTier": 13
-        },
-        "accountStat": {
-          "currentLevel": "INTERMEDIATE",
-          "solvedProblemCount": 1,
-          "requiredMinTier": 11,
-          "higherProblemTier": 11,
-          "lastSolvedDate": "2026-01-05"
-        },
-        "lockedYn": false,
-        "excludedYn": false,
-        "recommendationYn": true
-      },
-      {
-        "tagId": 12,
-        "tagCode": "geometry",
-        "tagDisplayName": "기하학",
-        "tagTargets": [
-          {
-            "targetId": 1,
-            "targetCode": "DAILY",
-            "targetDisplayName": "DAILY"
-          },
-          {
-            "targetId": 3,
-            "targetCode": "BEGINNER",
-            "targetDisplayName": "BEGINNER"
-          }
-        ],
-        "tagAliases": [],
-        "requiredStat": {
-          "requiredMinTier": 7,
-          "prevTags": []
-        },
-        "nextLevelStat": {
-          "nextLevel": "ADVANCED",
-          "solvedProblemCount": 10,
-          "requiredMinTier": 21,
-          "higherProblemTier": 12
-        },
-        "accountStat": {
-          "currentLevel": "INTERMEDIATE",
-          "solvedProblemCount": 3,
-          "requiredMinTier": 17,
-          "higherProblemTier": 17,
-          "lastSolvedDate": "2026-01-05"
-        },
-        "lockedYn": false,
-        "excludedYn": false,
-        "recommendationYn": true
-      },
-      {
-        "tagId": 13,
-        "tagCode": "trees",
-        "tagDisplayName": "트리",
-        "tagTargets": [
-          {
-            "targetId": 1,
-            "targetCode": "DAILY",
-            "targetDisplayName": "DAILY"
-          },
-          {
-            "targetId": 2,
-            "targetCode": "CT",
-            "targetDisplayName": "CT"
-          },
-          {
-            "targetId": 3,
-            "targetCode": "BEGINNER",
-            "targetDisplayName": "BEGINNER"
-          }
-        ],
-        "tagAliases": [
-          {
-            "alias": "trees"
-          }
-        ],
-        "requiredStat": {
-          "requiredMinTier": 13,
-          "prevTags": []
-        },
-        "nextLevelStat": {
-          "nextLevel": "MASTER",
-          "solvedProblemCount": 15,
-          "requiredMinTier": 15,
-          "higherProblemTier": 3
-        },
-        "accountStat": {
-          "currentLevel": "ADVANCED",
-          "solvedProblemCount": 11,
-          "requiredMinTier": 16,
-          "higherProblemTier": 16,
-          "lastSolvedDate": "2026-01-05"
-        },
-        "lockedYn": false,
-        "excludedYn": false,
-        "recommendationYn": true
-      },
+
       {
         "tagId": 14,
         "tagCode": "number_theory",
@@ -3249,70 +3368,6 @@
           "solvedProblemCount": 7,
           "requiredMinTier": 16,
           "higherProblemTier": 16,
-          "lastSolvedDate": "2026-01-05"
-        },
-        "lockedYn": false,
-        "excludedYn": false,
-        "recommendationYn": true
-      },
-      {
-        "tagId": 15,
-        "tagCode": "segtree",
-        "tagDisplayName": "세그먼트 트리",
-        "tagTargets": [
-          {
-            "targetId": 1,
-            "targetCode": "DAILY",
-            "targetDisplayName": "DAILY"
-          },
-          {
-            "targetId": 2,
-            "targetCode": "CT",
-            "targetDisplayName": "CT"
-          }
-        ],
-        "tagAliases": [
-          {
-            "alias": "구간트리"
-          },
-          {
-            "alias": "세그트리"
-          },
-          {
-            "alias": "fenwick"
-          },
-          {
-            "alias": "펜윅"
-          }
-        ],
-        "requiredStat": {
-          "requiredMinTier": 17,
-          "prevTags": [
-            {
-              "tagId": 13,
-              "tagCode": "trees",
-              "tagDisplayName": "트리",
-              "satisfiedYn": true
-            },
-            {
-              "tagId": 41,
-              "tagCode": "stack",
-              "tagDisplayName": "스택",
-              "satisfiedYn": true
-            }
-          ]
-        },
-        "nextLevelStat": {
-          "nextLevel": "MASTER",
-          "solvedProblemCount": 7,
-          "requiredMinTier": 18,
-          "higherProblemTier": 8
-        },
-        "accountStat": {
-          "currentLevel": "MASTER",
-          "solvedProblemCount": 13,
-          "requiredMinTier": 18,
-          "higherProblemTier": 18,
           "lastSolvedDate": "2026-01-05"
         },
         "lockedYn": false,
@@ -4019,60 +4074,7 @@
         "excludedYn": false,
         "recommendationYn": true
       },
-      {
-        "tagId": 32,
-        "tagCode": "disjoint_set",
-        "tagDisplayName": "분리 집합",
-        "tagTargets": [
-          {
-            "targetId": 1,
-            "targetCode": "DAILY",
-            "targetDisplayName": "DAILY"
-          },
-          {
-            "targetId": 2,
-            "targetCode": "CT",
-            "targetDisplayName": "CT"
-          }
-        ],
-        "tagAliases": [
-          {
-            "alias": "union"
-          },
-          {
-            "alias": "find"
-          },
-          {
-            "alias": "유니온"
-          },
-          {
-            "alias": "파인드"
-          },
-          {
-            "alias": "dsu"
-          }
-        ],
-        "requiredStat": {
-          "requiredMinTier": 13,
-          "prevTags": []
-        },
-        "nextLevelStat": {
-          "nextLevel": "MASTER",
-          "solvedProblemCount": 10,
-          "requiredMinTier": 16,
-          "higherProblemTier": 4
-        },
-        "accountStat": {
-          "currentLevel": "ADVANCED",
-          "solvedProblemCount": 9,
-          "requiredMinTier": 16,
-          "higherProblemTier": 16,
-          "lastSolvedDate": "2026-01-05"
-        },
-        "lockedYn": false,
-        "excludedYn": false,
-        "recommendationYn": true
-      },
+
       {
         "tagId": 33,
         "tagCode": "dp_tree",

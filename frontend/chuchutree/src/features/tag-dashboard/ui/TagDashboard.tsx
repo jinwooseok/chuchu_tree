@@ -54,16 +54,21 @@ export default function TagDashboard() {
       </div>
     );
   }
+  if (filteredAndSortedTags.length === 0) {
+    return (
+      <div className="flex h-full w-full items-center justify-center">
+        <p className="text-muted-foreground">검색 결과가 없습니다.</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="hide-scrollbar grid h-full w-full grid-cols-2 content-start gap-x-4 gap-y-8 overflow-y-auto lg:grid-cols-3">
-      {filteredAndSortedTags.length > 0 ? (
-        filteredAndSortedTags.map((tag) => <TagCard key={tag.tagId} tag={tag} />)
-      ) : (
-        <div className="col-span-full flex h-full items-center justify-center">
-          <p className="text-muted-foreground">검색 결과가 없습니다.</p>
-        </div>
-      )}
+    <div className="flex h-full w-full justify-center">
+      <div className="hide-scrollbar grid grid-cols-1 content-start gap-x-4 gap-y-8 overflow-y-auto lg:grid-cols-2 xl:grid-cols-3">
+        {filteredAndSortedTags.map((tag) => (
+          <TagCard key={tag.tagId} tag={tag} />
+        ))}
+      </div>
     </div>
   );
 }

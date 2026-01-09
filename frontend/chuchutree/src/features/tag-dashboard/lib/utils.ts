@@ -2,38 +2,20 @@ import { TierNumKey } from '@/shared/constants/tierSystem';
 import { CategoryName } from '@/shared/constants/tagSystem';
 
 // 레벨별 색상 클래스 반환
-export function getLevelColorClasses(level: CategoryName): { bg: string; text: string; border: string; short: string } {
+export function getLevelColorClasses(level: CategoryName): { bg: string; text: string; border: string; borderTop: string; short: string } {
   switch (level) {
     case 'INTERMEDIATE':
-      return { bg: 'bg-intermediate-bg', text: 'text-intermediate-text', border: 'border-intermediate-bg', short: 'I' };
+      return { bg: 'bg-intermediate-bg', text: 'text-intermediate-text', border: 'border-intermediate-bg', borderTop: 'border-t-intermediate-bg', short: 'I' };
     case 'ADVANCED':
-      return { bg: 'bg-advanced-bg', text: 'text-advanced-text', border: 'border-advanced-bg', short: 'A' };
+      return { bg: 'bg-advanced-bg', text: 'text-advanced-text', border: 'border-advanced-bg', borderTop: 'border-t-advanced-bg', short: 'A' };
     case 'MASTER':
-      return { bg: 'bg-master-bg', text: 'text-master-text', border: 'border-master-bg', short: 'M' };
+      return { bg: 'bg-master-bg', text: 'text-master-text', border: 'border-master-bg', borderTop: 'border-t-master-bg', short: 'M' };
     case 'LOCKED':
-      return { bg: 'bg-locked-bg', text: 'text-locked-text', border: 'border-locked-bg', short: 'L' };
+      return { bg: 'bg-locked-bg', text: 'text-locked-text', border: 'border-locked-bg', borderTop: 'border-t-locked-bg', short: 'L' };
     case 'EXCLUDED':
-      return { bg: 'bg-excluded-bg', text: 'text-excluded-text', border: 'border-excluded-bg', short: 'EX' };
+      return { bg: 'bg-excluded-bg', text: 'text-excluded-text', border: 'border-excluded-bg', borderTop: 'border-t-excluded-bg', short: 'EX' };
     default:
-      return { bg: 'bg-gray-300', text: 'text-gray-700', border: 'border-gray-300', short: 'D' };
-  }
-}
-
-// 레벨별 색상 값 반환 (inline style용)
-export function getLevelColorValue(level: CategoryName): string {
-  switch (level) {
-    case 'INTERMEDIATE':
-      return '#f9b473';
-    case 'ADVANCED':
-      return '#79ab7c';
-    case 'MASTER':
-      return '#47c6f9';
-    case 'LOCKED':
-      return '#e4e4e4';
-    case 'EXCLUDED':
-      return '#ed6e6e';
-    default:
-      return '#d1d5db';
+      return { bg: 'bg-gray-300', text: 'text-gray-700', border: 'border-gray-300', borderTop: 'border-t-gray-300', short: 'D' };
   }
 }
 
@@ -69,18 +51,13 @@ export function calculateProgress({
   return solvedPoint + userTierPoint + highestPoint;
 }
 
-// 게이지 박스 위치 계산 (10-90 범위로 제한)
+// 게이지 포인터 위치 계산
 export function calculatePeekPosition(ratio: number): number {
   return Math.round((ratio * 80) / 100) + 10;
 }
 
-// 게이지 박스 위치 계산 (25-75 범위로 제한)
-export function calculateBoxPosition(ratio: number): number {
-  return ratio > 75 ? 75 : ratio < 25 ? 25 : ratio;
-}
-
-// Master 이후 진행률 계산 (0-100)
-export function calculateMasterProgress({ solvedCnt, requireSolveCnt }: { solvedCnt: number; requireSolveCnt: number }) {
-  const solvedMasterPoint = Math.min(100, (solvedCnt - requireSolveCnt) * 10);
-  return solvedMasterPoint;
+// 게이지 박스 위치 계산
+export function calculateBoxPosition(ratio: number, name: CategoryName): number {
+  const len = name.length;
+  return Math.round((ratio * 80) / 100) + 10 + ((50 - ratio) / 100) * len * 2.3;
 }

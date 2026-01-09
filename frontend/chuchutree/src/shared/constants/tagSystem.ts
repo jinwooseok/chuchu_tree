@@ -60,6 +60,7 @@ export const TAG_INFO = {
 };
 
 export type CategoryName = 'INTERMEDIATE' | 'ADVANCED' | 'MASTER' | 'EXCLUDED' | 'LOCKED';
+
 export type TargetCode = 'DAILY' | 'BEGINNER' | 'CT';
 
 export type TagKey = keyof typeof TAG_INFO;
