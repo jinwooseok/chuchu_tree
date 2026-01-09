@@ -3,6 +3,7 @@
 import { Calendar, ChevronUp, Dices, Gem, Leaf, LibraryBig, PanelLeft, User2 } from 'lucide-react';
 import { useLayoutStore } from '@/lib/store/layout';
 import { useUser } from '@/lib/store/user';
+import { useRouter } from 'next/navigation';
 
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -14,6 +15,7 @@ import { BjAccountChangeDialog } from '@/features/bj-account-change';
 import { TargetCode } from '@/shared/constants/tagSystem';
 import { useModal } from '@/lib/providers/modal-provider';
 import { toast } from 'sonner';
+import { useLogout } from '@/entities/auth';
 
 const ICON_SIZE = 32;
 
@@ -22,6 +24,7 @@ export function AppSidebar() {
   const { topSection, centerSection, bottomSection, toggleTopSection, setCenterSection, toggleBottomSection } = useLayoutStore();
   const { user } = useUser();
   const { openModal, closeModal } = useModal();
+  const router = useRouter();
 
   // 7일 체크 함수
   const canChangeAccount = () => {
@@ -45,6 +48,25 @@ export function AppSidebar() {
       return;
     }
     openModal('bj-account-change', <BjAccountChangeDialog currentBjAccountId={user?.bjAccount?.bjAccountId || ''} onClose={() => closeModal('bj-account-change')} />);
+  };
+
+  // 로그아웃 훅 및 핸들러
+  const { mutate: logout, isPending: isLogoutPending } = useLogout({
+    onSuccess: () => {
+      toast.success('로그아웃되었습니다.', {
+        position: 'top-center',
+      });
+      router.push('/sign-in');
+    },
+    onError: () => {
+      toast.error('로그아웃에 실패했습니다. 다시 시도해주세요.', {
+        position: 'top-center',
+      });
+    },
+  });
+
+  const handleLogout = () => {
+    logout();
   };
 
   // Menu items.
@@ -165,8 +187,14 @@ export function AppSidebar() {
                   >
                     <span>목표 변경</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <span>로그아웃</span>
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      handleLogout();
+                    }}
+                    disabled={isLogoutPending}
+                  >
+                    <span>{isLogoutPending ? '로그아웃 중...' : '로그아웃'}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
