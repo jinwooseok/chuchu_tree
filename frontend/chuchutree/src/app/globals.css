@@ -20,8 +20,8 @@
   --color-tier-platinum: var(--tier-platinum);
   --color-tier-diamond: var(--tier-diamond);
   --color-tier-ruby: var(--tier-ruby);
-  --color-imediated-bg: var(--imediated-bg);
-  --color-imediated-text: var(--imediated-text);
+  --color-intermediate-bg: var(--intermediate-bg);
+  --color-intermediate-text: var(--intermediate-text);
   --color-advanced-bg: var(--advanced-bg);
   --color-advanced-text: var(--advanced-text);
   --color-master-bg: var(--master-bg);
@@ -84,8 +84,8 @@
   --tier-platinum: #27e2a4;
   --tier-diamond: #00b4fc;
   --tier-ruby: #ff0062;
-  --imediated-bg: #f9b473;
-  --imediated-text: #6e4116;
+  --intermediate-bg: #f9b473;
+  --intermediate-text: #6e4116;
   --advanced-bg: #79ab7c;
   --advanced-text: #4a5c4c;
   --master-bg: #47c6f9;
@@ -138,8 +138,8 @@
   --tier-platinum: #27e2a4;
   --tier-diamond: #00b4fc;
   --tier-ruby: #ff0062;
-  --imediated-bg: #f9b473;
-  --imediated-text: #6e4116;
+  --intermediate-bg: #f9b473;
+  --intermediate-text: #6e4116;
   --advanced-bg: #79ab7c;
   --advanced-text: #4a5c4c;
   --master-bg: #47c6f9;
@@ -323,9 +323,9 @@
   border-radius: 50%;
 }
 
-/* 선택된 날짜 (bg-imediated-bg 배경색) */
+/* 선택된 날짜 (bg-intermediate-bg 배경색) */
 .small-calendar-wrapper .custom-tile.selected-tile abbr {
-  background-color: #f9b473 !important; /* bg-imediated-bg */
+  background-color: #f9b473 !important; /* bg-intermediate-bg */
   border-radius: 50%;
 }
 

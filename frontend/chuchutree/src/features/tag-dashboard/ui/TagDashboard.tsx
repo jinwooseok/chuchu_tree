@@ -34,7 +34,7 @@ export default function TagDashboard() {
         result.sort((a, b) => new Date(b.accountStat.lastSolvedDate).getTime() - new Date(a.accountStat.lastSolvedDate).getTime());
         break;
       case 'level':
-        const levelOrder = { MASTER: 0, ADVANCED: 1, IMEDIATED: 2, EXCLUDED: 3, LOCKED: 4 };
+        const levelOrder = { MASTER: 3, ADVANCED: 2, INTERMEDIATE: 1, EXCLUDED: 0, LOCKED: 4 };
         result.sort((a, b) => levelOrder[a.accountStat.currentLevel as keyof typeof levelOrder] - levelOrder[b.accountStat.currentLevel as keyof typeof levelOrder]);
         break;
       case 'default':

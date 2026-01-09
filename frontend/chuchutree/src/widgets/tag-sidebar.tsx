@@ -14,9 +14,9 @@ export default function TagSidebar() {
 
   // 카테고리별 열림/닫힘 상태
   const [openCategories, setOpenCategories] = useState<Record<CategoryName, boolean>>({
-    IMEDIATED: true,
-    ADVANCED: true,
-    MASTER: true,
+    INTERMEDIATE: false,
+    ADVANCED: false,
+    MASTER: false,
     LOCKED: false,
     EXCLUDED: false,
   });
