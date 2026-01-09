@@ -46,9 +46,15 @@ export interface CategoryTags {
   recommendationYn: boolean;
 }
 
+interface CategoryInfoTags {
+  tagId: number;
+  tagCode: TagKey;
+  tagDisplayName: string;
+}
+
 interface Categories {
   categoryName: CategoryName;
-  tags: CategoryTags[];
+  tags: CategoryInfoTags[];
 }
 
 export interface TagDashboard {
