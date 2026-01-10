@@ -1,4 +1,4 @@
-import { Recommendation } from '@/entities/recommendation/model/types';
+import { BanProblem, Recommendation } from '@/entities/recommendation/model/types';
 import { axiosInstance } from '@/lib/axios';
 import { ApiResponse } from '@/shared/types/api';
 
@@ -11,5 +11,8 @@ export const RecommendationApi = {
       },
     });
     return data.data;
+  },
+  postProblemBan: async (data: BanProblem): Promise<void> => {
+    await axiosInstance.post<void>('/user-accounts/me/problems/banned-list', data);
   },
 };

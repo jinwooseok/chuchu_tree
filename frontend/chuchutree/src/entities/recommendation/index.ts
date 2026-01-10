@@ -1,3 +1,3 @@
-export type { Recommendation } from './model/types';
+export type { Recommendation, BanProblem } from './model/types';
 
-export { useGetRecommendation, RecommendationKeys } from './model/queries';
+export { useGetRecommendation, RecommendationKeys, useBanProblem } from './model/queries';

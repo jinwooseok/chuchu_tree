@@ -37,3 +37,8 @@ interface RecommendedProblems {
 export interface Recommendation {
   problems: RecommendedProblems[];
 }
+
+// 문제 밴
+export interface BanProblem {
+  problemId: number;
+}
