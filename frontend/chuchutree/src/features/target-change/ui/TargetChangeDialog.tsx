@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { usePostTarget } from '@/entities/user';
 import { TARGET_OPTIONS } from '@/shared/constants/target';
@@ -8,20 +8,24 @@ import { TargetCode } from '@/shared/constants/tagSystem';
 import { toast } from 'sonner';
 
 interface TargetChangeDialogProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
   currentTarget?: TargetCode;
+  onClose: () => void;
 }
 
-export function TargetChangeDialog({ open, onOpenChange, currentTarget = 'DAILY' }: TargetChangeDialogProps) {
+export function TargetChangeDialog({ currentTarget = 'DAILY', onClose }: TargetChangeDialogProps) {
   const [selectedTarget, setSelectedTarget] = useState<TargetCode>(currentTarget);
+
+  // Dialog가 열릴 때마다 현재 목표로 초기화
+  useEffect(() => {
+    setSelectedTarget(currentTarget);
+  }, [currentTarget]);
 
   const { mutate: postTarget, isPending: isPostTargetPending } = usePostTarget({
     onSuccess: () => {
       toast.success('목표가 변경되었습니다.', {
         position: 'top-center',
       });
-      onOpenChange(false);
+      onClose();
     },
     onError: () => {
       toast.error('목표 변경에 실패했습니다. 다시 시도해주세요.', {
@@ -34,16 +38,8 @@ export function TargetChangeDialog({ open, onOpenChange, currentTarget = 'DAILY'
     postTarget({ targetCode: selectedTarget });
   };
 
-  const handleOpenChange = (newOpen: boolean) => {
-    // Dialog가 열릴 때 현재 목표로 초기화
-    if (newOpen) {
-      setSelectedTarget(currentTarget);
-    }
-    onOpenChange(newOpen);
-  };
-
   return (
-    <Dialog open={open} onOpenChange={handleOpenChange}>
+    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>학습 목표 변경</DialogTitle>
@@ -76,7 +72,7 @@ export function TargetChangeDialog({ open, onOpenChange, currentTarget = 'DAILY'
         <DialogFooter className="sm:justify-end">
           <button
             type="button"
-            onClick={() => onOpenChange(false)}
+            onClick={onClose}
             disabled={isPostTargetPending}
             className="border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >

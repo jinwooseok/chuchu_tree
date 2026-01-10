@@ -1,14 +1,60 @@
+'use client';
+
 import { BadgeCheck } from 'lucide-react';
-import { CategoryTags } from '@/entities/tag-dashboard';
+import { CategoryTags, usePostTagBan, useDeleteTagBan } from '@/entities/tag-dashboard';
 import { getLevelColorClasses, getLevelColorValue, getDaysAgo, calculateProgress, calculatePeekPosition, calculateBoxPosition, calculateMasterProgress } from '../lib/utils';
 import Image from 'next/image';
 import { TIER_TO_NUM } from '@/shared/constants/tierSystem';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid'; // filled
 import { CheckCircleIcon as CheckCircleIconOutline } from '@heroicons/react/24/outline'; // outline
 import { CategoryName } from '@/shared/constants/tagSystem';
+import { toast } from 'sonner';
+import { useModal } from '@/lib/providers/modal-provider';
+import { TagBanAlertDialog } from './TagBanAlertDialog';
 
 export default function TagCard({ tag }: { tag: CategoryTags }) {
-  const { tagDisplayName, accountStat, nextLevelStat, lockedYn, excludedYn, recommendationYn, requiredStat } = tag;
+  const { tagCode, tagDisplayName, accountStat, nextLevelStat, lockedYn, excludedYn, recommendationYn, requiredStat } = tag;
+  const { openModal, closeModal } = useModal();
+
+  // Tag Ban mutations
+  const { mutate: postTagBan, isPending: isPostPending } = usePostTagBan({
+    onSuccess: () => {
+      toast.success('추천 목록에서 제외되었습니다.', { position: 'top-center' });
+      closeModal('tag-ban-alert');
+    },
+    onError: () => {
+      toast.error('제외 처리에 실패했습니다.', { position: 'top-center' });
+    },
+  });
+
+  const { mutate: deleteTagBan, isPending: isDeletePending } = useDeleteTagBan({
+    onSuccess: () => {
+      toast.success('추천 목록에 추가되었습니다.', { position: 'top-center' });
+      closeModal('tag-ban-alert');
+    },
+    onError: () => {
+      toast.error('추가 처리에 실패했습니다.', { position: 'top-center' });
+    },
+  });
+
+  const isPending = isPostPending || isDeletePending;
+
+  const handleConfirm = () => {
+    if (recommendationYn) {
+      // 현재 추천 중이면 제외 (Ban 추가)
+      postTagBan({ tagCode });
+    } else {
+      // 현재 제외 중이면 추가 (Ban 삭제)
+      deleteTagBan({ tagCode });
+    }
+  };
+
+  const handleTagBanClick = () => {
+    openModal(
+      'tag-ban-alert',
+      <TagBanAlertDialog tagDisplayName={tagDisplayName} recommendationYn={recommendationYn} isPending={isPending} onConfirm={handleConfirm} onClose={() => closeModal('tag-ban-alert')} />,
+    );
+  };
 
   // 현재 레벨과 다음 레벨
   const currentLevel = accountStat.currentLevel as CategoryName;
@@ -52,7 +98,12 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
         <div className={`text-foreground text-sm font-semibold`}>{tagDisplayName}</div>
         <div className="flex h-full items-center justify-center gap-2">
           <div className={`text-muted-foreground flex flex-col gap-0.5`}>
-            <button className={`hover:bg-excluded-bg hover:text-innerground-white border-innerground-darkgray rounded border px-2 text-center transition-colors`}>
+            {/* Tag Ban */}
+            <button
+              onClick={handleTagBanClick}
+              disabled={isPending}
+              className={`hover:bg-excluded-bg hover:text-innerground-white border-innerground-darkgray rounded border px-2 text-center transition-colors disabled:cursor-not-allowed disabled:opacity-50`}
+            >
               {recommendationYn ? '추천 포함됨' : '추천리스트 등록'}
             </button>
             <div className="flex gap-0.5">

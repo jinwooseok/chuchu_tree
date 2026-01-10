@@ -25,7 +25,7 @@ export async function serverFetch<T>(endpoint: string, options?: RequestInit): P
   const refreshToken = cookieStore.get('refresh_token')?.value;
 
   // 쿠키 문자열 올바르게 구성 (세미콜론으로 구분)
-  const cookieString = [accessToken && `access_token=${accessToken}`, refreshToken && `refresh_token=${refreshToken}`].filter(Boolean).join('; ');
+  let cookieString = [accessToken && `access_token=${accessToken}`, refreshToken && `refresh_token=${refreshToken}`].filter(Boolean).join('; ');
 
   const requestUrl = `${API_URL}/api/v1/${endpoint}`;
 
@@ -36,7 +36,7 @@ export async function serverFetch<T>(endpoint: string, options?: RequestInit): P
     hasRefreshToken: !!refreshToken,
   });
 
-  const response = await fetch(requestUrl, {
+  let response = await fetch(requestUrl, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -53,7 +53,77 @@ export async function serverFetch<T>(endpoint: string, options?: RequestInit): P
     ok: response.ok,
   });
 
-  // 에러 처리 개선
+  // 401 에러 처리 - 토큰 재발급 시도
+  if (response.status === 401 && refreshToken) {
+    const errorData: ApiResponse<any> = await response.json().catch(() => ({
+      status: response.status,
+      message: response.statusText,
+      data: null,
+      error: {},
+    }));
+
+    // EXPIRED_TOKEN 에러인 경우에만 재발급 시도
+    if (errorData.error?.code === 'EXPIRED_TOKEN') {
+      console.log('[serverFetch] Attempting token refresh...');
+
+      try {
+        // Refresh token으로 재발급 요청
+        const refreshResponse = await fetch(`${API_URL}/api/v1/auth/token/refresh`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Cookie: `refresh_token=${refreshToken}`,
+          },
+        });
+
+        if (refreshResponse.ok) {
+          console.log('[serverFetch] Token refresh successful');
+
+          // Set-Cookie 헤더에서 새 토큰 추출
+          const setCookieHeader = refreshResponse.headers.get('set-cookie');
+
+          if (setCookieHeader) {
+            // Set-Cookie 헤더를 Cookie 헤더 형식으로 변환
+            const newCookies = setCookieHeader
+              .split(',')
+              .map((cookie) => cookie.trim().split(';')[0])
+              .join('; ');
+
+            cookieString = newCookies || cookieString;
+          }
+
+          // 원래 요청 재시도
+          response = await fetch(requestUrl, {
+            ...options,
+            headers: {
+              'Content-Type': 'application/json',
+              ...options?.headers,
+              Cookie: cookieString,
+            },
+            cache: options?.cache || 'no-store',
+          });
+
+          console.log('[serverFetch] Retry after refresh:', {
+            url: requestUrl,
+            status: response.status,
+            ok: response.ok,
+          });
+        } else {
+          console.error('[serverFetch] Token refresh failed');
+          throw new ApiResponseError(401, 'REFRESH_FAILED', 'Token refresh failed');
+        }
+      } catch (refreshError) {
+        console.error('[serverFetch] Token refresh error:', refreshError);
+        throw new ApiResponseError(401, 'REFRESH_FAILED', 'Token refresh failed');
+      }
+    } else {
+      // EXPIRED_TOKEN이 아닌 다른 401 에러
+      console.error('[serverFetch] 401 Error (not EXPIRED_TOKEN):', errorData);
+      throw new ApiResponseError(response.status, errorData.error?.code, errorData.error?.message || errorData.message);
+    }
+  }
+
+  // 에러 처리
   if (!response.ok) {
     const errorData: ApiResponse<any> = await response.json().catch(() => ({
       status: response.status,
