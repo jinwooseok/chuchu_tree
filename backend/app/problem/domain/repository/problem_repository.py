@@ -40,3 +40,28 @@ class ProblemRepository(ABC):
     async def find_by_title_keyword(self, keyword: str, limit: int = 5) -> list[Problem]:
         """문제 제목에 키워드가 포함된 문제들을 조회"""
         pass
+
+    @abstractmethod
+    async def find_recommended_problem(
+        self,
+        tag_id: TagId,
+        tier_range: 'TierRange',
+        skill_rate: int,
+        min_solved_count: int,
+        exclude_ids: set[int],
+        priority_ids: set[int]
+    ) -> Problem | None:
+        """추천 문제 조회
+
+        Args:
+            tag_id: 태그 ID
+            tier_range: 티어 범위
+            skill_rate: 숙련도 비율 (해당 태그 내에서 상위 N% 문제)
+            min_solved_count: 최소 해결 수 (1000명 이상 푼 문제)
+            exclude_ids: 제외할 문제 ID 집합 (이미 푼 문제 + ban한 문제)
+            priority_ids: 우선순위 문제 ID 집합 (찜한 문제)
+
+        Returns:
+            추천 문제 (없으면 None)
+        """
+        pass

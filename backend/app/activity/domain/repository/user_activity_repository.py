@@ -47,5 +47,9 @@ class UserActivityRepository(ABC):
         pass
     
     @abstractmethod
+    async def find_by_user_account_id(user_account_id: UserAccountId) -> UserActivity:
+        pass
+    
+    @abstractmethod
     async def save_tag_custom(activity: UserActivity):
         pass    

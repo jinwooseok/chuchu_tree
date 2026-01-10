@@ -12,6 +12,8 @@ from app.baekjoon.infra.repository.streak_repository_impl import StreakRepositor
 from app.baekjoon.infra.scheduler.metric_scheduler import BjAccountUpdateScheduler
 from app.config.settings import get_settings
 from app.core.database import Database
+from app.recommendation.application.usecase.recommend_problems_usecase import RecommendProblemsUsecase
+from app.recommendation.infra.repository.level_filter_repository_impl import LevelFilterRepositoryImpl
 from app.tag.application.service.tag_application_service import TagApplicationService
 from app.target.application.service.target_application_service import TargetApplicationService
 from app.tier.infra.repository.tier_repository_impl import TierRepositoryImpl
@@ -314,6 +316,11 @@ class Container(containers.DeclarativeContainer):
         TagSkillRepositoryImpl,
         db=database
     )
+    
+    recommand_filter_repository = providers.Singleton(
+        LevelFilterRepositoryImpl,
+        db=database
+    )
 
     # ========================================================================
     # Target domain
@@ -365,6 +372,19 @@ class Container(containers.DeclarativeContainer):
         tag_skill_repository=tag_skill_repository,
         tier_repository=tier_repository,
         target_repository=target_repository
+    )
+    
+    recommand_problems_usecase = providers.Singleton(
+        RecommendProblemsUsecase,
+        user_account_repository = user_account_repository,
+        baekjoon_account_repository = baekjoon_account_repository,
+        user_activity_repository = user_activity_repository,
+        tag_repository = tag_repository,
+        target_repository = target_repository,
+        tag_skill_repository = tag_skill_repository,
+        recommend_filter_repository = recommand_filter_repository,
+        problem_repository = problem_repository,
+        tier_repository = tier_repository
     )
     
     # ========================================================================

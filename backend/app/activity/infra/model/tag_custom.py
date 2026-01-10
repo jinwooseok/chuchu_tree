@@ -1,10 +1,13 @@
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 from sqlalchemy import String, DateTime, Integer, ForeignKey, Boolean, UniqueConstraint
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
+from app.user.infra.model.user_account import UserAccountModel
 
+if TYPE_CHECKING:
+    from app.user.infra.model.user_account import UserAccountModel
 
 class TagCustomModel(Base):
     __tablename__ = "tag_custom"
@@ -21,3 +24,8 @@ class TagCustomModel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    
+    user_account: Mapped["UserAccountModel"] = relationship(
+        "UserAccountModel", 
+        back_populates="tag_customs"
+    )
