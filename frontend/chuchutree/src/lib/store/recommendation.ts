@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { combine, devtools } from 'zustand/middleware';
+import { combine, devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
 type LevelType = 'easy' | 'normal' | 'hard' | 'extreme';
@@ -46,6 +46,11 @@ type State = {
     recommendReason: boolean;
     algorithm: boolean;
   };
+
+  // UI section visibility
+  showLevelSection: boolean;
+  showTagSection: boolean;
+  showFilterSection: boolean;
 };
 
 const initialState: State = {
@@ -58,75 +63,124 @@ const initialState: State = {
     problemNumber: true,
     problemTier: true,
     recommendReason: true,
-    algorithm: true,
+    algorithm: false,
   },
+  showLevelSection: false,
+  showTagSection: false,
+  showFilterSection: false,
 };
 
 const recommendationStoreInternal = create(
   devtools(
-    immer(
-      combine(initialState, (set, get) => ({
-        actions: {
-          // Set selected level
-          setSelectedLevel: (level: LevelType | null) => {
-            set((state) => {
-              state.selectedLevel = level;
-            });
-          },
+    persist(
+      immer(
+        combine(initialState, (set, get) => ({
+          actions: {
+            // Set selected level
+            setSelectedLevel: (level: LevelType | null) => {
+              set((state) => {
+                state.selectedLevel = level;
+              });
+            },
 
-          // Set selected tags
-          setSelectedTags: (tags: string) => {
-            set((state) => {
-              state.selectedTags = tags;
-            });
-          },
+            // Set selected tags
+            setSelectedTags: (tags: string) => {
+              set((state) => {
+                state.selectedTags = tags;
+              });
+            },
 
-          // Set recommendation problems
-          setProblems: (problems: RecommendedProblems[]) => {
-            set((state) => {
-              state.problems = problems;
-            });
-          },
+            // Set recommendation problems
+            setProblems: (problems: RecommendedProblems[]) => {
+              set((state) => {
+                state.problems = problems;
+              });
+            },
 
-          // Set loading state
-          setLoading: (isLoading: boolean) => {
-            set((state) => {
-              state.isLoading = isLoading;
-            });
-          },
+            // Set loading state
+            setLoading: (isLoading: boolean) => {
+              set((state) => {
+                state.isLoading = isLoading;
+              });
+            },
 
-          // Set error state
-          setError: (error: Error | null) => {
-            set((state) => {
-              state.error = error;
-            });
-          },
+            // Set error state
+            setError: (error: Error | null) => {
+              set((state) => {
+                state.error = error;
+              });
+            },
 
-          // Toggle display filter
-          toggleFilter: (filterName: keyof State['showFilters']) => {
-            set((state) => {
-              state.showFilters[filterName] = !state.showFilters[filterName];
-            });
-          },
+            // Toggle display filter
+            toggleFilter: (filterName: keyof State['showFilters']) => {
+              set((state) => {
+                state.showFilters[filterName] = !state.showFilters[filterName];
+              });
+            },
 
-          // Clear recommendation
-          clearRecommendation: () => {
-            set((state) => {
-              state.problems = [];
-              state.isLoading = false;
-              state.error = null;
-            });
-          },
+            // Reset filters to initial state
+            resetFilters: () => {
+              set((state) => {
+                state.showFilters = {
+                  problemNumber: true,
+                  problemTier: true,
+                  recommendReason: true,
+                  algorithm: false,
+                };
+              });
+            },
 
-          // Reset all state
-          reset: () => {
-            set(initialState);
+            // Toggle section visibility
+            toggleLevelSection: () => {
+              set((state) => {
+                state.showLevelSection = !state.showLevelSection;
+                state.showFilterSection = false;
+              });
+            },
+
+            toggleTagSection: () => {
+              set((state) => {
+                state.showTagSection = !state.showTagSection;
+              });
+            },
+
+            toggleFilterSection: () => {
+              set((state) => {
+                state.showFilterSection = !state.showFilterSection;
+                state.showLevelSection = false;
+              });
+            },
+
+            // Clear recommendation
+            clearRecommendation: () => {
+              set((state) => {
+                state.problems = [];
+                state.isLoading = false;
+                state.error = null;
+              });
+            },
+
+            // Reset all state
+            reset: () => {
+              set(initialState);
+            },
           },
-        },
-      }))
+        })),
+      ),
+      {
+        name: 'recommendation-storage',
+        partialize: (state) => ({
+          selectedLevel: state.selectedLevel,
+          selectedTags: state.selectedTags,
+          showFilters: state.showFilters,
+          showLevelSection: state.showLevelSection,
+          showTagSection: state.showTagSection,
+          showFilterSection: state.showFilterSection,
+        }),
+      },
     ),
-    { name: 'RecommendationStore' }
-  )
+    { name: 'RecommendationStore' },
+  ),
 );
 
 // Selectors
