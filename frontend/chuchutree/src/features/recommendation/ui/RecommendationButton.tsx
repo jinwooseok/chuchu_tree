@@ -4,9 +4,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useRecommendationStore } from '@/lib/store/recommendation';
 import { useGetRecommendation } from '@/entities/recommendation';
+import { useCalendarStore } from '@/lib/store/calendar';
 import { toast } from 'sonner';
 
 export function RecommendationButton() {
+  const { selectedDate } = useCalendarStore();
   const {
     selectedLevel,
     selectedTags,
@@ -52,20 +54,24 @@ export function RecommendationButton() {
     { key: 'algorithm' as const, label: '알고리즘' },
   ];
 
+  // Format selected date
+  const formatSelectedDate = () => {
+    if (!selectedDate) return '날짜 선택 필요';
+    const month = selectedDate.getMonth() + 1;
+    const day = selectedDate.getDate();
+    return `${month}월 ${day}일`;
+  };
+
   return (
     <div className="flex h-full flex-col gap-2 rounded-lg border-2 border-dashed p-2">
+      <div className="text-center text-sm font-semibold">{formatSelectedDate()}</div>
       <Button className="flex-1" onClick={handleRecommend} disabled={isPending}>
         {isPending ? '추천 중...' : '추천 받기'}
       </Button>
 
       <div className="flex justify-between gap-2">
         {levels.map((level) => (
-          <Button
-            key={level}
-            className="h-6 px-2 py-0 text-[10px]"
-            variant={selectedLevel === level ? 'default' : 'outline'}
-            onClick={() => setSelectedLevel(selectedLevel === level ? null : level)}
-          >
+          <Button key={level} className="h-6 px-2 py-0 text-[10px]" variant={selectedLevel === level ? 'default' : 'outline'} onClick={() => setSelectedLevel(selectedLevel === level ? null : level)}>
             {level}
           </Button>
         ))}
@@ -73,22 +79,12 @@ export function RecommendationButton() {
 
       <div className="flex items-center gap-2 rounded-lg border px-2">
         <p className="text-xs">TAG</p>
-        <Input
-          className="border-none"
-          placeholder="All"
-          value={selectedTags}
-          onChange={(e) => setSelectedTags(e.target.value)}
-        />
+        <Input className="border-none" placeholder="All" value={selectedTags} onChange={(e) => setSelectedTags(e.target.value)} />
       </div>
 
       <div className="flex justify-between gap-1">
         {filters.map((filter) => (
-          <Button
-            key={filter.key}
-            className="h-6 px-2 py-0 text-[10px]"
-            variant={showFilters[filter.key] ? 'default' : 'outline'}
-            onClick={() => toggleFilter(filter.key)}
-          >
+          <Button key={filter.key} className="h-6 px-2 py-0 text-[10px]" variant={showFilters[filter.key] ? 'default' : 'outline'} onClick={() => toggleFilter(filter.key)}>
             {filter.label}
           </Button>
         ))}
