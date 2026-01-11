@@ -1,24 +1,28 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useRecommendationStore } from '@/lib/store/recommendation';
 import { useGetRecommendation } from '@/entities/recommendation';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { toast } from 'sonner';
-import { EyeOff, Search, SlidersHorizontal } from 'lucide-react';
+import { EyeOff, Search, SlidersHorizontal, ChevronDown } from 'lucide-react';
+import { useState } from 'react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { TAG_INFO } from '@/shared/constants/tagSystem';
 
 export function RecommendationButton() {
   const { selectedDate } = useCalendarStore();
   const {
-    selectedLevel,
-    selectedTags,
     showFilters,
     showLevelSection,
     showTagSection,
     showFilterSection,
-    actions: { setSelectedLevel, setSelectedTags, setProblems, setLoading, setError, toggleFilter, resetFilters, toggleLevelSection, toggleTagSection, toggleFilterSection },
+    actions: { setProblems, setLoading, setError, toggleFilter, resetFilters, toggleLevelSection, toggleTagSection, toggleFilterSection },
   } = useRecommendationStore();
+
+  // 로컬 state로 복수 선택 관리
+  const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
+  const [selectedTagsList, setSelectedTagsList] = useState<string[]>([]);
 
   const { mutate: getRecommendation, isPending } = useGetRecommendation();
 
@@ -44,10 +48,38 @@ export function RecommendationButton() {
   const handleRecommend = () => {
     setLoading(true);
     setError(null);
+
+    // 배열을 JSON 문자열로 변환 (level은 대문자로)
+    const levelParam = selectedLevels.length === 0
+      ? '[]'
+      : JSON.stringify(selectedLevels.map(l => l.toUpperCase()));
+
+    const tagsParam = selectedTagsList.length === 0
+      ? '[]'
+      : JSON.stringify(selectedTagsList);
+
     handleGetRecommendation({
-      level: selectedLevel || '',
-      tags: selectedTags || '',
+      level: levelParam,
+      tags: tagsParam
     });
+  };
+
+  // Level 토글 핸들러
+  const toggleLevel = (level: string) => {
+    setSelectedLevels((prev) =>
+      prev.includes(level)
+        ? prev.filter((l) => l !== level)
+        : [...prev, level]
+    );
+  };
+
+  // Tag 토글 핸들러
+  const toggleTag = (tag: string) => {
+    setSelectedTagsList((prev) =>
+      prev.includes(tag)
+        ? prev.filter((t) => t !== tag)
+        : [...prev, tag]
+    );
   };
 
   const levels = ['easy', 'normal', 'hard', 'extreme'] as const;
@@ -67,9 +99,9 @@ export function RecommendationButton() {
   };
 
   // Check if current state is different from initial state
-  const hasTagChanges = selectedTags !== '';
+  const hasTagChanges = selectedTagsList.length > 0;
   const hasFilterChanges = JSON.stringify(showFilters) !== JSON.stringify(initialShowFilters);
-  const hasLevelChanges = selectedLevel !== null;
+  const hasLevelChanges = selectedLevels.length > 0;
 
   // Format selected date
   const formatSelectedDate = () => {
@@ -104,12 +136,46 @@ export function RecommendationButton() {
         <Button className="flex-1" onClick={handleRecommend} disabled={isPending}>
           {isPending ? '추천 중...' : '추천 받기'}
         </Button>
-        {/* 알고리즘 유형 검색창 */}
+        {/* 알고리즘 유형 멀티셀렉트 */}
         {showTagSection && (
-          <div className="relative">
-            <Search className="text-muted-foreground absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2" />
-            <Input className="pl-8" placeholder="선택된 유형만 추천받습니다." value={selectedTags} onChange={(e) => setSelectedTags(e.target.value)} />
-          </div>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" className="w-full justify-between text-xs">
+                {selectedTagsList.length > 0
+                  ? `${selectedTagsList.length}개 선택됨`
+                  : '알고리즘 선택'}
+                <ChevronDown className="ml-2 h-4 w-4" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-64 p-2">
+              <div className="space-y-2 max-h-64 overflow-y-auto">
+                {Object.entries(TAG_INFO).map(([tagKey, tagInfo]) => (
+                  <label
+                    key={tagKey}
+                    className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded p-1"
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedTagsList.includes(tagKey)}
+                      onChange={() => toggleTag(tagKey)}
+                      className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 cursor-pointer appearance-none rounded border-2"
+                    />
+                    <span className="text-xs">{tagInfo.kr}</span>
+                  </label>
+                ))}
+              </div>
+              {selectedTagsList.length > 0 && (
+                <div className="mt-2 flex justify-end border-t pt-2">
+                  <button
+                    onClick={() => setSelectedTagsList([])}
+                    className="text-muted-foreground hover:text-foreground text-xs underline"
+                  >
+                    전체 해제
+                  </button>
+                </div>
+              )}
+            </PopoverContent>
+          </Popover>
         )}
       </div>
       <div className={`h-full rounded-lg ${showLevelSection || showFilterSection ? 'w-26 border-2 border-dashed p-2' : ''}`}>
@@ -120,20 +186,19 @@ export function RecommendationButton() {
               {levels.map((level) => (
                 <label key={level} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded">
                   <input
-                    type="radio"
-                    name="level"
-                    checked={selectedLevel === level}
-                    onChange={() => setSelectedLevel(level)}
-                    className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 cursor-pointer appearance-none rounded-full border-2"
+                    type="checkbox"
+                    checked={selectedLevels.includes(level)}
+                    onChange={() => toggleLevel(level)}
+                    className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 cursor-pointer appearance-none rounded border-2"
                   />
                   <span className="text-xs capitalize">{level}</span>
                 </label>
               ))}
             </div>
-            {selectedLevel && (
+            {selectedLevels.length > 0 && (
               <div className="mt-4 mr-2 flex justify-end">
-                <button onClick={() => setSelectedLevel(null)} className="text-muted-foreground hover:text-muted-foreground text-xs underline">
-                  선택 해제
+                <button onClick={() => setSelectedLevels([])} className="text-muted-foreground hover:text-muted-foreground text-xs underline">
+                  전체 해제
                 </button>
               </div>
             )}
