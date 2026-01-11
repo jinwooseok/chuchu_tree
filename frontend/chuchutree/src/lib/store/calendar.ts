@@ -13,6 +13,7 @@ interface MonthlyData {
 
 type State = {
   selectedDate: Date | null;
+  bigCalendarDate: Date | null;
   monthlyData: MonthlyData[];
   totalProblemCount: number;
   isInitialized: boolean;
@@ -28,6 +29,7 @@ const formatDateString = (date: Date): string => {
 
 const initialState: State = {
   selectedDate: null,
+  bigCalendarDate: null,
   monthlyData: [],
   totalProblemCount: 0,
   isInitialized: false,
@@ -55,6 +57,13 @@ const calendarStoreInternal = create(
           setSelectedDate: (date: Date) => {
             set((state) => {
               state.selectedDate = date;
+            });
+          },
+
+          // BigCalendar 표시 월 설정
+          setBigCalendarDate: (date: Date) => {
+            set((state) => {
+              state.bigCalendarDate = date;
             });
           },
 
@@ -94,8 +103,37 @@ const calendarStoreInternal = create(
 
 // Selectors
 export const useCalendarStore = () => {
-  const store = calendarStoreInternal();
-  return store as typeof store & State;
+  const selectedDate = calendarStoreInternal((s) => s.selectedDate);
+  const bigCalendarDate = calendarStoreInternal((s) => s.bigCalendarDate);
+  const monthlyData = calendarStoreInternal((s) => s.monthlyData);
+  const totalProblemCount = calendarStoreInternal((s) => s.totalProblemCount);
+  const isInitialized = calendarStoreInternal((s) => s.isInitialized);
+  const getDataByDate = calendarStoreInternal((s) => s.getDataByDate);
+  const getSolvedProblemsByDate = calendarStoreInternal((s) => s.getSolvedProblemsByDate);
+  const getWillSolveProblemsByDate = calendarStoreInternal((s) => s.getWillSolveProblemsByDate);
+
+  // actions는 별도로 가져오기 (stable reference)
+  const setSelectedDate = calendarStoreInternal((s) => s.actions.setSelectedDate);
+  const setCalendarData = calendarStoreInternal((s) => s.actions.setCalendarData);
+  const setBigCalendarDate = calendarStoreInternal((s) => s.actions.setBigCalendarDate);
+  const clearCalendarData = calendarStoreInternal((s) => s.actions.clearCalendarData);
+
+  return {
+    selectedDate,
+    bigCalendarDate,
+    monthlyData,
+    totalProblemCount,
+    isInitialized,
+    actions: {
+      setSelectedDate,
+      setCalendarData,
+      setBigCalendarDate,
+      clearCalendarData,
+    },
+    getDataByDate,
+    getSolvedProblemsByDate,
+    getWillSolveProblemsByDate,
+  };
 };
 
 export const useSetCalendarData = () => {

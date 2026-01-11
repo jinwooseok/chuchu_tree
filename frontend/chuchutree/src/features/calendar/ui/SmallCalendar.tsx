@@ -9,12 +9,29 @@ import { isSameDay, isSameMonth, format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { ChevronUp, ChevronDown, Undo2 } from 'lucide-react';
 
+interface MonthlyData {
+  targetDate: string;
+  solvedProblemCount: number;
+  willSolveProblemCount: number;
+}
+
 export default function SmallCalendar() {
-  const { selectedDate, monthlyData, actions } = useCalendarStore();
-  const { setSelectedDate, setCalendarData } = actions;
+  const { selectedDate, bigCalendarDate, actions } = useCalendarStore();
+  const { setSelectedDate } = actions;
 
   // 현재 표시중인 월 관리 (selectedDate가 null이면 오늘 날짜 사용)
   const [activeStartDate, setActiveStartDate] = useState<Date>(selectedDate || new Date());
+
+  // 로컬 상태로 monthlyData 관리 (store와 독립)
+  const [localMonthlyData, setLocalMonthlyData] = useState<MonthlyData[]>([]);
+
+  // BigCalendar의 월이 변경되면 SmallCalendar도 따라감
+  useEffect(() => {
+    if (bigCalendarDate && !isSameMonth(bigCalendarDate, activeStartDate)) {
+      setActiveStartDate(bigCalendarDate);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [bigCalendarDate]); // activeStartDate 제거 (무한 루프 방지)
 
   // 현재 표시 중인 월의 year/month
   const year = activeStartDate.getFullYear();
@@ -23,12 +40,12 @@ export default function SmallCalendar() {
   // 해당 월의 calendar 데이터 fetch
   const { data: calendarData } = useCalendar(year, month);
 
-  // 데이터가 로드되면 store에 저장
+  // 데이터가 로드되면 로컬 상태에 저장 (store에 저장하지 않음)
   useEffect(() => {
     if (calendarData) {
-      setCalendarData(calendarData);
+      setLocalMonthlyData(calendarData.monthlyData);
     }
-  }, [calendarData, setCalendarData]);
+  }, [calendarData]);
 
   // 날짜 클릭 핸들러
   const handleDateChange = (value: Date | null) => {
@@ -41,7 +58,6 @@ export default function SmallCalendar() {
   const handleToday = () => {
     const today = new Date();
     setActiveStartDate(today);
-    setSelectedDate(today);
   };
 
   // 이전달로 이동
@@ -64,14 +80,14 @@ export default function SmallCalendar() {
   // 특정 날짜에 solved 문제가 있는지 확인
   const hasSolvedProblems = (date: Date) => {
     const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    const dayData = monthlyData.find((data) => data.targetDate === dateString);
+    const dayData = localMonthlyData.find((data) => data.targetDate === dateString);
     return dayData && dayData.solvedProblemCount > 0;
   };
 
   // 특정 날짜에 will solve 문제만 있는지 확인
   const hasOnlyWillSolveProblems = (date: Date) => {
     const dateString = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
-    const dayData = monthlyData.find((data) => data.targetDate === dateString);
+    const dayData = localMonthlyData.find((data) => data.targetDate === dateString);
     return dayData && dayData.solvedProblemCount === 0 && dayData.willSolveProblemCount > 0;
   };
 
@@ -112,7 +128,7 @@ export default function SmallCalendar() {
         {/* 현재 월이 오늘이 포함된 월이 아닐 때만 년월 표시 */}
         {!isCurrentMonth && <div className="mt-1 text-xs font-semibold select-none">{format(activeStartDate, 'yyyy MM월', { locale: ko })}</div>}
         {isCurrentMonth && <div></div>}
-
+        {/* 네비게이션 버튼 */}
         <div className="flex items-center gap-1">
           {/* 오늘로 이동 */}
           <button onClick={handleToday} className="hover:bg-background text-muted-foreground cursor-pointer rounded p-1 transition-colors" title="오늘로 돌아가기">
@@ -133,6 +149,7 @@ export default function SmallCalendar() {
         onChange={(value) => handleDateChange(value as Date)}
         value={selectedDate || new Date()}
         activeStartDate={activeStartDate}
+        calendarType="gregory"
         onActiveStartDateChange={({ activeStartDate }) => activeStartDate && setActiveStartDate(activeStartDate)}
         locale="ko-KR"
         formatDay={(locale, date) => String(date.getDate())}
