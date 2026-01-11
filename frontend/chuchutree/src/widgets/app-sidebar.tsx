@@ -16,6 +16,8 @@ import { TargetCode } from '@/shared/constants/tagSystem';
 import { useModal } from '@/lib/providers/modal-provider';
 import { toast } from 'sonner';
 import { useLogout } from '@/entities/auth';
+import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 const ICON_SIZE = 32;
 
@@ -76,30 +78,35 @@ export function AppSidebar() {
       action: () => toggleTopSection('tierbar'),
       icon: Gem,
       isActive: topSection === 'tierbar',
+      tooltipText: '내 티어',
     },
     {
       title: '스트릭',
       action: () => toggleTopSection('streak'),
       icon: Leaf,
       isActive: topSection === 'streak',
+      tooltipText: '1년간 문제 풀이 기록',
     },
     {
       title: '캘린더',
       action: () => setCenterSection('calendar'),
       icon: Calendar,
       isActive: centerSection === 'calendar',
+      tooltipText: '문제 풀이 일정 관리',
     },
     {
       title: '유형별 숙련도',
       action: () => setCenterSection('dashboard'),
       icon: LibraryBig,
       isActive: centerSection === 'dashboard',
+      tooltipText: '유형별 실력 현황',
     },
     {
       title: '오늘의 문제',
       action: () => toggleBottomSection(),
       icon: Dices,
       isActive: bottomSection === 'recommend',
+      tooltipText: '사용자 맞춤 문제 추천',
     },
   ];
 
@@ -126,9 +133,11 @@ export function AppSidebar() {
                 <h1 className={`text-md ml-9 font-bold ${sidebarOpenState !== 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>ChuChuTree</h1>
               </div>
               {/* 사이드 바 토글 (header) */}
-              <SidebarGroupAction title="메뉴 접기">
-                <PanelLeft onClick={setSidebarOpenState} size={ICON_SIZE} className={`cursor-pointer`} /> <span className="sr-only">Toggle Sidebar OpenState</span>
-              </SidebarGroupAction>
+              <AppTooltip content="사이드바 닫기" side="right">
+                <SidebarGroupAction aria-label="사이드바 닫기">
+                  <PanelLeft onClick={setSidebarOpenState} size={ICON_SIZE} className={`cursor-pointer`} /> <span className="sr-only">Toggle Sidebar OpenState</span>
+                </SidebarGroupAction>
+              </AppTooltip>
             </header>
             {/* link list */}
             <SidebarGroupContent>
@@ -136,22 +145,30 @@ export function AppSidebar() {
                 {/* 사이드바 토글버튼 (inside) */}
                 <div className={`transition-all duration-200 ease-in-out ${sidebarOpenState === 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>
                   <SidebarMenuItem key="toggleSidebarOpenState">
-                    <SidebarMenuButton asChild>
-                      <div>
-                        <PanelLeft onClick={setSidebarOpenState} size={ICON_SIZE} className="cursor-pointer" /> <span className="sr-only">Toggle Sidebar OpenState in Sidebar</span>
-                      </div>
-                    </SidebarMenuButton>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <SidebarMenuButton asChild>
+                          <PanelLeft onClick={setSidebarOpenState} size={ICON_SIZE} className="cursor-pointer" />
+                        </SidebarMenuButton>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">사이드바 열기</TooltipContent>
+                    </Tooltip>
                   </SidebarMenuItem>
                 </div>
                 {/* 나머지 link */}
                 {items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={item.isActive}>
-                      <div onClick={item.action} className="cursor-pointer">
-                        <item.icon size={ICON_SIZE} />
-                        <span>{item.title}</span>
-                      </div>
-                    </SidebarMenuButton>
+                  <SidebarMenuItem key={item.title} aria-label={item.tooltipText}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <SidebarMenuButton asChild isActive={item.isActive}>
+                          <div onClick={item.action} className="cursor-pointer">
+                            <item.icon size={ICON_SIZE} />
+                            <span>{item.title}</span>
+                          </div>
+                        </SidebarMenuButton>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">{item.tooltipText}</TooltipContent>
+                    </Tooltip>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>

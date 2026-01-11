@@ -73,7 +73,7 @@ export default function TagCardProgressBar({ tag }: { tag: CategoryTags }) {
     );
   } else {
     return (
-      <div className="flex min-h-18 flex-1 items-center justify-center rounded border-2 border-dashed p-2">
+      <div className="flex min-h-18 flex-1 items-center justify-center rounded border-2 border-dashed p-2" aria-label={`현재 ${accountStat.currentLevel}, 다음 레벨 ${nextLevelStat.nextLevel}까지 진행률 ${Math.round(currentPeekRatio)}%`}>
         <div className="bg-innerground-darkgray relative h-2 w-full rounded-sm">
           {/* 현재 레벨 라벨 */}
           <div className={`${currentLevelColors.bg} ${currentLevelColors.text} absolute -top-6 -translate-x-1/2 rounded px-4 text-xs`} style={{ left: `calc(${currentBoxRatio}% )` }}>

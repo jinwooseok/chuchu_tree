@@ -11,6 +11,7 @@ import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, v
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, X, Search } from 'lucide-react';
 import { toast } from 'sonner';
+import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 
 // 클라이언트 전용 렌더링 (hydration mismatch 방지)
 const SmallCalendar = dynamic(() => import('@/features/calendar/ui/SmallCalendar'), {
@@ -46,9 +47,11 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
   return (
     <div ref={setNodeRef} style={style} className="bg-background relative flex items-center rounded-md px-1 py-2 text-xs">
       {/* 드래그 핸들 */}
-      <button {...attributes} {...listeners} className="text-muted-foreground hover:text-foreground mr-1 cursor-grab active:cursor-grabbing">
-        <GripVertical className="h-4 w-4" />
-      </button>
+      <AppTooltip content="문제 순서 변경" side="right">
+        <button {...attributes} {...listeners} className="text-muted-foreground hover:text-foreground mr-1 cursor-grab active:cursor-grabbing" aria-label="문제 순서 변경">
+          <GripVertical className="h-4 w-4" />
+        </button>
+      </AppTooltip>
 
       {/* 문제 기본정보 */}
       <div className="mr-2 flex shrink-0 flex-col gap-1 text-center">
@@ -65,9 +68,11 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
 
       {/* 삭제 버튼 (willSolve만) */}
       {!isSolved && onDelete && (
-        <button onClick={onDelete} className="text-muted-foreground hover:text-destructive absolute top-0 right-0 shrink-0 rounded p-1 transition-colors" title="삭제하기">
-          <X className="h-4 w-4" />
-        </button>
+        <AppTooltip content="문제 삭제" side="left">
+          <button onClick={onDelete} className="text-muted-foreground hover:text-destructive absolute top-0 right-0 shrink-0 rounded p-1 transition-colors" aria-label="문제 삭제">
+            <X className="h-4 w-4" />
+          </button>
+        </AppTooltip>
       )}
     </div>
   );
@@ -286,7 +291,7 @@ export default function CalendarSidebar() {
           <div className="my-4 flex flex-col gap-2">
             {/* 검색창 */}
             <div className="relative">
-              <Search className="text-muted-foreground absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2" />
+              <Search className="text-muted-foreground absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2" aria-label="문제 검색" />
               <input
                 type="text"
                 value={searchKeyword}

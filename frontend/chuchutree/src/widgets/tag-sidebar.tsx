@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { useTagDashboardSidebarStore, useTagDashboardStore, SortBy } from '@/lib/store/tagDashboard';
 import { CategoryName } from '@/shared/constants/tagSystem';
 import { getLevelColorClasses } from '@/features/tag-dashboard/lib/utils';
+import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 
 export default function TagSidebar() {
   const { searchQuery, sortBy, selectedTagId, setSearchQuery, setSortBy, setSelectedTagId } = useTagDashboardSidebarStore();
@@ -20,6 +21,14 @@ export default function TagSidebar() {
     LOCKED: false,
     EXCLUDED: false,
   });
+
+  const categoryTooltip = {
+    INTERMEDIATE: '취약한 유형',
+    ADVANCED: '익숙한 유형',
+    MASTER: '충분히 숙련된 유형',
+    EXCLUDED: '문제 추천 제외된 유형',
+    LOCKED: '추천 조건 미달 유형',
+  };
 
   // 카테고리 토글
   const toggleCategory = (categoryName: CategoryName) => {
@@ -78,13 +87,15 @@ export default function TagSidebar() {
 
           return (
             <Collapsible key={category.categoryName} open={isOpen} onOpenChange={() => toggleCategory(category.categoryName)}>
-              <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md p-2 hover:bg-gray-100">
-                <div className="flex items-center gap-2">
-                  {isOpen ? <ChevronDown className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
-                  <span className={`${levelColors.bg} ${levelColors.text} rounded px-2 py-0.5 text-xs font-semibold`}>{category.categoryName}</span>
-                  <span className="text-muted-foreground text-xs">({category.tags.length})</span>
-                </div>
-              </CollapsibleTrigger>
+              <AppTooltip content={categoryTooltip[category.categoryName]} side="right">
+                <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md p-2 hover:bg-gray-100" aria-label={isOpen ? '섹션 접기' : '섹션 펼치기'}>
+                  <div className="flex items-center gap-2">
+                    {isOpen ? <ChevronDown className="h-4 w-4" aria-hidden="true" /> : <ChevronRight className="h-4 w-4" aria-hidden="true" />}
+                    <span className={`${levelColors.bg} ${levelColors.text} rounded px-2 py-0.5 text-xs font-semibold`}>{category.categoryName}</span>
+                    <span className="text-muted-foreground text-xs">({category.tags.length})</span>
+                  </div>
+                </CollapsibleTrigger>
+              </AppTooltip>
 
               <CollapsibleContent className="mt-1 flex flex-col gap-1 pl-6">
                 {category.tags.map((tag) => (

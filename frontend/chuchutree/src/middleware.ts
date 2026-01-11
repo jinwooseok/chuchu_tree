@@ -6,6 +6,8 @@ const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_A
 // 인증이 필요한 경로
 const protectedPaths = ['/', '/bj-account'];
 
+const isDev = process.env.NODE_ENV === 'development';
+
 // 인증된 사용자가 접근하면 안되는 경로
 const authPaths = ['/sign-in'];
 
@@ -105,7 +107,10 @@ export async function middleware(request: NextRequest) {
       return response;
     } catch (error) {
       console.error('[Middleware] Error during token validation:', error);
-
+      if (isDev) {
+        // dev에서는 그냥 통과 or 유지
+        return NextResponse.next();
+      }
       // 네트워크 에러 등 - 쿠키 삭제 후 로그인 페이지로
       const response = NextResponse.redirect(new URL('/sign-in', request.url));
       response.cookies.delete('access_token');

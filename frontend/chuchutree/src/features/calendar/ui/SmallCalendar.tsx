@@ -8,6 +8,7 @@ import { useCalendar } from '@/entities/calendar';
 import { isSameDay, isSameMonth, format } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import { ChevronUp, ChevronDown, Undo2 } from 'lucide-react';
+import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 
 interface MonthlyData {
   targetDate: string;
@@ -131,17 +132,23 @@ export default function SmallCalendar() {
         {/* 네비게이션 버튼 */}
         <div className="flex items-center gap-1">
           {/* 오늘로 이동 */}
-          <button onClick={handleToday} className="hover:bg-background text-muted-foreground cursor-pointer rounded p-1 transition-colors" title="오늘로 돌아가기">
-            <Undo2 className="h-4 w-4" />
-          </button>
+          <AppTooltip content="오늘로 돌아가기" side="bottom">
+            <button onClick={handleToday} className="hover:bg-background text-muted-foreground cursor-pointer rounded p-1 transition-colors" aria-label="오늘로 돌아가기">
+              <Undo2 className="h-4 w-4" />
+            </button>
+          </AppTooltip>
           {/* 이전달 */}
-          <button onClick={handlePrevMonth} className="hover:bg-background text-muted-foreground cursor-pointer rounded p-1 transition-colors" title="지난달로 이동">
-            <ChevronUp className="h-4 w-4" />
-          </button>
+          <AppTooltip content="지난달로 이동" side="bottom">
+            <button onClick={handlePrevMonth} className="hover:bg-background text-muted-foreground cursor-pointer rounded p-1 transition-colors" aria-label="지난달로 이동">
+              <ChevronUp className="h-4 w-4" />
+            </button>
+          </AppTooltip>
           {/* 다음달 */}
-          <button onClick={handleNextMonth} className="hover:bg-background text-muted-foreground cursor-pointer rounded p-1 transition-colors" title="다음 달로 이동">
-            <ChevronDown className="h-4 w-4" />
-          </button>
+          <AppTooltip content="다음 달로 이동" side="bottom">
+            <button onClick={handleNextMonth} className="hover:bg-background text-muted-foreground cursor-pointer rounded p-1 transition-colors" aria-label="다음 달로 이동">
+              <ChevronDown className="h-4 w-4" />
+            </button>
+          </AppTooltip>
         </div>
       </div>
 
