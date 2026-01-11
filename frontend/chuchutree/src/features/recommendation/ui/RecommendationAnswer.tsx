@@ -109,7 +109,10 @@ export function RecommendationAnswer() {
   // 테스트시 주석처리
   if (problems.length === 0) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-2">
+      <div
+        className="ml-2 flex h-full flex-1 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-2"
+        aria-label="추천 결과 영역(추천결과가 없습니다. 추천받기 버튼을 눌러주세요)"
+      >
         <div className="text-muted-foreground text-sm">추천받기 버튼을 눌러주세요</div>
       </div>
     );

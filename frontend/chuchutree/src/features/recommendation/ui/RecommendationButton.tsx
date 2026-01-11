@@ -9,6 +9,7 @@ import { EyeOff, Search, SlidersHorizontal, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
+import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 
 export function RecommendationButton() {
   const { selectedDate } = useCalendarStore();
@@ -50,36 +51,24 @@ export function RecommendationButton() {
     setError(null);
 
     // 배열을 JSON 문자열로 변환 (level은 대문자로)
-    const levelParam = selectedLevels.length === 0
-      ? '[]'
-      : JSON.stringify(selectedLevels.map(l => l.toUpperCase()));
+    const levelParam = selectedLevels.length === 0 ? '[]' : JSON.stringify(selectedLevels.map((l) => l.toUpperCase()));
 
-    const tagsParam = selectedTagsList.length === 0
-      ? '[]'
-      : JSON.stringify(selectedTagsList);
+    const tagsParam = selectedTagsList.length === 0 ? '[]' : JSON.stringify(selectedTagsList);
 
     handleGetRecommendation({
       level: levelParam,
-      tags: tagsParam
+      tags: tagsParam,
     });
   };
 
   // Level 토글 핸들러
   const toggleLevel = (level: string) => {
-    setSelectedLevels((prev) =>
-      prev.includes(level)
-        ? prev.filter((l) => l !== level)
-        : [...prev, level]
-    );
+    setSelectedLevels((prev) => (prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]));
   };
 
   // Tag 토글 핸들러
   const toggleTag = (tag: string) => {
-    setSelectedTagsList((prev) =>
-      prev.includes(tag)
-        ? prev.filter((t) => t !== tag)
-        : [...prev, tag]
-    );
+    setSelectedTagsList((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
   };
 
   const levels = ['easy', 'normal', 'hard', 'extreme'] as const;
@@ -105,7 +94,7 @@ export function RecommendationButton() {
 
   // Format selected date
   const formatSelectedDate = () => {
-    if (!selectedDate) return '날짜 선택 필요';
+    if (!selectedDate) return '오늘!';
     const month = selectedDate.getMonth() + 1;
     const day = selectedDate.getDate();
     return `${month}월 ${day}일`;
@@ -118,42 +107,45 @@ export function RecommendationButton() {
         <div className="flex items-center justify-between px-2 text-xs">
           <div className="text-center">{formatSelectedDate()}</div>
           <div className="flex items-center justify-center gap-2">
-            <div title="알고리즘 유형 검색" className="relative" onClick={toggleTagSection}>
-              <Search className="text-muted-foreground h-4 w-4 cursor-pointer" />
-              {hasTagChanges && <div className="bg-primary/80 absolute top-0 -right-0.5 h-2 w-2 rounded-full" />}
-            </div>
-            <div title="표시 항목" className="relative" onClick={toggleFilterSection}>
-              <EyeOff className="text-muted-foreground h-4 w-4 cursor-pointer" />
-              {hasFilterChanges && <div className="bg-primary/80 absolute top-0 -right-0.5 h-2 w-2 rounded-full" />}
-            </div>
-            <div title="난이도 선택" className="relative" onClick={toggleLevelSection}>
-              <SlidersHorizontal className="text-muted-foreground h-4 w-4 cursor-pointer" />
-              {hasLevelChanges && <div className="bg-primary/80 absolute top-0 -right-0.5 h-2 w-2 rounded-full" />}
-            </div>
+            <AppTooltip content="알고리즘 유형 선택" side="top">
+              <div aria-label="알고리즘 유형 선택창 열기" className="relative cursor-pointer" onClick={toggleTagSection}>
+                <Search className="text-muted-foreground h-4 w-4" />
+                {hasTagChanges && <div className="bg-primary/80 absolute top-0 -right-0.5 h-2 w-2 rounded-full" />}
+              </div>
+            </AppTooltip>
+            <AppTooltip content="표시 항목" side="top">
+              <div aria-label="표시 항목창 열기" className="relative cursor-pointer" onClick={toggleFilterSection}>
+                <EyeOff className="text-muted-foreground h-4 w-4" />
+                {hasFilterChanges && <div className="bg-primary/80 absolute top-0 -right-0.5 h-2 w-2 rounded-full" />}
+              </div>
+            </AppTooltip>
+            <AppTooltip content="난이도 선택" side="top">
+              <div aria-label="난이도 선택창 열기" className="relative cursor-pointer" onClick={toggleLevelSection}>
+                <SlidersHorizontal className="text-muted-foreground h-4 w-4" />
+                {hasLevelChanges && <div className="bg-primary/80 absolute top-0 -right-0.5 h-2 w-2 rounded-full" />}
+              </div>
+            </AppTooltip>
           </div>
         </div>
         {/* 추천받기 */}
-        <Button className="flex-1" onClick={handleRecommend} disabled={isPending}>
+        <Button aria-label="알고리즘 문제 추천받기" className="selcect-none flex-1 cursor-pointer" onClick={handleRecommend} disabled={isPending}>
           {isPending ? '추천 중...' : '추천 받기'}
         </Button>
         {/* 알고리즘 유형 멀티셀렉트 */}
         {showTagSection && (
           <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full justify-between text-xs">
-                {selectedTagsList.length > 0
-                  ? `${selectedTagsList.length}개 선택됨`
-                  : '알고리즘 선택'}
-                <ChevronDown className="ml-2 h-4 w-4" />
-              </Button>
-            </PopoverTrigger>
+            <AppTooltip content="선택한 알고리즘 유형만 추천됩니다." side="right">
+              <PopoverTrigger asChild>
+                <Button aria-label="알고리즘 유형 선택" variant="outline" className="w-full cursor-pointer justify-between text-xs">
+                  {selectedTagsList.length > 0 ? `${selectedTagsList.length}개 선택됨` : '알고리즘 선택'}
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+            </AppTooltip>
             <PopoverContent className="w-64 p-2">
-              <div className="space-y-2 max-h-64 overflow-y-auto">
+              <div className="max-h-64 space-y-2 overflow-y-auto">
                 {Object.entries(TAG_INFO).map(([tagKey, tagInfo]) => (
-                  <label
-                    key={tagKey}
-                    className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded p-1"
-                  >
+                  <label key={tagKey} aria-label={tagInfo.kr} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded p-1">
                     <input
                       type="checkbox"
                       checked={selectedTagsList.includes(tagKey)}
@@ -166,10 +158,7 @@ export function RecommendationButton() {
               </div>
               {selectedTagsList.length > 0 && (
                 <div className="mt-2 flex justify-end border-t pt-2">
-                  <button
-                    onClick={() => setSelectedTagsList([])}
-                    className="text-muted-foreground hover:text-foreground text-xs underline"
-                  >
+                  <button onClick={() => setSelectedTagsList([])} className="text-muted-foreground hover:text-foreground text-xs underline">
                     전체 해제
                   </button>
                 </div>
@@ -184,7 +173,7 @@ export function RecommendationButton() {
             <div className="text-muted-foreground mb-4 text-xs font-semibold">난이도 선택</div>
             <div className="space-y-5">
               {levels.map((level) => (
-                <label key={level} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded">
+                <label key={level} aria-label={level} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded">
                   <input
                     type="checkbox"
                     checked={selectedLevels.includes(level)}
@@ -197,7 +186,7 @@ export function RecommendationButton() {
             </div>
             {selectedLevels.length > 0 && (
               <div className="mt-4 mr-2 flex justify-end">
-                <button onClick={() => setSelectedLevels([])} className="text-muted-foreground hover:text-muted-foreground text-xs underline">
+                <button onClick={() => setSelectedLevels([])} aria-label="난이도 선택 초기화" className="text-muted-foreground hover:text-muted-foreground text-xs underline">
                   전체 해제
                 </button>
               </div>
@@ -210,7 +199,7 @@ export function RecommendationButton() {
             <div className="text-muted-foreground mb-4 text-xs font-semibold">표시 항목</div>
             <div className="space-y-5">
               {filters.map((filter) => (
-                <label key={filter.key} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded">
+                <label key={filter.key} aria-label={filter.label} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded">
                   <input
                     type="checkbox"
                     checked={showFilters[filter.key]}
@@ -223,7 +212,7 @@ export function RecommendationButton() {
             </div>
             {hasFilterChanges && (
               <div className="mt-4 mr-2 flex justify-end">
-                <button onClick={resetFilters} className="text-muted-foreground hover:text-foreground text-xs underline">
+                <button onClick={resetFilters} aria-label="표시 항목 초기화" className="text-muted-foreground hover:text-foreground text-xs underline">
                   초기화
                 </button>
               </div>

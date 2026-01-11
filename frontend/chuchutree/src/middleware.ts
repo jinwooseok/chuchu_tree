@@ -14,11 +14,11 @@ export async function middleware(request: NextRequest) {
   const accessToken = request.cookies.get('access_token')?.value;
   const refreshToken = request.cookies.get('refresh_token')?.value;
 
-  console.log('[Middleware]', {
-    pathname,
-    hasAccessToken: !!accessToken,
-    hasRefreshToken: !!refreshToken,
-  });
+  // console.log('[Middleware]', {
+  //   pathname,
+  //   hasAccessToken: !!accessToken,
+  //   hasRefreshToken: !!refreshToken,
+  // });
 
   // 보호된 경로에 대한 처리
   if (protectedPaths.includes(pathname)) {
@@ -30,6 +30,7 @@ export async function middleware(request: NextRequest) {
 
     // access_token이 있는 경우, 유효성 검증
     try {
+      console.log('[T@KENCHECK]');
       const verifyResponse = await fetch(`${API_URL}/api/v1/bj-accounts/me`, {
         method: 'GET',
         headers: {
@@ -55,7 +56,7 @@ export async function middleware(request: NextRequest) {
             Cookie: `refresh_token=${refreshToken}`,
           },
         });
-
+        // Refresh token 재발급 성공
         if (refreshResponse.ok) {
           console.log('[Middleware] Token refresh successful');
 
@@ -85,7 +86,6 @@ export async function middleware(request: NextRequest) {
               }
             });
           }
-
           return response;
         } else {
           console.log('[Middleware] Token refresh failed, clearing cookies');
@@ -97,7 +97,6 @@ export async function middleware(request: NextRequest) {
           return response;
         }
       }
-
       // 401이지만 refresh_token이 없거나, 다른 에러
       console.log('[Middleware] Authentication failed, clearing cookies');
       const response = NextResponse.redirect(new URL('/sign-in', request.url));
