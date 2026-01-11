@@ -140,6 +140,9 @@ class UserTagSummaryResponse(BaseModel):
     tag_code: str = Field(..., alias="tagCode")
     tag_display_name: str = Field(..., alias="tagDisplayName")
     
+    class Config:
+        populate_by_name = True
+    
     @classmethod
     def from_query(cls, query: UserTagDetailQuery) -> 'UserTagSummaryResponse':
         return cls(
@@ -186,7 +189,7 @@ class UserTagDetailResponse(BaseModel):
 class CategoryResponse(BaseModel):
     """태그 카테고리"""
     category_name: str = Field(..., alias="categoryName")
-    tags: list[UserTagDetailResponse]
+    tags: list[UserTagSummaryResponse]
 
     class Config:
         populate_by_name = True
