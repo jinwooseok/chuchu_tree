@@ -1,10 +1,12 @@
 from datetime import datetime
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 from sqlalchemy import DateTime, Integer, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 
+if TYPE_CHECKING:
+    from app.user.infra.model.user_account import UserAccountModel
 
 class ProblemBannedRecordModel(Base):
     __tablename__ = "problem_banned_record"
@@ -16,3 +18,8 @@ class ProblemBannedRecordModel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    
+    user_account: Mapped["UserAccountModel"] = relationship(
+        "UserAccountModel", 
+        back_populates="banned_problems"
+    )

@@ -122,17 +122,23 @@ class UserAccountApplicationService:
             GetUserAccountInfoQuery: 유저 계정 정보
         """
         # 유저 계정 조회
-        user_account = await self.user_account_repository.find_by_id(
+        user_account: UserAccount = await self.user_account_repository.find_by_id(
             UserAccountId(command.user_account_id)
         )
-
+        
         if not user_account:
             raise APIException(ErrorCode.INVALID_REQUEST)
-
+        
+        if user_account.targets:
+            target_info = await self.get_user_target(user_account.user_account_id.value)
+        else:
+            target_info = None
+            
+        print(target_info)
         return GetUserAccountInfoQuery(
             user_account_id=user_account.user_account_id.value,
             provider=user_account.provider.value,
-            targets=user_account.targets,
+            targets=[target_info] if target_info else [],
             profile_image=user_account.profile_image,
             registered_at=user_account.registered_at
         )
@@ -145,7 +151,7 @@ class UserAccountApplicationService:
         if user_account.targets:
             event = DomainEvent(
                 event_type="GET_TARGET_INFO_REQUESTED",
-                data=GetTargetInfoPayload(target_id=user_account.targets[0].target_id.value),
+                data=GetTargetInfoPayload(target_id=user_account._get_current_target().target_id.value),
                 result_type=GetTargetInfoResultPayload
             )
             

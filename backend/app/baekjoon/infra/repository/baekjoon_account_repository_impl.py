@@ -188,7 +188,7 @@ class BaekjoonAccountRepositoryImpl(BaekjoonAccountRepository):
                 tag_id=TagId(row.tag_id),
                 solved_problem_count=row.solved_problem_count,
                 highest_tier_id=TierId(row.highest_tier_level) if row.highest_tier_level else None,
-                last_solved_date=row.last_solved_date.date() if row.last_solved_date else None
+                last_solved_date=row.last_solved_streak_date if row.last_solved_streak_date else None
             ))
 
         return stats

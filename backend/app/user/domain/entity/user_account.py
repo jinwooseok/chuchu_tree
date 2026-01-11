@@ -116,3 +116,8 @@ class UserAccount:
             t.target_id.value == target_id.value and t.deleted_at is None
             for t in self.targets
         )
+    
+    def _get_current_target(self) -> UserTarget:
+        for t in self.targets:
+            if t.deleted_at is None:
+                return t

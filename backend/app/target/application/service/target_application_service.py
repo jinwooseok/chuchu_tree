@@ -15,6 +15,7 @@ class TargetApplicationService:
                 ):
         self.target_repository = target_repository
     
+    @event_handler("GET_TARGET_INFOS_REQUESTED")
     @transactional
     async def get_all_targets(self, target_ids: list[int] | None = None) -> list[TargetQuery]:
         if target_ids:

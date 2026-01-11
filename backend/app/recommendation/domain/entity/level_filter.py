@@ -69,7 +69,7 @@ class LevelFilter:
         if self.max_user_tier_diff is not None:
             max_value = user_tier.value + self.max_user_tier_diff
             max_tier = TierLevel(max(0, max_value))
-        
+        print(min_tier.value, max_tier.value)
         return TierRange(
             min_tier_id=TierId(min_tier.value) if min_tier else None,
             max_tier_id=TierId(max_tier.value) if max_tier else None

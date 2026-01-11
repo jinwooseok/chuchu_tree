@@ -5,13 +5,17 @@ from typing import override
 
 from sqlalchemy import and_, extract, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
+
+from app.activity.domain.entity.problem_banned_record import ProblemBannedRecord
 from app.activity.domain.entity.problem_record import ProblemRecord
 from app.activity.domain.entity.user_activity import UserActivity
 from app.activity.domain.entity.will_solve_problem import WillSolveProblem
 from app.activity.domain.repository.user_activity_repository import UserActivityRepository
 from app.activity.infra.mapper.problem_record_mapper import ProblemRecordMapper
 from app.activity.infra.mapper.will_solve_problem_mapper import WillSolveProblemMapper
+from app.activity.infra.model.problem_banned_record import ProblemBannedRecordModel
 from app.activity.infra.model.problem_record import ProblemRecordModel
 from app.activity.infra.model.will_solve_problem import WillSolveProblemModel
 from app.activity.infra.mapper.tag_customization_mapper import TagCustomizationMapper
@@ -19,6 +23,7 @@ from app.activity.infra.mapper.user_activity_mapper import UserActivityMapper
 from app.activity.infra.model.tag_custom import TagCustomModel
 from app.common.domain.vo.identifiers import UserAccountId
 from app.core.database import Database
+from app.user.infra.model.user_account import UserAccountModel
 
 
 class UserActivityRepositoryImpl(UserActivityRepository):
@@ -30,6 +35,31 @@ class UserActivityRepositoryImpl(UserActivityRepository):
     @property
     def session(self) -> AsyncSession:
         return self.db.get_current_session()
+
+    @override
+    async def find_by_user_account_id(
+        self, user_account_id: UserAccountId
+    ) -> UserActivity:
+        # UserAccountModel을 기준으로 연관된 모든 활동 데이터를 한 번에 로드
+        stmt = (
+            select(UserAccountModel)
+            .options(
+                selectinload(UserAccountModel.tag_customs.and_(TagCustomModel.deleted_at.is_(None))),
+                selectinload(UserAccountModel.banned_problems.and_(ProblemBannedRecordModel.deleted_at.is_(None))),
+                selectinload(UserAccountModel.will_solve_problems.and_(WillSolveProblemModel.deleted_at.is_(None)))
+            )
+            .where(UserAccountModel.user_account_id == user_account_id.value)
+        )
+
+        result = await self.session.execute(stmt)
+        user_account_model = result.scalar_one_or_none()
+
+        # 매퍼에게 유저 계정 모델을 통째로 넘겨서 엔티티로 변환
+        return UserActivityMapper.to_entity(
+            user_account_id=user_account_model.user_account_id,
+            tag_custom_models=user_account_model.tag_customs,
+            will_solve_problem_models=user_account_model.will_solve_problems,
+            problem_banned_record_models=user_account_model.banned_problems)
 
     @override
     async def find_monthly_problem_records(

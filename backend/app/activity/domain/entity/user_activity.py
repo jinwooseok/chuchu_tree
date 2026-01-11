@@ -5,6 +5,7 @@ from app.activity.domain.entity.problem_banned_record import ProblemBannedRecord
 from app.activity.domain.entity.problem_record import ProblemRecord
 from app.activity.domain.entity.tag_customization import TagCustomization
 from app.activity.domain.entity.will_solve_problem import WillSolveProblem
+from app.common.domain.vo.collections import ProblemIdSet, TagIdSet
 from app.common.domain.vo.identifiers import ProblemId, TagId, UserAccountId, UserActivityId
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
@@ -145,3 +146,28 @@ class UserActivity:
             if problem.problem_id.value == problem_id.value:
                 problem.delete()
                 break
+            
+    @property
+    def solved_problem_ids(self) -> ProblemIdSet:
+        """해결한 문제 ID 집합 (O(1) 조회를 위해 set 사용)"""
+        ids = {p.problem_id for p in self.solved_problems if p.deleted_at is None}
+        return ProblemIdSet.from_ids(ids)
+
+    @property
+    def banned_problem_ids(self) -> ProblemIdSet:
+        """제외된 문제 ID 집합"""
+        ids = {p.problem_id for p in self.banned_problems if p.deleted_at is None}
+        return ProblemIdSet.from_ids(ids)
+
+    @property
+    def excluded_tag_ids(self) -> TagIdSet:
+        """제외된 태그 ID 집합"""
+        ids = {tc.tag_id for tc in self.tag_customizations
+               if tc.excluded and tc.deleted_at is None}
+        return TagIdSet.from_ids(ids)
+
+    @property
+    def will_solve_problem_ids(self) -> ProblemIdSet:
+        """풀 예정인 문제 ID 집합 (찜한 문제)"""
+        ids = {p.problem_id for p in self.will_solve_problems if p.deleted_at is None}
+        return ProblemIdSet.from_ids(ids)
