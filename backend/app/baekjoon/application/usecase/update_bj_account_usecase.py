@@ -38,19 +38,29 @@ class UpdateBjAccountUsecase:
     async def execute(self, user_account_id: int) -> None:
         # 1. 기존 데이터 로드
         existing_account = await self.baekjoon_account_repository.find_by_user_id(UserAccountId(user_account_id))
-        existing_problem_history_ids = await self.problem_history_repository.find_solved_ids_by_bj_account_id(existing_account.bj_account_id)
+        return self._sync_solved_ac(existing_account)
+        
+    @transactional
+    async def execute_bulk(self) -> None:
+        bj_accounts: list[BaekjoonAccount] = await self.baekjoon_account_repository.find_all()
+        print(bj_accounts)
+        for bj_account in bj_accounts:
+            await self._sync_solved_ac(bj_account)
+            
+    async def _sync_solved_ac(self, bj_account: BaekjoonAccount):
+        existing_problem_history_ids = await self.problem_history_repository.find_solved_ids_by_bj_account_id(bj_account.bj_account_id)
         
         # 2. solved.ac 데이터 수집
-        user_data = await self.solvedac_gateway.fetch_user_data_first(existing_account.bj_account_id.value)
+        user_data = await self.solvedac_gateway.fetch_user_data_first(bj_account.bj_account_id.value)
    
         if user_data is None:
             raise APIException(ErrorCode.BAEKJOON_USER_NOT_FOUND)
 
         # 3. 유저 기본 정보 및 통계 업데이트 (추가된 부분)
         # 기존 객체의 필드를 업데이트합니다.
-        existing_account.update_tier(TierId(user_data.user_info.tier))
-        existing_account.update_rating(user_data.user_info.rating)
-        existing_account.update_statistics(
+        bj_account.update_tier(TierId(user_data.user_info.tier))
+        bj_account.update_rating(user_data.user_info.rating)
+        bj_account.update_statistics(
             contribution_count=0, # API 미제공 시
             class_level=user_data.user_info.class_level,
             longest_streak=user_data.user_info.max_streak
@@ -63,7 +73,7 @@ class UpdateBjAccountUsecase:
         
         streak_data_list = [
             Streak.create(
-                bj_account_id=existing_account.bj_account_id, 
+                bj_account_id=bj_account.bj_account_id, 
                    streak_date=datetime.fromisoformat(h.timestamp.replace('Z', '+00:00')).date(),
                    solved_count=h.solved_count,
                    problem_history_id=None)
@@ -71,7 +81,7 @@ class UpdateBjAccountUsecase:
         ]
         
         date_to_streak_id: list[int] = await self.streak_repository.save_unlinked_streaks_and_get_ids(
-            bj_account_id=existing_account.bj_account_id,
+            bj_account_id=bj_account.bj_account_id,
             streaks=streak_data_list
         )
         
@@ -83,17 +93,11 @@ class UpdateBjAccountUsecase:
                 # 단, 필요하다면 history 엔티티 내부에 solved_date 필드를 두어 나중에 매칭 포인트로 활용
                 new_history_entities = [
                     ProblemHistory.create(
-                        bj_account_id=existing_account.bj_account_id,
+                        bj_account_id=bj_account.bj_account_id,
                         problem_id=ProblemId(p.problem_id),
                         streak_id=StreakId(s)
                     ) for p in new_problems
                 ]
             await self.problem_history_repository.save_all(new_history_entities)
 
-        await self.baekjoon_account_repository.update_stat(existing_account)
-        
-    @transactional
-    async def execute_bulk(self) -> None:
-        bj_account_ids: list[str] = self.baekjoon_account_repository.find_all_ids()
-        for bj_account_id in bj_account_ids:
-            self.execute(bj_account_id)
+        await self.baekjoon_account_repository.update_stat(bj_account)

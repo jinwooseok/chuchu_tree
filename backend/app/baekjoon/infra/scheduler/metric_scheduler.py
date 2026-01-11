@@ -23,7 +23,7 @@ class BjAccountUpdateScheduler:
             # 매일 6시 반에 수집 작업 스케줄링
             self.scheduler.add_job(
                 self._collect_metrics_job,
-                trigger=CronTrigger(hour=6, minute=30),
+                trigger=CronTrigger(hour=18, minute=27),
                 id='daily_metric_collection',
                 name='Daily Metrics Collection',
                 replace_existing=True,

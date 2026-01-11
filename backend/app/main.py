@@ -43,7 +43,7 @@ class AppWithContainer(FastAPI):
 async def lifespan(app: AppWithContainer):
     injection_container = Container()
     app.container = injection_container
-    app.container.init_resources()
+    await injection_container.init_resources_provider(injection_container)
     db = injection_container.database()
     database.database_instance = db
     try:
