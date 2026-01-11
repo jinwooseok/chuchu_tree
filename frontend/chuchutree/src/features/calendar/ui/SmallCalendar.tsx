@@ -41,7 +41,6 @@ export default function SmallCalendar() {
   const handleToday = () => {
     const today = new Date();
     setActiveStartDate(today);
-    setSelectedDate(today);
   };
 
   // 이전달로 이동
@@ -112,7 +111,7 @@ export default function SmallCalendar() {
         {/* 현재 월이 오늘이 포함된 월이 아닐 때만 년월 표시 */}
         {!isCurrentMonth && <div className="mt-1 text-xs font-semibold select-none">{format(activeStartDate, 'yyyy MM월', { locale: ko })}</div>}
         {isCurrentMonth && <div></div>}
-
+        {/* 네비게이션 버튼 */}
         <div className="flex items-center gap-1">
           {/* 오늘로 이동 */}
           <button onClick={handleToday} className="hover:bg-background text-muted-foreground cursor-pointer rounded p-1 transition-colors" title="오늘로 돌아가기">

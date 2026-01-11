@@ -1,7 +1,7 @@
 'use client';
 
 import { Calendar, dateFnsLocalizer, ToolbarProps, EventProps } from 'react-big-calendar';
-import { format, parse, startOfWeek, getDay, isSameDay, isToday } from 'date-fns';
+import { format, parse, startOfWeek, getDay, isSameDay, isToday, isSameMonth } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { ComponentType, useMemo, useState, useEffect } from 'react';
@@ -106,7 +106,7 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
 
 export default function BigCalendar() {
   // Zustand 스토어에서 데이터 가져오기
-  const { monthlyData, actions } = useCalendarStore();
+  const { monthlyData, selectedDate, actions } = useCalendarStore();
   const { setSelectedDate, setCalendarData } = actions;
 
   // 현재 표시 중인 월 관리 (초기값: 오늘 날짜)
@@ -122,7 +122,21 @@ export default function BigCalendar() {
     if (calendarData) {
       setCalendarData(calendarData);
     }
-  }, [calendarData, setCalendarData]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [calendarData]);
+
+  // selectedDate가 변경되면 BigCalendar도 해당 월로 이동
+  useEffect(() => {
+    if (selectedDate) {
+      setCurrentDate((prev) => {
+        // 이미 같은 월이면 업데이트하지 않음
+        if (isSameMonth(selectedDate, prev)) {
+          return prev;
+        }
+        return selectedDate;
+      });
+    }
+  }, [selectedDate]);
 
   // calendar 데이터를 react-big-calendar 이벤트로 변환
   const events = useMemo(() => {
