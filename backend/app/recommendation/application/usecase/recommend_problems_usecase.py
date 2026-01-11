@@ -25,8 +25,6 @@ from app.recommendation.domain.vo.recommendation_candidate import Recommendation
 from app.recommendation.domain.vo.tag_candidate import TagCandidate, TagCandidates, TagStatsMap
 from app.tag.domain.entity.tag import Tag
 from app.tag.domain.repository.tag_repository import TagRepository
-from app.target.domain.entity.target import Target
-from app.target.domain.repository.target_repository import TargetRepository
 from app.tier.domain.repository.tier_repository import TierRepository
 from app.user.domain.repository.user_account_repository import UserAccountRepository
 
@@ -38,7 +36,6 @@ class RecommendProblemsUsecase:
                  user_activity_repository: UserActivityRepository,
                  tag_repository: TagRepository,
                  tag_skill_repository: TagSkillRepository,
-                 target_repository: TargetRepository,
                  recommend_filter_repository: LevelFilterRepository,
                  problem_repository: ProblemRepository,
                  tier_repository: TierRepository
@@ -47,7 +44,6 @@ class RecommendProblemsUsecase:
         self.baekjoon_account_repository = baekjoon_account_repository
         self.user_activity_repository = user_activity_repository
         self.tag_repository = tag_repository
-        self.target_repository = target_repository
         self.tag_skill_repository = tag_skill_repository
         self.recommend_filter_repository = recommend_filter_repository
         self.problem_repository = problem_repository
@@ -64,12 +60,13 @@ class RecommendProblemsUsecase:
         bj_account = await self.baekjoon_account_repository.find_by_user_id(user_account_id)
         raw_tag_stats = await self.baekjoon_account_repository.get_tag_stats(bj_account.bj_account_id)
         user_activity: UserActivity = await self.user_activity_repository.find_by_user_account_id(user_account_id)
-        all_tags: list[Tag] = await self.tag_repository.find_active_tags()
+        all_tags: list[Tag] = await self.tag_repository.find_active_tags_with_relations()
         all_tag_skills = await self.tag_skill_repository.find_all_active()
 
         # 2. 데이터 구조화 (O(1) 조회를 위해)
         stats_map: TagStatsMap = TagStatsMap.from_stats(raw_tag_stats)
         excluded_tag_ids: TagIdSet = user_activity.excluded_tag_ids
+        all_tags_dict: dict[int, Tag] = {tag.tag_id.value: tag for tag in all_tags if tag.tag_id}
 
         # 3. 태그 후보 필터링 및 스코어링
         candidates_list: list[TagCandidate] = []
@@ -144,20 +141,19 @@ class RecommendProblemsUsecase:
 
             # 6-2. Tag 정보 조회
             tag_infos = []
-            targets:list[Target] = await self.target_repository.find_all_active()
             for problem_tag in candidate.problem.tags:
-                tag = await self.tag_repository.find_by_id(problem_tag.tag_id)
+                tag = all_tags_dict.get(problem_tag.tag_id.value)
                 if tag:
-                    # Tag의 Target 정보 조회
-                    tag_targets = []
-                    
-                    for target in targets:
-                        if tag.tag_id in target.required_tags:
-                            tag_targets.append(TagTargetQuery(
-                                target_id=target.target_id.value,
-                                target_code=target.code,
-                                target_display_name=target.display_name
-                            ))
+                    # tag.targets로 직접 접근 (relationship으로 이미 매핑됨)
+                    tag_targets = [
+                        TagTargetQuery(
+                            target_id=target.target_id.value,
+                            target_code=target.code,
+                            target_display_name=target.display_name
+                        )
+                        for target in tag.targets
+                        if target.target_id is not None
+                    ]
 
                     # Tag 별칭 정보
                     tag_aliases = [TagAliasQuery(alias=alias['alias']) for alias in tag.aliases]

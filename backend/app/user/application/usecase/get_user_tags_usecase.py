@@ -14,7 +14,6 @@ from app.recommendation.domain.entity.tag_skill import TagSkill
 from app.recommendation.domain.repository.tag_skill_repository import TagSkillRepository
 from app.tag.domain.entity.tag import Tag
 from app.tag.domain.repository.tag_repository import TagRepository
-from app.target.domain.repository.target_repository import TargetRepository
 from app.tier.domain.entity.tier import Tier
 from app.tier.domain.repository.tier_repository import TierRepository
 from app.user.application.command.get_user_tags_command import GetUserTagsCommand
@@ -48,13 +47,11 @@ class GetUserTagsUsecase:
         tag_repository: TagRepository,
         tag_skill_repository: TagSkillRepository,
         tier_repository: TierRepository,
-        target_repository: TargetRepository,
     ):
         self.baekjoon_account_repository = baekjoon_account_repository
         self.tag_repository = tag_repository
         self.tag_skill_repository = tag_skill_repository
         self.tier_repository = tier_repository
-        self.target_repository = target_repository
 
     @transactional
     async def execute(self, command: GetUserTagsCommand) -> UserTagsQuery:
@@ -77,9 +74,8 @@ class GetUserTagsUsecase:
 
         # 2. 모든 데이터 미리 조회
         tag_stats = await self.baekjoon_account_repository.get_tag_stats(bj_account.bj_account_id)
-        all_tags = await self.tag_repository.find_active_tags()
+        all_tags = await self.tag_repository.find_active_tags_with_relations()
         all_tag_skills = await self.tag_skill_repository.find_all_active()
-        all_targets = await self.target_repository.find_all_active()
         all_tiers = await self.tier_repository.find_all()
 
         # 3. 데이터 가공 및 매핑 생성
@@ -89,13 +85,6 @@ class GetUserTagsUsecase:
             (ts.tag_level, ts.skill_code): ts for ts in all_tag_skills
         }
         tiers_dict: dict[int, Tier] = {tier.tier_id.value: tier for tier in all_tiers if tier.tier_id}
-        
-        tag_targets_map = {}
-        for target in all_targets:
-            for target_tag in target.required_tags:
-                if target_tag.tag_id.value not in tag_targets_map:
-                    tag_targets_map[target_tag.tag_id.value] = []
-                tag_targets_map[target_tag.tag_id.value].append(target)
 
         # 4. 태그별 상세 정보 생성
         tag_details: list[UserTagDetailQuery] = []
@@ -152,15 +141,15 @@ class GetUserTagsUsecase:
             
             # Fix alias query: tag.aliases is list[str], not list[dict]
             alias_queries = [TagAliasQuery(alias=alias['alias']) for alias in tag.aliases]
-            
-            targets_for_this_tag = tag_targets_map.get(tag.tag_id.value, [])
+
+            # tag.targets로 직접 접근 (relationship으로 이미 매핑됨)
             target_queries = [
                 TargetQuery(
                     target_id=target.target_id.value,
                     target_code=target.code,
                     target_display_name=target.display_name,
                 )
-                for target in targets_for_this_tag
+                for target in tag.targets
                 if target.target_id is not None
             ]
 
@@ -202,6 +191,7 @@ class GetUserTagsUsecase:
         advanced_skill = tag_skills_dict.get((tag.level, SkillCode.AD))
         if advanced_skill and self._meets_requirements(stat, advanced_skill):
             return SkillCode.AD
+        
 
         return SkillCode.IM
 
@@ -280,14 +270,26 @@ class GetUserTagsUsecase:
     def _categorize_tags(self, tag_details: list[UserTagDetailQuery]) -> list[CategoryQuery]:
         """태그를 카테고리별로 분류"""
         categories_dict: dict[str, list[UserTagDetailQuery]] = {}
-
+ 
+        categories_dict["EXCLUDED"] = []
+        categories_dict["LOCKED"] = []
+        
         for tag in tag_details:
-            level = tag.account_stat.current_level
-            if level not in categories_dict:
-                categories_dict[level] = []
-            categories_dict[level].append(tag)
+            if tag.excluded_yn:
+                categories_dict["EXCLUDED"].append(tag)
+                continue
+            
+            if tag.locked_yn:
+                categories_dict["LOCKED"].append(tag)
+                continue
+            
+            key = tag.account_stat.current_level
+                
+            if key not in categories_dict:
+                categories_dict[key] = []    
+            categories_dict[key].append(tag)
 
         return [
-            CategoryQuery(category_name=level, tags=tags)
-            for level, tags in categories_dict.items()
+            CategoryQuery(category_name=key, tags=tags)
+            for key, tags in categories_dict.items()
         ]

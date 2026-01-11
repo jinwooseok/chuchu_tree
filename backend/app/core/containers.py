@@ -370,8 +370,7 @@ class Container(containers.DeclarativeContainer):
         baekjoon_account_repository=baekjoon_account_repository,
         tag_repository=tag_repository,
         tag_skill_repository=tag_skill_repository,
-        tier_repository=tier_repository,
-        target_repository=target_repository
+        tier_repository=tier_repository
     )
     
     recommand_problems_usecase = providers.Singleton(
@@ -380,7 +379,6 @@ class Container(containers.DeclarativeContainer):
         baekjoon_account_repository = baekjoon_account_repository,
         user_activity_repository = user_activity_repository,
         tag_repository = tag_repository,
-        target_repository = target_repository,
         tag_skill_repository = tag_skill_repository,
         recommend_filter_repository = recommand_filter_repository,
         problem_repository = problem_repository,

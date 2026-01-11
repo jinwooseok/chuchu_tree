@@ -1,12 +1,13 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional, List
-from sqlalchemy import String, DateTime, Integer, ForeignKey, Boolean, JSON, UniqueConstraint
+from sqlalchemy import String, DateTime, Integer, ForeignKey, Boolean, JSON, UniqueConstraint, and_
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 
 if TYPE_CHECKING:
     from app.tag.infra.model.tag_relation import TagRelationModel
+    from app.target.infra.model.target import TargetModel
 
 class TagModel(Base):
     __tablename__ = "tag"
@@ -42,4 +43,13 @@ class TagModel(Base):
         foreign_keys="[TagRelationModel.sub_tag_id]",
         cascade="all, delete-orphan",
         passive_deletes=True,
+    )
+
+    targets: Mapped[List["TargetModel"]] = relationship(
+        "TargetModel",
+        secondary="target_tag",
+        primaryjoin="TagModel.tag_id == foreign(remote(target_tag.c.tag_id))",
+        secondaryjoin="and_(TargetModel.target_id == foreign(remote(target_tag.c.target_id)), remote(target_tag.c.active_yn) == True)",
+        viewonly=True,
+        lazy="select"
     )
