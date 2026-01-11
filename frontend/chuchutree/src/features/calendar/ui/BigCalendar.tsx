@@ -24,15 +24,10 @@ const localizer = dateFnsLocalizer({
   locales,
 });
 
-// 커스텀 툴바 (외부에서 onNavigate를 받음)
-interface CustomToolbarPropsWithHandler extends ToolbarProps {
-  onNavigateCustom: (action: 'PREV' | 'NEXT' | 'TODAY') => void;
-}
-
-function CustomToolbar({ date, onNavigate, onNavigateCustom }: CustomToolbarPropsWithHandler) {
+// 커스텀 툴바 - 순수 presentational component
+function CustomToolbar({ date, onNavigate }: ToolbarProps) {
   const handleClick = (action: 'PREV' | 'NEXT' | 'TODAY') => {
-    onNavigate(action); // react-big-calendar의 내부 상태 업데이트
-    onNavigateCustom(action); // 우리의 커스텀 핸들러 (API 요청)
+    onNavigate(action); // react-big-calendar의 onNavigate만 호출
   };
 
   return (
@@ -106,11 +101,22 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
 
 export default function BigCalendar() {
   // Zustand 스토어에서 데이터 가져오기
-  const { monthlyData, selectedDate, actions } = useCalendarStore();
-  const { setSelectedDate, setCalendarData } = actions;
+  const { monthlyData, selectedDate, bigCalendarDate, actions } = useCalendarStore();
+  const { setSelectedDate, setCalendarData, setBigCalendarDate } = actions;
 
-  // 현재 표시 중인 월 관리 (초기값: 오늘 날짜)
-  const [currentDate, setCurrentDate] = useState(new Date());
+  // 안정적인 초기 날짜 (한 번만 생성)
+  const [initialDate] = useState(new Date());
+
+  // 컴포넌트 마운트 시 bigCalendarDate가 null이면 초기 날짜로 설정 (한 번만 실행)
+  useEffect(() => {
+    if (!bigCalendarDate) {
+      setBigCalendarDate(initialDate);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // 마운트 시 한 번만 실행
+
+  // 현재 표시 중인 월 (store에서 관리, fallback은 initialDate)
+  const currentDate = bigCalendarDate || initialDate;
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth() + 1;
 
@@ -127,16 +133,14 @@ export default function BigCalendar() {
 
   // selectedDate가 변경되면 BigCalendar도 해당 월로 이동
   useEffect(() => {
-    if (selectedDate) {
-      setCurrentDate((prev) => {
-        // 이미 같은 월이면 업데이트하지 않음
-        if (isSameMonth(selectedDate, prev)) {
-          return prev;
-        }
-        return selectedDate;
-      });
+    if (selectedDate && bigCalendarDate) {
+      // 이미 같은 월이면 업데이트하지 않음
+      if (!isSameMonth(selectedDate, bigCalendarDate)) {
+        setBigCalendarDate(selectedDate);
+      }
     }
-  }, [selectedDate]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedDate]); // selectedDate 변경 시에만 실행!
 
   // calendar 데이터를 react-big-calendar 이벤트로 변환
   const events = useMemo(() => {
@@ -154,20 +158,9 @@ export default function BigCalendar() {
     setSelectedDate(start);
   };
 
-  // 월 네비게이션 핸들러
-  const handleNavigate = (action: 'PREV' | 'NEXT' | 'TODAY') => {
-    const newDate = new Date(currentDate);
-
-    if (action === 'PREV') {
-      newDate.setMonth(newDate.getMonth() - 1);
-    } else if (action === 'NEXT') {
-      newDate.setMonth(newDate.getMonth() + 1);
-    } else if (action === 'TODAY') {
-      setCurrentDate(new Date());
-      return;
-    }
-
-    setCurrentDate(newDate);
+  // 네비게이션 핸들러 - single source of truth
+  const handleBigCalendarNavigate = (newDate: Date) => {
+    setBigCalendarDate(newDate);
   };
 
   return (
@@ -182,11 +175,11 @@ export default function BigCalendar() {
         views={['month']}
         defaultView="month"
         date={currentDate}
-        onNavigate={(newDate) => setCurrentDate(newDate)}
+        onNavigate={handleBigCalendarNavigate}
         selectable
         onSelectSlot={handleSelectSlot}
         components={{
-          toolbar: ((props: ToolbarProps) => <CustomToolbar {...props} onNavigateCustom={handleNavigate} />) as ComponentType<ToolbarProps>,
+          toolbar: CustomToolbar as ComponentType<ToolbarProps>,
           month: {
             dateHeader: CustomMonthDateHeaderWrapper as ComponentType<any>,
           },
