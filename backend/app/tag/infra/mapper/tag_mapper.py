@@ -1,4 +1,5 @@
 """Tag Mapper"""
+from sqlalchemy import inspect
 from app.common.domain.enums import ExcludedReason, TagLevel
 from app.common.domain.vo.identifiers import TagId, TierId
 from app.common.domain.vo.primitives import TierRange
@@ -60,15 +61,23 @@ class TagMapper:
             if isinstance(model.aliases, list):
                 aliases = [item for item in model.aliases]
         
-        parent_tag_relations = [
-            TagRelationMapper.to_entity(parent_model)
-            for parent_model in model.parent_tag_relations
-        ] if hasattr(model, 'parent_tag_relations') and model.parent_tag_relations else []
+        ins = inspect(model)
 
+        # 1. parent_tag_relations 처리
+        parent_tag_relations = []
+        # 'unloaded' 목록에 없다는 것은 이미 DB에서 가져왔다는 뜻입니다.
+        if "parent_tag_relations" not in ins.unloaded:
+            if model.parent_tag_relations:
+                parent_tag_relations = [
+                    TagRelationMapper.to_entity(m) for m in model.parent_tag_relations
+                ]
+
+        # 2. targets 처리
         targets = []
-        if hasattr(model, 'targets') and model.targets:
-            targets = [TargetMapper.to_entity(t) for t in model.targets]
-
+        if "targets" not in ins.unloaded:
+            if model.targets:
+                targets = [TargetMapper.to_entity(m) for m in model.targets]
+        
         return Tag(
             tag_id=TagId(model.tag_id) if model.tag_id else None,
             code=model.tag_code,

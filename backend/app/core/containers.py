@@ -393,12 +393,12 @@ class Container(containers.DeclarativeContainer):
         update_bj_account_use_case=update_bj_account_usecase
     )
 
-    def init_resources(self):
+    async def init_resources(self):
         """앱 시작 시점에 싱글톤 객체들을 미리 생성"""
         # 1. 인프라 클라이언트 (Redis, Storage 등)
-        self.redis_client()
         self.storage_client()
-
+        redis = self.redis_client()
+        await redis._initialize_client()
         # 2. 이벤트 핸들러가 등록되어야 하는 서비스들
         self.auth_application_service()
         self.user_account_application_service()
@@ -411,5 +411,6 @@ class Container(containers.DeclarativeContainer):
         # 3. 스케줄러 시작 (추가)
         scheduler = self.bj_account_update_scheduler()
         scheduler.start()
-        
+        return self
     
+    init_resources_provider = providers.Callable(init_resources)

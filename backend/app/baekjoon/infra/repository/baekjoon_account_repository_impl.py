@@ -139,21 +139,19 @@ class BaekjoonAccountRepositoryImpl(BaekjoonAccountRepository):
         return (bj_account, linked_at)
     
     @override
-    async def find_all_ids(self) -> list[str]:
-        """모든 id 조회"""
+    async def find_all(self) -> list[BaekjoonAccount]:
+        """모든 id 조회 (최적화 버전)"""
         stmt = (
             select(BjAccountModel)
-            .where(
-                and_(
-                    BjAccountModel.deleted_at.is_(None)
-                )
-            )
+            .where(BjAccountModel.deleted_at.is_(None))
         )
 
         result = await self.session.execute(stmt)
-        models = result.unique().scalars().fetchall()
+        
+        models = result.scalars().all()
 
-        return [model.bj_account_id for model in models]
+        # 3. Mapper를 사용하여 Model 리스트를 Entity 리스트로 변환
+        return [BaekjoonAccountMapper.to_entity(model) for model in models]
 
     @override
     async def get_tag_stats(self, account_id: BaekjoonAccountId) -> list[TagAccountStat]:

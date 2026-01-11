@@ -25,7 +25,7 @@ class BaekjoonAccountRepository(ABC):
         pass
     
     @abstractmethod
-    async def find_all_ids(self) -> list[str]:
+    async def find_all(self) -> list[str]:
         pass
 
     @abstractmethod
