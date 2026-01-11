@@ -3,7 +3,7 @@ from typing import override
 
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import joinedload, selectinload
 
 from app.common.domain.enums import TagLevel
 from app.common.domain.vo.identifiers import TagId
@@ -146,4 +146,25 @@ class TagRepositoryImpl(TagRepository):
         )
         result = await self.session.execute(stmt)
         models = result.unique().scalars().fetchall()
+        return [TagMapper.to_entity(model) for model in models]
+
+    @override
+    async def find_active_tags_with_relations(self) -> list[Tag]:
+        """활성 태그를 선수 태그 관계 및 연관 목표와 함께 조회"""
+        stmt = (
+            select(TagModel)
+            .options(
+                selectinload(TagModel.parent_tag_relations),
+                selectinload(TagModel.targets)
+            )
+            .where(
+                and_(
+                    TagModel.excluded_yn == False,
+                    TagModel.deleted_at.is_(None)
+                )
+            )
+            .order_by(TagModel.tag_id.asc())
+        )
+        result = await self.session.execute(stmt)
+        models = result.scalars().unique().all()
         return [TagMapper.to_entity(model) for model in models]

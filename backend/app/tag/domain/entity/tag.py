@@ -1,11 +1,15 @@
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import TYPE_CHECKING
 
 from app.common.domain.enums import ExcludedReason, TagLevel
 from app.common.domain.vo.identifiers import TagId, TierId
 from app.tag.domain.entity.tag_relation import TagRelation
 from app.tag.domain.vo.tag_exclusion import TagExclusion
 from app.common.domain.vo.primitives import TierRange
+
+if TYPE_CHECKING:
+    from app.target.domain.entity.target import Target
 
 @dataclass
 class Tag:
@@ -23,6 +27,7 @@ class Tag:
     updated_at: datetime
     deleted_at: datetime|None = None
     parent_tag_relations: list[TagRelation] = field(default_factory=list)
+    targets: list['Target'] = field(default_factory=list)
     
     @staticmethod
     def create(

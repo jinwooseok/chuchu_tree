@@ -164,7 +164,6 @@ class BaekjoonAccountRepositoryImpl(BaekjoonAccountRepository):
                 ProblemTagModel.tag_id,
                 func.count(func.distinct(ProblemHistoryModel.problem_id)).label('solved_problem_count'),
                 func.max(ProblemModel.problem_tier_level).label('highest_tier_level'),
-                # created_at 대신 streak_date의 최대값을 구합니다.
                 func.max(StreakModel.streak_date).label('last_solved_streak_date')
             )
             .select_from(ProblemHistoryModel)
@@ -173,7 +172,7 @@ class BaekjoonAccountRepositoryImpl(BaekjoonAccountRepository):
             # 문제 난이도 정보 조인
             .join(ProblemModel, ProblemHistoryModel.problem_id == ProblemModel.problem_id)
             # 스트릭 날짜 정보를 가져오기 위해 StreakModel 조인
-            .join(StreakModel, ProblemHistoryModel.streak_id == StreakModel.streak_id) 
+            .join(StreakModel, ProblemHistoryModel.streak_id == StreakModel.streak_id, isouter=True) 
             .where(ProblemHistoryModel.bj_account_id == account_id.value)
             .group_by(ProblemTagModel.tag_id)
         )

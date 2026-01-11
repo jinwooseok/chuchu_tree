@@ -7,6 +7,7 @@ from app.tag.domain.entity.tag_relation import TagRelation
 from app.tag.domain.vo.tag_exclusion import TagExclusion
 from app.tag.infra.model.tag import TagModel
 from app.tag.infra.model.tag_relation import TagRelationModel
+from app.target.infra.mapper.target_mapper import TargetMapper
 
 
 class TagRelationMapper:
@@ -64,6 +65,9 @@ class TagMapper:
             for parent_model in model.parent_tag_relations
         ] if hasattr(model, 'parent_tag_relations') and model.parent_tag_relations else []
 
+        targets = []
+        if hasattr(model, 'targets') and model.targets:
+            targets = [TargetMapper.to_entity(t) for t in model.targets]
 
         return Tag(
             tag_id=TagId(model.tag_id) if model.tag_id else None,
@@ -78,7 +82,8 @@ class TagMapper:
             created_at=model.created_at,
             updated_at=model.updated_at,
             deleted_at=model.deleted_at,
-            parent_tag_relations=parent_tag_relations
+            parent_tag_relations=parent_tag_relations,
+            targets=targets
         )
 
     @staticmethod

@@ -36,5 +36,17 @@ class TagRepository(ABC):
     @abstractmethod
     async def find_active_tags(self) -> list[Tag]:
         pass
-    
-    
+
+    @abstractmethod
+    async def find_active_tags_with_relations(self) -> list[Tag]:
+        """
+        활성 태그를 선수 태그 관계 및 연관 목표와 함께 조회
+
+        Eager loading:
+        - parent_tag_relations (선수 태그)
+        - targets (연관 목표)
+
+        Returns:
+            Tag 리스트 (parent_tag_relations, targets 포함)
+        """
+        pass
