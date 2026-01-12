@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import temp from '@/entities/recommendation/mockdata/mock_recommendation.json';
 import { Trash2, CheckCircle } from 'lucide-react';
 import { useBanProblem } from '@/entities/recommendation';
+import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 
 // Date to YYYY-MM-DD format
 const formatDateString = (date: Date): string => {
@@ -107,16 +108,19 @@ export function RecommendationAnswer() {
   }
 
   // 테스트시 주석처리
-  if (problems.length === 0) {
-    return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-2">
-        <div className="text-muted-foreground text-sm">추천받기 버튼을 눌러주세요</div>
-      </div>
-    );
-  }
+  // if (problems.length === 0) {
+  //   return (
+  //     <div
+  //       className="ml-2 flex h-full flex-1 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-2"
+  //       aria-label="추천 결과 영역(추천결과가 없습니다. 추천받기 버튼을 눌러주세요)"
+  //     >
+  //       <div className="text-muted-foreground text-sm">추천받기 버튼을 눌러주세요</div>
+  //     </div>
+  //   );
+  // }
   return (
     <div className="flex h-full flex-col gap-2 rounded-lg border-2 border-dashed p-2">
-      {problems.map((problem) => {
+      {/* {problems.map((problem) => {
         const isRegistered = isProblemRegistered(problem.problemId);
         return (
           <div key={problem.problemId} className="flex flex-1">
@@ -136,7 +140,6 @@ export function RecommendationAnswer() {
             </Button>
             <div className="bg-background text-foreground hover:bg-innerground-darkgray/70 flex h-full flex-1 items-center justify-between rounded-l-none rounded-r-lg px-2 text-xs">
               <div className="flex items-center gap-2">
-                {/* left */}
                 {showFilters.problemTier && !showFilters.problemNumber && (
                   <div className="flex min-w-4 items-center gap-1">
                     <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
@@ -153,19 +156,39 @@ export function RecommendationAnswer() {
                     <p>#{problem.problemId}</p>
                   </div>
                 )}
-                {/* 제목 */}
+
                 <p className="line-clamp-2">{problem.problemTitle}</p>
               </div>
-              {/* right */}
+
               {!showFilters.algorithm && !showFilters.recommendReason ? (
                 <div className="flex min-w-6 flex-col items-end">
-                  <Trash2 className="text-muted-foreground hover:text-excluded-bg h-4 w-4 cursor-pointer" onClick={() => handleBanProblem(problem.problemId, problem.problemTierName)} />
+                  <AppTooltip content="문제 추천에서 제외" side="left">
+                    <div
+                      aria-label="문제 추천에서 제외"
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => handleBanProblem(problem.problemId, problem.problemTierName)}
+                      onKeyDown={(e) => e.key === 'Enter' && handleBanProblem(problem.problemId, problem.problemTierName)}
+                    >
+                      <Trash2 className="text-muted-foreground hover:text-excluded-bg h-4 w-4 cursor-pointer" />
+                    </div>
+                  </AppTooltip>
                 </div>
               ) : (
                 <div className="flex min-w-30 flex-col items-end">
                   <div className="flex items-center justify-center gap-1">
                     {showFilters.algorithm && problem.tags.length > 0 && <p className="line-clamp-1">{problem.tags[0].tagDisplayName}</p>}
-                    <Trash2 className="text-muted-foreground hover:text-excluded-bg h-4 w-4 cursor-pointer" onClick={() => handleBanProblem(problem.problemId, problem.problemTierName)} />
+                    <AppTooltip content="문제 추천에서 제외" side="left">
+                      <div
+                        aria-label="문제 추천에서 제외"
+                        role="button"
+                        tabIndex={0}
+                        onClick={() => handleBanProblem(problem.problemId, problem.problemTierName)}
+                        onKeyDown={(e) => e.key === 'Enter' && handleBanProblem(problem.problemId, problem.problemTierName)}
+                      >
+                        <Trash2 className="text-muted-foreground hover:text-excluded-bg h-4 w-4 cursor-pointer" />
+                      </div>
+                    </AppTooltip>
                   </div>
                   {showFilters.recommendReason && problem.recommandReasons.length > 0 && <p className="text-muted-foreground line-clamp-1">{problem.recommandReasons[0].reason}</p>}
                 </div>
@@ -173,9 +196,9 @@ export function RecommendationAnswer() {
             </div>
           </div>
         );
-      })}
+      })} */}
       {/* mock data 테스트 전용  */}
-      {/* {problems.length === 0 ? (
+      {problems.length === 0 ? (
         <>
           {temp.data.problems.map((problem) => {
             const isRegistered = isProblemRegistered(problem.problemId);
@@ -291,7 +314,7 @@ export function RecommendationAnswer() {
             );
           })}
         </>
-      )} */}
+      )}
     </div>
   );
 }

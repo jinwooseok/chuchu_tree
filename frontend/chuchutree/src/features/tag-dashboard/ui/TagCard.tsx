@@ -9,6 +9,8 @@ import { toast } from 'sonner';
 import { useModal } from '@/lib/providers/modal-provider';
 import { TagBanAlertDialog } from './TagBanAlertDialog';
 import TagCardProgressBar from '@/features/tag-dashboard/ui/TagCardProgressBar';
+import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
+import { TIER_INFO } from '@/shared/constants/tierSystem';
 
 export default function TagCard({ tag }: { tag: CategoryTags }) {
   const { tagCode, tagDisplayName, accountStat, nextLevelStat, excludedYn, recommendationYn } = tag;
@@ -83,13 +85,16 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
         <div className="flex h-full items-center justify-center gap-2">
           <div className={`text-muted-foreground flex flex-col gap-0.5`}>
             {/* Tag Ban */}
-            <button
-              onClick={handleTagBanClick}
-              disabled={isPending}
-              className={`hover:bg-excluded-bg hover:text-innerground-white border-innerground-darkgray rounded border px-2 text-center transition-colors disabled:cursor-not-allowed disabled:opacity-50`}
-            >
-              {recommendationYn ? '추천 포함됨' : '추천리스트 등록'}
-            </button>
+            <AppTooltip side="bottom" content={recommendationYn ? '추천 목록에서 제외' : '추천 목록에 추가'}>
+              <button
+                onClick={handleTagBanClick}
+                aria-label="추천 여부 토글버튼"
+                disabled={isPending}
+                className={`hover:bg-excluded-bg hover:text-innerground-white border-innerground-darkgray rounded border px-2 text-center transition-colors disabled:cursor-not-allowed disabled:opacity-50`}
+              >
+                {recommendationYn ? '추천 포함됨' : '추천 제외됨'}
+              </button>
+            </AppTooltip>
             {accountStat.lastSolvedDate !== null ? (
               <div className="flex gap-0.5">
                 <p>마지막 풀이</p>
@@ -115,30 +120,44 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
       {/* 게이지 */}
       <TagCardProgressBar tag={tag} />
       {/* 스탯 */}
-      <div className="flex flex-col gap-2 rounded border-2 border-dashed px-1 py-2">
+      <div className="flex cursor-default flex-col gap-2 rounded border-2 border-dashed px-1 py-2">
         <div className="flex items-center justify-between gap-4">
-          <div>풀이 수</div>
+          <AppTooltip content="다음 등급을 위한 문제 수" side="right">
+            <div>풀이 수</div>
+          </AppTooltip>
+
           <div className={`${excludedYn ? 'text-excluded-text' : isSuccessClear ? 'text-advanced-bg font-semibold' : 'text-muted-foreground'} flex items-center justify-center`}>
             <p>{accountStat.solvedProblemCount}</p>
             <p>/</p>
-            <p>{nextLevelStat.solvedProblemCount}</p>
-            <div className="ml-2">{isSuccessClear ? <CheckCircleIconSolid height={12} width={12} /> : <CheckCircleIconOutline height={12} width={12} />}</div>
+            <p>{nextLevelStat.solvedProblemCount} 문제</p>
+            <div className="ml-2" aria-label={isSuccessClear ? '풀이 수 달성' : '풀이 수 미달성'}>
+              {isSuccessClear ? <CheckCircleIconSolid height={12} width={12} aria-hidden="true" /> : <CheckCircleIconOutline height={12} width={12} aria-hidden="true" />}
+            </div>
           </div>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <div>최소 달성 티어</div>
+          <AppTooltip content="다음 등급을 위한 사용자 티어" side="right">
+            <div>최소 달성 티어</div>
+          </AppTooltip>
           <div className={`${excludedYn ? 'text-excluded-text' : isSuccessTier ? 'text-advanced-bg font-semibold' : 'text-muted-foreground'} flex items-center justify-center`}>
             <Image src={`/tiers/tier_${nextLevelStat.requiredMinTier}.svg`} alt={`Tier ${nextLevelStat.requiredMinTier}`} width={12} height={12} className="h-4 w-4" />
-            <div className="ml-2">{isSuccessTier ? <CheckCircleIconSolid height={12} width={12} /> : <CheckCircleIconOutline height={12} width={12} />}</div>
+            <div className="ml-2" aria-label={isSuccessTier ? '최소 티어 달성' : '최소 티어 미달성'}>
+              {isSuccessTier ? <CheckCircleIconSolid height={12} width={12} aria-hidden="true" /> : <CheckCircleIconOutline height={12} width={12} aria-hidden="true" />}
+            </div>
           </div>
         </div>
         <div className="flex items-center justify-between gap-4">
-          <div>최고 난이도</div>
+          <AppTooltip content="다음 등급을 위한 목표 문제 티어" side="right">
+            <div>최고 난이도</div>
+          </AppTooltip>
+
           <div className={`${excludedYn ? 'text-excluded-text' : isSuccessBest ? 'text-advanced-bg font-semibold' : 'text-muted-foreground'} flex items-center justify-center`}>
-            <p>{accountStat.higherProblemTier}</p>
+            {accountStat.higherProblemTier === null ? <p>0</p> : <p>{TIER_INFO[accountStat.higherProblemTier].short}</p>}
             <p>/</p>
-            <p>{nextLevelStat.higherProblemTier}</p>
-            <div className="ml-2">{isSuccessBest ? <CheckCircleIconSolid height={12} width={12} /> : <CheckCircleIconOutline height={12} width={12} />}</div>
+            <p>{TIER_INFO[nextLevelStat.higherProblemTier].short}</p>
+            <div className="ml-2" aria-label={isSuccessBest ? '최고 난이도 달성' : '최고 난이도 미달성'}>
+              {isSuccessBest ? <CheckCircleIconSolid height={12} width={12} aria-hidden="true" /> : <CheckCircleIconOutline height={12} width={12} aria-hidden="true" />}
+            </div>
           </div>
         </div>
       </div>

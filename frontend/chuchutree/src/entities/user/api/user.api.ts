@@ -8,6 +8,6 @@ export const userApi = {
     return data.data;
   },
   postTarget: async (data: PostTargetType): Promise<void> => {
-    await axiosInstance.post('/user-accounts/me/target', data);
+    await axiosInstance.post('/user-accounts/me/targets', data);
   },
 };

@@ -74,6 +74,7 @@ export function TargetChangeDialog({ currentTarget = 'DAILY', onClose }: TargetC
             type="button"
             onClick={onClose}
             disabled={isPostTargetPending}
+            aria-label="목표 변경 취소"
             className="border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md border px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
             취소
@@ -82,6 +83,7 @@ export function TargetChangeDialog({ currentTarget = 'DAILY', onClose }: TargetC
             type="button"
             onClick={handleTargetChange}
             disabled={isPostTargetPending}
+            aria-label="목표 변경 확인"
             className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-50"
           >
             {isPostTargetPending ? '변경 중...' : '변경하기'}

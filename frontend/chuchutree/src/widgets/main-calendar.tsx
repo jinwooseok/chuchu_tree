@@ -17,7 +17,7 @@ export default function MainCalendar() {
   return (
     <div className="bg-innerground-white relative h-full w-full p-4">
       <BigCalendar />
-      <div className="absolute right-16 bottom-16">
+      <div className="absolute right-16 bottom-16 z-10">
         <RefreshButton />
       </div>
     </div>

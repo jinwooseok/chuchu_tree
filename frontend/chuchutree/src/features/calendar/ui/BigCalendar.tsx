@@ -11,6 +11,7 @@ import { CalendarEvent, useCalendar } from '@/entities/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 
 const locales = {
   ko: ko,
@@ -39,15 +40,21 @@ function CustomToolbar({ date, onNavigate }: ToolbarProps) {
 
       {/* 우측: 네비게이션 버튼 */}
       <div className="flex gap-2">
-        <button onClick={() => handleClick('TODAY')} className="hover:bg-background rounded border px-3 py-1 text-xs" title="오늘로 이동">
-          오늘
-        </button>
-        <button onClick={() => handleClick('PREV')} className="hover:bg-background rounded px-3 py-1 text-xs" title="지난달로 이동">
-          <ChevronUp className="h-4 w-4" />
-        </button>
-        <button onClick={() => handleClick('NEXT')} className="hover:bg-background rounded px-3 py-1 text-xs" title="다음 달로 이동">
-          <ChevronDown className="h-4 w-4" />
-        </button>
+        <AppTooltip content="오늘로 이동" side="bottom">
+          <button onClick={() => handleClick('TODAY')} className="hover:bg-background rounded border px-3 py-1 text-xs" aria-label="오늘로 이동">
+            오늘
+          </button>
+        </AppTooltip>
+        <AppTooltip content="지난달로 이동" side="bottom">
+          <button onClick={() => handleClick('PREV')} className="hover:bg-background rounded px-3 py-1 text-xs" aria-label="지난달로 이동">
+            <ChevronUp className="h-4 w-4" />
+          </button>
+        </AppTooltip>
+        <AppTooltip content="다음 달로 이동" side="bottom">
+          <button onClick={() => handleClick('NEXT')} className="hover:bg-background rounded px-3 py-1 text-xs" aria-label="다음 달로 이동">
+            <ChevronDown className="h-4 w-4" />
+          </button>
+        </AppTooltip>
       </div>
     </div>
   );
