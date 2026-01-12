@@ -4,12 +4,13 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { useRecommendationStore } from '@/lib/store/recommendation';
 import { useCalendarStore } from '@/lib/store/calendar';
-import { useUpdateWillSolveProblems } from '@/entities/calendar';
+import { useCalendar, useUpdateWillSolveProblems } from '@/entities/calendar';
 import { toast } from 'sonner';
 import temp from '@/entities/recommendation/mockdata/mock_recommendation.json';
 import { Trash2, CheckCircle } from 'lucide-react';
 import { useBanProblem } from '@/entities/recommendation';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
+import { useMemo } from 'react';
 
 // Date to YYYY-MM-DD format
 const formatDateString = (date: Date): string => {
@@ -21,8 +22,19 @@ const formatDateString = (date: Date): string => {
 
 export function RecommendationAnswer() {
   const { problems, isLoading, showFilters } = useRecommendationStore();
-  const { selectedDate, getWillSolveProblemsByDate } = useCalendarStore();
+  const { selectedDate } = useCalendarStore();
+  // 현재 선택된 날짜의 년/월로 calendar 데이터 fetch
+  const year = selectedDate?.getFullYear() || new Date().getFullYear();
+  const month = (selectedDate?.getMonth() || new Date().getMonth()) + 1;
+  const { data: calendarData } = useCalendar(year, month);
   const { mutate: banProblem, isPending } = useBanProblem();
+
+  const willSolveProblems = useMemo(() => {
+    if (!calendarData || !selectedDate) return [];
+    const dateString = formatDateString(selectedDate);
+    const dayData = calendarData.monthlyData.find((d) => d.targetDate === dateString);
+    return dayData?.willSolveProblems || [];
+  }, [calendarData, selectedDate]);
 
   const updateWillSolve = useUpdateWillSolveProblems({
     onError: (error: any) => {
@@ -36,7 +48,6 @@ export function RecommendationAnswer() {
   // Check if problem is already registered
   const isProblemRegistered = (problemId: number): boolean => {
     if (!selectedDate) return false;
-    const willSolveProblems = getWillSolveProblemsByDate(selectedDate);
     return willSolveProblems.some((p) => p.problemId === problemId);
   };
 
@@ -49,8 +60,6 @@ export function RecommendationAnswer() {
       return;
     }
 
-    // Get existing will solve problems for the selected date
-    const willSolveProblems = getWillSolveProblemsByDate(selectedDate);
     const isRegistered = willSolveProblems.some((p) => p.problemId === problemId);
 
     let problemIds: number[];
@@ -108,19 +117,19 @@ export function RecommendationAnswer() {
   }
 
   // 테스트시 주석처리
-  // if (problems.length === 0) {
-  //   return (
-  //     <div
-  //       className="ml-2 flex h-full flex-1 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-2"
-  //       aria-label="추천 결과 영역(추천결과가 없습니다. 추천받기 버튼을 눌러주세요)"
-  //     >
-  //       <div className="text-muted-foreground text-sm">추천받기 버튼을 눌러주세요</div>
-  //     </div>
-  //   );
-  // }
+  if (problems.length === 0) {
+    return (
+      <div
+        className="ml-2 flex h-full flex-1 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-2"
+        aria-label="추천 결과 영역(추천결과가 없습니다. 추천받기 버튼을 눌러주세요)"
+      >
+        <div className="text-muted-foreground text-sm">추천받기 버튼을 눌러주세요</div>
+      </div>
+    );
+  }
   return (
-    <div className="flex h-full flex-col gap-2 rounded-lg border-2 border-dashed p-2">
-      {/* {problems.map((problem) => {
+    <div className="ml-1 flex h-full flex-1 flex-col gap-2 rounded-lg border-2 border-dashed p-2">
+      {problems.map((problem) => {
         const isRegistered = isProblemRegistered(problem.problemId);
         return (
           <div key={problem.problemId} className="flex flex-1">
@@ -196,9 +205,9 @@ export function RecommendationAnswer() {
             </div>
           </div>
         );
-      })} */}
+      })}
       {/* mock data 테스트 전용  */}
-      {problems.length === 0 ? (
+      {/* {problems.length === 0 ? (
         <>
           {temp.data.problems.map((problem) => {
             const isRegistered = isProblemRegistered(problem.problemId);
@@ -314,7 +323,7 @@ export function RecommendationAnswer() {
             );
           })}
         </>
-      )}
+      )} */}
     </div>
   );
 }

@@ -3,9 +3,9 @@
 import dynamic from 'next/dynamic';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
-import { Problem, useUpdateWillSolveProblems, useUpdateSolvedProblems, useSearchProblems, WillSolveProblems } from '@/entities/calendar';
+import { Problem, useUpdateWillSolveProblems, useUpdateSolvedProblems, useSearchProblems, WillSolveProblems, useCalendar } from '@/entities/calendar';
 import Image from 'next/image';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -102,10 +102,15 @@ function SearchResultCard({ problem, onClick }: { problem: WillSolveProblems; on
 }
 
 export default function CalendarSidebar() {
-  const { selectedDate, getSolvedProblemsByDate, getWillSolveProblemsByDate } = useCalendarStore();
+  const { selectedDate } = useCalendarStore();
   const [showAddInput, setShowAddInput] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [debouncedKeyword, setDebouncedKeyword] = useState('');
+
+  // 현재 선택된 날짜의 년/월로 calendar 데이터 fetch
+  const year = selectedDate?.getFullYear() || new Date().getFullYear();
+  const month = (selectedDate?.getMonth() || new Date().getMonth()) + 1;
+  const { data: calendarData } = useCalendar(year, month);
 
   const updateWillSolve = useUpdateWillSolveProblems({
     onError: (error: any) => {
@@ -129,9 +134,20 @@ export default function CalendarSidebar() {
   // 검색 API 호출
   const { data: searchResults, isLoading: isSearching } = useSearchProblems(debouncedKeyword);
 
-  // selectedDate가 null일 경우 빈 배열 반환
-  const solvedProblems = selectedDate ? getSolvedProblemsByDate(selectedDate) : [];
-  const willSolveProblems = selectedDate ? getWillSolveProblemsByDate(selectedDate) : [];
+  // selectedDate에 해당하는 문제 목록 필터링
+  const solvedProblems = useMemo(() => {
+    if (!calendarData || !selectedDate) return [];
+    const dateString = formatDateString(selectedDate);
+    const dayData = calendarData.monthlyData.find((d) => d.targetDate === dateString);
+    return dayData?.solvedProblems || [];
+  }, [calendarData, selectedDate]);
+
+  const willSolveProblems = useMemo(() => {
+    if (!calendarData || !selectedDate) return [];
+    const dateString = formatDateString(selectedDate);
+    const dayData = calendarData.monthlyData.find((d) => d.targetDate === dateString);
+    return dayData?.willSolveProblems || [];
+  }, [calendarData, selectedDate]);
 
   // 드래그 센서 설정
   const sensors = useSensors(

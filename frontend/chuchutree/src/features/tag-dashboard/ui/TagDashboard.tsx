@@ -2,18 +2,21 @@
 
 import { useMemo } from 'react';
 import TagCard from '@/features/tag-dashboard/ui/TagCard';
-import { useTagDashboardSidebarStore, useTagDashboardStore } from '@/lib/store/tagDashboard';
+import { useTagDashboardSidebarStore } from '@/lib/store/tagDashboard';
+import { useTagDashboard } from '@/entities/tag-dashboard';
 
 export default function TagDashboard() {
-  // store에서 태그 목록 가져오기
-  const { tags, isInitialized } = useTagDashboardStore();
+  // TanStack Query에서 태그 데이터 가져오기
+  const { data: tagDashboard } = useTagDashboard();
 
   // store에서 필터/정렬 상태 가져오기
   const { searchQuery, sortBy, selectedTagId } = useTagDashboardSidebarStore();
 
   // 필터링 및 정렬된 태그 목록
   const filteredAndSortedTags = useMemo(() => {
-    let result = [...tags];
+    if (!tagDashboard) return [];
+
+    let result = [...tagDashboard.tags];
 
     // 검색어 필터링
     if (searchQuery) {
@@ -44,10 +47,10 @@ export default function TagDashboard() {
     }
 
     return result;
-  }, [tags, searchQuery, sortBy, selectedTagId]);
+  }, [tagDashboard, searchQuery, sortBy, selectedTagId]);
 
   // 데이터 로딩 중
-  if (!isInitialized) {
+  if (!tagDashboard) {
     return (
       <div className="flex h-full w-full items-center justify-center">
         <p className="text-muted-foreground">로딩 중...</p>

@@ -1,5 +1,5 @@
 import { TagKey } from '@/shared/constants/tagSystem';
-import { TIER_INFO, TierKey, TierNumKey } from '@/shared/constants/tierSystem';
+import { TierKey, TierNumKey } from '@/shared/constants/tierSystem';
 
 export interface TagTargets {
   targetId: number;
@@ -28,7 +28,7 @@ export interface SolvedProblems {
   problemId: number;
   realSolvedYn: boolean;
   problemTitle: string;
-  problemTierLevel: TierNumKey
+  problemTierLevel: TierNumKey;
   problemTierName: TierKey;
   problemClassLevel: number;
   tags: Tags[];
@@ -37,7 +37,7 @@ export interface SolvedProblems {
 export interface WillSolveProblems {
   problemId: number;
   problemTitle: string;
-  problemTierLevel: TierNumKey
+  problemTierLevel: TierNumKey;
   problemTierName: TierKey;
   problemClassLevel: number;
   tags: Tags[];
