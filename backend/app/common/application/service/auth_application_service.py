@@ -29,12 +29,16 @@ class AuthApplicationService:
             cookie_service: CookieService,
             kakao_oauth_client: OAuthClient,
             naver_oauth_client: OAuthClient,
+            google_oauth_client: OAuthClient,
+            github_oauth_client: OAuthClient,
             domain_event_bus: DomainEventBus
     ):
         self.token_service = token_service
         self.cookie_service = cookie_service
         self.kakao_oauth_client = kakao_oauth_client
         self.naver_oauth_client = naver_oauth_client
+        self.google_oauth_client = google_oauth_client
+        self.github_oauth_client = github_oauth_client
         self.domain_event_bus = domain_event_bus
     
     def authenticate_user(self, token: Optional[str]) -> CurrentUser:
@@ -136,6 +140,10 @@ class AuthApplicationService:
             return self.naver_oauth_client
         elif provider == Provider.KAKAO:
             return self.kakao_oauth_client
+        elif provider == Provider.GOOGLE:
+            return self.google_oauth_client
+        elif provider == Provider.GITHUB:
+            return self.github_oauth_client
         else:
             raise APIException(ErrorCode.INVALID_PROVIDER)
         

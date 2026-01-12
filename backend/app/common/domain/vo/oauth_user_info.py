@@ -70,3 +70,52 @@ class KakaoUserInfo(OAuthUserInfo):
             nickname=profile.get("nickname"),
             profile_image_url=profile.get("profile_image_url")
         )
+
+@dataclass(frozen=True)
+class GoogleUserInfo(OAuthUserInfo):
+    """구글 사용자 정보 Value Object"""
+
+    provider: Provider = Provider.GOOGLE
+
+    @classmethod
+    def from_api_response(cls, response: dict) -> "GoogleUserInfo":
+        """
+        구글 API 응답을 GoogleUserInfo 객체로 변환
+
+        구글 응답 형식:
+        {
+            "sub": "1234567890",
+            "name": "홍길동",
+            "picture": "https://..."
+        }
+        """
+        return cls(
+            provider_id=response.get("sub", ""),
+            nickname=response.get("name"),
+            profile_image_url=response.get("picture")
+        )
+
+@dataclass(frozen=True)
+class GitHubUserInfo(OAuthUserInfo):
+    """깃허브 사용자 정보 Value Object"""
+
+    provider: Provider = Provider.GITHUB
+
+    @classmethod
+    def from_api_response(cls, response: dict) -> "GitHubUserInfo":
+        """
+        깃허브 API 응답을 GitHubUserInfo 객체로 변환
+
+        깃허브 응답 형식:
+        {
+            "id": 1234567,
+            "login": "username",
+            "name": "홍길동",
+            "avatar_url": "https://..."
+        }
+        """
+        return cls(
+            provider_id=str(response.get("id", "")),
+            nickname=response.get("name") or response.get("login"),
+            profile_image_url=response.get("avatar_url")
+        )

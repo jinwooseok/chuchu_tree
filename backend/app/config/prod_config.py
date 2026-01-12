@@ -46,4 +46,12 @@ class ProdConfig(BaseConfig):
     NAVER_CLIENT_SECRET: str = Field(alias="PROD_NAVER_CLIENT_SECRET", default="", description="네이버 클라이언트 비밀키")
     NAVER_REDIRECT_URI: str = Field(alias="PROD_NAVER_REDIRECT_URI", default="http://localhost:8000/api/auth/naver/callback", description="네이버 리다이렉트 URI")
 
+    GOOGLE_CLIENT_ID: str = Field(alias="GOOGLE_CLIENT_ID", default="", description="구글 클라이언트 아이디")
+    GOOGLE_CLIENT_SECRET: str = Field(alias="GOOGLE_CLIENT_SECRET", default="", description="구글 클라이언트 비밀키")
+    GOOGLE_REDIRECT_URI: str = Field(alias="PROD_GOOGLE_REDIRECT_URI", default="https://chuchu-tree.duckdns.org/api/v1/auth/login/google/callback", description="구글 리다이렉트 URI")
+
+    GITHUB_CLIENT_ID: str = Field(alias="PROD_GITHUB_CLIENT_ID", default="", description="깃허브 클라이언트 아이디")
+    GITHUB_CLIENT_SECRET: str = Field(alias="PROD_GITHUB_CLIENT_SECRET", default="", description="깃허브 클라이언트 비밀키")
+    GITHUB_REDIRECT_URI: str = Field(alias="PROD_GITHUB_REDIRECT_URI", default="https://chuchu-tree.duckdns.org/api/v1/auth/login/github/callback", description="깃허브 리다이렉트 URI")
+
     FRONTEND_REDIRECT_URI: str = Field(alias="PROD_FRONTEND_REDIRECT_URI", default="https://chuchu-tree.duckdns.org", description="프론트엔드 리다이렉트 URI")
