@@ -4,6 +4,7 @@ from sqlalchemy import String, DateTime, Enum as SQLEnum, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 import enum
 
+from app.common.domain.enums import Provider
 from app.core.database import Base
 
 if TYPE_CHECKING:
@@ -13,13 +14,6 @@ if TYPE_CHECKING:
     from app.activity.infra.model.tag_custom import TagCustomModel
     from app.activity.infra.model.will_solve_problem import WillSolveProblemModel
 
-class ProviderEnum(str, enum.Enum):
-    KAKAO = "KAKAO"
-    NAVER = "NAVER"
-    GOOGLE = "GOOGLE"
-    NONE = "NONE"
-
-
 class UserAccountModel(Base):
     __tablename__ = "user_account"
     __table_args__ = (
@@ -28,7 +22,7 @@ class UserAccountModel(Base):
     )
 
     user_account_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    provider: Mapped[ProviderEnum] = mapped_column(SQLEnum(ProviderEnum), nullable=False)
+    provider: Mapped[Provider] = mapped_column(SQLEnum(Provider), nullable=False)
     provider_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     profile_image: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     registered_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
