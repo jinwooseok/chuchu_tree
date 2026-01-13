@@ -57,44 +57,48 @@ class GetMonthlyProblemsUsecase:
 
         # 4. 계획된 문제(Will Solve) 중 전체 이력에서 해결 여부 확인
         # (이번 달 계획된 모든 ID를 모아서 한 번에 조회)
+        print(activity_data.daily_activities)
         all_planned_ids = {pid for daily in activity_data.daily_activities for pid in daily.will_solve_problem_ids}
         actually_solved_ids_ever = await self.problem_history_repository.find_solved_ids_in_list(
             bj_account.bj_account_id, list(all_planned_ids)
         )
-
+        print(actually_solved_ids_ever)
         # 5. 문제 상세 정보 조회 (Problem Domain)
         # 계획된 문제 + 이번 달 실제로 푼 문제들의 상세 정보 통합 요청
         all_problem_ids = all_planned_ids | set(real_solved_by_date.keys())
         problems_info = await self._fetch_problems_info(all_problem_ids)
-
+        
         # 6. 일별 데이터 조립
         monthly_data = []
         for daily in activity_data.daily_activities:
             target_date = daily.target_date
 
-            # [핵심 로직] 풀 예정 목록에서 '전체 이력 중 풀린 적 있는 문제' 제거
-            # 11월에 풀었든, 오늘 풀었든, 앞으로 풀든 히스토리에 있으면 will_solve에서 빠짐
+            # [수정] 1. 'will_solve' 목록 필터링 (순서 보존)
+            # daily.will_solve_problem_ids는 이미 order 순으로 정렬된 list입니다.
             actual_will_solve_ids = [
                 pid for pid in daily.will_solve_problem_ids 
-                if pid not in actually_solved_ids_ever
+                if pid not in actually_solved_ids_ever  # 전체 이력에 있으면 제외
             ]
 
-            # [핵심 로직] 푼 문제 목록 조립
-            # 활동 기록상 solved + '실제 이 날짜에 스트릭이 찍힌 문제'
+            # [수정] 2. 'solved' 목록 조립
+            # 여기서는 순서가 덜 중요할 수 있지만, 필요하다면 정렬 로직을 넣을 수 있습니다.
             real_solved_on_this_date = {
                 pid for pid, s_date in real_solved_by_date.items() if s_date == target_date
             }
+            # set 연산으로 중복을 제거한 뒤 최종 리스트로 만듭니다.
             all_solved_ids = set(daily.solved_problem_ids) | real_solved_on_this_date
 
-            # 결과 매핑
+            # [수정] 3. 상세 정보 매핑 (리스트 순서대로)
+            # actual_will_solve_ids 리스트가 이미 order 순이므로 결과도 order 순이 됩니다.
+            will_solve_problems = [
+                problems_info.problems[pid]
+                for pid in actual_will_solve_ids 
+                if pid in problems_info.problems
+            ]
+
             solved_problems = [
                 SolvedProblemQuery(**problems_info.problems[pid].model_dump(), real_solved_yn=True)
                 for pid in all_solved_ids if pid in problems_info.problems
-            ]
-
-            will_solve_problems = [
-                problems_info.problems[pid]
-                for pid in actual_will_solve_ids if pid in problems_info.problems
             ]
 
             monthly_data.append(MonthlyDayDataQuery(
