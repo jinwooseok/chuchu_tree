@@ -17,6 +17,7 @@ class ProblemModel(Base):
     problem_title: Mapped[str] = mapped_column(String(500), nullable=False)
     problem_tier_level: Mapped[int] = mapped_column(Integer, ForeignKey('tier.tier_id'), nullable=False)
     class_level: Mapped[Optional[int]] = mapped_column(Integer, nullable=True)
+    solved_user_count: Mapped[int] =mapped_column(Integer, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)

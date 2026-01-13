@@ -85,9 +85,15 @@ class RecommendProblemsUsecase:
             stat = stats_map.get_or_empty(tag.tag_id)
             score = self._calculate_tag_score(stat, user_activity, all_tag_skills, bj_account.current_tier_id)
             candidates_list.append(TagCandidate.create(tag, stat, score))
+        
+        # 4. 가중치 랜덤 샘플링 (다양성 확보)
+        # 점수가 높을수록 선택 확률이 높지만, 낮은 점수도 선택 가능
+        all_candidates: TagCandidates = TagCandidates.from_list(candidates_list)
 
-        # 4. 점수순 정렬
-        tag_candidates: TagCandidates = TagCandidates.from_list(candidates_list).sorted_by_score()
+        # 랜덤 샘플링으로 상위 N개 선택 (추천할 개수보다 많이 선택)
+        # 실제 추천은 3개지만, 문제를 찾지 못할 수 있으므로 여유있게 선택
+        CANDIDATE_POOL_SIZE = 10  # 상위 10개 후보 선택
+        tag_candidates: TagCandidates = all_candidates.weighted_random_sample(CANDIDATE_POOL_SIZE)
 
         # 5. 메인 추출 루프
         recommended_results: list[RecommendationCandidate] = []
@@ -103,31 +109,33 @@ class RecommendProblemsUsecase:
                 filter_code=current_filter_code,
                 all_skills=all_tag_skills
             )
-            # print(criteria)
+
             if not criteria: continue
-            tier_range, skill_rate = criteria
+            tier_range, min_skill_rate, max_skill_rate = criteria
         
             # WillSolve(찜한 문제) 우선 검색 로직 추가
             excluded_problem_ids = user_activity.solved_problem_ids | user_activity.banned_problem_ids
             problem = await self.problem_repository.find_recommended_problem(
                 tag_id=tag_candidate.tag.tag_id,
                 tier_range=tier_range,
-                skill_rate=skill_rate,
-                min_solved_count=1000,
+                min_skill_rate=min_skill_rate,
+                max_skill_rate=max_skill_rate,
+                min_solved_count=tag.min_solved_person_count,
                 exclude_ids=excluded_problem_ids,
                 priority_ids=user_activity.will_solve_problem_ids # 찜한 문제 우선순위
             )
             print("추천된 문제 :" , problem)
             if problem:
+                reasons = self._generate_reasons(
+                    tag_candidate.stat,
+                    tag_candidate.tag.tag_display_name,
+                    all_tag_skills,
+                    bj_account.current_tier_id,
+                    current_filter_code
+                )
                 recommendation = RecommendationCandidate.create(
                     problem=problem,
-                    reason=self._generate_reason(
-                        tag_candidate.stat,
-                        tag_candidate.tag.tag_display_name,
-                        all_tag_skills,
-                        bj_account.current_tier_id,
-                        current_filter_code
-                    ),
+                    reasons=reasons,
                     tag_name=tag_candidate.tag.tag_display_name
                 )
                 recommended_results.append(recommendation)
@@ -173,7 +181,10 @@ class RecommendProblemsUsecase:
                 problem_tier_level=candidate.problem.tier_level.value,
                 problem_tier_name=tier_name,
                 problem_class_level=candidate.problem.class_level if candidate.problem.class_level else 0,
-                recommend_reasons=[RecommendReasonQuery(reason=candidate.reason, additional_data=None)],
+                recommend_reasons=[
+                    RecommendReasonQuery(reason=r, additional_data=None)
+                    for r in candidate.reasons
+                ],
                 tags=tag_infos
             )
             problem_queries.append(problem_query)
@@ -193,8 +204,9 @@ class RecommendProblemsUsecase:
         if not current_skill: return None
 
         # 2. 레벨 필터 엔티티 조회
-        level_filter: LevelFilter = await self.recommend_filter_repository.find_by_code(
-            code=filter_code
+        level_filter: LevelFilter = await self.recommend_filter_repository.find_by_skill_and_code(
+            filter_code=filter_code.value,
+            tag_skill_level=current_skill.skill_code.value
         )
         
         # print("level_filter :", level_filter)
@@ -209,7 +221,7 @@ class RecommendProblemsUsecase:
             min_val = max(tier_range.min_tier_id.value if tier_range.min_tier_id else 0, highest_val + 2)
             tier_range = TierRange(min_tier_id=TierId(min_val), max_tier_id=TierId(31))
         
-        return tier_range, level_filter.tag_skill_rate
+        return tier_range, level_filter.min_tag_skill_rate, level_filter.max_tag_skill_rate
 
     def _match_tag_skill(self, tag_stat: TagAccountStat, user_tier: TierId, all_skills: list[TagSkill]) -> TagSkill | None:
         """요구사항 비교를 통한 숙련도 판별 (Entity 정책 활용)"""
@@ -225,30 +237,56 @@ class RecommendProblemsUsecase:
                 return skill
         return sorted_skills[-1] if sorted_skills else None
 
-    def _generate_reason(
+    def _generate_reasons(
         self,
         tag_stat: TagAccountStat,
         tag_name: str,
         all_tag_skills: list[TagSkill],
         user_tier: TierId,
         filter_code: FilterCode
-    ) -> str:
-        """추천 사유 생성기"""
-        # 1. 승급 임박 체크 (우선순위 높음)
+    ) -> list[str]:
+        """추천 사유 생성기 (여러 개 반환)"""
+        reasons = []
+
+        # 1. 처음 푸는 태그 체크 (solved_problem_count로 정확히 확인)
+        if tag_stat.solved_problem_count == 0:
+            reasons.append(f"새로운 '{tag_name}' 분야에 도전해보세요!")
+            return reasons  # 첫 문제는 다른 조건 의미 없음
+
+        # 2. last_solved_date가 None인 경우 (서비스 가입 전에 푼 문제들)
+        # solved_problem_count > 0인데 last_solved_date가 None
+        # → 서비스 가입 전 기록이라 날짜를 알 수 없음
+        # → 복습 주기 체크는 불가능하지만, 승급 임박은 확인 가능
+        if not tag_stat.last_solved_date:
+            # 승급 임박 체크만 수행
+            level_up_info = self._check_level_up_status(tag_stat, user_tier, all_tag_skills)
+            if level_up_info:
+                reasons.append(level_up_info)
+
+            # 승급 임박이 아니면 기본 메시지
+            if not reasons:
+                reasons.append(f"'{tag_name}' 숙련도를 높여보세요!")
+
+            return reasons
+
+        # 3. 복습 주기 체크 (날짜 정보가 있는 경우)
+        days_diff = (datetime.now().date() - tag_stat.last_solved_date).days
+
+        # 현재 숙련도를 찾아서 해당 숙련도의 추천 주기를 가져옴
+        current_skill = self._match_tag_skill(tag_stat, user_tier, all_tag_skills)
+        if current_skill and days_diff >= current_skill.recommendation_period:
+            reasons.append(f"'{tag_name}' 태그를 안 푼 지 {days_diff}일이 지났어요.")
+
+        # 4. 승급 임박 체크
         level_up_info = self._check_level_up_status(tag_stat, user_tier, all_tag_skills)
         if level_up_info:
-            return level_up_info
+            reasons.append(level_up_info)
 
-        # 2. 복습 주기 체크
-        if not tag_stat.last_solved_date:
-            return f"새로운 '{tag_name}' 분야에 도전해보세요!"
+        # 5. 기본 메시지 (사유가 없을 때만)
+        if not reasons:
+            reasons.append(f"'{tag_name}' 숙련도를 높일 시간입니다.")
 
-        days_diff = (datetime.now().date() - tag_stat.last_solved_date).days
-        if days_diff >= 7:
-            return f"'{tag_name}' 태그를 안 푼 지 {days_diff}일이 지났어요."
-
-        # 3. 기본 메시지
-        return f"'{tag_name}' 숙련도를 높일 시간입니다."
+        return reasons
 
     def _check_level_up_status(
         self,
@@ -312,11 +350,26 @@ class RecommendProblemsUsecase:
         # 1. 복습 주기 점수 (오래될수록 가중치, 최대 50점)
         if tag_stat.last_solved_date:
             days_diff = (datetime.now().date() - tag_stat.last_solved_date).days
-            # 주기(예: 7일)를 넘긴 시점부터 점수 급증
-            score += min(days_diff * 2, 50)
+
+            # 현재 숙련도를 찾아서 해당 숙련도의 추천 주기를 기준으로 점수 계산
+            current_skill = self._match_tag_skill(tag_stat, user_tier, all_tag_skills)
+            if current_skill:
+                # recommendation_period를 넘긴 시점부터 점수 급증
+                # 넘긴 일수에 비례하여 점수 추가 (최대 50점)
+                if days_diff >= current_skill.recommendation_period:
+                    excess_days = days_diff - current_skill.recommendation_period
+                    score += min(excess_days * 2 + 10, 50)  # 기본 10점 + 초과일 * 2
+            else:
+                # 숙련도를 찾을 수 없는 경우 기본 로직
+                score += min(days_diff * 2, 50)
         else:
-            # 아예 처음 푸는 태그는 높은 우선순위 부여
-            score += 40
+            # 아예 처음 푸는 태그 또는 서비스 가입 전 기록
+            if tag_stat.solved_problem_count == 0:
+                # 처음 푸는 태그는 높은 우선순위 부여
+                score += 40
+            else:
+                # 서비스 가입 전 기록은 중간 우선순위
+                score += 20
 
         # 2. 승급 임박 가중치 (다음 레벨까지 5문제 미만일 때, +30점)
         level_up_bonus = self._calculate_level_up_bonus(tag_stat, user_tier, all_tag_skills)

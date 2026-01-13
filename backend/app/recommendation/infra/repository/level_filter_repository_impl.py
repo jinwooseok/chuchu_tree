@@ -75,13 +75,13 @@ class LevelFilterRepositoryImpl(LevelFilterRepository):
     @override
     async def find_by_skill_and_code(
         self,
-        tag_skill_id: TagSkillId,
+        tag_skill_level: str,
         filter_code: str
     ) -> LevelFilter | None:
         """태그 스킬 ID와 필터 코드로 조회"""
         stmt = select(ProblemRecommendationLevelFilterModel).where(
             and_(
-                ProblemRecommendationLevelFilterModel.tag_skill_id == tag_skill_id.value,
+                ProblemRecommendationLevelFilterModel.tag_skill_code == tag_skill_level,
                 ProblemRecommendationLevelFilterModel.filter_code == filter_code,
                 ProblemRecommendationLevelFilterModel.active_yn == True,
                 ProblemRecommendationLevelFilterModel.deleted_at.is_(None)

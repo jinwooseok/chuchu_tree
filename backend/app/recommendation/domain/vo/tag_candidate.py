@@ -41,6 +41,56 @@ class TagCandidates:
         sorted_candidates = sorted(self._candidates, key=lambda x: x.score, reverse=True)
         return TagCandidates(tuple(sorted_candidates))
 
+    def weighted_random_sample(self, k: int) -> 'TagCandidates':
+        """점수 기반 가중치 랜덤 샘플링 (중복 없음)
+
+        Args:
+            k: 샘플링할 개수
+
+        Returns:
+            샘플링된 태그 후보 컬렉션
+        """
+        import random
+
+        # k가 전체 개수보다 크거나 같으면 전체 반환
+        if len(self._candidates) <= k:
+            return self
+
+        # 빈 경우 처리
+        if len(self._candidates) == 0:
+            return self
+
+        # 점수를 가중치로 변환 (최소값 0.1 보장)
+        candidates_list = list(self._candidates)
+        weights = [max(c.score, 0.1) for c in candidates_list]
+
+        total_weight = sum(weights)
+
+        # 누적 가중치 계산
+        cumulative_weights = []
+        cum_sum = 0
+        for w in weights:
+            cum_sum += w
+            cumulative_weights.append(cum_sum)
+
+        # k개 샘플링 (중복 없음)
+        sampled_indices = set()
+        sampled = []
+        attempts = 0
+        max_attempts = k * 100  # 무한 루프 방지
+
+        while len(sampled) < k and attempts < max_attempts:
+            attempts += 1
+            r = random.uniform(0, total_weight)
+
+            for i, cum_w in enumerate(cumulative_weights):
+                if r <= cum_w and i not in sampled_indices:
+                    sampled_indices.add(i)
+                    sampled.append(candidates_list[i])
+                    break
+
+        return TagCandidates(tuple(sampled))
+
     def __iter__(self) -> Iterator[TagCandidate]:
         """반복 가능"""
         return iter(self._candidates)

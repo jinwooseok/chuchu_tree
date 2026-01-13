@@ -20,6 +20,7 @@ class ProblemMapper:
             created_at=model.created_at,
             updated_at=model.updated_at,
             deleted_at=model.deleted_at,
+            solved_user_count=model.solved_user_count,
             tags=tags or [],
             update_histories=[]
         )
@@ -32,6 +33,7 @@ class ProblemMapper:
             problem_title=entity.title,
             problem_tier_level=entity.tier_level.value,
             class_level=entity.class_level,
+            solved_user_count=entity.solved_user_count,
             created_at=entity.created_at,
             updated_at=entity.updated_at,
             deleted_at=entity.deleted_at

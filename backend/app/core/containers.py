@@ -384,7 +384,8 @@ class Container(containers.DeclarativeContainer):
         baekjoon_account_repository=baekjoon_account_repository,
         tag_repository=tag_repository,
         tag_skill_repository=tag_skill_repository,
-        tier_repository=tier_repository
+        tier_repository=tier_repository,
+        activity_repository=user_activity_repository
     )
     
     recommand_problems_usecase = providers.Singleton(

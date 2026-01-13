@@ -38,6 +38,7 @@ class WillSolveProblem:
     
     def delete(self) -> None:
         """마킹 해제"""
+        self.order = -1
         self.updated_at = datetime.now()
         self.deleted_at = datetime.now()
     

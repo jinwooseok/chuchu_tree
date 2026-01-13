@@ -16,6 +16,7 @@ class Problem:
     title: str
     tier_level: TierLevel
     class_level: int|None
+    solved_user_count: int
     created_at: datetime
     updated_at: datetime
     deleted_at: datetime|None = None
@@ -27,6 +28,7 @@ class Problem:
         problem_id: ProblemId,
         title: str,
         tier_level: TierLevel,
+        solved_user_count: int,
         class_level: int|None = None
     ) -> 'Problem':
         """팩토리 메서드"""
@@ -36,6 +38,7 @@ class Problem:
             title=title,
             tier_level=tier_level,
             class_level=class_level,
+            solved_user_count=solved_user_count,
             created_at=now,
             updated_at=now,
             deleted_at=None,
