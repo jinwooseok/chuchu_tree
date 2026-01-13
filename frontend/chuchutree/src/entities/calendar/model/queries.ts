@@ -4,20 +4,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { calendarApi } from '../api/calendar.api';
 import { UpdateProblemsData } from './calendar.types';
 import { UseMutationCallback } from '@/shared/types/api';
-
-export const calendarKeys = {
-  all: ['calendar'],
-  lists: () => [...calendarKeys.all, 'list'],
-  list: (year: number, month: number) => [...calendarKeys.lists(), { year, month }],
-  searches: () => [...calendarKeys.all, 'search'],
-  search: (keyword: string) => [...calendarKeys.searches(), { keyword }],
-};
+import { calendarKeys } from './keys';
 
 export const useCalendar = (year: number, month: number) => {
   return useQuery({
     queryKey: calendarKeys.list(year, month),
     queryFn: () => calendarApi.getCalendar({ year, month }),
-    staleTime: 5 * 60 * 1000,
   });
 };
 

@@ -107,9 +107,9 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
 }
 
 export default function BigCalendar() {
-  // Zustand 스토어에서 데이터 가져오기
-  const { monthlyData, selectedDate, bigCalendarDate, actions } = useCalendarStore();
-  const { setSelectedDate, setCalendarData, setBigCalendarDate } = actions;
+  // Zustand에서 UI 상태만 가져오기
+  const { selectedDate, bigCalendarDate, actions } = useCalendarStore();
+  const { setSelectedDate, setBigCalendarDate } = actions;
 
   // 안정적인 초기 날짜 (한 번만 생성)
   const [initialDate] = useState(new Date());
@@ -127,16 +127,8 @@ export default function BigCalendar() {
   const year = currentDate.getFullYear();
   const month = currentDate.getMonth() + 1;
 
-  // 해당 월의 calendar 데이터 fetch
+  // 해당 월의 calendar 데이터 fetch (TanStack Query가 자동으로 캐시 관리)
   const { data: calendarData, isLoading } = useCalendar(year, month);
-
-  // 데이터가 로드되면 store에 저장
-  useEffect(() => {
-    if (calendarData) {
-      setCalendarData(calendarData);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [calendarData]);
 
   // selectedDate가 변경되면 BigCalendar도 해당 월로 이동
   useEffect(() => {
@@ -151,8 +143,9 @@ export default function BigCalendar() {
 
   // calendar 데이터를 react-big-calendar 이벤트로 변환
   const events = useMemo(() => {
-    return transformToCalendarEvents(monthlyData);
-  }, [monthlyData]);
+    if (!calendarData) return [];
+    return transformToCalendarEvents(calendarData.monthlyData);
+  }, [calendarData]);
 
   // MonthDateHeader를 래핑하여 allEvents를 전달
   const CustomMonthDateHeaderWrapper = useMemo(() => {

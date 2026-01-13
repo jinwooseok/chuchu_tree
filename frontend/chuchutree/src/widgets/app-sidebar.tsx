@@ -2,7 +2,7 @@
 
 import { Calendar, ChevronUp, Dices, Gem, Leaf, LibraryBig, PanelLeft, User2 } from 'lucide-react';
 import { useLayoutStore } from '@/lib/store/layout';
-import { useUser } from '@/lib/store/user';
+import { useUser } from '@/entities/user/model/queries';
 import { useRouter } from 'next/navigation';
 
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
@@ -24,7 +24,7 @@ const ICON_SIZE = 32;
 export function AppSidebar() {
   const { state: sidebarOpenState, toggleSidebar: setSidebarOpenState } = useSidebar();
   const { topSection, centerSection, bottomSection, toggleTopSection, setCenterSection, toggleBottomSection } = useLayoutStore();
-  const { user } = useUser();
+  const { data: user } = useUser();
   const { openModal, closeModal } = useModal();
   const router = useRouter();
 

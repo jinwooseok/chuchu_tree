@@ -4,14 +4,15 @@ import { useState } from 'react';
 import { Search, ChevronDown, ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
-import { useTagDashboardSidebarStore, useTagDashboardStore, SortBy } from '@/lib/store/tagDashboard';
+import { useTagDashboardSidebarStore, SortBy } from '@/lib/store/tagDashboard';
+import { useTagDashboard } from '@/entities/tag-dashboard';
 import { CategoryName } from '@/shared/constants/tagSystem';
 import { getLevelColorClasses } from '@/features/tag-dashboard/lib/utils';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 
 export default function TagSidebar() {
   const { searchQuery, sortBy, selectedTagId, setSearchQuery, setSortBy, setSelectedTagId } = useTagDashboardSidebarStore();
-  const { categories, isInitialized } = useTagDashboardStore();
+  const { data: tagDashboard } = useTagDashboard();
 
   // 카테고리별 열림/닫힘 상태
   const [openCategories, setOpenCategories] = useState<Record<CategoryName, boolean>>({
@@ -45,7 +46,7 @@ export default function TagSidebar() {
   };
 
   // 로딩 상태
-  if (!isInitialized) {
+  if (!tagDashboard) {
     return (
       <div className="flex h-full items-center justify-center p-4">
         <p className="text-muted-foreground text-sm">로딩 중...</p>
@@ -81,7 +82,7 @@ export default function TagSidebar() {
 
       {/* 카테고리별 태그 리스트 */}
       <div className="flex flex-col gap-2">
-        {categories.map((category) => {
+        {tagDashboard.categories.map((category) => {
           const levelColors = getLevelColorClasses(category.categoryName);
           const isOpen = openCategories[category.categoryName];
 

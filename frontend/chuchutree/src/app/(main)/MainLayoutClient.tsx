@@ -2,46 +2,14 @@
 
 import { AppSidebar } from '@/widgets/app-sidebar';
 import { SidebarInset, SidebarProvider } from '@/components/ui/sidebar';
-import { useSetUser } from '@/lib/store/user';
-import { useSetCalendarData } from '@/lib/store/calendar';
-import { User } from '@/entities/user';
-import { Calendar } from '@/entities/calendar';
-import { useEffect } from 'react';
-import { TagDashboard } from '@/entities/tag-dashboard';
-import { useSetTagDashboardData } from '@/lib/store/tagDashboard';
 
 interface MainLayoutClientProps {
   children: React.ReactNode;
-  initialUserData: User;
-  initialCalendarData: Calendar | null;
-  initialTagDashboard: TagDashboard | null;
 }
 
-export function MainLayoutClient({ children, initialUserData, initialCalendarData, initialTagDashboard }: MainLayoutClientProps) {
-  const setUser = useSetUser();
-  const setCalendarData = useSetCalendarData();
-  const setTagDashboardData = useSetTagDashboardData();
-
-  // 서버에서 받은 User 데이터를 Zustand store에 저장
-  useEffect(() => {
-    if (initialUserData) {
-      setUser(initialUserData);
-    }
-  }, [initialUserData, setUser]);
-
-  // 서버에서 받은 Calendar 데이터를 Zustand store에 저장
-  useEffect(() => {
-    if (initialCalendarData) {
-      setCalendarData(initialCalendarData);
-    }
-  }, [initialCalendarData, setCalendarData]);
-
-  // 서버에서 받은 TagDashboard 데이타 store 저장
-  useEffect(() => {
-    if (initialTagDashboard) {
-      setTagDashboardData(initialTagDashboard);
-    }
-  }, [initialTagDashboard, setTagDashboardData]);
+export function MainLayoutClient({ children }: MainLayoutClientProps) {
+  // SSR prefetch 데이터는 HydrationBoundary가 자동으로 Query cache에 주입
+  // Zustand 동기화 로직 제거 - 컴포넌트가 직접 Query hooks 사용
 
   return (
     <SidebarProvider defaultOpen={false}>

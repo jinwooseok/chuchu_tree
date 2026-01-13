@@ -4,17 +4,12 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { userApi } from '../api/user.api';
 import { PostTargetType } from './types';
 import { UseMutationCallback } from '@/shared/types/api';
-
-export const userKeys = {
-  all: ['user'],
-  me: () => [...userKeys.all, 'me'],
-};
+import { userKeys } from './keys';
 
 export const useUser = () => {
   return useQuery({
     queryKey: userKeys.me(),
     queryFn: userApi.getMe,
-    staleTime: 5 * 60 * 1000,
   });
 };
 

@@ -4,17 +4,12 @@ import { tagDashboardApi } from '../api/tagDashboard.api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { TagBan } from './tagDashboard.types';
 import { UseMutationCallback } from '@/shared/types/api';
-
-export const tagDashboardKeys = {
-  all: ['tagDashboard'] as const,
-  dashboard: () => [...tagDashboardKeys.all, 'dashboard'] as const,
-};
+import { tagDashboardKeys } from './keys';
 
 export const useTagDashboard = () => {
   return useQuery({
     queryKey: tagDashboardKeys.dashboard(),
     queryFn: () => tagDashboardApi.getTagDashboard(),
-    staleTime: 5 * 60 * 1000,
   });
 };
 

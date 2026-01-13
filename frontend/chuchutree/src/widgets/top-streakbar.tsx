@@ -1,4 +1,4 @@
-import { useUser } from '@/lib/store/user';
+import { useUser } from '@/entities/user/model/queries';
 import { Leaf } from 'lucide-react';
 import { ActivityCalendar, Props as CalendarProps, ThemeInput } from 'react-activity-calendar';
 
@@ -87,7 +87,7 @@ const transformStreaksData = (streaks: Array<{ streakDate: string; solvedCount: 
 };
 
 export default function TopStreakbar() {
-  const { user } = useUser();
+  const { data: user } = useUser();
 
   // 데이터가 없거나 배열이 아니면 로딩 상태 표시
   if (!user?.bjAccount?.streaks || !Array.isArray(user.bjAccount.streaks)) {
@@ -112,7 +112,7 @@ export default function TopStreakbar() {
   } satisfies CalendarProps['labels'];
 
   return (
-    <div className="bg-innerground-white flex h-full items-center justify-center overflow-hidden p-4">
+    <div className="bg-innerground-white flex h-full items-center justify-center p-4">
       <div className="max-w-full min-w-0">
         <div className="text-muted-foreground mb-2 flex items-center gap-2 text-sm">
           <Leaf height={14} width={14} />
