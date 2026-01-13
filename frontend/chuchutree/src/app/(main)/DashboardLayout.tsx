@@ -3,15 +3,16 @@
 import { useLayoutStore } from '@/lib/store/layout';
 import { useSidebar } from '@/components/ui/sidebar';
 import { useState } from 'react';
-import InfoSidebar from '@/widgets/info-sidebar';
 import MainCalendar from '@/widgets/main-calendar';
 import MainTagDashboard from '@/widgets/main-tag-dashboard';
 import TopTierbar from '@/widgets/top-tierbar';
 import TopStreakbar from '@/widgets/top-streakbar';
 import BottomRecommend from '@/widgets/bottom-recommend';
+import CalendarSidebar from '@/widgets/calendar-sidebar';
+import TagSidebar from '@/widgets/tag-sidebar';
 
 export default function DashboardLayout() {
-  const { topSection, centerSection, bottomSection, topSectionTierbarHeight, topSectionStreakHeight, bottomSectionHeight } = useLayoutStore();
+  const { topSection, centerSection, bottomSection, topSectionTierbarHeight, topSectionStreakHeight, bottomSectionHeight, infoSidebarWidth } = useLayoutStore();
   const { state: sidebarState } = useSidebar();
 
   // 애니메이션 중에 이전 컴포넌트를 유지하기 위한 state
@@ -53,7 +54,13 @@ export default function DashboardLayout() {
   return (
     <div className="bg-background flex h-[calc(100vh-16px)] gap-2 overflow-hidden">
       {/* Info 사이드바 - AppSidebar가 닫혔을 때만 표시 */}
-      {showInfoSidebar && <InfoSidebar />}
+      {showInfoSidebar && (
+        <div className={`h-full w-1/3 border-r transition-all delay-200 duration-300 ease-in-out md:w-1/4 xl:w-1/5`}>
+          <div className="animate-in slide-in-from-left bg-innerground-white overflow-hidden transition-transform duration-300 ease-in-out">
+            {centerSection === 'calendar' ? <CalendarSidebar /> : <TagSidebar />}
+          </div>
+        </div>
+      )}
 
       {/* 메인 영역 */}
       <main className="flex min-w-0 flex-1 flex-col">
