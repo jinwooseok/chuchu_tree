@@ -5,6 +5,7 @@ class Provider(str, Enum):
     KAKAO = "KAKAO"
     NAVER = "NAVER"
     GOOGLE = "GOOGLE"
+    GITHUB = "GITHUB"
     NONE = "NONE"
 
     @classmethod

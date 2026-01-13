@@ -127,9 +127,6 @@ class ActivityApplicationService:
         for index, p_id in enumerate(new_problem_ids):
             if p_id in existing_map:
                 target = existing_map.pop(p_id)
-                # 만약 삭제되었던 문제라면 복구
-                if target.deleted_at:
-                    target.restore()
                 # 순서 변경 (메서드 내부에서 변경 여부 체크)
                 target.change_order(index)
                 processed_entities.append(target)

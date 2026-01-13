@@ -1,24 +1,27 @@
-"""insert_data
+"""github enum add
 
-Revision ID: adfb5f7c7742
-Revises: e5b6ca7e3819
-Create Date: 2026-01-02 09:48:30.604960
+Revision ID: 46664d739d74
+Revises: 36ad2838530f
+Create Date: 2026-01-12 23:21:22.060856
 
 """
 from typing import Sequence, Union
 
+from alembic import op
+import sqlalchemy as sa
+
+
 # revision identifiers, used by Alembic.
-revision: str = 'adfb5f7c7742'
-down_revision: Union[str, Sequence[str], None] = 'e5b6ca7e3819'
+revision: str = '46664d739d74'
+down_revision: Union[str, Sequence[str], None] = '36ad2838530f'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
 def upgrade() -> None:
     """Upgrade schema."""
-    # ### end Alembic commands ###
-
+    pass
 
 def downgrade() -> None:
     """Downgrade schema."""
-    # ### end Alembic commands ###
+    pass

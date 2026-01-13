@@ -16,8 +16,9 @@ class LevelFilter:
     display_name: str
     max_user_tier_diff: int | None
     min_user_tier_diff: int | None
-    tag_skill_id: TagSkillId
-    tag_skill_rate: int
+    tag_skill_code: str
+    min_tag_skill_rate: int
+    max_tag_skill_rate: int
     active: bool
     created_at: datetime
     updated_at: datetime
@@ -27,8 +28,9 @@ class LevelFilter:
     def create(
         filter_code: FilterCode,
         display_name: str,
-        tag_skill_id: TagSkillId,
-        tag_skill_rate: int,
+        tag_skill_code: str,
+        min_tag_skill_rate: int,
+        max_tag_skill_rate: int,
         max_user_tier_diff: int | None = None,
         min_user_tier_diff: int | None = None
     ) -> 'LevelFilter':
@@ -39,7 +41,7 @@ class LevelFilter:
                 raise APIException(ErrorCode.INVALID_INPUT_VALUE)
         
         # 숙련도 비율 검증
-        if tag_skill_rate < 0 or tag_skill_rate > 100:
+        if max_tag_skill_rate < 0 or min_tag_skill_rate > 100:
             raise APIException(ErrorCode.INVALID_INPUT_VALUE)
         
         now = datetime.now()
@@ -49,8 +51,9 @@ class LevelFilter:
             display_name=display_name,
             max_user_tier_diff=max_user_tier_diff,
             min_user_tier_diff=min_user_tier_diff,
-            tag_skill_id=tag_skill_id,
-            tag_skill_rate=tag_skill_rate,
+            tag_skill_code=tag_skill_code,
+            min_tag_skill_rate=min_tag_skill_rate,
+            max_tag_skill_rate=max_tag_skill_rate,
             active=True,
             created_at=now,
             updated_at=now,
@@ -69,7 +72,7 @@ class LevelFilter:
         if self.max_user_tier_diff is not None:
             max_value = user_tier.value + self.max_user_tier_diff
             max_tier = TierLevel(max(0, max_value))
-        print(min_tier.value, max_tier.value)
+        
         return TierRange(
             min_tier_id=TierId(min_tier.value) if min_tier else None,
             max_tier_id=TierId(max_tier.value) if max_tier else None

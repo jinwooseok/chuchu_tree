@@ -3,6 +3,8 @@
 import logging
 from typing import Dict, Tuple
 
+from app.activity.domain.entity.user_activity import UserActivity
+from app.activity.domain.repository.user_activity_repository import UserActivityRepository
 from app.baekjoon.domain.repository.baekjoon_account_repository import BaekjoonAccountRepository
 from app.baekjoon.domain.vo.tag_account_stat import TagAccountStat
 from app.common.domain.enums import SkillCode, TagLevel
@@ -47,11 +49,13 @@ class GetUserTagsUsecase:
         tag_repository: TagRepository,
         tag_skill_repository: TagSkillRepository,
         tier_repository: TierRepository,
+        activity_repository: UserActivityRepository
     ):
         self.baekjoon_account_repository = baekjoon_account_repository
         self.tag_repository = tag_repository
         self.tag_skill_repository = tag_skill_repository
         self.tier_repository = tier_repository
+        self.activity_repository = activity_repository
 
     @transactional
     async def execute(self, command: GetUserTagsCommand) -> UserTagsQuery:
@@ -77,6 +81,7 @@ class GetUserTagsUsecase:
         all_tags = await self.tag_repository.find_active_tags_with_relations()
         all_tag_skills = await self.tag_skill_repository.find_all_active()
         all_tiers = await self.tier_repository.find_all()
+        activity: UserActivity = await self.activity_repository.find_only_tag_custom_by_user_account_id(user_account_id)
 
         # 3. 데이터 가공 및 매핑 생성
         tag_stats_dict: dict[int, TagAccountStat] = {stat.tag_id.value: stat for stat in tag_stats}
@@ -132,7 +137,10 @@ class GetUserTagsUsecase:
             )
 
             # recommendation_yn 계산
-            excluded_yn = tag.exclusion.excluded
+            if tag.tag_id in activity.excluded_tag_ids:
+                excluded_yn = True
+            else:
+                excluded_yn = False
             recommendation_yn = not (excluded_yn or locked_yn)
 
             # DTO 생성

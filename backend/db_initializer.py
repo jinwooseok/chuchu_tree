@@ -76,72 +76,72 @@ LEVELS = ["NEWBIE", "BEGINNER", "REQUIREMENT", "DETAIL", "CHALLENGE"]
 
 TAG_CONFIG = {
     # 쌩기초 (BEGINNER)
-    "수학": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER"], "parents": []},
-    "정렬": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER"], "parents": []},
-    "기하학": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER"], "parents": []},
-    "사칙연산": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER"], "parents": []},
-    "정수론": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER"], "parents": []},
-    "조합론": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER"], "parents": []},
-    "소수 판정": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER"], "parents": []},
+    "math": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER"], "parents": []},
+    "sorting": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER"], "parents": []},
+    "geometry": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER"], "parents": []},
+    "arithmetic": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER"], "parents": []},
+    "number_theory": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER"], "parents": []},
+    "combinatorics": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER"], "parents": []},
+    "primality_test": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER"], "parents": []},
     
     # 기초알고리즘 (BEGINNER)
-    "구현": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
-    "그리디 알고리즘": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
-    "문자열": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
-    "브루트포스 알고리즘": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
-    "트리": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
-    "집합과 맵": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
-    "시뮬레이션": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": ["구현"]},
-    "누적 합": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
-    "너비 우선 탐색": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
-    "깊이 우선 탐색": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
-    "해시를 사용한 집합과 맵": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": ["집합과 맵"]},
-    "백트래킹": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
-    "스택": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
-    "재귀": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
-    "임의 정밀도 / 큰 수 연산": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
-    "에라토스테네스의 체": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
-    "덱": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
-    "큐": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
+    "implementation": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
+    "greedy": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
+    "string": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
+    "bruteforcing": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
+    "trees": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
+    "set": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
+    "simulation": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": ["implementation"]},
+    "prefix_sum": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
+    "bfs": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
+    "dfs": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
+    "hash_set": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": ["set"]},
+    "backtracking": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
+    "stack": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
+    "recursion": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
+    "arbitrary_precision": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
+    "sieve": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
+    "deque": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
+    "queue": {"level": "BEGINNER", "goals": ["DAILY", "BEGINNER", "CT"], "parents": []},
 
     # 필수알고리즘 (REQUIREMENT)
-    "다이나믹 프로그래밍": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": []},
-    "애드 혹": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": []},
-    "이분 탐색": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": ["집합과 맵"]},
-    "최단 경로": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": ["깊이 우선 탐색", "너비 우선 탐색"]},
-    "비트마스킹": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": []},
-    "분리 집합": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": []},
-    "트리를 사용한 집합과 맵": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": ["집합과 맵", "트리"]},
-    "우선순위 큐": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": ["스택", "큐"]},
-    "분할 정복": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": []},
-    "투 포인터": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": []},
-    "유클리드 호제법": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": []},
-    "격자 그래프": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": []},
-    "슬라이딩 윈도우": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": ["투 포인터"]},
+    "dp": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": []},
+    "ad_hoc": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": []},
+    "binary_search": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": ["set"]},
+    "shortest_path": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": ["dfs", "bfs"]},
+    "bitmask": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": []},
+    "disjoint_set": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": []},
+    "tree_set": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": ["set", "trees"]},
+    "priority_queue": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": ["stack", "queue"]},
+    "divide_and_conquer": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": []},
+    "two_pointer": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": []},
+    "euclidean": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": []},
+    "grid_graph": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": []},
+    "sliding_window": {"level": "REQUIREMENT", "goals": ["DAILY", "CT"], "parents": ["two_pointer"]},
 
     # 세부알고리즘 (DETAIL)
-    "세그먼트 트리": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["트리", "스택"]},
-    "데이크스트라": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["최단 경로"]},
-    "최대 유량": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": []},
-    "트라이": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["문자열"]},
-    "최소 스패닝 트리": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["우선순위 큐"]},
-    "위상 정렬": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["트리"]},
-    "최소 공통 조상": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["트리"]},
-    "플로이드–워셜": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["최단 경로"]},
-    "느리게 갱신되는 세그먼트 트리": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["세그먼트 트리"]},
-    "트리에서의 다이나믹 프로그래밍": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["다이나믹 프로그래밍", "트리"]},
-    "비트필드를 이용한 다이나믹 프로그래밍": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["다이나믹 프로그래밍", "비트마스킹"]},
-    "배낭 문제": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["다이나믹 프로그래밍"]},
-    "역추적": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["다이나믹 프로그래밍"]},
-    "가장 긴 증가하는 부분 수열: o(n log n)": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["다이나믹 프로그래밍"]},
+    "segtree": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["trees", "stack"]},
+    "dijkstra": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["shortest_path"]},
+    "flow": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": []},
+    "trie": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["string"]},
+    "mst": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["priority_queue"]},
+    "topological_sorting": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["trees"]},
+    "lca": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["trees"]},
+    "floyd_warshall": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["shortest_path"]},
+    "lazyprop": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["segtree"]},
+    "dp_tree": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["dp", "trees"]},
+    "dp_bitfield": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["dp", "bitmask"]},
+    "knapsack": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["dp"]},
+    "traceback": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["dp"]},
+    "lis": {"level": "DETAIL", "goals": ["DAILY", "CT"], "parents": ["dp"]},
 
     # 도전알고리즘 (CHALLENGE)
-    "최소 비용 최대 유량": {"level": "CHALLENGE", "goals": ["DAILY"], "parents": ["최대 유량"]},
-    "KMP": {"level": "CHALLENGE", "goals": ["DAILY"], "parents": ["문자열"]},
-    "외판원 순회": {"level": "CHALLENGE", "goals": ["DAILY"], "parents": ["비트필드를 이용한 다이나믹 프로그래밍"]},
-    "이분 매칭": {"level": "CHALLENGE", "goals": ["DAILY"], "parents": ["최대 유량"]},
-    "강한 연결 요소": {"level": "CHALLENGE", "goals": ["DAILY"], "parents": ["깊이 우선 탐색", "스택"]},
-    "볼록 껍질": {"level": "CHALLENGE", "goals": ["DAILY"], "parents": ["기하학"]}
+    "mcmf": {"level": "CHALLENGE", "goals": ["DAILY"], "parents": ["flow"]},
+    "kmp": {"level": "CHALLENGE", "goals": ["DAILY"], "parents": ["string"]},
+    "tsp": {"level": "CHALLENGE", "goals": ["DAILY"], "parents": ["dp_bitfield"]},
+    "bipartite_matching": {"level": "CHALLENGE", "goals": ["DAILY"], "parents": ["flow"]},
+    "scc": {"level": "CHALLENGE", "goals": ["DAILY"], "parents": ["dfs", "stack"]},
+    "convex_hull": {"level": "CHALLENGE", "goals": ["DAILY"], "parents": ["geometry"]}
 }
 
 # 로깅 설정
@@ -161,16 +161,96 @@ class DBMigrator:
         self.tag_id_map = {}
         self.target_id_map = {}
         self.skill_id_map = {}
-        self.missing_tags = set() # 설정에 누락된 태그 수집용  
-    
+        self.missing_tags = set() # 설정에 누락된 태그 수집용
+
     def load_json(self, path):
         with open(path, 'r', encoding='utf-8') as f:
             return json.load(f)
+
+    def _validate_tag_config(self, tags_data):
+        """TAG_CONFIG와 tags.json 간 일관성 검증"""
+        logger.info("Validating TAG_CONFIG consistency...")
+
+        issues = []
+
+        # tags.json의 모든 태그 코드와 한글명 추출
+        tag_mapping = {}
+        for item in tags_data:
+            ko_name = next((n['name'] for n in item['displayNames'] if n['language'] == 'ko'), item['key'])
+            tag_mapping[item['key']] = ko_name
+
+        # TAG_CONFIG 검증
+        for tag_name, config in TAG_CONFIG.items():
+            # 1. 태그가 tags.json에 존재하는지
+            if tag_name not in tag_mapping.values() and tag_name not in tag_mapping.keys():
+                issues.append(f"TAG_CONFIG에는 있지만 tags.json에 없음: {tag_name}")
+
+            # 2. 부모 태그들이 모두 TAG_CONFIG에 존재하는지
+            for parent in config.get('parents', []):
+                if parent not in TAG_CONFIG:
+                    issues.append(f"존재하지 않는 부모 태그 참조: {tag_name} -> {parent}")
+
+        # tags.json에는 있지만 TAG_CONFIG에 없는 태그들
+        for tag_code, ko_name in tag_mapping.items():
+            if ko_name not in TAG_CONFIG and tag_code not in TAG_CONFIG:
+                issues.append(f"tags.json에는 있지만 TAG_CONFIG에 없음: {ko_name} ({tag_code})")
+
+        if issues:
+            logger.warning(f"Found {len(issues)} TAG_CONFIG issues:")
+            for issue in issues:
+                logger.warning(f"  - {issue}")
+        else:
+            logger.info("TAG_CONFIG validation passed!")
+
+        return issues
+
+    def _normalize_tag_config(self, tags_data):
+        """Convert Korean parent names to English keys in TAG_CONFIG"""
+        logger.info("Normalizing TAG_CONFIG parent references...")
+
+        # Build Korean -> English key mapping from tags.json
+        ko_to_key = {}
+        key_to_ko = {}
+        for item in tags_data:
+            key = item['key']
+            ko_name = next((n['name'] for n in item['displayNames'] if n['language'] == 'ko'), key)
+            ko_to_key[ko_name] = key
+            key_to_ko[key] = ko_name
+
+        # Normalize TAG_CONFIG in place
+        normalized_config = {}
+        for tag_key, config in TAG_CONFIG.items():
+            # Convert tag_key if it's Korean (most are already English)
+            eng_key = ko_to_key.get(tag_key, tag_key)
+
+            # Convert parent names to English keys
+            normalized_parents = []
+            for parent in config.get('parents', []):
+                parent_key = ko_to_key.get(parent, parent)
+                normalized_parents.append(parent_key)
+
+            # Create normalized config entry
+            normalized_config[eng_key] = {
+                **config,
+                'parents': normalized_parents
+            }
+
+        logger.info(f"TAG_CONFIG normalized: {len(normalized_config)} tags processed")
+        return normalized_config, ko_to_key, key_to_ko
 
     def execute_init(self):
         try:
             tags_data = self.load_json('data/tags.json')['items']
             problems_data = self.load_json('data/problems.json')['items']
+
+            # Normalize TAG_CONFIG before processing (convert Korean parent names to English keys)
+            global TAG_CONFIG
+            TAG_CONFIG, self.ko_to_key, self.key_to_ko = self._normalize_tag_config(tags_data)
+
+            # Validate TAG_CONFIG after normalization
+            validation_issues = self._validate_tag_config(tags_data)
+            if validation_issues:
+                logger.warning("Proceeding with migration despite validation issues")
 
             with self.engine.begin() as conn:
                 conn.execute(text("SET SESSION sql_mode = CONCAT(@@sql_mode, ',NO_AUTO_VALUE_ON_ZERO');"))
@@ -232,19 +312,37 @@ class DBMigrator:
     def _migrate_tags(self, conn, tags_data, now):
         for item in tags_data:
             ko_name = next((n['name'] for n in item['displayNames'] if n['language'] == 'ko'), item['key'])
-            config = TAG_CONFIG.get(ko_name, {"level": "NEWBIE", "goals": [], "excluded": True})
+
+            # Try key first (English), fallback to Korean name for backwards compatibility
+            config = TAG_CONFIG.get(item['key'])
+            if not config:
+                config = {"level": "NEWBIE", "goals": [], "excluded": True}
+                self.missing_tags.add(item['key'])
+
+            # Determine excluded_reason if tag is excluded
+            excluded_reason = None
+            if config.get("excluded", False):
+                excluded_reason = self._determine_excluded_reason(item, config)
 
             conn.execute(text("""
-                INSERT INTO tag (tag_code, tag_level, excluded_yn, min_solved_person_count, aliases, tag_problem_count, tag_display_name, created_at, updated_at)
-                VALUES (:code, :lvl, :ex, :min_s, :ali, :cnt, :display_name, :now, :now)
+                INSERT INTO tag (tag_code, tag_level, excluded_yn, excluded_reason, min_solved_person_count, aliases, tag_problem_count, tag_display_name, created_at, updated_at)
+                VALUES (:code, :lvl, :ex, :ex_reason, :min_s, :ali, :cnt, :display_name, :now, :now)
                 ON DUPLICATE KEY UPDATE
                     tag_problem_count = VALUES(tag_problem_count),
                     tag_display_name = VALUES(tag_display_name),
+                    excluded_yn = VALUES(excluded_yn),
+                    excluded_reason = VALUES(excluded_reason),
                     updated_at = VALUES(updated_at)
             """), {
-                "code": item['key'], "lvl": config['level'], "ex": config.get("excluded", False),
-                "min_s": 1000, "ali": json.dumps(item['aliases']), "cnt": item['problemCount'],
-                "display_name": ko_name, "now": now
+                "code": item['key'],
+                "lvl": config['level'],
+                "ex": config.get("excluded", False),
+                "ex_reason": excluded_reason,
+                "min_s": 1000,
+                "ali": json.dumps(item['aliases']),
+                "cnt": item['problemCount'],
+                "display_name": ko_name,
+                "now": now
             })
             
             tag_id = conn.execute(text("SELECT tag_id FROM tag WHERE tag_code = :c"), {"c": item['key']}).fetchone()[0]
@@ -257,21 +355,57 @@ class DBMigrator:
                     VALUES (:tid, :target_id, :now, :now)
                 """), {"tid": tag_id, "target_id": self.target_id_map[g_code], "now": now})
 
+    def _determine_excluded_reason(self, tag_item, config):
+        """Determine excluded reason based on TODO.md rules"""
+        problem_count = tag_item['problemCount']
+        tag_key = tag_item['key']
+
+        # Rule 1: Minor tags (difficult + few problems with 1000+ solvers)
+        # Approximation: very low problem count (지협적인 태그)
+        if problem_count < 50:
+            return "MINOR"
+
+        # Rule 2: Comprehensive tags (has many sub-tags) (포괄적 태그)
+        comprehensive_tags = {
+            "data_structures", "graphs", "graph_traversal", "ds",
+            "number_theory", "geometry"
+        }
+        if tag_key in comprehensive_tags:
+            return "COMPREHENSIVE"
+
+        # Rule 3: Insignificant tags (not important algorithmically) (중요하지 않은 태그)
+        insignificant_tags = {
+            "game_theory", "offline_queries", "coordinate_compression",
+            "constructive", "parsing", "regex", "case_work"
+        }
+        if tag_key in insignificant_tags:
+            return "INSIGNIFICANT"
+
+        # Default to INSIGNIFICANT for unknown excluded tags
+        return "INSIGNIFICANT"
+
     def _migrate_problems(self, conn, problems_data, now):
         for prob in problems_data:
             conn.execute(text("""
-                INSERT INTO problem (problem_id, problem_title, problem_tier_level, created_at, updated_at)
-                VALUES (:id, :title, :lvl, :now, :now)
-                ON DUPLICATE KEY UPDATE 
+                INSERT INTO problem (problem_id, problem_title, problem_tier_level, solved_user_count, created_at, updated_at)
+                VALUES (:id, :title, :lvl, :solved_count, :now, :now)
+                ON DUPLICATE KEY UPDATE
                     problem_tier_level = VALUES(problem_tier_level),
+                    solved_user_count = VALUES(solved_user_count),
                     updated_at = VALUES(updated_at)
-            """), {"id": prob['problemId'], "title": prob['titleKo'], "lvl": prob['level'], "now": now})
+            """), {
+                "id": prob['problemId'],
+                "title": prob['titleKo'],
+                "lvl": prob['level'],
+                "solved_count": prob.get('acceptedUserCount', 0),
+                "now": now
+            })
 
             for t_obj in prob.get('tags', []):
                 t_id = self.tag_id_map.get(t_obj['key'])
                 if t_id:
                     conn.execute(text("""
-                        INSERT IGNORE INTO problem_tag (problem_id, tag_id, created_at) 
+                        INSERT IGNORE INTO problem_tag (problem_id, tag_id, created_at)
                         VALUES (:pid, :tid, :now)
                     """), {"pid": prob['problemId'], "tid": t_id, "now": now})
 
@@ -287,8 +421,8 @@ class DBMigrator:
                     """), {"p": p_id, "s": sub_id, "now": now})
 
     def _update_tag_tier_range(self, conn, now):
-        """각 태그별 문제 티어 범위(상위/하위 10%)를 계산하여 업데이트"""
-        logger.info("Calculating tag tier ranges...")
+        """각 태그별 문제 티어 범위 계산 (상위 20%, 하위 10% 절사 후)"""
+        logger.info("Calculating tag tier ranges with trimming...")
 
         # 모든 태그에 대해 처리
         for tag_id in self.tag_id_map.values():
@@ -307,13 +441,25 @@ class DBMigrator:
             tier_list = [t[0] for t in tiers]
             total_count = len(tier_list)
 
-            # 하위 10% 인덱스 (0-based)
-            lower_10_idx = max(0, int(total_count * 0.1) - 1)
-            # 상위 10% 인덱스 (0-based)
-            upper_10_idx = min(total_count - 1, int(total_count * 0.9))
+            # 상위 20%, 하위 10% 절사
+            lower_trim_idx = int(total_count * 0.1)  # 하위 10% 제거
+            upper_trim_idx = int(total_count * 0.8)  # 상위 20% 제거 (0.8 = 1.0 - 0.2)
 
-            min_tier_id = tier_list[lower_10_idx]
-            max_tier_id = tier_list[upper_10_idx]
+            # 인덱스 보정 (최소 1개 이상의 문제는 남겨야 함)
+            if upper_trim_idx <= lower_trim_idx:
+                lower_trim_idx = 0
+                upper_trim_idx = total_count
+
+            trimmed_list = tier_list[lower_trim_idx:upper_trim_idx]
+            trimmed_count = len(trimmed_list)
+
+            # 절사된 목록에서 최소티어 (상위 90%)
+            min_tier_idx = int(trimmed_count * 0.9)
+            min_tier_idx = min(min_tier_idx, trimmed_count - 1)  # 경계 체크
+            min_tier_id = trimmed_list[min_tier_idx]
+
+            # 최대티어는 절사된 목록의 최대값
+            max_tier_id = trimmed_list[-1]
 
             # 태그 업데이트
             conn.execute(text("""
@@ -324,38 +470,75 @@ class DBMigrator:
                 WHERE tag_id = :tag_id
             """), {"min_tier": min_tier_id, "max_tier": max_tier_id, "tag_id": tag_id, "now": now})
 
-        logger.info("Tag tier ranges updated successfully")
+            logger.debug(f"Tag {tag_id}: total={total_count}, trimmed={trimmed_count}, "
+                        f"min_tier={min_tier_id}, max_tier={max_tier_id}")
+
+        logger.info("Tag tier ranges updated successfully with trimming")
 
     def _setup_tag_skills(self, conn, now):
-        """레벨별 문제 티어 분포를 기반으로 tag_skill 테이블 설정"""
-        logger.info("Setting up tag skills with tier calculations...")
+        """태그별 문제 티어 분포를 기반으로 tag_skill 테이블 설정 (절사 적용)"""
+        logger.info("Setting up per-tag tag skills with trimmed tier calculations...")
+
+        # 기존 global tag_skill 레코드 삭제 (tag_id가 NULL인 것들)
+        # 주의: problem_recommendation_level_filter가 tag_skill_id를 참조하므로 먼저 삭제
+        logger.info("Deleting dependent records first...")
+
+        # Step 1: problem_recommendation_level_filter의 기존 레코드 삭제
+        filter_result = conn.execute(text("DELETE FROM problem_recommendation_level_filter"))
+        logger.info(f"Deleted {filter_result.rowcount} old level_filter records")
+
+        # Step 2: 이제 tag_skill의 기존 global 레코드 삭제 가능
+        skill_result = conn.execute(text("DELETE FROM tag_skill WHERE tag_id IS NULL"))
+        logger.info(f"Deleted {skill_result.rowcount} old global tag_skill records (tag_id=NULL)")
 
         skill_id_map = {}
 
-        for lvl in LEVELS:
-            # 해당 레벨에 속한 모든 문제의 티어를 가져옴
+        # Iterate through ALL tags (not just levels)
+        for tag_id in self.tag_id_map.values():
+            # Get tag info
+            tag_info = conn.execute(text("""
+                SELECT tag_id, tag_level, tag_code FROM tag WHERE tag_id = :tid
+            """), {"tid": tag_id}).fetchone()
+
+            if not tag_info:
+                continue
+
+            tag_id_val, tag_level, tag_code = tag_info
+
+            # Get tier distribution for THIS SPECIFIC TAG
             tiers = conn.execute(text("""
-                SELECT DISTINCT p.problem_tier_level
+                SELECT p.problem_tier_level
                 FROM problem p
                 JOIN problem_tag pt ON p.problem_id = pt.problem_id
-                JOIN tag t ON pt.tag_id = t.tag_id
-                WHERE t.tag_level = :lvl
+                WHERE pt.tag_id = :tag_id
                 ORDER BY p.problem_tier_level ASC
-            """), {"lvl": lvl}).fetchall()
+            """), {"tag_id": tag_id_val}).fetchall()
 
             if not tiers:
-                logger.warning(f"No problems found for level {lvl}, using default tier 1")
+                logger.warning(f"No problems found for tag {tag_code} (id={tag_id_val}), using default tier 1")
                 tier_list = [1]
             else:
                 tier_list = [t[0] for t in tiers]
 
             total_count = len(tier_list)
 
-            # 백분위수 계산
+            # 상위 20%, 하위 10% 절사
+            lower_trim_idx = int(total_count * 0.1)
+            upper_trim_idx = int(total_count * 0.8)
+
+            if upper_trim_idx <= lower_trim_idx:
+                trimmed_list = tier_list
+            else:
+                trimmed_list = tier_list[lower_trim_idx:upper_trim_idx]
+
+            trimmed_count = len(trimmed_list)
+
+            # 백분위수 계산 함수 (절사된 목록 기준)
             def get_percentile_tier(percentile):
                 """백분위수에 해당하는 티어 반환 (percentile: 0.0 ~ 1.0)"""
-                idx = min(total_count - 1, int(total_count * percentile))
-                return tier_list[idx]
+                target_percentile = 1.0 - percentile 
+                idx = min(trimmed_count - 1, int(trimmed_count * target_percentile))
+                return trimmed_list[idx]
 
             # Master: user-tier 50%, highest 10%
             master_user_tier = get_percentile_tier(0.5)
@@ -365,85 +548,142 @@ class DBMigrator:
             advanced_user_tier = get_percentile_tier(0.7)
             advanced_highest_tier = get_percentile_tier(0.4)
 
-            # Immediate: 기본값 (tier_id=1)
-            immediate_user_tier = tier_list[0] if tier_list else 1
-            immediate_highest_tier = tier_list[0] if tier_list else 1
+            # Intermediate: 최소 티어
+            immediate_user_tier = trimmed_list[0] if trimmed_list else 1
+            immediate_highest_tier = trimmed_list[0] if trimmed_list else 1
 
-            # 문제 수 설정
-            if lvl in ["NEWBIE", "BEGINNER"]:
+            # 문제 수 설정 (태그 레벨에 따라)
+            if tag_level in ["NEWBIE", "BEGINNER"]:
                 m_cnt, a_cnt = 15, 10
-            elif lvl == "REQUIREMENT":
+            elif tag_level == "REQUIREMENT":
                 m_cnt, a_cnt = 10, 7
             else:
                 m_cnt, a_cnt = 7, 5
 
+            # Recommendation period 설정
+            im_period, ad_period, mas_period = 3, 7, 14
+
             # Immediate 삽입
             conn.execute(text("""
-                INSERT INTO tag_skill (tag_level, tag_skill_code, min_solved_problem, min_user_tier, min_solved_problem_tier, created_at, updated_at, active_yn)
-                VALUES (:lvl, :sc, :mp, :mut, :mspt, :now, :now, :yn)
+                INSERT INTO tag_skill (tag_id, tag_level, tag_skill_code,
+                                     min_solved_problem, min_user_tier, min_solved_problem_tier,
+                                     recommendation_period, created_at, updated_at, active_yn)
+                VALUES (:tag_id, :lvl, :sc, :mp, :mut, :mspt, :period, :now, :now, :yn)
                 ON DUPLICATE KEY UPDATE
                     min_solved_problem = VALUES(min_solved_problem),
                     min_user_tier = VALUES(min_user_tier),
                     min_solved_problem_tier = VALUES(min_solved_problem_tier),
+                    recommendation_period = VALUES(recommendation_period),
                     updated_at = VALUES(updated_at)
-            """), {"lvl": lvl, "sc": "IM", "mp": 0, "mut": immediate_user_tier, "mspt": immediate_highest_tier, "now": now, "yn": True})
+            """), {
+                "tag_id": tag_id_val,
+                "lvl": tag_level,
+                "sc": "IM",
+                "mp": 0,
+                "mut": immediate_user_tier,
+                "mspt": immediate_highest_tier,
+                "period": im_period,
+                "now": now,
+                "yn": True
+            })
 
-            sid = conn.execute(text("SELECT tag_skill_id FROM tag_skill WHERE tag_level=:lvl AND tag_skill_code=:sc"),
-                               {"lvl": lvl, "sc": "IM"}).fetchone()[0]
-            skill_id_map[(lvl, "IM")] = sid
+            sid = conn.execute(text(
+                "SELECT tag_skill_id FROM tag_skill WHERE tag_id=:tid AND tag_skill_code=:sc"
+            ), {"tid": tag_id_val, "sc": "IM"}).fetchone()[0]
+            skill_id_map[(tag_id_val, "IM")] = sid
 
             # Advanced 삽입
             conn.execute(text("""
-                INSERT INTO tag_skill (tag_level, tag_skill_code, min_solved_problem, min_user_tier, min_solved_problem_tier, created_at, updated_at, active_yn)
-                VALUES (:lvl, :sc, :mp, :mut, :mspt, :now, :now, :yn)
+                INSERT INTO tag_skill (tag_id, tag_level, tag_skill_code,
+                                     min_solved_problem, min_user_tier, min_solved_problem_tier,
+                                     recommendation_period, created_at, updated_at, active_yn)
+                VALUES (:tag_id, :lvl, :sc, :mp, :mut, :mspt, :period, :now, :now, :yn)
                 ON DUPLICATE KEY UPDATE
                     min_solved_problem = VALUES(min_solved_problem),
                     min_user_tier = VALUES(min_user_tier),
                     min_solved_problem_tier = VALUES(min_solved_problem_tier),
+                    recommendation_period = VALUES(recommendation_period),
                     updated_at = VALUES(updated_at)
-            """), {"lvl": lvl, "sc": "AD", "mp": a_cnt, "mut": advanced_user_tier, "mspt": advanced_highest_tier, "now": now, "yn": True})
+            """), {
+                "tag_id": tag_id_val,
+                "lvl": tag_level,
+                "sc": "AD",
+                "mp": a_cnt,
+                "mut": advanced_user_tier,
+                "mspt": advanced_highest_tier,
+                "period": ad_period,
+                "now": now,
+                "yn": True
+            })
 
-            sid = conn.execute(text("SELECT tag_skill_id FROM tag_skill WHERE tag_level=:lvl AND tag_skill_code=:sc"),
-                               {"lvl": lvl, "sc": "AD"}).fetchone()[0]
-            skill_id_map[(lvl, "AD")] = sid
+            sid = conn.execute(text(
+                "SELECT tag_skill_id FROM tag_skill WHERE tag_id=:tid AND tag_skill_code=:sc"
+            ), {"tid": tag_id_val, "sc": "AD"}).fetchone()[0]
+            skill_id_map[(tag_id_val, "AD")] = sid
 
             # Master 삽입
             conn.execute(text("""
-                INSERT INTO tag_skill (tag_level, tag_skill_code, min_solved_problem, min_user_tier, min_solved_problem_tier, created_at, updated_at, active_yn)
-                VALUES (:lvl, :sc, :mp, :mut, :mspt, :now, :now, :yn)
+                INSERT INTO tag_skill (tag_id, tag_level, tag_skill_code,
+                                     min_solved_problem, min_user_tier, min_solved_problem_tier,
+                                     recommendation_period, created_at, updated_at, active_yn)
+                VALUES (:tag_id, :lvl, :sc, :mp, :mut, :mspt, :period, :now, :now, :yn)
                 ON DUPLICATE KEY UPDATE
                     min_solved_problem = VALUES(min_solved_problem),
                     min_user_tier = VALUES(min_user_tier),
                     min_solved_problem_tier = VALUES(min_solved_problem_tier),
+                    recommendation_period = VALUES(recommendation_period),
                     updated_at = VALUES(updated_at)
-            """), {"lvl": lvl, "sc": "MAS", "mp": m_cnt, "mut": master_user_tier, "mspt": master_highest_tier, "now": now, "yn": True})
+            """), {
+                "tag_id": tag_id_val,
+                "lvl": tag_level,
+                "sc": "MAS",
+                "mp": m_cnt,
+                "mut": master_user_tier,
+                "mspt": master_highest_tier,
+                "period": mas_period,
+                "now": now,
+                "yn": True
+            })
 
-            sid = conn.execute(text("SELECT tag_skill_id FROM tag_skill WHERE tag_level=:lvl AND tag_skill_code=:sc"),
-                               {"lvl": lvl, "sc": "MAS"}).fetchone()[0]
-            skill_id_map[(lvl, "MAS")] = sid
+            sid = conn.execute(text(
+                "SELECT tag_skill_id FROM tag_skill WHERE tag_id=:tid AND tag_skill_code=:sc"
+            ), {"tid": tag_id_val, "sc": "MAS"}).fetchone()[0]
+            skill_id_map[(tag_id_val, "MAS")] = sid
+
+            logger.debug(f"Created tag_skills for tag {tag_code} (id={tag_id_val}): "
+                        f"IM={immediate_user_tier}, AD={advanced_user_tier}, MAS={master_user_tier}")
 
         self.skill_id_map = skill_id_map
-        logger.info("Tag skills setup completed with calculated tiers")
+        logger.info(f"Per-tag tag skills setup completed: {len(skill_id_map)} records created")
 
     def _setup_filters(self, conn, now):
-        """문제 추천 난이도 필터 설정"""
+        """문제 추천 난이도 필터 설정
+        """
         logger.info("Setting up recommendation level filters...")
 
+
         filter_data = [
-            ("EASY", "쉬움", -5, None, "IM", 100),
-            ("NORMAL", "보통", 0, -1, "AD", 20),
-            ("HARD", "어려움", 2, 1, "AD", 40),
-            ("EXTREME", "매우 어려움", 10, 2, "MAS", 10)
+            ("EASY", "쉬움", None, -5, "IM", 100, 0),
+            ("EASY", "쉬움", None, -5, "AD", 100, 0),
+            ("EASY", "쉬움", None, -5, "MAS", 100, 0),
+            ("NORMAL", "보통", None, None, "IM", 100, 50),
+            ("NORMAL", "보통", None, None, "AD", 50, 20),
+            ("NORMAL", "보통", None, None, "MAS", 20, 0),
+            ("HARD", "어려움", None, None, "IM", 50, 30),
+            ("HARD", "어려움", None, None, "AD", 20, 0),
+            ("HARD", "어려움", None, None, "MAS", 10, 0),
+            ("EXTREME", "매우 어려움", 2, None, "IM", 10, 0),
+            ("EXTREME", "매우 어려움", 2, None, "AD", 10, 0),
+            ("EXTREME", "매우 어려움", 2, None, "MAS", 10, 0)
         ]
-        for f_code, d_name, min_d, max_d, s_code, rate in filter_data:
-            s_id = self.skill_id_map.get(("BEGINNER", s_code))
+        for f_code, d_name, min_d, max_d, code, min_rate, max_rate in filter_data:
             conn.execute(text("""
-                INSERT INTO problem_recommendation_level_filter (filter_code, display_name, min_user_tier_diff, max_user_tier_diff, tag_skill_id, tag_skill_rate, created_at, updated_at, active_yn)
-                VALUES (:fc, :dn, :min, :max, :sid, :rate, :now, :now, :yn)
+                INSERT INTO problem_recommendation_level_filter (filter_code, display_name, min_user_tier_diff, max_user_tier_diff, tag_skill_code, min_tag_skill_rate, max_tag_skill_rate, created_at, updated_at, active_yn)
+                VALUES (:fc, :dn, :min, :max, :scode, :mirate, :marate, :now, :now, :yn)
                 ON DUPLICATE KEY UPDATE
                     display_name = VALUES(display_name),
                     updated_at = VALUES(updated_at)
-            """), {"fc": f_code, "dn": d_name, "min": min_d, "max": max_d, "sid": s_id, "rate": rate, "now": now, "yn": True})
+            """), {"fc": f_code, "dn": d_name, "min": min_d, "max": max_d, "scode": code, "mirate": min_rate, "marate": max_rate, "now": now, "yn": True})
 
         logger.info("Recommendation level filters setup completed")
     

@@ -9,14 +9,14 @@ from app.problem.domain.entity.problem import Problem
 class RecommendationCandidate:
     """추천 문제 후보 VO"""
     problem: Problem
-    reason: str
+    reasons: list[str]
     tag_name: str
 
     @staticmethod
-    def create(problem: Problem, reason: str, tag_name: str) -> 'RecommendationCandidate':
+    def create(problem: Problem, reasons: list[str], tag_name: str) -> 'RecommendationCandidate':
         """팩토리 메서드"""
         return RecommendationCandidate(
             problem=problem,
-            reason=reason,
+            reasons=reasons,
             tag_name=tag_name
         )

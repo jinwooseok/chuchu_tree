@@ -25,6 +25,8 @@ from app.common.infra.client.redis_client import AsyncRedisClient
 from app.common.infra.client.storage_client import MinioClient, NCloudClient
 from app.common.infra.client.kakao_oauth_client import KakaoOAuthClient
 from app.common.infra.client.naver_oauth_client import NaverOAuthClient
+from app.common.infra.client.google_oauth_client import GoogleOAuthClient
+from app.common.infra.client.github_oauth_client import GitHubOAuthClient
 
 # ============================================================================
 # Infrastructure - Security
@@ -177,6 +179,16 @@ class Container(containers.DeclarativeContainer):
         csrf_gateway=csrf_token_gateway,
     )
 
+    google_oauth_client = providers.Singleton(
+        GoogleOAuthClient,
+        csrf_gateway=csrf_token_gateway,
+    )
+
+    github_oauth_client = providers.Singleton(
+        GitHubOAuthClient,
+        csrf_gateway=csrf_token_gateway,
+    )
+
     # ========================================================================
     # Infrastructure - Event Bus (전역 싱글톤)
     # ========================================================================
@@ -193,7 +205,9 @@ class Container(containers.DeclarativeContainer):
         cookie_service=cookie_service,
         domain_event_bus=domain_event_bus,
         kakao_oauth_client=kakao_oauth_client,
-        naver_oauth_client=naver_oauth_client
+        naver_oauth_client=naver_oauth_client,
+        google_oauth_client=google_oauth_client,
+        github_oauth_client=github_oauth_client
     )
 
     # ========================================================================
@@ -370,7 +384,8 @@ class Container(containers.DeclarativeContainer):
         baekjoon_account_repository=baekjoon_account_repository,
         tag_repository=tag_repository,
         tag_skill_repository=tag_skill_repository,
-        tier_repository=tier_repository
+        tier_repository=tier_repository,
+        activity_repository=user_activity_repository
     )
     
     recommand_problems_usecase = providers.Singleton(

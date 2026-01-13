@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 from app.common.domain.vo.identifiers import ProblemId, TagId
+from app.common.domain.vo.primitives import TierRange
 from app.problem.domain.entity.problem import Problem, TierLevel
 
 class ProblemRepository(ABC):
@@ -46,7 +47,8 @@ class ProblemRepository(ABC):
         self,
         tag_id: TagId,
         tier_range: 'TierRange',
-        skill_rate: int,
+        min_skill_rate: int,      # 예: 10 (상위 10%) -> 더 어려운 문제
+        max_skill_rate: int,      # 예: 30 (상위 30%) -> 더 쉬운 문제
         min_solved_count: int,
         exclude_ids: set[int],
         priority_ids: set[int]
