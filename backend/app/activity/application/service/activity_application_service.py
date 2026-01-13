@@ -44,54 +44,55 @@ class ActivityApplicationService:
         self,
         payload: GetMonthlyActivityDataPayload
     ) -> MonthlyActivityDataQuery:
-        """
-        월간 활동 데이터 조회
-        Args:
-            payload: 월간 활동 데이터 조회 요청
-        Returns:
-            MonthlyActivityDataQuery: 월간 활동 데이터
-        """
         user_account_id = UserAccountId(payload.user_account_id)
 
-        # 1. 월간 푼 문제 기록 조회
+        # 1. 월간 푼 문제 기록 조회 (Repository에서 이미 ORDER BY 정렬되어 있어야 함)
         problem_records = await self.user_activity_repository.find_monthly_problem_records(
             user_id=user_account_id,
             year=payload.year,
             month=payload.month
         )
 
-        # 2. 월간 풀 예정 문제 조회
+        # 2. 월간 풀 예정 문제 조회 (Repository에서 이미 ORDER BY 정렬되어 있어야 함)
         will_solve_problems = await self.user_activity_repository.find_monthly_will_solve_problems(
             user_id=user_account_id,
             year=payload.year,
             month=payload.month
         )
-
-        # 3. 날짜별로 그룹화
-        daily_map = defaultdict(lambda: {"solved": set(), "will_solve": set()})
+        # print(will_solve_problems)
+        # 3. 날짜별로 그룹화 (set 대신 list 사용)
+        # 순서를 보존하기 위해 list를 사용합니다.
+        daily_map = defaultdict(lambda: {"solved": [], "will_solve": []})
 
         for record in problem_records:
             if record.solved:
-                daily_map[record.marked_date]["solved"].add(record.problem_id.value)
+                pid = record.problem_id.value
+                # 중복 체크를 하며 리스트에 추가 (이미 정렬된 순서 유지)
+                if pid not in daily_map[record.marked_date]["solved"]:
+                    daily_map[record.marked_date]["solved"].append(pid)
 
         for will_solve in will_solve_problems:
-            daily_map[will_solve.marked_date]["will_solve"].add(will_solve.problem_id.value)
+            pid = will_solve.problem_id.value
+            # 중복 체크를 하며 리스트에 추가 (이미 정렬된 순서 유지)
+            if pid not in daily_map[will_solve.marked_date]["will_solve"]:
+                daily_map[will_solve.marked_date]["will_solve"].append(pid)
 
-        # 4. 해당 월의 모든 날짜 생성 (데이터가 없는 날도 포함)
+        # 4. 해당 월의 모든 날짜 생성
         _, last_day = monthrange(payload.year, payload.month)
         daily_activities = []
 
         for day in range(1, last_day + 1):
             target_date = date(payload.year, payload.month, day)
-            day_data = daily_map.get(target_date, {"solved": set(), "will_solve": set()})
+            # 이미 3번에서 list로 만들었으므로 그대로 사용합니다.
+            day_data = daily_map.get(target_date, {"solved": [], "will_solve": []})
 
             daily_activities.append(DailyActivityQuery(
                 target_date=target_date,
-                solved_problem_ids=list(day_data["solved"]),
-                will_solve_problem_ids=list(day_data["will_solve"])
+                solved_problem_ids=day_data["solved"],
+                will_solve_problem_ids=day_data["will_solve"]
             ))
 
-        # 5. 전체 문제 수 계산
+        # 5. 전체 문제 수 계산 (고유 ID 수이므로 여기선 set을 써도 무방)
         total_problem_ids = set()
         for day_data in daily_map.values():
             total_problem_ids.update(day_data["solved"])

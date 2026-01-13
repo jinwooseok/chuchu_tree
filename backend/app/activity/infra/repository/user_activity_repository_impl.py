@@ -115,7 +115,10 @@ class UserActivityRepositoryImpl(UserActivityRepository):
                     WillSolveProblemModel.deleted_at.is_(None)
                 )
             )
-            .order_by(WillSolveProblemModel.marked_date.asc())
+            .order_by(
+                WillSolveProblemModel.marked_date.asc(), 
+                WillSolveProblemModel.order.asc()
+            )
         )
 
         result = await self.session.execute(stmt)
