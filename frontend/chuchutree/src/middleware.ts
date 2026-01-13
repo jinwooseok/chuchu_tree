@@ -1,7 +1,18 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const API_URL = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || 'https://chuchu-tree-dev.duckdns.org';
+// middleware.ts 상단에 추가
+const getApiUrl = () => {
+  // 서버 사이드(Middleware)에서는 내부 localhost 사용
+  if (typeof window === 'undefined') {
+    // FastAPI가 같은 host network에서 실행 중이라면
+    return process.env.INTERNAL_API_URL || 'http://localhost:8000';
+  }
+  // 클라이언트에서는 외부 도메인 사용
+  return process.env.NEXT_PUBLIC_BACKEND_URL || 'https://chuchu-tree-dev.duckdns.org';
+};
+
+const API_URL = getApiUrl();
 
 // 인증이 필요한 경로
 const protectedPaths = ['/', '/bj-account'];
@@ -106,16 +117,9 @@ export async function middleware(request: NextRequest) {
       response.cookies.delete('refresh_token');
       return response;
     } catch (error) {
-      console.error('[Middleware] Error during token validation:', error);
-      if (isDev) {
-        // dev에서는 그냥 통과 or 유지
-        return NextResponse.next();
-      }
-      // 네트워크 에러 등 - 쿠키 삭제 후 로그인 페이지로
-      const response = NextResponse.redirect(new URL('/sign-in', request.url));
-      response.cookies.delete('access_token');
-      response.cookies.delete('refresh_token');
-      return response;
+      console.error('[Middleware] Token validation failed (server-side network issue):', error instanceof Error ? error.message : error);
+      console.log('[Middleware] Allowing access - client-side auth will handle validation');
+      return NextResponse.next();
     }
   }
 

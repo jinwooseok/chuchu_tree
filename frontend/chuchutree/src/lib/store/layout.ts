@@ -14,6 +14,7 @@ interface LayoutState {
   topSection: TopSection;
   centerSection: CenterSection;
   bottomSection: BottomSection;
+  infoSidebarWidth: number;
   topSectionTierbarHeight: number;
   topSectionStreakHeight: number;
   bottomSectionHeight: number;
@@ -23,6 +24,7 @@ interface LayoutState {
   toggleTopSection: (section: 'tierbar' | 'streak') => void;
   setCenterSection: (section: CenterSection) => void;
   toggleBottomSection: () => void;
+  setInfoSidebarWidth: () => void;
   setTopSectionTierbarHeight: () => void;
   setTopSectionStreakHeight: () => void;
   setBottomSectionHeight: () => void;
@@ -36,6 +38,7 @@ export const useLayoutStore = create<LayoutState>()(
         topSection: null,
         centerSection: 'calendar',
         bottomSection: null,
+        infoSidebarWidth: 200,
         topSectionTierbarHeight: 80,
         topSectionStreakHeight: 240,
         bottomSectionHeight: 240,
@@ -96,6 +99,11 @@ export const useLayoutStore = create<LayoutState>()(
             state.bottomSectionHeight = 60;
           });
         },
+        setInfoSidebarWidth: () => {
+          set((state) => {
+            state.infoSidebarWidth = 300;
+          });
+        },
       })),
       {
         name: 'layout-storage',
@@ -103,6 +111,7 @@ export const useLayoutStore = create<LayoutState>()(
           topSection: state.topSection,
           centerSection: state.centerSection,
           bottomSection: state.bottomSection,
+          infoSidebarWidth: state.infoSidebarWidth,
           topSectionTierbarHeight: state.topSectionTierbarHeight,
           topSectionStreakHeight: state.topSectionStreakHeight,
           bottomSectionHeight: state.bottomSectionHeight,
