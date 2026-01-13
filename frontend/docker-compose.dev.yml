@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile.dev
       args:
-        - NEXT_PUBLIC_API_URL=https://chuchu-tree-dev.duckdns.org/api/v1
+        - ENV_FILE=chuchutree/.env.production
     image: chuchu-frontend-dev:latest
     container_name: chuchu-frontend-dev
     network_mode: host 
@@ -12,5 +12,5 @@ services:
       - NODE_ENV=development
       - PORT=3334
       - HOSTNAME=0.0.0.0
-    command: ["node", "server.js", "--port", "3334"] 
+    command: ["node", "server.js"] 
     restart: unless-stopped
