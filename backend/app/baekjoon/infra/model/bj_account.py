@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class BjAccount(Base):
+class BjAccountModel(Base):
     __tablename__ = "bj_account"
     __table_args__ = {'comment': '백준 계정'}
 

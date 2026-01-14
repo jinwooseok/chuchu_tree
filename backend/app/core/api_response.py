@@ -11,8 +11,8 @@ class ErrorDetail(BaseModel):
 class ApiResponseSchema(BaseModel, Generic[T]):
     status: int
     message: str
-    data: T|None = None
-    error: ErrorDetail|None = None
+    data: T|dict
+    error: ErrorDetail|dict
 
 
 # 표준 API 응답 클래스
@@ -32,9 +32,9 @@ class ApiResponse(JSONResponse):
         if error_code and error_message:
             message = "failed"
             error = ErrorDetail(code=error_code, message=error_message)
-            data = None
+            data = {}
         else:
-            error = None
+            error = {}
             
         content = ApiResponseSchema(
             status=status_code,

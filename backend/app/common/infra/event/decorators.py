@@ -5,7 +5,7 @@ import inspect
 from typing import get_type_hints
 from pydantic import BaseModel
 
-from app.common.domain.service.local_handler import local_handler
+from app.common.infra.event.in_memory_event_bus import get_event_bus
 
 logger = logging.getLogger(__name__)
 
@@ -64,66 +64,85 @@ def event_register_handlers(service_name: str | None = None):
             event_types = method._event_types # type: ignore
 
             for event_type in event_types:
-                def make_handler(bound_method, bound_service_name):
-                    async def wrapper(event_name: str, payload):
+                def make_handler(bound_method, bound_service_name, bound_method_name):
+                    """
+                    메서드를 감싸는 wrapper 생성
+
+                    wrapper의 책임:
+                    1. dict → B_Command 변환 (타입 힌트 기반)
+                    2. 실제 메서드 실행
+                    3. B_Query → dict 변환
+                    """
+                    # 타입 힌트 미리 분석 (정적 분석 - 한 번만 실행)
+                    try:
+                        type_hints = get_type_hints(bound_method)
+                    except Exception as e:
+                        logger.warning(f"Failed to get type hints for {bound_method.__name__}: {e}")
+                        type_hints = {}
+
+                    # self를 제외한 첫 번째 파라미터의 타입 찾기
+                    target_command_type = None
+                    sig = inspect.signature(bound_method)
+                    param_names = list(sig.parameters.keys())
+
+                    if len(param_names) > 1:  # self 제외하고 파라미터가 있으면
+                        second_param_name = param_names[1]
+                        target_command_type = type_hints.get(second_param_name)
+
+                    async def wrapper(event_name: str, payload: dict):
+                        """
+                        이벤트 핸들러 wrapper
+                        """
                         try:
-                            from main import app
+                            # Container에서 서비스 인스턴스 획득
+                            from app.main import app
                             container = app.container
                             service = getattr(container, bound_service_name)()
 
-                            # Command 객체 또는 dict 처리
-                            type_hints = get_type_hints(bound_method)
-                            params = list(type_hints.items())
+                            # [2단계: dict → B_Command] wrapper의 책임
+                            converted_payload = payload
 
-                            if len(params) > 1:
-                                param_name, param_type = params[1]
-                                
-                                # Union type 처리 (int | Command)
-                                if hasattr(param_type, '__args__'):
-                                    # Union type이면 BaseModel 찾기
-                                    for arg_type in param_type.__args__:
-                                        try:
-                                            if isinstance(arg_type, type) and issubclass(arg_type, BaseModel):
-                                                if isinstance(payload, arg_type):
-                                                    result = await bound_method(service, payload)
-                                                elif isinstance(payload, dict):
-                                                    payload_obj = arg_type(**payload)
-                                                    result = await bound_method(service, payload_obj)
-                                                else:
-                                                    result = await bound_method(service, payload)
-
-                                                logger.info(f"✅ Event handler succeeded: {bound_service_name}.{bound_method.__name__} for {event_name}")
-                                                return result
-                                        except TypeError:
-                                            # issubclass 실패 시 다음 arg로
-                                            continue
-                                # 단일 BaseModel type
+                            if target_command_type is not None:
                                 try:
-                                    if isinstance(param_type, type) and issubclass(param_type, BaseModel):
-                                        if isinstance(payload, param_type):
-                                            result = await bound_method(service, payload)
-                                        elif isinstance(payload, dict):
-                                            # dict를 Command로 변환
-                                            payload_obj = param_type(**payload)
-                                            result = await bound_method(service, payload_obj)
-                                        else:
-                                            result = await bound_method(service, payload)
-                                        return result
+                                    if isinstance(payload, dict):
+                                        if inspect.isclass(target_command_type) and issubclass(target_command_type, BaseModel):
+                                            converted_payload = target_command_type.model_validate(payload)
+ 
                                 except TypeError:
-                                    # issubclass 실패 시 fallback
-                                    pass
+                                    # Union type 등으로 issubclass 실패 시 원본 사용
+                                    logger.debug(f"[wrapper] Type conversion skipped for {bound_method_name}")
 
-                            # fallback: dict를 그대로 전달
-                            result = await bound_method(service, payload)
+                            # 실제 도메인 로직 실행
+                            result = await bound_method(service, converted_payload)
+
+                            # [3단계: B_Query → dict] wrapper의 책임
+                            if hasattr(result, "model_dump"):
+                                dict_result = result.model_dump()
+                                return dict_result
+
                             return result
 
                         except Exception as e:
+                            logger.error(
+                                f"Error in event wrapper [{event_name}] "
+                                f"for {bound_service_name}.{bound_method_name}: {e}",
+                                exc_info=True
+                            )
                             raise
+
                     return wrapper
 
-                handler = make_handler(method, actual_service_name)
-                local_handler.register(event_name=event_type)(handler)
-                logger.info(f"✅ Registered: {actual_service_name}.{method_name} → {event_type.value}")
+                # wrapper 생성
+                handler = make_handler(method, actual_service_name, method_name)
+
+                # 전역 싱글톤 EventBus의 맵에 등록
+                event_bus = get_event_bus()
+                event_bus.subscribe(event_name=event_type)(handler)
+                
+                logger.info(
+                    f"✨ [Event-Register] {actual_service_name}.{method_name} "
+                    f"is now listening to '{event_type}'"
+                )
 
         return cls
     return class_decorator

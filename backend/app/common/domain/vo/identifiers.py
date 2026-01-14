@@ -9,6 +9,10 @@ class BaekjoonAccountId:
     value: str
 
 @dataclass(frozen=True)
+class AccountLinkId:
+    value: int
+
+@dataclass(frozen=True)
 class TargetId:
     value: int
 
@@ -34,5 +38,12 @@ class UserActivityId:
 
 @dataclass(frozen=True)
 class LevelFilterId:
-    """Value Object - 필터 ID"""
+    value: int
+    
+@dataclass(frozen=True)
+class ProblemHistoryId:
+    value: int
+
+@dataclass(frozen=True)
+class StreakId:
     value: int

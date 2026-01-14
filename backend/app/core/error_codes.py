@@ -124,3 +124,51 @@ class ErrorCode(Enum):
         message="올바르지 않은 값이 입력됐습니다.",
         status_code=400
     )
+
+    INVALID_REQUEST = ErrorCodeInfo(
+        code="INVALID_REQUEST",
+        message="잘못된 요청입니다.",
+        status_code=400
+    )
+
+    INVALID_CSRF_TOKEN = ErrorCodeInfo(
+        code="INVALID_CSRF_TOKEN",
+        message="CSRF 토큰 검증에 실패했습니다.",
+        status_code=403
+    )
+
+    EXTERNAL_API_ERROR = ErrorCodeInfo(
+        code="EXTERNAL_API_ERROR",
+        message="외부 API 호출 중 오류가 발생했습니다.",
+        status_code=502
+    )
+
+    BAEKJOON_USER_NOT_FOUND = ErrorCodeInfo(
+        code="BAEKJOON_USER_NOT_FOUND",
+        message="백준 유저를 찾을 수 없습니다.",
+        status_code=404
+    )
+    
+    UNLINKED_USER = ErrorCodeInfo(
+        code="UNLINKED_USER",
+        message="백준 계정과 연동되지 않았습니다.",
+        status_code=404
+    )
+    
+    DUPLICATED_ORDER = ErrorCodeInfo(
+        code="DUPLICATED_ORDER",
+        message="순서가 중복입니다.",
+        status_code=400
+    )
+    
+    TAG_NOT_FOUND = ErrorCodeInfo(
+        code="TAG_NOT_FOUND",
+        message="태그 정보를 찾을 수 없습니다.",
+        status_code=400
+    )
+    
+    LINK_COOLDOWN_PERIOD = ErrorCodeInfo(
+        code="LINK_COOLDOWN_PERIOD",
+        message="마지막 계정 변경 이후 7일이 지나지 않았습니다.",
+        status_code=400
+    )

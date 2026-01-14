@@ -1,13 +1,13 @@
 from dataclasses import dataclass
 from datetime import datetime
-from app.common.domain.vo.identifiers import BaekjoonAccountId
+from app.common.domain.vo.identifiers import AccountLinkId, BaekjoonAccountId
 from app.user.domain.entity.user_account import UserAccountId
 
 
 @dataclass
 class AccountLink:
     """Entity - 계정 연동"""
-    account_link_id: int|None
+    account_link_id: AccountLinkId | None
     user_account_id: UserAccountId
     bj_account_id: BaekjoonAccountId
     created_at: datetime

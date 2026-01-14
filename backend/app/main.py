@@ -1,20 +1,29 @@
 from datetime import datetime
 from fastapi import FastAPI
+from fastapi.exceptions import RequestValidationError
+from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from fastapi.concurrency import asynccontextmanager
 
 from app.core.api_response import ApiResponse
 from app.core.containers import Container
 from app.core.loggers import setup_logging
+from app.core import database
+import app.core.database_models
+from app.core.exception import (
+    APIException,
+    custom_exception_handler,
+    http_exception_handler,
+    validation_exception_handler
+)
+from app.middlewares import create_middlewares
 
 # Import routers
 from app.common.presentation.controller.auth_controller import router as auth_router
 from app.user.presentation.controller.user_controller import router as user_router, admin_router as admin_user_router
-from app.baekjoon.presentation.controller.baekjoon_controller import router as baekjoon_router, admin_router as admin_baekjoon_router
+from app.baekjoon.presentation.controller.baekjoon_controller import router as baekjoon_router
 from app.target.presentation.controller.target_controller import (
-    router as target_router,
-    user_router as target_user_router,
-    baekjoon_router as target_baekjoon_router
+    router as target_router
 )
 from app.activity.presentation.controller.activity_controller import router as activity_router
 from app.problem.presentation.controller.problem_controller import router as problem_router
@@ -34,10 +43,15 @@ class AppWithContainer(FastAPI):
 async def lifespan(app: AppWithContainer):
     injection_container = Container()
     app.container = injection_container
+    await injection_container.init_resources_provider(injection_container)
+    db = injection_container.database()
+    database.database_instance = db
     try:
         yield
     finally:
         # 정리 작업
+        if database.database_instance:
+            await database.database_instance.close()
         return
 
 app = AppWithContainer(
@@ -51,6 +65,14 @@ app = AppWithContainer(
     lifespan=lifespan
 )
 
+# Register middlewares (CORS 등)
+create_middlewares(app)
+
+# Register exception handlers
+app.add_exception_handler(APIException, custom_exception_handler)
+app.add_exception_handler(StarletteHTTPException, http_exception_handler)
+app.add_exception_handler(RequestValidationError, validation_exception_handler)
+
 # Register routers with /api/v1 prefix
 API_V1_PREFIX = "/api/v1"
 
@@ -63,12 +85,9 @@ app.include_router(admin_user_router, prefix=API_V1_PREFIX)
 
 # Baekjoon routers
 app.include_router(baekjoon_router, prefix=API_V1_PREFIX)
-app.include_router(admin_baekjoon_router, prefix=API_V1_PREFIX)
 
 # Target routers
 app.include_router(target_router, prefix=API_V1_PREFIX)
-app.include_router(target_user_router, prefix=API_V1_PREFIX)
-app.include_router(target_baekjoon_router, prefix=API_V1_PREFIX)
 
 # Activity router
 app.include_router(activity_router, prefix=API_V1_PREFIX)

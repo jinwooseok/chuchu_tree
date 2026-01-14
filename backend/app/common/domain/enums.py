@@ -5,9 +5,13 @@ class Provider(str, Enum):
     KAKAO = "KAKAO"
     NAVER = "NAVER"
     GOOGLE = "GOOGLE"
+    GITHUB = "GITHUB"
     NONE = "NONE"
 
-
+    @classmethod
+    def has_value(cls, value: str) -> bool:
+        return value in cls._value2member_map_
+    
 class TagLevel(str, Enum):
     NEWBIE = "NEWBIE"
     BEGINNER = "BEGINNER"

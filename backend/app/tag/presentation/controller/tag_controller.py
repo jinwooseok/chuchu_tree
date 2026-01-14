@@ -14,30 +14,30 @@ from app.core.api_response import ApiResponse, ApiResponseSchema
 user_router = APIRouter(prefix="/user-accounts/me", tags=["user-tags"])
 
 
-@user_router.get("/tags", response_model=ApiResponseSchema[UserTagsResponse])
-@inject
-async def get_user_tags(
-    current_user: CurrentUser = Depends(get_current_member),
-    # tag_service = Depends(Provide[Container.tag_service])
-):
-    """
-    유저의 태그 목록 조회 (EXCLUDED - 유저 밴 + 목표 포함 X)
+# @user_router.get("/tags", response_model=ApiResponseSchema[UserTagsResponse])
+# @inject
+# async def get_user_tags(
+#     current_user: CurrentUser = Depends(get_current_member),
+#     # tag_service = Depends(Provide[Container.tag_service])
+# ):
+#     """
+#     유저의 태그 목록 조회 (EXCLUDED - 유저 밴 + 목표 포함 X)
 
-    Returns:
-        카테고리별 태그, 전체 태그 목록
-    """
-    # TODO: Implement get user tags logic
-    # 1. Get all tags
-    # 2. Filter by user's ban list
-    # 3. Filter by user's targets
-    # 4. Calculate statistics for each tag
+#     Returns:
+#         카테고리별 태그, 전체 태그 목록
+#     """
+#     # TODO: Implement get user tags logic
+#     # 1. Get all tags
+#     # 2. Filter by user's ban list
+#     # 3. Filter by user's targets
+#     # 4. Calculate statistics for each tag
 
-    response_data = UserTagsResponse(
-        categories=[],
-        tags=[]
-    )
+#     response_data = UserTagsResponse(
+#         categories=[],
+#         tags=[]
+#     )
 
-    return ApiResponse(data=response_data.model_dump(by_alias=True))
+#     return ApiResponse(data=response_data.model_dump(by_alias=True))
 
 
 # Public tag endpoints

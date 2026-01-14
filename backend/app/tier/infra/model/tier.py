@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class Tier(Base):
+class TierModel(Base):
     __tablename__ = "tier"
     __table_args__ = (
         UniqueConstraint('tier_level', 'tier_code', name='uk_tier_level_code'),

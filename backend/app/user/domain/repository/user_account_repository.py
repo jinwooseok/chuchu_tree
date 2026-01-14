@@ -8,7 +8,7 @@ class UserAccountRepository(ABC):
     """Repository 인터페이스"""
     
     @abstractmethod
-    async def save(self, user_account: UserAccount) -> UserAccount:
+    async def insert(self, user_account: UserAccount) -> UserAccount:
         """유저 저장"""
         pass
     
@@ -29,4 +29,9 @@ class UserAccountRepository(ABC):
     @abstractmethod
     async def exists_by_id(self, user_id: UserAccountId) -> bool:
         """유저 존재 여부 확인"""
+        pass
+
+    @abstractmethod
+    async def update(self, user_account: UserAccount) -> UserAccount:
+        """유저 업데이트"""
         pass

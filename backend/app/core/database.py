@@ -106,7 +106,6 @@ def transactional(func: Callable[..., Awaitable]) -> Callable[..., Awaitable]:
             return await func(*args, **kwargs)
 
         if database_instance is None:
-            logger.info("DB 인스턴스가 없습니다.")
             raise APIException(ErrorCode.DATABASE_ERROR)
 
         is_test_env = environment == 'test'
@@ -135,10 +134,13 @@ def transactional(func: Callable[..., Awaitable]) -> Callable[..., Awaitable]:
             # 로컬/프로덕션 환경: 기존 세션 확인 후 새 세션 생성
             try:
                 current_session = database_instance.get_current_session()
-                return await func(*args, **kwargs)
             except (LookupError, APIException):
+                # 세션이 없으면 새 세션 생성
                 async with database_instance.session() as session:
                     return await func(*args, **kwargs)
+            else:
+                # 세션이 있으면 그냥 함수 실행
+                return await func(*args, **kwargs)
 
     return _wrapper
 

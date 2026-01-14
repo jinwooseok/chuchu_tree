@@ -34,3 +34,24 @@ class DevConfig(BaseConfig):
     STORAGE_BUCKET: str = Field(alias="LOCAL_STORAGE_BUCKET", default="adkick-bucket", description="스토리지 버킷명")
     STORAGE_REGION: str = Field(alias="LOCAL_STORAGE_REGION", default="us-east-1", description="스토리지 리전")
     STORAGE_PATH: str = Field(alias="DEV_STORAGE_PATH", default="./storage_data", description="로컬 스토리지 경로")
+    
+    # ================================
+    # OAuth Providers
+    # ================================
+    KAKAO_CLIENT_ID: str = Field(alias="KAKAO_CLIENT_ID", default="", description="카카오 클라이언트 아이디")
+    KAKAO_CLIENT_SECRET: str = Field(alias="KAKAO_CLIENT_SECRET", default="", description="카카오 클라이언트 비밀키")
+    KAKAO_REDIRECT_URI: str = Field(alias="DEV_KAKAO_REDIRECT_URI", default="http://localhost:8000/api/auth/kakao/callback", description="카카오 리다이렉트 URI")
+    
+    NAVER_CLIENT_ID: str = Field(alias="DEV_NAVER_CLIENT_ID", default="", description="네이버 클라이언트 아이디")
+    NAVER_CLIENT_SECRET: str = Field(alias="DEV_NAVER_CLIENT_SECRET", default="", description="네이버 클라이언트 비밀키")
+    NAVER_REDIRECT_URI: str = Field(alias="DEV_NAVER_REDIRECT_URI", default="http://localhost:8000/api/auth/naver/callback", description="네이버 리다이렉트 URI")
+
+    GOOGLE_CLIENT_ID: str = Field(alias="GOOGLE_CLIENT_ID", default="", description="구글 클라이언트 아이디")
+    GOOGLE_CLIENT_SECRET: str = Field(alias="GOOGLE_CLIENT_SECRET", default="", description="구글 클라이언트 비밀키")
+    GOOGLE_REDIRECT_URI: str = Field(alias="DEV_GOOGLE_REDIRECT_URI", default="https://chuchu-tree-dev.duckdns.org/api/v1/auth/login/google/callback", description="구글 리다이렉트 URI")
+
+    GITHUB_CLIENT_ID: str = Field(alias="DEV_GITHUB_CLIENT_ID", default="", description="깃허브 클라이언트 아이디")
+    GITHUB_CLIENT_SECRET: str = Field(alias="DEV_GITHUB_CLIENT_SECRET", default="", description="깃허브 클라이언트 비밀키")
+    GITHUB_REDIRECT_URI: str = Field(alias="DEV_GITHUB_REDIRECT_URI", default="https://chuchu-tree-dev.duckdns.org/api/v1/auth/login/github/callback", description="깃허브 리다이렉트 URI")
+
+    FRONTEND_REDIRECT_URI: str = Field(alias="DEV_FRONTEND_REDIRECT_URI", default="https://chuchu-tree-dev.duckdns.org", description="프론트엔드 리다이렉트 URI")

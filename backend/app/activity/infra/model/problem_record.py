@@ -6,7 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 from app.core.database import Base
 
 
-class ProblemRecord(Base):
+class ProblemRecordModel(Base):
     __tablename__ = "problem_record"
     __table_args__ = (
         Index('idx_marked_date', 'marked_date'),

@@ -2,26 +2,30 @@ from dataclasses import dataclass
 from datetime import datetime
 
 from app.common.domain.enums import SkillCode, TagLevel
-from app.common.domain.vo.identifiers import TagSkillId, TierId
+from app.common.domain.vo.identifiers import TagSkillId, TagId, TierId
 from app.recommendation.domain.vo.skill_requirements import SkillRequirements
 
 @dataclass
 class TagSkill:
     """Entity - 태그 숙련도"""
     tag_skill_id: TagSkillId | None
+    tag_id: TagId | None  # NEW: Per-tag skill support
     tag_level: TagLevel
     skill_code: SkillCode
     requirements: SkillRequirements
+    recommendation_period: int
     active: bool
     created_at: datetime
     updated_at: datetime
     deleted_at: datetime | None = None
-    
+
     @staticmethod
     def create(
+        tag_id: TagId,  # NEW: Required for per-tag skills
         tag_level: TagLevel,
         skill_code: SkillCode,
         min_solved_problem: int,
+        recommendation_period: int,
         min_user_tier: TierId,
         min_solved_problem_tier: TierId
     ) -> 'TagSkill':
@@ -29,6 +33,7 @@ class TagSkill:
         now = datetime.now()
         return TagSkill(
             tag_skill_id=None,
+            tag_id=tag_id,  # NEW
             tag_level=tag_level,
             skill_code=skill_code,
             requirements=SkillRequirements(
@@ -36,6 +41,7 @@ class TagSkill:
                 min_user_tier,
                 min_solved_problem_tier
             ),
+            recommendation_period=recommendation_period,
             active=True,
             created_at=now,
             updated_at=now,

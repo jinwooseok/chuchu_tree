@@ -17,6 +17,9 @@ services:
       "
     network_mode: host
     restart: "no"
+    depends_on:
+      chuchu-mysql:
+        condition: service_healthy
     deploy:
       resources:
         limits:
@@ -39,6 +42,11 @@ services:
     network_mode: host
     volumes:
       - ./logs:/project/logs
+    depends_on:
+      chuchu-fastapi-migrate:
+        condition: service_completed_successfully
+      chuchu-redis:
+        condition: service_started
   
   chuchu-mysql:
     container_name: chuchu-mysql-dev
@@ -64,14 +72,15 @@ services:
       "--innodb_lock_wait_timeout=120",
       "--max_allowed_packet=1G",
       "--tmp_table_size=256M",
-      "--max_heap_table_size=256M"
+      "--max_heap_table_size=256M",
+      "--port=${DEV_MYSQL_PORT}"
     ]
-    ports:
-      - "${DEV_MYSQL_PORT}:3306"
+    volumes:
+      - ./mysql-dev-data:/var/lib/mysql
     network_mode: host
     restart: always
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-P", "${DEV_MYSQL_PORT}", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
       timeout: 10s
       retries: 5
       start_period: 30s
@@ -80,17 +89,15 @@ services:
   chuchu-redis:
     container_name: chuchu-redis-dev
     image: redis:latest
-    ports:
-      - "${DEV_REDIS_PORT}:6379"
     environment:
       - REDIS_PASSWORD=${REDIS_PASSWORD}
-    command: redis-server --requirepass ${REDIS_PASSWORD} --appendonly yes
+    command: redis-server --port ${DEV_REDIS_PORT} --requirepass ${REDIS_PASSWORD} --appendonly yes
     volumes:
       - ${REDIS_DATA_PATH}:/data
     restart: always
     network_mode: host
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      test: ["CMD", "redis-cli", "-p", "${DEV_REDIS_PORT}", "-a", "${REDIS_PASSWORD}", "ping"]
       timeout: 10s
       retries: 5
       start_period: 10s

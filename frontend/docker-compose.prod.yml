@@ -4,11 +4,13 @@ services:
       context: .
       dockerfile: Dockerfile.prod
       args:
-        - NEXT_PUBLIC_API_URL=https://chuchu-tree.duckdns.org/api/v1
+        - ENV_FILE=chuchutree/.env.production
     image: chuchu-frontend-prod:latest
     container_name: chuchu-frontend-prod
     network_mode: host 
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       - PORT=3333
+      - HOSTNAME=0.0.0.0
+    command: ["node", "server.js", "--port", "3333"] 
     restart: unless-stopped
