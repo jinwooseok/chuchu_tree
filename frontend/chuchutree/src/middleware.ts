@@ -1,134 +1,61 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-
-// middleware.ts 상단에 추가
-const getApiUrl = () => {
-  // 서버 사이드(Middleware)에서는 내부 localhost 사용
-  if (typeof window === 'undefined') {
-    // FastAPI가 같은 host network에서 실행 중이라면
-    return process.env.INTERNAL_API_URL || 'http://localhost:8000';
-  }
-  // 클라이언트에서는 외부 도메인 사용
-  return process.env.NEXT_PUBLIC_BACKEND_URL || 'https://chuchu-tree-dev.duckdns.org';
-};
-
-const API_URL = getApiUrl();
+import { refreshAccessToken, parseCookiesForMiddleware } from '@/lib/auth-utils';
 
 // 인증이 필요한 경로
 const protectedPaths = ['/', '/bj-account'];
-
-const isDev = process.env.NODE_ENV === 'development';
-
-// 인증된 사용자가 접근하면 안되는 경로
-const authPaths = ['/sign-in'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const accessToken = request.cookies.get('access_token')?.value;
   const refreshToken = request.cookies.get('refresh_token')?.value;
 
-  // console.log('[Middleware]', {
-  //   pathname,
-  //   hasAccessToken: !!accessToken,
-  //   hasRefreshToken: !!refreshToken,
-  // });
-
-  // 보호된 경로에 대한 처리
   if (protectedPaths.includes(pathname)) {
-    // 토큰이 아예 없으면 로그인 페이지로
     if (!accessToken) {
-      console.log('[Middleware] No access token, redirecting to sign-in');
       return NextResponse.redirect(new URL('/sign-in', request.url));
     }
-
     // access_token이 있는 경우, 유효성 검증
+    // local환경: rewrites에 의해 https://chuchu-tree-dev.duckdns.org/api/v1/bj-accounts/me로 프록시
+    // 배포 dev 환경: 상대 경로이므로 현재 도메인 기준 https://chuchu-tree-dev.duckdns.org/api/v1/bj-accounts/me 요청 후 Nginx가 이를 FastAPI:8002로 라우팅
+    // 배포 production 환경: 상대 경로이므로 https://chuchu-tree.duckdns.org/api/v1/bj-accounts/me 요청 후 Nginx가 FastAPI로 FastAPI:8001(추정)로 라우팅
     try {
-      console.log('[T@KENCHECK]');
-      const verifyResponse = await fetch(`${API_URL}/api/v1/bj-accounts/me`, {
-        method: 'GET',
+      const verifyResponse = await fetch(`/api/v1/bj-accounts/me`, {
         headers: {
           Cookie: `access_token=${accessToken}${refreshToken ? `; refresh_token=${refreshToken}` : ''}`,
         },
       });
 
-      // 토큰이 유효하면 통과
       if (verifyResponse.ok) {
-        console.log('[Middleware] Token valid, allowing access');
         return NextResponse.next();
       }
 
       // 401 에러 - 토큰 만료
       if (verifyResponse.status === 401 && refreshToken) {
-        console.log('[Middleware] Access token expired, attempting refresh');
+        // 공통 함수 사용
+        const { success, newCookies } = await refreshAccessToken(refreshToken, '');
 
-        // Refresh token으로 재발급 시도
-        const refreshResponse = await fetch(`${API_URL}/api/v1/auth/token/refresh`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Cookie: `refresh_token=${refreshToken}`,
-          },
-        });
-        // Refresh token 재발급 성공
-        if (refreshResponse.ok) {
-          console.log('[Middleware] Token refresh successful');
-
-          // 새 토큰을 쿠키에 설정
+        if (success && newCookies) {
           const response = NextResponse.next();
-          const setCookieHeader = refreshResponse.headers.get('set-cookie');
+          const cookies = parseCookiesForMiddleware(newCookies);
 
-          if (setCookieHeader) {
-            // Set-Cookie 헤더를 파싱하여 각각 설정
-            const cookies = setCookieHeader.split(',').map((c) => c.trim());
-            cookies.forEach((cookie) => {
-              const [nameValue, ...attributes] = cookie.split(';');
-              const [name, value] = nameValue.split('=');
+          cookies.forEach((cookie) => {
+            if (cookie) {
+              response.cookies.set(cookie.name, cookie.value, cookie.options);
+            }
+          });
 
-              if (name && value) {
-                // 쿠키 속성 파싱
-                const cookieOptions: any = {};
-                attributes.forEach((attr) => {
-                  const [key, val] = attr.trim().split('=');
-                  if (key.toLowerCase() === 'path') cookieOptions.path = val;
-                  if (key.toLowerCase() === 'httponly') cookieOptions.httpOnly = true;
-                  if (key.toLowerCase() === 'secure') cookieOptions.secure = true;
-                  if (key.toLowerCase() === 'samesite') cookieOptions.sameSite = val?.toLowerCase();
-                });
-
-                response.cookies.set(name, value, cookieOptions);
-              }
-            });
-          }
-          return response;
-        } else {
-          console.log('[Middleware] Token refresh failed, clearing cookies');
-
-          // Refresh 실패 - 쿠키 삭제 후 로그인 페이지로
-          const response = NextResponse.redirect(new URL('/sign-in', request.url));
-          response.cookies.delete('access_token');
-          response.cookies.delete('refresh_token');
           return response;
         }
       }
-      // 401이지만 refresh_token이 없거나, 다른 에러
-      console.log('[Middleware] Authentication failed, clearing cookies');
+
+      // 재발급 실패
       const response = NextResponse.redirect(new URL('/sign-in', request.url));
       response.cookies.delete('access_token');
       response.cookies.delete('refresh_token');
       return response;
     } catch (error) {
-      console.error('[Middleware] Token validation failed (server-side network issue):', error instanceof Error ? error.message : error);
-      console.log('[Middleware] Allowing access - client-side auth will handle validation');
+      console.error('[Middleware] Error:', error);
       return NextResponse.next();
-    }
-  }
-
-  // 인증 페이지 (로그인)에 대한 처리
-  if (authPaths.includes(pathname)) {
-    // 유효한 토큰이 있으면 홈으로 리다이렉트
-    if (accessToken) {
-      console.log('[Middleware] Already authenticated, redirecting to home');
-      return NextResponse.redirect(new URL('/', request.url));
     }
   }
 
