@@ -33,7 +33,7 @@ axiosInstance.interceptors.response.use(
     const originalRequest = error.config;
 
     // 401 에러이고, 재시도하지 않은 요청인 경우
-    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/login')) {
+    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/sign-in')) {
       originalRequest._retry = true;
 
       try {
@@ -46,7 +46,7 @@ axiosInstance.interceptors.response.use(
       } catch (refreshError) {
         // Refresh 실패 시 로그인 페이지로 리다이렉트
         if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+          window.location.href = '/sign-in';
         }
         return Promise.reject(refreshError);
       }

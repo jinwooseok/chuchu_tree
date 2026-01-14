@@ -16,16 +16,13 @@ const SocialLoginButton = (props: SocialWay) => {
 
     window.location.href = `${baseUrl}${loginPath}${redirectUrl}`;
   };
-  const isDisabled = props.en === 'google' || props.en === 'github' ? true : false;
   return (
     <button
       onClick={handleLogin}
       className="hover:bg-background/50 border-innerground-darkgray relative flex w-80 cursor-pointer items-center justify-between rounded border px-2 py-2 text-sm"
-      disabled={isDisabled}
     >
       <Image src={`/socialicon/${props.en}_light.svg`} alt={`social icon ${props.en}_light`} width={16} height={16} className="absolute left-2 h-6 w-6" />
       <div className="flex-1 text-center">{props.kr}로 시작하기</div>
-      {isDisabled && <div>⚠️(연동안됨)</div>}
     </button>
   );
 };
