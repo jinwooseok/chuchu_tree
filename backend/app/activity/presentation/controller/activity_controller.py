@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, Query
 from dependency_injector.wiring import inject, Provide
 
+from app.activity.application.command.ban_problem_command import BanProblemCommand
 from app.activity.application.command.tag_custom_command import TagCustomCommand
 from app.activity.application.command.update_will_solve_problems import UpdateWillSolveProblemsCommand
+from app.activity.application.query.banned_list_query import BannedProblemsQuery
 from app.activity.application.service.activity_application_service import ActivityApplicationService
 from app.common.domain.vo.current_user import CurrentUser
 from app.common.presentation.dependency.auth_dependencies import get_current_member
@@ -14,6 +16,8 @@ from app.activity.presentation.schema.request.activity_request import (
     BanTagRequest
 )
 from app.activity.presentation.schema.response.activity_response import (
+    BannedProblemsResponse,
+    BannedTagsResponse,
     ProblemRecordResponse
 )
 from app.core.containers import Container
@@ -133,7 +137,10 @@ async def ban_problem(
     Returns:
         빈 데이터
     """
-
+    
+    await activity_application_service.ban_problem(BanProblemCommand(user_account_id=current_user.user_account_id, 
+                                                                     problem_id=request.problem_id,
+                                                                     problem_ban_yn=False))
     return ApiResponse(data={})
 
 
@@ -142,7 +149,7 @@ async def ban_problem(
 async def unban_problem(
     problem_id: int = Query(..., alias="problemId", description="문제 ID"),
     current_user: CurrentUser = Depends(get_current_member),
-    # activity_service = Depends(Provide[Container.activity_service])
+    activity_application_service: ActivityApplicationService = Depends(Provide[Container.activity_application_service])
 ):
     """
     문제 밴 해제
@@ -153,9 +160,11 @@ async def unban_problem(
     Returns:
         빈 데이터
     """
-    # TODO: Implement unban problem logic
     # 1. Remove problem from banned list
-
+    await activity_application_service.unban_problem(BanProblemCommand(user_account_id=current_user.user_account_id, 
+                                                                     problem_id=problem_id,
+                                                                     problem_ban_yn=False))
+    
     return ApiResponse(data={})
 
 
@@ -208,3 +217,23 @@ async def unban_tag(
     ))
 
     return ApiResponse(data={})
+
+@router.get("/problems/banned-list", response_model=ApiResponseSchema[dict])
+@inject
+async def get_banned_problems(
+    current_user: CurrentUser = Depends(get_current_member),
+    activity_application_service: ActivityApplicationService = Depends(Provide[Container.activity_application_service])
+):
+    query: BannedProblemsQuery = await activity_application_service.get_banned_problems(current_user.user_account_id)
+    
+    return ApiResponse(data=BannedProblemsResponse.from_query(query))
+
+@router.get("/tags/banned-list", response_model=ApiResponseSchema[dict])
+@inject
+async def get_banned_tags(
+    current_user: CurrentUser = Depends(get_current_member),
+    activity_application_service: ActivityApplicationService = Depends(Provide[Container.activity_application_service])
+):
+    query = await activity_application_service.get_banned_tags(current_user.user_account_id)
+    
+    return ApiResponse(data=BannedTagsResponse.from_query(query))

@@ -133,7 +133,7 @@ class GetMonthlyProblemsUsecase:
         if not problem_ids:
             return ProblemsInfoQuery(problems={})
         event = DomainEvent(
-            event_type="GET_PROBLEMS_INFO_REQUESTED",
+            event_type="GET_PROBLEM_INFOS_REQUESTED",
             data=GetProblemsInfoPayload(problem_ids=list(problem_ids)),
             result_type=ProblemsInfoQuery
         )

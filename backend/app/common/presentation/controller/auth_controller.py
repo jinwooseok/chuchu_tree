@@ -110,3 +110,9 @@ async def refresh_token(
     await auth_application_service.refresh_access_token(response, refresh_token)
 
     return response
+
+@router.get("/me", response_model=ApiResponseSchema[None])
+async def me(
+    current_user: CurrentUser = Depends(get_current_member),
+):
+    return ApiResponse()

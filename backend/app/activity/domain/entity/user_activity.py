@@ -64,7 +64,19 @@ class UserActivity:
         self.banned_problems.append(
             ProblemBannedRecord.create(problem_id, self.user_account_id)
         )
-        self._remove_from_will_solve(problem_id)
+        
+    def remove_ban_problem(self, problem_id: ProblemId) -> None:
+        """도메인 로직 - 문제 제외 제거 (논리적 삭제)"""
+        
+        existing_banned_problem: ProblemBannedRecord | None = None
+        for bp in self.banned_problems:
+            if bp.problem_id.value == problem_id.value and bp.deleted_at is None:
+                existing_banned_problem = bp
+                break
+        
+        if existing_banned_problem:
+            existing_banned_problem.deleted_at = datetime.now()
+            existing_banned_problem.updated_at = datetime.now()
     
     def record_problem_solved(self, problem_id: 'ProblemId') -> None:
         """도메인 로직 - 문제 해결 기록"""

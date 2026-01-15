@@ -13,6 +13,7 @@ from app.activity.domain.entity.problem_record import ProblemRecord
 from app.activity.domain.entity.user_activity import UserActivity
 from app.activity.domain.entity.will_solve_problem import WillSolveProblem
 from app.activity.domain.repository.user_activity_repository import UserActivityRepository
+from app.activity.infra.mapper.problem_banned_record_mapper import ProblemBannedRecordMapper
 from app.activity.infra.mapper.problem_record_mapper import ProblemRecordMapper
 from app.activity.infra.mapper.will_solve_problem_mapper import WillSolveProblemMapper
 from app.activity.infra.model.problem_banned_record import ProblemBannedRecordModel
@@ -193,3 +194,31 @@ class UserActivityRepositoryImpl(UserActivityRepository):
             await self.session.merge(model)
 
         await self.session.flush()    
+        
+    @override
+    async def find_only_banned_problem_by_user_account_id(self, user_account_id: UserAccountId) -> UserActivity:
+        stmt = select(ProblemBannedRecordModel).where(
+            and_(
+                ProblemBannedRecordModel.user_account_id == user_account_id.value,
+                ProblemBannedRecordModel.deleted_at.is_(None),
+            )
+        )
+        result = await self.session.execute(stmt)
+        problem_banned_record_models = result.scalars().all()
+
+        return UserActivityMapper.to_entity(
+            user_account_id=user_account_id,
+            problem_banned_record_models=problem_banned_record_models,
+        )
+
+    
+    @override
+    async def save_problem_banned_record(self, activity: UserActivity):
+        if not activity.banned_problems:
+            return
+
+        for entity in activity.banned_problems:
+            model = ProblemBannedRecordMapper.to_model(entity)
+            await self.session.merge(model)
+
+        await self.session.flush()   

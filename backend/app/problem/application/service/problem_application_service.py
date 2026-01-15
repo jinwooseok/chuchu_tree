@@ -39,7 +39,7 @@ class ProblemApplicationService:
         self.target_repository = target_repository
         self.tier_repository = tier_repository
 
-    @event_handler("GET_PROBLEMS_INFO_REQUESTED")
+    @event_handler("GET_PROBLEM_INFOS_REQUESTED")
     @transactional
     async def get_problems_info(self, payload: GetProblemsInfoPayload) -> ProblemsInfoQuery:
         """단일 진입점: 문제 ID 목록으로 상세 정보 조회"""

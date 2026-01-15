@@ -54,7 +54,8 @@ class RecommendProblemsUsecase:
         self,
         user_account_id: UserAccountId,
         level_filter_codes: list[FilterCode] | None = None,
-        tag_filter_codes: list[str] | None = None
+        tag_filter_codes: list[str] | None = None,
+        count: int = 3
     ) -> RecommendProblemsQuery:
         # 1. 초기 데이터 로딩
         bj_account = await self.baekjoon_account_repository.find_by_user_id(user_account_id)
@@ -101,7 +102,7 @@ class RecommendProblemsUsecase:
         current_filter_code = level_filter_codes[0] if len(level_filter_codes) != 0 else FilterCode.NORMAL
         # print(current_filter_code)
         for tag_candidate in tag_candidates:
-            if len(recommended_results) >= 3: break
+            if len(recommended_results) >= count: break
 
             criteria = await self._get_search_criteria(
                 user_tier=bj_account.current_tier_id,
