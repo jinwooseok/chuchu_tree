@@ -38,7 +38,7 @@ class UpdateBjAccountUsecase:
     async def execute(self, user_account_id: int) -> None:
         # 1. 기존 데이터 로드
         existing_account = await self.baekjoon_account_repository.find_by_user_id(UserAccountId(user_account_id))
-        return self._sync_solved_ac(existing_account)
+        return await self._sync_solved_ac(existing_account)
         
     @transactional
     async def execute_bulk(self) -> None:
