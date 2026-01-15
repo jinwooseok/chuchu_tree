@@ -66,8 +66,8 @@ export default function TagDashboard() {
   }
 
   return (
-    <div className="flex h-full w-full justify-center">
-      <div className="hide-scrollbar grid grid-cols-1 content-start gap-x-4 gap-y-8 overflow-y-auto lg:grid-cols-2 xl:grid-cols-3">
+    <div className="hide-scrollbar flex h-full w-full overflow-y-auto">
+      <div className="mx-auto grid w-fit grid-cols-1 content-start gap-x-4 gap-y-8 lg:grid-cols-2 xl:grid-cols-3">
         {filteredAndSortedTags.map((tag) => (
           <TagCard key={tag.tagId} tag={tag} />
         ))}
