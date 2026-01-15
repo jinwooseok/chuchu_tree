@@ -37,14 +37,11 @@ export default function DashboardLayout() {
   const [prevBottomSection, setPrevBottomSection] = useState(bottomSection);
 
   // InfoSidebar 리사이즈
-  const {
-    size: sidebarWidth,
-    handleMouseDown: handleSidebarResize,
-  } = useResizable({
+  const { size: sidebarWidth, handleMouseDown: handleSidebarResize } = useResizable({
     direction: 'horizontal',
     initialSize: infoSidebarWidth,
     minSize: 200,
-    maxSize: 600,
+    maxSize: 350,
     onResizeStart: () => setResizing(true),
     onResizeEnd: (width) => {
       setInfoSidebarWidth(width);
@@ -53,14 +50,11 @@ export default function DashboardLayout() {
   });
 
   // TopSection 리사이즈
-  const {
-    size: topHeight,
-    handleMouseDown: handleTopResize,
-  } = useResizable({
+  const { size: topHeight, handleMouseDown: handleTopResize } = useResizable({
     direction: 'vertical',
     initialSize: topSection === 'tierbar' ? topSectionTierbarHeight : topSectionStreakHeight,
-    minSize: topSection === 'streak' ? 200 : 60,
-    maxSize: 400,
+    minSize: topSection === 'streak' ? 240 : 60,
+    maxSize: topSection === 'streak' ? 300 : 120,
     onResizeStart: () => setResizing(true),
     onResizeEnd: (height) => {
       if (topSection === 'tierbar') {
@@ -73,14 +67,12 @@ export default function DashboardLayout() {
   });
 
   // BottomSection 리사이즈
-  const {
-    size: bottomHeight,
-    handleMouseDown: handleBottomResize,
-  } = useResizable({
+  const { size: bottomHeight, handleMouseDown: handleBottomResize } = useResizable({
     direction: 'vertical',
     initialSize: bottomSectionHeight,
-    minSize: 60,
-    maxSize: 600,
+    minSize: 240,
+    maxSize: 300,
+    inverted: true, // bottom section은 핸들이 위쪽에 있어 드래그 방향 반전 필요
     onResizeStart: () => setResizing(true),
     onResizeEnd: (height) => {
       setBottomSectionHeight(height);
@@ -116,9 +108,7 @@ export default function DashboardLayout() {
       {/* Info 사이드바 - AppSidebar가 닫혔을 때만 표시 */}
       {showInfoSidebar && (
         <div className={cn('relative h-full border-r', !isResizing && 'transition-all delay-200 duration-300 ease-in-out')} style={{ width: `${sidebarWidth}px` }}>
-          <div className="bg-innerground-white h-full overflow-hidden">
-            {centerSection === 'calendar' ? <CalendarSidebar /> : <TagSidebar />}
-          </div>
+          <div className="bg-innerground-white h-full overflow-hidden">{centerSection === 'calendar' ? <CalendarSidebar /> : <TagSidebar />}</div>
           <ResizeHandle direction="horizontal" onMouseDown={handleSidebarResize} className="absolute top-0 right-0 h-full" />
         </div>
       )}

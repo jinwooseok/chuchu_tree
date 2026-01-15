@@ -7,6 +7,7 @@ export interface UseResizableOptions {
   initialSize: number;
   minSize: number;
   maxSize: number;
+  inverted?: boolean; // true면 드래그 방향 반전 (bottom section용)
   onResizeStart?: () => void;
   onResize?: (size: number) => void;
   onResizeEnd?: (size: number) => void;
@@ -23,7 +24,7 @@ export interface UseResizableReturn {
  * Uses requestAnimationFrame for smooth 60fps updates
  */
 export function useResizable(options: UseResizableOptions): UseResizableReturn {
-  const { direction, initialSize, minSize, maxSize, onResizeStart, onResize, onResizeEnd } = options;
+  const { direction, initialSize, minSize, maxSize, inverted = false, onResizeStart, onResize, onResizeEnd } = options;
 
   // Current size state
   const [size, setSize] = useState(initialSize);
@@ -93,8 +94,8 @@ export function useResizable(options: UseResizableOptions): UseResizableReturn {
           const currentPos = direction === 'horizontal' ? e.clientX : e.clientY;
           const delta = currentPos - startPosRef.current;
 
-          // Calculate new size
-          const newSize = clampSize(startSizeRef.current + delta);
+          // Calculate new size (inverted면 delta 부호 반전)
+          const newSize = clampSize(startSizeRef.current + (inverted ? -delta : delta));
 
           // Update size
           currentSizeRef.current = newSize;
@@ -148,7 +149,7 @@ export function useResizable(options: UseResizableOptions): UseResizableReturn {
         onResizeStart();
       }
     },
-    [direction, clampSize, onResize, onResizeStart, onResizeEnd],
+    [direction, inverted, clampSize, onResize, onResizeStart, onResizeEnd],
   );
 
   /**
