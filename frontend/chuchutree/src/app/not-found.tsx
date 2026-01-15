@@ -4,7 +4,7 @@ import Link from 'next/link';
 
 export default function NotFound() {
   return (
-    <div className="bg-background flex min-h-screen flex-col items-center justify-center">
+    <div className="bg-background flex min-h-screen w-full flex-col items-center justify-center">
       <GlitchText speed={4} enableShadows={true} enableOnHover={false} className="cursor-target">
         404 Not Found
       </GlitchText>

@@ -23,35 +23,38 @@ axiosInstance.interceptors.request.use(
   },
 );
 
-// 응답 인터셉터 (401 처리 + RTR)
 axiosInstance.interceptors.response.use(
-  (response) => {
-    // 성공 응답 그대로 반환
-    return response;
-  },
+  (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    // 401 에러이고, 재시도하지 않은 요청인 경우
-    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/login')) {
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry &&
+      !originalRequest.url?.includes('/sign-in')
+    ) {
       originalRequest._retry = true;
 
       try {
-        // Refresh 토큰으로 새 Access 토큰 발급
-        const refreshUrl = API_URL ? `${API_URL}/api/v1/auth/token/refresh` : '/api/v1/auth/token/refresh';
-        await axios.post(refreshUrl, {}, { withCredentials: true });
+        const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
 
-        // 원래 요청 재시도
+        // 공통 함수 사용 (간단한 버전)
+        await axios.post(
+          API_URL ? `${API_URL}/api/v1/auth/token/refresh` : '/api/v1/auth/token/refresh',
+          {},
+          { withCredentials: true }
+        );
+
         return axiosInstance(originalRequest);
       } catch (refreshError) {
-        // Refresh 실패 시 로그인 페이지로 리다이렉트
         if (typeof window !== 'undefined') {
-          window.location.href = '/login';
+          window.location.href = '/sign-in';
         }
         return Promise.reject(refreshError);
       }
     }
 
     return Promise.reject(error);
-  },
+  }
 );
+

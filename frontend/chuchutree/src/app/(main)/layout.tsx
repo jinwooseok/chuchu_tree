@@ -25,14 +25,14 @@ export default async function MainLayout({
   // QueryClient 생성
   const queryClient = new QueryClient();
 
-  // 2단계: 사용자 정보 prefetch
+  // 2단계: 사용자 정보 직접 호출 및 에러 처리
   try {
-    console.log('[MainLayout] Prefetching user data...');
-    await queryClient.prefetchQuery({
-      queryKey: userKeys.me(),
-      queryFn: userServerApi.getMe,
-    });
-    console.log('[MainLayout] User data prefetched successfully');
+    console.log('[MainLayout] Fetching user data...');
+    const userData = await userServerApi.getMe();
+
+    // 성공하면 QueryClient에 수동으로 설정
+    queryClient.setQueryData(userKeys.me(), userData);
+    console.log('[MainLayout] User data fetched successfully');
   } catch (error) {
     // UNLINKED_USER 에러: 백준 계정 미등록 사용자
     if (error instanceof ApiResponseError && error.errorCode === 'UNLINKED_USER') {
@@ -41,7 +41,7 @@ export default async function MainLayout({
     }
 
     // 기타 에러 발생 시 로그인 페이지로
-    console.error('[MainLayout] Failed to prefetch user data:', {
+    console.error('[MainLayout] Failed to fetch user data:', {
       message: error instanceof Error ? error.message : 'Unknown error',
       errorCode: error instanceof ApiResponseError ? error.errorCode : undefined,
     });
