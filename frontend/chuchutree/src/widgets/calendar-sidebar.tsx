@@ -45,7 +45,12 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
   const tagInfo = TAG_INFO[firstTag?.tagCode as keyof typeof TAG_INFO];
 
   return (
-    <div ref={setNodeRef} style={style} className="bg-background relative flex items-center rounded-md px-1 py-2 text-xs">
+    <div
+      ref={setNodeRef}
+      onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')}
+      style={style}
+      className="bg-background relative flex cursor-pointer items-center rounded-md px-1 py-2 text-xs"
+    >
       {/* 드래그 핸들 */}
       <AppTooltip content="문제 순서 변경" side="right">
         <button {...attributes} {...listeners} className="text-muted-foreground hover:text-foreground mr-1 cursor-grab active:cursor-grabbing" aria-label="문제 순서 변경">
@@ -69,7 +74,14 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
       {/* 삭제 버튼 (willSolve만) */}
       {!isSolved && onDelete && (
         <AppTooltip content="문제 삭제" side="left">
-          <button onClick={onDelete} className="text-muted-foreground hover:text-destructive absolute top-0 right-0 shrink-0 rounded p-1 transition-colors" aria-label="문제 삭제">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            className="text-muted-foreground hover:text-destructive absolute top-0 right-0 shrink-0 rounded p-1 transition-colors"
+            aria-label="문제 삭제"
+          >
             <X className="h-4 w-4" />
           </button>
         </AppTooltip>
