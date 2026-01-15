@@ -20,8 +20,9 @@ router = APIRouter(prefix="/user-accounts/me", tags=["recommendation"])
 @router.get("/problems", response_model=ApiResponseSchema[RecommendationResponse])
 @inject
 async def get_recommended_problems(
-    level: Optional[str] = Query(None, description="난이도 필터 (예: [\"EASY\", \"NORMAL\"])"),
-    tags: Optional[str] = Query(None, description="태그 필터 (예: [1, 2, 3])"),
+    level: Optional[str] = Query("[]", description="난이도 필터 (예: [\"EASY\", \"NORMAL\"])"),
+    tags: Optional[str] = Query("[]", description="태그 필터 (예: [1, 2, 3])"),
+    count: Optional[int] = Query(3, description="문제 개수"),
     current_user: CurrentUser = Depends(get_current_member),
     recommendation_usecase: RecommendProblemsUsecase = Depends(Provide[Container.recommand_problems_usecase])
 ):
@@ -49,7 +50,8 @@ async def get_recommended_problems(
     query = await recommendation_usecase.execute(
         user_account_id=UserAccountId(current_user.user_account_id),
         level_filter_codes=level_filter_codes,
-        tag_filter_codes=tag_filter_codes
+        tag_filter_codes=tag_filter_codes,
+        count=count
     )
 
     # 3. Response 변환

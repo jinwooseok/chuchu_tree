@@ -4,15 +4,18 @@ from calendar import monthrange
 from collections import defaultdict
 from datetime import date
 
+from app.activity.application.command.ban_problem_command import BanProblemCommand
 from app.activity.application.command.tag_custom_command import TagCustomCommand
 from app.activity.application.command.update_will_solve_problems import UpdateWillSolveProblemsCommand
+from app.activity.application.query.banned_list_query import BannedProblemsQuery, BannedTagsQuery
 from app.activity.application.query.monthly_activity_data_query import (
     DailyActivityQuery,
     MonthlyActivityDataQuery
 )
+from app.problem.application.query.problems_info_query import ProblemsInfoQuery
 from app.activity.domain.entity.user_activity import UserActivity
 from app.activity.domain.entity.will_solve_problem import WillSolveProblem
-from app.activity.domain.event.payloads import GetTagSummaryPayload, GetTagSummaryResultPayload
+from app.activity.domain.event.payloads import GetProblemsInfoPayload, GetTagSummaryPayload, GetTagSummaryResultPayload, GetTagSummarysPayload, GetTagSummarysResultPayload
 from app.activity.domain.repository.user_activity_repository import UserActivityRepository
 from app.baekjoon.domain.event.get_monthly_activity_data_payload import GetMonthlyActivityDataPayload
 from app.common.domain.entity.domain_event import DomainEvent
@@ -199,7 +202,77 @@ class ActivityApplicationService:
         # 5. 변경된 애그리거트 저장
         await self.user_activity_repository.save_tag_custom(activity)
         
+    @transactional
+    async def ban_problem(self, command: BanProblemCommand):
+        # 3. 사용자 활동 애그리거트 로드
+        user_id = UserAccountId(command.user_account_id)
+        activity: UserActivity = await self.user_activity_repository.find_only_banned_problem_by_user_account_id(user_id)
+        
+        # 4. 도메인 로직 실행
+        activity.ban_problem(ProblemId(command.problem_id))
+        
+        # 5. 변경된 애그리거트 저장
+        await self.user_activity_repository.save_problem_banned_record(activity)
+        
+    @transactional
+    async def unban_problem(self, command: BanProblemCommand):
+        # 3. 사용자 활동 애그리거트 로드
+        user_id = UserAccountId(command.user_account_id)
+        activity: UserActivity = await self.user_activity_repository.find_only_banned_problem_by_user_account_id(user_id)
+        
+        # 4. 도메인 로직 실행
+        activity.remove_ban_problem(ProblemId(command.problem_id))
+        await self.user_activity_repository.save_problem_banned_record(activity)
+        
     def _validate_order_consistency(self, problem_ids: list[int]):
         # 중복된 ID가 포함되어 있는지 체크
         if len(problem_ids) != len(set(problem_ids)):
             raise APIException(ErrorCode.DUPLICATED_ORDER)
+        
+    @transactional
+    async def get_banned_problems(self, user_account_id: int):
+        user_id = UserAccountId(user_account_id)
+        activity: UserActivity = await self.user_activity_repository.find_only_banned_problem_by_user_account_id(user_id)
+
+        # 문제 id들 추출
+        problem_ids = activity.banned_problem_ids
+
+        if not problem_ids:
+            return BannedProblemsQuery(banned_problem_list=[])
+
+        event = DomainEvent(
+            event_type="GET_PROBLEM_INFOS_REQUESTED",
+            data=GetProblemsInfoPayload(problem_ids=[problem_id.value for problem_id in problem_ids]),
+            result_type=ProblemsInfoQuery
+        )
+        problems_info: ProblemsInfoQuery | None = await self.domain_event_bus.publish(event)
+
+        if not problems_info:
+            return BannedProblemsQuery(banned_problem_list=[])
+
+        # ProblemsInfoQuery의 problems dict를 list로 변환
+        banned_problem_list = list(problems_info.problems.values())
+        return BannedProblemsQuery(banned_problem_list=banned_problem_list) 
+    
+    @transactional
+    async def get_banned_tags(self, user_account_id: int):
+        user_id = UserAccountId(user_account_id)
+        activity: UserActivity = await self.user_activity_repository.find_only_tag_custom_by_user_account_id(user_id)
+
+        # 제외된 태그 ID들 추출
+        excluded_tag_ids = activity.excluded_tag_ids
+
+        if not excluded_tag_ids:
+            return BannedTagsQuery(banned_tag_list=[])
+
+        event = DomainEvent(
+            event_type="GET_TAG_INFOS_REQUESTED",
+            data=GetTagSummarysPayload(tag_ids=list(excluded_tag_ids)),
+            result_type=GetTagSummarysResultPayload
+        )
+        result: GetTagSummarysResultPayload | None = await self.domain_event_bus.publish(event)
+
+        if not result:
+            return BannedTagsQuery(banned_tag_list=[])
+
+        return BannedTagsQuery(banned_tag_list=result.tags)

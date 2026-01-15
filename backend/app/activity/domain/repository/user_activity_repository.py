@@ -43,13 +43,21 @@ class UserActivityRepository(ABC):
         pass
     
     @abstractmethod
-    async def find_only_tag_custom_by_user_account_id(user_account_id: UserAccountId) -> UserActivity:
+    async def find_only_tag_custom_by_user_account_id(self, user_account_id: UserAccountId) -> UserActivity:
         pass
     
     @abstractmethod
-    async def find_by_user_account_id(user_account_id: UserAccountId) -> UserActivity:
+    async def find_by_user_account_id(self, user_account_id: UserAccountId) -> UserActivity:
         pass
     
     @abstractmethod
-    async def save_tag_custom(activity: UserActivity):
+    async def save_tag_custom(self, activity: UserActivity):
         pass    
+    
+    @abstractmethod
+    async def find_only_banned_problem_by_user_account_id(self, user_account_id: UserAccountId) -> UserActivity:
+        pass
+    
+    @abstractmethod
+    async def save_problem_banned_record(self, activity: UserActivity):
+        pass
