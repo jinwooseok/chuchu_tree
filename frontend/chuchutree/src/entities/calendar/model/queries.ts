@@ -32,16 +32,74 @@ export const useUpdateWillSolveProblems = (callbacks?: UseMutationCallback) => {
 
   return useMutation({
     mutationFn: (data: UpdateProblemsData) => calendarApi.updateWillSolveProblems(data),
-    onSuccess: (_, variables) => {
-      // 해당 날짜가 포함된 월의 캐시 무효화
+    onMutate: async (variables) => {
+      const date = new Date(variables.date);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const queryKey = calendarKeys.list(year, month);
+
+      // 진행 중인 쿼리 취소
+      await queryClient.cancelQueries({ queryKey });
+
+      // 이전 데이터 저장
+      const previousData = queryClient.getQueryData(queryKey);
+
+      // 낙관적 업데이트
+      queryClient.setQueryData(queryKey, (old: any) => {
+        if (!old) return old;
+
+        return {
+          ...old,
+          monthlyData: old.monthlyData.map((day: any) => {
+            if (day.targetDate === variables.date) {
+              // 기존 문제 + 새 문제 병합
+              const existingProblems = day.willSolveProblems || [];
+              const newProblemsMap = new Map(
+                (variables.newProblems || []).map((p) => [p.problemId, p])
+              );
+              const allProblemsMap = new Map(
+                existingProblems.map((p: any) => [p.problemId, p])
+              );
+
+              // 새 문제 추가
+              newProblemsMap.forEach((problem, id) => {
+                allProblemsMap.set(id, problem);
+              });
+
+              // willSolveProblems를 업데이트된 순서로 재구성
+              const newWillSolveProblems = variables.problemIds
+                .map((id) => allProblemsMap.get(id))
+                .filter(Boolean);
+
+              return {
+                ...day,
+                willSolveProblems: newWillSolveProblems,
+                willSolveProblemCount: newWillSolveProblems.length,
+              };
+            }
+            return day;
+          }),
+        };
+      });
+
+      return { previousData, queryKey };
+    },
+    onError: (error, _, context) => {
+      // 롤백
+      if (context?.previousData) {
+        queryClient.setQueryData(context.queryKey, context.previousData);
+      }
+      if (callbacks?.onError) callbacks.onError(error);
+    },
+    onSettled: (_, __, variables) => {
+      // 서버 데이터와 동기화
       const date = new Date(variables.date);
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       queryClient.invalidateQueries({ queryKey: calendarKeys.list(year, month) });
-      if (callbacks?.onSuccess) callbacks.onSuccess();
     },
-    onError: (error) => {
-      if (callbacks?.onError) callbacks.onError(error);
+    onSuccess: () => {
+      if (callbacks?.onSuccess) callbacks.onSuccess();
     },
   });
 };
@@ -52,16 +110,59 @@ export const useUpdateSolvedProblems = (callbacks?: UseMutationCallback) => {
 
   return useMutation({
     mutationFn: (data: UpdateProblemsData) => calendarApi.updateSolvedProblems(data),
-    onSuccess: (_, variables) => {
-      // 해당 날짜가 포함된 월의 캐시 무효화
+    onMutate: async (variables) => {
+      const date = new Date(variables.date);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const queryKey = calendarKeys.list(year, month);
+
+      // 진행 중인 쿼리 취소
+      await queryClient.cancelQueries({ queryKey });
+
+      // 이전 데이터 저장
+      const previousData = queryClient.getQueryData(queryKey);
+
+      // 낙관적 업데이트
+      queryClient.setQueryData(queryKey, (old: any) => {
+        if (!old) return old;
+
+        return {
+          ...old,
+          monthlyData: old.monthlyData.map((day: any) => {
+            if (day.targetDate === variables.date) {
+              // solvedProblems를 업데이트된 순서로 재구성
+              const newSolvedProblems = variables.problemIds
+                .map((id) => day.solvedProblems.find((p: any) => p.problemId === id))
+                .filter(Boolean);
+
+              return {
+                ...day,
+                solvedProblems: newSolvedProblems,
+              };
+            }
+            return day;
+          }),
+        };
+      });
+
+      return { previousData, queryKey };
+    },
+    onError: (error, _, context) => {
+      // 롤백
+      if (context?.previousData) {
+        queryClient.setQueryData(context.queryKey, context.previousData);
+      }
+      if (callbacks?.onError) callbacks.onError(error);
+    },
+    onSettled: (_, __, variables) => {
+      // 서버 데이터와 동기화
       const date = new Date(variables.date);
       const year = date.getFullYear();
       const month = date.getMonth() + 1;
       queryClient.invalidateQueries({ queryKey: calendarKeys.list(year, month) });
-      if (callbacks?.onSuccess) callbacks.onSuccess();
     },
-    onError: (error) => {
-      if (callbacks?.onError) callbacks.onError(error);
+    onSuccess: () => {
+      if (callbacks?.onSuccess) callbacks.onSuccess();
     },
   });
 };

@@ -203,6 +203,10 @@ export default function CalendarSidebar() {
   const handleAddProblemFromSearch = (problemId: number) => {
     if (!selectedDate) return;
 
+    // 검색 결과에서 추가할 문제 찾기
+    const problemToAdd = uniqueSearchResults.find((p) => p.problemId === problemId);
+    if (!problemToAdd) return;
+
     // 기존 문제들 + 새 문제
     const problemIds = [...willSolveProblems.map((p) => p.problemId), problemId];
 
@@ -210,6 +214,7 @@ export default function CalendarSidebar() {
       {
         date: formatDateString(selectedDate),
         problemIds,
+        newProblems: [problemToAdd], // 낙관적 업데이트를 위한 새 문제 정보
       },
       {
         onSuccess: () => {

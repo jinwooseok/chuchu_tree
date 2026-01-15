@@ -75,6 +75,8 @@ export interface CalendarEvent {
 export interface UpdateProblemsData {
   date: string;
   problemIds: number[];
+  // 낙관적 업데이트를 위한 새 문제 정보 (추가 시에만 사용)
+  newProblems?: WillSolveProblems[];
 }
 
 // 문제 검색
