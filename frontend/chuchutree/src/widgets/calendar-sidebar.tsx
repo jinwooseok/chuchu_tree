@@ -5,7 +5,7 @@ import { useCalendarStore } from '@/lib/store/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { Problem, useUpdateWillSolveProblems, useUpdateSolvedProblems, useSearchProblems, WillSolveProblems, useCalendar } from '@/entities/calendar';
 import Image from 'next/image';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useId } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -106,6 +106,8 @@ export default function CalendarSidebar() {
   const [showAddInput, setShowAddInput] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [debouncedKeyword, setDebouncedKeyword] = useState('');
+  const solvedContextId = useId(); // DndContext
+  const willsolveContextId = useId();
 
   // 현재 선택된 날짜의 년/월로 calendar 데이터 fetch
   const year = selectedDate?.getFullYear() || new Date().getFullYear();
@@ -265,7 +267,7 @@ export default function CalendarSidebar() {
         {solvedProblems.length === 0 ? (
           <div className="rounded-lg border border-dashed border-gray-300 p-4 text-center text-xs text-gray-400">풀이한 문제가 없습니다</div>
         ) : (
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleSolvedDragEnd}>
+          <DndContext id={solvedContextId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleSolvedDragEnd}>
             <SortableContext items={solvedProblems.map((p) => p.problemId)} strategy={verticalListSortingStrategy}>
               <div className="flex flex-col gap-2">
                 {solvedProblems.map((problem) => (
@@ -287,7 +289,7 @@ export default function CalendarSidebar() {
         {willSolveProblems.length === 0 ? (
           <div className="rounded-lg border border-dashed border-gray-300 p-4 text-center text-xs text-gray-400">예약된 문제가 없습니다</div>
         ) : (
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleWillSolveDragEnd}>
+          <DndContext id={willsolveContextId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleWillSolveDragEnd}>
             <SortableContext items={willSolveProblems.map((p) => p.problemId)} strategy={verticalListSortingStrategy}>
               <div className="flex flex-col gap-2">
                 {willSolveProblems.map((problem) => (
