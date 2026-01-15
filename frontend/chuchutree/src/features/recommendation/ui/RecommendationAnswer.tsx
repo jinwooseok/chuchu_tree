@@ -203,7 +203,14 @@ export function RecommendationAnswer() {
                     </AppTooltip>
                   </div>
                   {showFilters.recommendReason && problem.recommandReasons.length > 0 && (
-                    <p className="text-muted-foreground line-clamp-1">{showFilters.algorithm ? problem.recommandReasons[0].reason : problem.recommandReasons[0].reason.replace(/^'[^']+'\s*/, '')}</p>
+                    <p className="text-muted-foreground line-clamp-1">
+                      {showFilters.algorithm
+                        ? problem.recommandReasons[0].reason
+                        : problem.recommandReasons[0].reason
+                            .replace(/'[^']+'/g, '')
+                            .replace(/\s+/g, ' ')
+                            .trim()}
+                    </p>
                   )}
                 </div>
               )}
