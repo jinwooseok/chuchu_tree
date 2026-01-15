@@ -17,8 +17,6 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY chuchutree/ . 
 
 # 빌드 시 필요한 환경변수 주입
-ARG ENV_FILE
-RUN if [ -f "$ENV_FILE" ]; then cp "$ENV_FILE" .env; fi
 ENV NEXT_TELEMETRY_DISABLED=1
 
 # 메모리 부족 방지를 위해 Node 옵션 추가
@@ -27,11 +25,6 @@ RUN NODE_OPTIONS="--max-old-space-size=4096" npm run build
 # --- Stage 3: Runner ---
 FROM base AS runner
 WORKDIR /app
-
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-ENV PORT=3333
-ENV HOSTNAME="0.0.0.0"
 
 RUN addgroup --system --gid 1001 nodejs && \
     adduser --system --uid 1001 nextjs

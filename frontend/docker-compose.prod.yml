@@ -3,14 +3,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.prod
-      args:
-        - ENV_FILE=chuchutree/.env.production
     image: chuchu-frontend-prod:latest
     container_name: chuchu-frontend-prod
     network_mode: host 
     environment:
-      - NODE_ENV=development
+      - NODE_ENV=production
       - PORT=3333
-      - HOSTNAME=0.0.0.0
+      - HOSTNAME=localhost
+      - NEXT_PUBLIC_BACKEND_URL=http://localhost:8004
     command: ["node", "server.js", "--port", "3333"] 
     restart: unless-stopped
