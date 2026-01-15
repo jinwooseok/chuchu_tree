@@ -5,14 +5,17 @@ interface AppTooltipProps {
   children: React.ReactElement;
   side?: 'top' | 'right' | 'bottom' | 'left';
   delayDuration?: number;
+  contentClassName?: string;
 }
 
-export function AppTooltip({ content, children, side = 'bottom', delayDuration = 100 }: AppTooltipProps) {
+export function AppTooltip({ content, children, side = 'bottom', delayDuration = 100, contentClassName = 'bg-foreground' }: AppTooltipProps) {
   return (
-    <TooltipProvider delayDuration={delayDuration}>
-      <Tooltip>
+    <TooltipProvider>
+      <Tooltip delayDuration={delayDuration}>
         <TooltipTrigger asChild>{children}</TooltipTrigger>
-        <TooltipContent side={side}>{content}</TooltipContent>
+        <TooltipContent side={side} className={contentClassName}>
+          {content}
+        </TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );

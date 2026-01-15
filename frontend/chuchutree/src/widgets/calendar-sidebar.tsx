@@ -5,7 +5,7 @@ import { useCalendarStore } from '@/lib/store/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { Problem, useUpdateWillSolveProblems, useUpdateSolvedProblems, useSearchProblems, WillSolveProblems, useCalendar } from '@/entities/calendar';
 import Image from 'next/image';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useId } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
@@ -45,7 +45,12 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
   const tagInfo = TAG_INFO[firstTag?.tagCode as keyof typeof TAG_INFO];
 
   return (
-    <div ref={setNodeRef} style={style} className="bg-background relative flex items-center rounded-md px-1 py-2 text-xs">
+    <div
+      ref={setNodeRef}
+      onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')}
+      style={style}
+      className="bg-background relative flex cursor-pointer items-center rounded-md px-1 py-2 text-xs"
+    >
       {/* 드래그 핸들 */}
       <AppTooltip content="문제 순서 변경" side="right">
         <button {...attributes} {...listeners} className="text-muted-foreground hover:text-foreground mr-1 cursor-grab active:cursor-grabbing" aria-label="문제 순서 변경">
@@ -69,7 +74,14 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
       {/* 삭제 버튼 (willSolve만) */}
       {!isSolved && onDelete && (
         <AppTooltip content="문제 삭제" side="left">
-          <button onClick={onDelete} className="text-muted-foreground hover:text-destructive absolute top-0 right-0 shrink-0 rounded p-1 transition-colors" aria-label="문제 삭제">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onDelete();
+            }}
+            className="text-muted-foreground hover:text-destructive absolute top-0 right-0 shrink-0 rounded p-1 transition-colors"
+            aria-label="문제 삭제"
+          >
             <X className="h-4 w-4" />
           </button>
         </AppTooltip>
@@ -106,6 +118,8 @@ export default function CalendarSidebar() {
   const [showAddInput, setShowAddInput] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [debouncedKeyword, setDebouncedKeyword] = useState('');
+  const solvedContextId = useId(); // DndContext
+  const willsolveContextId = useId();
 
   // 현재 선택된 날짜의 년/월로 calendar 데이터 fetch
   const year = selectedDate?.getFullYear() || new Date().getFullYear();
@@ -201,6 +215,10 @@ export default function CalendarSidebar() {
   const handleAddProblemFromSearch = (problemId: number) => {
     if (!selectedDate) return;
 
+    // 검색 결과에서 추가할 문제 찾기
+    const problemToAdd = uniqueSearchResults.find((p) => p.problemId === problemId);
+    if (!problemToAdd) return;
+
     // 기존 문제들 + 새 문제
     const problemIds = [...willSolveProblems.map((p) => p.problemId), problemId];
 
@@ -208,6 +226,7 @@ export default function CalendarSidebar() {
       {
         date: formatDateString(selectedDate),
         problemIds,
+        newProblems: [problemToAdd], // 낙관적 업데이트를 위한 새 문제 정보
       },
       {
         onSuccess: () => {
@@ -265,7 +284,7 @@ export default function CalendarSidebar() {
         {solvedProblems.length === 0 ? (
           <div className="rounded-lg border border-dashed border-gray-300 p-4 text-center text-xs text-gray-400">풀이한 문제가 없습니다</div>
         ) : (
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleSolvedDragEnd}>
+          <DndContext id={solvedContextId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleSolvedDragEnd}>
             <SortableContext items={solvedProblems.map((p) => p.problemId)} strategy={verticalListSortingStrategy}>
               <div className="flex flex-col gap-2">
                 {solvedProblems.map((problem) => (
@@ -287,7 +306,7 @@ export default function CalendarSidebar() {
         {willSolveProblems.length === 0 ? (
           <div className="rounded-lg border border-dashed border-gray-300 p-4 text-center text-xs text-gray-400">예약된 문제가 없습니다</div>
         ) : (
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleWillSolveDragEnd}>
+          <DndContext id={willsolveContextId} sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleWillSolveDragEnd}>
             <SortableContext items={willSolveProblems.map((p) => p.problemId)} strategy={verticalListSortingStrategy}>
               <div className="flex flex-col gap-2">
                 {willSolveProblems.map((problem) => (

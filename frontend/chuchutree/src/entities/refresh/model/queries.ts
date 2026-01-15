@@ -12,6 +12,7 @@ export const useRefresh = (callbacks: UseMutationCallback) => {
       if (callbacks.onSuccess) callbacks.onSuccess();
       queryClient.invalidateQueries({ queryKey: ['user'] });
       queryClient.invalidateQueries({ queryKey: ['calendar'] });
+      queryClient.invalidateQueries({ queryKey: ['tagDashboard'] });
     },
     onError: (error) => {
       if (callbacks.onError) callbacks.onError(error);

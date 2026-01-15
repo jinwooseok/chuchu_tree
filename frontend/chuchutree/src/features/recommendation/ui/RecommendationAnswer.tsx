@@ -134,7 +134,7 @@ export function RecommendationAnswer() {
         return (
           <div key={problem.problemId} className="flex flex-1">
             <Button
-              className={`${isRegistered ? 'bg-primary hover:bg-primary/90' : 'bg-muted-foreground'} h-full w-8 items-center justify-center rounded-l-lg rounded-r-none text-xs`}
+              className={`${isRegistered ? 'bg-primary hover:bg-primary/90' : 'bg-muted-foreground'} h-full w-8 cursor-pointer items-center justify-center rounded-l-lg rounded-r-none text-xs`}
               onClick={() => handleToggleProblem(problem.problemId)}
               disabled={updateWillSolve.isPending}
             >
@@ -147,7 +147,10 @@ export function RecommendationAnswer() {
                 </div>
               )}
             </Button>
-            <div className="bg-background text-foreground hover:bg-innerground-darkgray/70 flex h-full flex-1 items-center justify-between rounded-l-none rounded-r-lg px-2 text-xs">
+            <div
+              className="bg-background text-foreground hover:bg-innerground-darkgray/70 flex h-full flex-1 cursor-pointer items-center justify-between rounded-l-none rounded-r-lg px-2 text-xs"
+              onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')}
+            >
               <div className="flex items-center gap-2">
                 {showFilters.problemTier && !showFilters.problemNumber && (
                   <div className="flex min-w-4 items-center gap-1">
@@ -199,131 +202,22 @@ export function RecommendationAnswer() {
                       </div>
                     </AppTooltip>
                   </div>
-                  {showFilters.recommendReason && problem.recommandReasons.length > 0 && <p className="text-muted-foreground line-clamp-1">{problem.recommandReasons[0].reason}</p>}
+                  {showFilters.recommendReason && problem.recommandReasons.length > 0 && (
+                    <p className="text-muted-foreground line-clamp-1">
+                      {showFilters.algorithm
+                        ? problem.recommandReasons[0].reason
+                        : problem.recommandReasons[0].reason
+                            .replace(/'[^']+'/g, '')
+                            .replace(/\s+/g, ' ')
+                            .trim()}
+                    </p>
+                  )}
                 </div>
               )}
             </div>
           </div>
         );
       })}
-      {/* mock data 테스트 전용  */}
-      {/* {problems.length === 0 ? (
-        <>
-          {temp.data.problems.map((problem) => {
-            const isRegistered = isProblemRegistered(problem.problemId);
-            return (
-              <div key={problem.problemId} className="flex flex-1">
-                <Button
-                  className={`${isRegistered ? 'bg-primary hover:bg-primary/90' : 'bg-muted-foreground'} h-full w-8 items-center justify-center rounded-l-lg rounded-r-none text-xs`}
-                  onClick={() => handleToggleProblem(problem.problemId)}
-                  disabled={updateWillSolve.isPending}
-                >
-                  {isRegistered ? (
-                    <CheckCircle className="h-5 w-5" />
-                  ) : (
-                    <div className="flex flex-col">
-                      <span>문제</span>
-                      <span>등록</span>
-                    </div>
-                  )}
-                </Button>
-                <div className="bg-background text-foreground hover:bg-innerground-darkgray/70 flex h-full flex-1 items-center justify-between rounded-l-none rounded-r-lg px-2 text-xs">
-                  <div className="flex items-center gap-2">
-                    {showFilters.problemTier && !showFilters.problemNumber && (
-                      <div className="flex min-w-4 items-center gap-1">
-                        <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
-                      </div>
-                    )}
-                    {showFilters.problemTier && showFilters.problemNumber && (
-                      <div className="flex min-w-20 items-center gap-1">
-                        <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
-                        <p>{problem.problemId}</p>
-                      </div>
-                    )}
-                    {!showFilters.problemTier && showFilters.problemNumber && (
-                      <div className="flex min-w-16 items-center">
-                        <p>#{problem.problemId}</p>
-                      </div>
-                    )}
-                    <p className="line-clamp-2">{problem.problemTitle}</p>
-                  </div>
-                  {!showFilters.algorithm && !showFilters.recommendReason ? (
-                    <div className="flex min-w-6 flex-col items-end">
-                      <Trash2 className="text-muted-foreground hover:text-excluded-bg h-4 w-4 cursor-pointer" onClick={() => handleBanProblem(problem.problemId, problem.problemTierName)} />
-                    </div>
-                  ) : (
-                    <div className="flex min-w-30 flex-col items-end">
-                      <div className="flex items-center justify-center gap-1">
-                        {showFilters.algorithm && problem.tags.length > 0 && <p className="line-clamp-1">{problem.tags[0].tagDisplayName}</p>}
-                        <Trash2 className="text-muted-foreground hover:text-excluded-bg h-4 w-4 cursor-pointer" onClick={() => handleBanProblem(problem.problemId, problem.problemTierName)} />
-                      </div>
-                      {showFilters.recommendReason && problem.recommandReasons.length > 0 && <p className="text-muted-foreground line-clamp-1">{problem.recommandReasons[0].reason}</p>}
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </>
-      ) : (
-        <>
-          {problems.map((problem) => {
-            const isRegistered = isProblemRegistered(problem.problemId);
-            return (
-              <div key={problem.problemId} className="flex flex-1">
-                <Button
-                  className={`${isRegistered ? 'bg-primary hover:bg-primary/90' : 'bg-muted-foreground'} h-full w-8 items-center justify-center rounded-l-lg rounded-r-none text-xs`}
-                  onClick={() => handleToggleProblem(problem.problemId)}
-                  disabled={updateWillSolve.isPending}
-                >
-                  {isRegistered ? (
-                    <CheckCircle className="h-5 w-5" />
-                  ) : (
-                    <div className="flex flex-col">
-                      <span>문제</span>
-                      <span>등록</span>
-                    </div>
-                  )}
-                </Button>
-                <div className="bg-background text-foreground hover:bg-innerground-darkgray/70 flex h-full flex-1 items-center justify-between rounded-l-none rounded-r-lg px-2 text-xs">
-                  <div className="flex items-center gap-2">
-                    {showFilters.problemTier && !showFilters.problemNumber && (
-                      <div className="flex min-w-4 items-center gap-1">
-                        <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
-                      </div>
-                    )}
-                    {showFilters.problemTier && showFilters.problemNumber && (
-                      <div className="flex min-w-20 items-center gap-1">
-                        <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
-                        <p>{problem.problemId}</p>
-                      </div>
-                    )}
-                    {!showFilters.problemTier && showFilters.problemNumber && (
-                      <div className="flex min-w-16 items-center">
-                        <p>#{problem.problemId}</p>
-                      </div>
-                    )}
-                    <p className="line-clamp-2">{problem.problemTitle}</p>
-                  </div>
-                  {!showFilters.algorithm && !showFilters.recommendReason ? (
-                    <div className="flex min-w-6 flex-col items-end">
-                      <Trash2 className="text-muted-foreground hover:text-excluded-bg h-4 w-4 cursor-pointer" onClick={() => handleBanProblem(problem.problemId, problem.problemTierName)} />
-                    </div>
-                  ) : (
-                    <div className="flex min-w-30 flex-col items-end">
-                      <div className="flex items-center justify-center gap-1">
-                        {showFilters.algorithm && problem.tags.length > 0 && <p className="line-clamp-1">{problem.tags[0].tagDisplayName}</p>}
-                        <Trash2 className="text-muted-foreground hover:text-excluded-bg h-4 w-4 cursor-pointer" onClick={() => handleBanProblem(problem.problemId, problem.problemTierName)} />
-                      </div>
-                      {showFilters.recommendReason && problem.recommandReasons.length > 0 && <p className="text-muted-foreground line-clamp-1">{problem.recommandReasons[0].reason}</p>}
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-        </>
-      )} */}
     </div>
   );
 }

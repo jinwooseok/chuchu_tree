@@ -1,10 +1,10 @@
 'use client';
 
 import { Calendar, dateFnsLocalizer, ToolbarProps, EventProps } from 'react-big-calendar';
-import { format, parse, startOfWeek, getDay, isSameDay, isToday, isSameMonth } from 'date-fns';
+import { format, parse, startOfWeek, getDay, isSameDay, isToday, isSameMonth, addMonths, subMonths } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { ComponentType, useMemo, useState, useEffect } from 'react';
+import { ComponentType, useMemo, useState, useEffect, useRef } from 'react';
 
 import { transformToCalendarEvents, getDisplayTags } from '../lib/utils';
 import { CalendarEvent, useCalendar } from '@/entities/calendar';
@@ -163,8 +163,29 @@ export default function BigCalendar() {
     setBigCalendarDate(newDate);
   };
 
+  // 스크롤로 월 이동 (throttle 적용)
+  const lastScrollTime = useRef(0);
+  const SCROLL_THROTTLE = 300; // ms
+
+  const handleWheel = (e: React.WheelEvent) => {
+    const now = Date.now();
+    if (now - lastScrollTime.current < SCROLL_THROTTLE) {
+      return; // throttle: 너무 빠른 연속 스크롤 방지
+    }
+
+    lastScrollTime.current = now;
+
+    if (e.deltaY > 0) {
+      // 아래로 스크롤 → 다음달
+      handleBigCalendarNavigate(addMonths(currentDate, 1));
+    } else if (e.deltaY < 0) {
+      // 위로 스크롤 → 지난달
+      handleBigCalendarNavigate(subMonths(currentDate, 1));
+    }
+  };
+
   return (
-    <div className="calendar-12px h-full w-full">
+    <div className="calendar-12px h-full w-full" onWheel={handleWheel}>
       <Calendar
         localizer={localizer}
         events={events}

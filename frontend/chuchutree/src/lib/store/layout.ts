@@ -18,16 +18,18 @@ interface LayoutState {
   topSectionTierbarHeight: number;
   topSectionStreakHeight: number;
   bottomSectionHeight: number;
+  isResizing: boolean;
 
   // 액션들
   setTopSection: (section: TopSection) => void;
   toggleTopSection: (section: 'tierbar' | 'streak') => void;
   setCenterSection: (section: CenterSection) => void;
   toggleBottomSection: () => void;
-  setInfoSidebarWidth: () => void;
-  setTopSectionTierbarHeight: () => void;
-  setTopSectionStreakHeight: () => void;
-  setBottomSectionHeight: () => void;
+  setResizing: (isResizing: boolean) => void;
+  setInfoSidebarWidth: (width: number) => void;
+  setTopSectionTierbarHeight: (height: number) => void;
+  setTopSectionStreakHeight: (height: number) => void;
+  setBottomSectionHeight: (height: number) => void;
 }
 
 export const useLayoutStore = create<LayoutState>()(
@@ -38,10 +40,11 @@ export const useLayoutStore = create<LayoutState>()(
         topSection: null,
         centerSection: 'calendar',
         bottomSection: null,
-        infoSidebarWidth: 200,
+        infoSidebarWidth: 280,
         topSectionTierbarHeight: 80,
         topSectionStreakHeight: 240,
         bottomSectionHeight: 240,
+        isResizing: false,
 
         // 상단 영역 직접 설정
         setTopSection: (section) =>
@@ -81,29 +84,35 @@ export const useLayoutStore = create<LayoutState>()(
             }
           }),
 
+        // 리사이즈 상태 설정
+        setResizing: (isResizing) =>
+          set((state) => {
+            state.isResizing = isResizing;
+          }),
+
+        // InfoSidebar 너비 조절
+        setInfoSidebarWidth: (width) =>
+          set((state) => {
+            state.infoSidebarWidth = width;
+          }),
+
         // 티어바 높이 조절
-        setTopSectionTierbarHeight: () => {
+        setTopSectionTierbarHeight: (height) =>
           set((state) => {
-            state.topSectionTierbarHeight = 60;
-          });
-        },
+            state.topSectionTierbarHeight = height;
+          }),
+
         // 스트릭바 높이 조절
-        setTopSectionStreakHeight: () => {
+        setTopSectionStreakHeight: (height) =>
           set((state) => {
-            state.topSectionStreakHeight = 60;
-          });
-        },
+            state.topSectionStreakHeight = height;
+          }),
+
         // 하단 추천 높이 조절
-        setBottomSectionHeight: () => {
+        setBottomSectionHeight: (height) =>
           set((state) => {
-            state.bottomSectionHeight = 60;
-          });
-        },
-        setInfoSidebarWidth: () => {
-          set((state) => {
-            state.infoSidebarWidth = 300;
-          });
-        },
+            state.bottomSectionHeight = height;
+          }),
       })),
       {
         name: 'layout-storage',

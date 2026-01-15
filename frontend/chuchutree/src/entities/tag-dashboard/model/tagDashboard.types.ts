@@ -40,6 +40,7 @@ export interface CategoryTags {
     requiredMinTier: TierNumKey;
     higherProblemTier: TierNumKey;
     lastSolvedDate: string;
+    recommendation_period: number;
   };
   lockedYn: boolean;
   excludedYn: boolean;
