@@ -85,30 +85,31 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
         <div className="flex h-full items-center justify-center gap-2">
           <div className={`text-muted-foreground flex flex-col gap-0.5`}>
             {/* Tag Ban */}
-            <AppTooltip side="bottom" content={recommendationYn ? '추천 목록에서 제외' : '추천 목록에 추가'}>
+            <AppTooltip side="left" content={recommendationYn ? '추천 목록에서 제외' : '추천 목록에 추가'}>
               <button
                 onClick={handleTagBanClick}
                 aria-label="추천 여부 토글버튼"
                 disabled={isPending}
-                className={`hover:bg-excluded-bg hover:text-innerground-white border-innerground-darkgray rounded border px-2 text-center transition-colors disabled:cursor-not-allowed disabled:opacity-50`}
+                className={`hover:bg-excluded-bg hover:text-innerground-white border-innerground-darkgray cursor-pointer rounded border px-2 text-center transition-colors disabled:cursor-not-allowed disabled:opacity-50`}
               >
                 {recommendationYn ? '추천 포함됨' : '추천 제외됨'}
               </button>
             </AppTooltip>
             {accountStat.lastSolvedDate !== null ? (
-              <div className="flex gap-0.5">
-                <p>마지막 풀이</p>
-                <p className={`text-primary font-semibold`}>{daysAgo}</p>
-                <p>일 전</p>
-              </div>
+              <AppTooltip content="마지막 풀이" side="left" delayDuration={300}>
+                <div className="mr-1 flex justify-end gap-0.5">
+                  <p className={` ${accountStat.recommendation_period < daysAgo ? 'text-primary font-semibold' : ''}`}>{daysAgo}</p>
+                  <p>일 전 풀이</p>
+                </div>
+              </AppTooltip>
             ) : accountStat.solvedProblemCount === 0 ? (
-              <div className="flex gap-0.5">
+              <div className="mr-1 flex justify-end gap-0.5">
                 <p>풀어본 적</p>
                 <p className={`text-primary font-semibold`}>없는</p>
                 <p>유형</p>
               </div>
             ) : (
-              <div className="flex gap-0.5">
+              <div className="mr-1 flex justify-end gap-0.5">
                 <p>가입</p>
                 <p className={`text-primary font-semibold`}>전</p>
                 <p>풀이</p>
