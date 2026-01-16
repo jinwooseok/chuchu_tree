@@ -9,6 +9,7 @@ import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { TargetCode } from '@/shared/constants/tagSystem';
 import { TARGET_OPTIONS } from '@/shared/constants/target';
+import { useLogout } from '@/entities/auth';
 
 export default function BjAccountRegistrationClient() {
   const [bjHandle, setBjHandle] = useState('');
@@ -45,6 +46,19 @@ export default function BjAccountRegistrationClient() {
       });
     },
   });
+  const { mutate: logout, isPending: isLogoutPending } = useLogout({
+    onSuccess: () => {
+      toast.success('로그아웃되었습니다.', {
+        position: 'top-center',
+      });
+      router.push('/sign-in');
+    },
+    onError: () => {
+      toast.error('로그아웃에 실패했습니다. 다시 시도해주세요.', {
+        position: 'top-center',
+      });
+    },
+  });
 
   const isPending = isLinkBjAccountPending || isPostTargetPending;
 
@@ -59,10 +73,14 @@ export default function BjAccountRegistrationClient() {
     linkBjAccount({ bjAccount: bjHandle.trim() });
   };
 
+  const handleLogout = () => {
+    logout();
+  };
+
   return (
-    <div className="bg-innerground-white hide-scrollbar flex h-full w-full max-w-md flex-col overflow-auto rounded-xl p-8">
-      <div className="mb-8 flex items-center justify-between">
-        <div className="flex items-center gap-2">
+    <div className="bg-innerground-white hide-scrollbar flex h-full w-full max-w-md flex-col overflow-auto rounded-xl px-8 py-4">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex cursor-default items-center gap-2">
           <Image src="/logo/logo.svg" alt="logo" width={16} height={16} className="h-6 w-6" />
           <div>ChuChuTree</div>
         </div>
@@ -73,8 +91,8 @@ export default function BjAccountRegistrationClient() {
 
       <div className="flex flex-1 flex-col justify-center">
         <div className="mb-8">
-          <h1 className="mb-2 text-2xl font-semibold">백준 계정 등록</h1>
-          <p className="text-muted-foreground text-sm">ChuChuTree 서비스를 이용하려면 백준 계정 연동이 필요합니다.</p>
+          <h1 className="mb-2 cursor-default text-2xl font-semibold">백준 계정 등록</h1>
+          <p className="text-muted-foreground cursor-default text-sm">ChuChuTree 서비스를 이용하려면 백준 계정 연동이 필요합니다.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -125,20 +143,31 @@ export default function BjAccountRegistrationClient() {
           <button
             type="submit"
             disabled={isPending}
-            className="bg-primary hover:bg-primary/90 disabled:bg-muted-foreground w-full rounded-lg px-4 py-2 text-white transition-colors disabled:cursor-not-allowed"
+            className="bg-primary hover:bg-primary/90 disabled:bg-muted-foreground w-full cursor-pointer rounded-lg px-4 py-2 text-white transition-colors disabled:cursor-not-allowed"
           >
             {isPending ? '등록 중...' : '계정 등록'}
           </button>
         </form>
 
-        <div className="mt-8 text-center">
-          <p className="text-muted-foreground text-xs">
+        <div className="text-muted-foreground mt-6 flex items-center justify-center gap-2 text-center text-xs">
+          <span>
             백준 아이디는{' '}
             <a href="https://www.acmicpc.net" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
               www.acmicpc.net
             </a>
             에서 확인할 수 있습니다.
-          </p>
+          </span>
+          <span className="cursor-default">|</span>
+          <button
+            className="hover:text-primary cursor-pointer"
+            onClick={(e) => {
+              e.preventDefault();
+              handleLogout();
+            }}
+            disabled={isLogoutPending}
+          >
+            로그아웃
+          </button>
         </div>
       </div>
     </div>

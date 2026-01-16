@@ -13,6 +13,7 @@
   --color-innerground-white: var(--innerground-white);
   --color-innerground-darkgray: var(--innerground-darkgray);
   --color-innerground-hovergray: var(--innerground-hovergray);
+  --color-antiground: var(--antiground);
   --color-only-gray: var(--only-gray);
   --color-only-black: var(--only-black);
   --color-logo: var(--logo);
@@ -95,6 +96,7 @@
   --innerground-white: oklch(1 0 0);
   --innerground-darkgray: #e4e4e4;
   --innerground-hovergray: #f3f3f3;
+  --antiground: #f3f0f0;
   --only-gray: #6b7280;
   --only-black: oklch(0.205 0 0);
   --logo: #e7d8cb;
@@ -164,9 +166,10 @@
   --innerground-white: #2b2a28;
   --innerground-darkgray: oklch(33.289% 0.00004 271.152);
   --innerground-hovergray: oklch(33.289% 0.00004 271.152);
+  --antiground: #dfdfdf;
   --only-gray: #6b7280;
   --only-black: oklch(0.205 0 0);
-  --logo: #e7d8cb;
+  --logo: #ccb5a0;
   --tier-undefined: #2d2d2d;
   --tier-bronze: #ad5600;
   --tier-silver: #435f7a;
