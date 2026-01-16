@@ -60,7 +60,7 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
 
       {/* 문제 기본정보 */}
       <div className="mr-2 flex shrink-0 flex-col gap-1 text-center">
-        {firstTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300'}`}>{firstTag.tagDisplayName}</div>}
+        {firstTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-muted-foreground'}`}>{firstTag.tagDisplayName}</div>}
         {!firstTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300'}`}>Undefined</div>}
         <div className="flex items-center gap-1">
           <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
@@ -99,8 +99,8 @@ function SearchResultCard({ problem, onClick }: { problem: WillSolveProblems; on
     <button onClick={onClick} className="bg-background hover:bg-accent flex w-full items-center gap-2 rounded-md p-2 text-left text-xs transition-colors">
       {/* 문제 기본정보 */}
       <div className="flex shrink-0 flex-col gap-1 text-center">
-        {firstTag && <div className={`rounded px-2 py-0.5 ${tagInfo ? tagInfo.bgColor : 'bg-gray-300'}`}>{firstTag.tagDisplayName}</div>}
-        {!firstTag && <div className="rounded bg-gray-300 px-2 py-0.5">Undefined</div>}
+        {firstTag && <div className={`rounded px-2 py-0.5 ${tagInfo ? tagInfo.bgColor : 'bg-only-gray'}`}>{firstTag.tagDisplayName}</div>}
+        {!firstTag && <div className="bg-only-gray rounded px-2 py-0.5">Undefined</div>}
         <div className="flex items-center gap-1">
           <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
           <span>{problem.problemId}</span>
