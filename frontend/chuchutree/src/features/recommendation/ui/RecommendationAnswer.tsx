@@ -134,7 +134,7 @@ export function RecommendationAnswer() {
         return (
           <div key={problem.problemId} className="flex flex-1">
             <Button
-              className={`${isRegistered ? 'bg-primary hover:bg-primary/90' : 'bg-muted-foreground'} h-full w-8 cursor-pointer items-center justify-center rounded-l-lg rounded-r-none text-xs`}
+              className={`${isRegistered ? 'bg-primary hover:bg-primary/90' : 'bg-innerground-darkgray'} hover:bg-excluded-bg text-muted-foreground hover:text-excluded-text h-full w-8 cursor-pointer items-center justify-center rounded-l-lg rounded-r-none text-xs`}
               onClick={() => handleToggleProblem(problem.problemId)}
               disabled={updateWillSolve.isPending}
             >
@@ -148,7 +148,7 @@ export function RecommendationAnswer() {
               )}
             </Button>
             <div
-              className="bg-background text-foreground hover:bg-innerground-darkgray/70 flex h-full flex-1 cursor-pointer items-center justify-between rounded-l-none rounded-r-lg px-2 text-xs"
+              className="bg-innerground-hovergray/50 text-foreground hover:bg-innerground-darkgray/70 flex h-full flex-1 cursor-pointer items-center justify-between rounded-l-none rounded-r-lg px-2 text-xs"
               onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')}
             >
               <div className="flex items-center gap-2">

@@ -1,10 +1,16 @@
 import { useUser } from '@/entities/user/model/queries';
 import { Leaf } from 'lucide-react';
 import { ActivityCalendar, Props as CalendarProps, ThemeInput } from 'react-activity-calendar';
+import { useTheme } from 'next-themes';
 
-const explicitTheme: ThemeInput = {
+const lightTheme: ThemeInput = {
   light: ['#e4e4e4', '#A1E4AC', '#78CB94', '#4EB17C', '#007950'],
   dark: ['#e4e4e4', '#A1E4AC', '#78CB94', '#4EB17C', '#007950'],
+};
+
+const darkTheme: ThemeInput = {
+  light: ['#222120', '#4EB17C', '#007950', '#025036', '#023a27'],
+  dark: ['#222120', '#4EB17C', '#007950', '#025036', '#023a27'],
 };
 
 interface ActivityData {
@@ -55,6 +61,8 @@ const transformStreaksData = (streaks: Array<{ streakDate: string; solvedCount: 
 
 export default function TopStreakbar() {
   const { data: user } = useUser();
+  const { resolvedTheme } = useTheme();
+  const currentTheme = resolvedTheme === 'dark' ? darkTheme : lightTheme;
 
   // 데이터가 없거나 배열이 아니면 로딩 상태 표시
   if (!user?.bjAccount?.streaks || !Array.isArray(user.bjAccount.streaks)) {
@@ -92,7 +100,7 @@ export default function TopStreakbar() {
             labels={labels}
             showMonthLabels
             showWeekdayLabels={['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat']}
-            theme={explicitTheme}
+            theme={currentTheme}
             tooltips={{
               activity: {
                 text: (activity) => `${activity.date}: ${activity.count}문제 해결`,
