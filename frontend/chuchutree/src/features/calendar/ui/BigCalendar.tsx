@@ -34,24 +34,24 @@ function CustomToolbar({ date, onNavigate }: ToolbarProps) {
   return (
     <div className="mb-4 flex items-center justify-between">
       {/* 좌측: 년/월 표시 */}
-      <div className="text-lg font-semibold" suppressHydrationWarning>
+      <div className="cursor-default text-lg font-semibold" suppressHydrationWarning>
         {format(date, 'yyyy M월', { locale: ko })}
       </div>
 
       {/* 우측: 네비게이션 버튼 */}
       <div className="flex gap-2">
         <AppTooltip content="오늘로 이동" side="bottom">
-          <button onClick={() => handleClick('TODAY')} className="hover:bg-background rounded border px-3 py-1 text-xs" aria-label="오늘로 이동">
+          <button onClick={() => handleClick('TODAY')} className="hover:bg-background cursor-pointer rounded border px-3 py-1 text-xs" aria-label="오늘로 이동">
             오늘
           </button>
         </AppTooltip>
         <AppTooltip content="지난달로 이동" side="bottom">
-          <button onClick={() => handleClick('PREV')} className="hover:bg-background rounded px-3 py-1 text-xs" aria-label="지난달로 이동">
+          <button onClick={() => handleClick('PREV')} className="hover:bg-background cursor-pointer rounded px-3 py-1 text-xs" aria-label="지난달로 이동">
             <ChevronUp className="h-4 w-4" />
           </button>
         </AppTooltip>
         <AppTooltip content="다음 달로 이동" side="bottom">
-          <button onClick={() => handleClick('NEXT')} className="hover:bg-background rounded px-3 py-1 text-xs" aria-label="다음 달로 이동">
+          <button onClick={() => handleClick('NEXT')} className="hover:bg-background cursor-pointer rounded px-3 py-1 text-xs" aria-label="다음 달로 이동">
             <ChevronDown className="h-4 w-4" />
           </button>
         </AppTooltip>

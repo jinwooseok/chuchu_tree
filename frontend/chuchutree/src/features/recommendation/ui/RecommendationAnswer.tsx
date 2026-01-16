@@ -110,7 +110,7 @@ export function RecommendationAnswer() {
 
   if (isLoading) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-2">
+      <div className="ml-1 flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-2">
         <div className="text-muted-foreground text-sm">추천 중...</div>
       </div>
     );

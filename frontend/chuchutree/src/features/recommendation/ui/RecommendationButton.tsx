@@ -105,7 +105,7 @@ export function RecommendationButton() {
       <div className="flex h-full w-50 flex-col gap-2 rounded-lg border-2 border-dashed p-2">
         {/* header */}
         <div className="flex items-center justify-between px-2 text-xs">
-          <div className="text-center">{formatSelectedDate()}</div>
+          <div className="cursor-default text-center">{formatSelectedDate()}</div>
           <div className="flex items-center justify-center gap-2">
             <AppTooltip content="알고리즘 유형 선택" side="top">
               <div aria-label="알고리즘 유형 선택창 열기" className="relative cursor-pointer" onClick={toggleTagSection}>
@@ -170,7 +170,7 @@ export function RecommendationButton() {
       <div className={`h-full rounded-lg ${showLevelSection || showFilterSection ? 'w-26 border-2 border-dashed p-2' : ''}`}>
         {showLevelSection && (
           <div>
-            <div className="text-muted-foreground mb-4 text-xs font-semibold">난이도 선택</div>
+            <div className="text-muted-foreground mb-4 cursor-default text-xs font-semibold">난이도 선택</div>
             <div className="space-y-5">
               {levels.map((level) => (
                 <label key={level} aria-label={level} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded">
@@ -196,7 +196,7 @@ export function RecommendationButton() {
 
         {showFilterSection && (
           <div>
-            <div className="text-muted-foreground mb-4 text-xs font-semibold">표시 항목</div>
+            <div className="text-muted-foreground mb-4 cursor-default text-xs font-semibold">표시 항목</div>
             <div className="space-y-5">
               {filters.map((filter) => (
                 <label key={filter.key} aria-label={filter.label} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded">

@@ -69,7 +69,7 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
 
   return (
     <div
-      className={`bg-innerground-white flex flex-col gap-2 rounded-lg border-3 ${!excludedYn ? currentLevelColors.border : 'border-excluded-bg'} group relative w-80 p-4 text-xs transition-all duration-100 ease-in-out hover:shadow-md`}
+      className={`bg-innerground-white flex flex-col gap-2 rounded-lg border-3 ${!excludedYn ? currentLevelColors.border : 'border-excluded-bg'} group relative w-80 cursor-default p-4 text-xs transition-all duration-100 ease-in-out hover:shadow-md`}
     >
       {/* 우상단 */}
       <div className="absolute top-0 right-0 overflow-hidden">
@@ -121,7 +121,7 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
       {/* 게이지 */}
       <TagCardProgressBar tag={tag} />
       {/* 스탯 */}
-      <div className="flex cursor-default flex-col gap-2 rounded border-2 border-dashed px-1 py-2">
+      <div className="flex flex-col gap-2 rounded border-2 border-dashed px-1 py-2">
         <div className="flex items-center justify-between gap-4">
           <AppTooltip content="다음 등급을 위한 문제 수" side="right">
             <div>풀이 수</div>

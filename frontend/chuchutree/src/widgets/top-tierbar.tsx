@@ -16,7 +16,7 @@ export default function TopTierbar() {
   const tierRatio = ((totalRatingForNextTier - ratingToNext) / totalRatingForNextTier) * 100;
 
   return (
-    <div className="bg-innerground-white flex h-full flex-col items-center justify-center gap-2 p-6">
+    <div className="bg-innerground-white flex h-full cursor-default flex-col items-center justify-center gap-2 p-6">
       <div className="flex w-full justify-between">
         <div className="flex items-center justify-center gap-1">
           <h3 className="text-sm">{TIER_INFO[tierId].name}</h3>

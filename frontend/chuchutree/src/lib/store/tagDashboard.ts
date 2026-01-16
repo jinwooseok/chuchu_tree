@@ -1,6 +1,12 @@
 import { create } from 'zustand';
 
-export type SortBy = 'default' | 'name' | 'lastSolved' | 'level';
+export const SortByName = {
+  default: '기본순',
+  name: '이름순',
+  lastSolved: '마지막 풀이순',
+  level: '등급순',
+};
+export type SortBy = keyof typeof SortByName;
 
 interface TagDashboardStore {
   // 상태

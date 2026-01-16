@@ -4,15 +4,18 @@ import { useState } from 'react';
 import { Search, ChevronDown, ChevronRight } from 'lucide-react';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { Input } from '@/components/ui/input';
-import { useTagDashboardSidebarStore, SortBy } from '@/lib/store/tagDashboard';
+import { useTagDashboardSidebarStore, SortBy, SortByName } from '@/lib/store/tagDashboard';
 import { useTagDashboard } from '@/entities/tag-dashboard';
 import { CategoryName } from '@/shared/constants/tagSystem';
 import { getLevelColorClasses } from '@/features/tag-dashboard/lib/utils';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Button } from '@/components/ui/button';
 
 export default function TagSidebar() {
   const { searchQuery, sortBy, selectedTagId, setSearchQuery, setSortBy, setSelectedTagId } = useTagDashboardSidebarStore();
   const { data: tagDashboard } = useTagDashboard();
+  const [isSortingOpen, setIsSortingOpen] = useState(false);
 
   // 카테고리별 열림/닫힘 상태
   const [openCategories, setOpenCategories] = useState<Record<CategoryName, boolean>>({
@@ -57,21 +60,34 @@ export default function TagSidebar() {
   return (
     <div className="hide-scrollbar flex h-full flex-col gap-4 overflow-y-auto p-4 text-sm">
       {/* 제목 */}
-      <div className="text-lg font-semibold">알고리즘 Dashboard</div>
+      <div className="cursor-default text-lg font-semibold">알고리즘 Dashboard</div>
 
       {/* 정렬 드롭다운 */}
-      <div className="flex flex-col gap-2">
+      <div className="flex w-full flex-col gap-2">
         <label className="text-muted-foreground text-xs">정렬 기준</label>
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value as SortBy)}
-          className="border-input bg-background ring-offset-background focus-visible:ring-ring flex h-9 w-full rounded-md border px-3 py-1 text-sm shadow-sm transition-colors focus-visible:ring-1 focus-visible:outline-none"
-        >
-          <option value="default">기본순</option>
-          <option value="name">이름순</option>
-          <option value="lastSolved">마지막 풀이날짜순</option>
-          <option value="level">태그 등급순</option>
-        </select>
+        <Popover open={isSortingOpen} onOpenChange={setIsSortingOpen}>
+          <PopoverTrigger asChild>
+            <Button aria-label="정렬기준" variant="outline" className="w-full cursor-pointer justify-between text-xs">
+              {SortByName[sortBy]}
+              <ChevronDown className="ml-2 h-4 w-4" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="p-2" style={{ width: 'var(--radix-popover-trigger-width)' }}>
+            {Object.entries(SortByName).map(([sortKey, sortKr]) => (
+              <div
+                aria-label={sortKr}
+                key={sortKey}
+                onClick={() => {
+                  setSortBy(sortKey as SortBy);
+                  setIsSortingOpen(false);
+                }}
+                className="hover:bg-innerground-hovergray flex cursor-pointer items-start rounded py-1 pl-2 text-xs"
+              >
+                {sortKr}
+              </div>
+            ))}
+          </PopoverContent>
+        </Popover>
       </div>
 
       {/* 검색 입력 */}

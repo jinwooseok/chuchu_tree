@@ -13,39 +13,6 @@ interface ActivityData {
   level: number;
 }
 
-const data = [
-  {
-    date: '2025-01-01',
-    count: 0,
-    level: 0,
-  },
-  {
-    date: '2025-02-20',
-    count: 2,
-    level: 1,
-  },
-  {
-    date: '2025-02-21',
-    count: 16,
-    level: 2,
-  },
-  {
-    date: '2025-02-22',
-    count: 16,
-    level: 3,
-  },
-  {
-    date: '2025-02-23',
-    count: 16,
-    level: 4,
-  },
-  {
-    date: '2025-12-30',
-    count: 0,
-    level: 4,
-  },
-];
-
 /**
  * streaks 데이터를 ActivityCalendar 형식으로 변환
  * 오늘 날짜와 1년 전 날짜가 없으면 추가
@@ -112,7 +79,7 @@ export default function TopStreakbar() {
   } satisfies CalendarProps['labels'];
 
   return (
-    <div className="bg-innerground-white flex h-full items-center justify-center p-4">
+    <div className="bg-innerground-white flex h-full cursor-default items-center justify-center p-4">
       <div className="max-w-full min-w-0">
         <div className="text-muted-foreground mb-2 flex items-center gap-2 text-sm">
           <Leaf height={14} width={14} />
