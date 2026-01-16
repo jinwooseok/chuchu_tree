@@ -69,7 +69,7 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
 
   return (
     <div
-      className={`bg-background flex flex-col gap-2 rounded-lg border-3 ${!excludedYn ? currentLevelColors.border : 'border-excluded-bg'} group relative w-80 p-4 text-xs transition-all duration-100 ease-in-out hover:shadow-md`}
+      className={`bg-innerground-white flex flex-col gap-2 rounded-lg border-3 ${!excludedYn ? currentLevelColors.border : 'border-excluded-bg'} group relative w-80 p-4 text-xs transition-all duration-100 ease-in-out hover:shadow-md`}
     >
       {/* 우상단 */}
       <div className="absolute top-0 right-0 overflow-hidden">

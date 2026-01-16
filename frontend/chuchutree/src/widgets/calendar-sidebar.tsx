@@ -60,7 +60,7 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
 
       {/* 문제 기본정보 */}
       <div className="mr-2 flex shrink-0 flex-col gap-1 text-center">
-        {firstTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-muted-foreground'}`}>{firstTag.tagDisplayName}</div>}
+        {firstTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-innerground-darkgray'}`}>{firstTag.tagDisplayName}</div>}
         {!firstTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300'}`}>Undefined</div>}
         <div className="flex items-center gap-1">
           <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
@@ -319,7 +319,7 @@ export default function CalendarSidebar() {
 
         {/* 문제 추가하기 */}
         {!showAddInput ? (
-          <button onClick={() => setShowAddInput(true)} className="hover:bg-background text-muted-foreground my-4 cursor-pointer rounded px-2 py-2 text-start text-sm">
+          <button onClick={() => setShowAddInput(true)} className="hover:bg-innerground-hovergray text-muted-foreground my-4 cursor-pointer rounded px-2 py-2 text-start text-sm">
             + 오늘 풀 문제 등록하기
           </button>
         ) : (

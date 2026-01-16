@@ -12,6 +12,7 @@
   /* >>>>>>>>>>>커스텀>>>>>>>>>>> */
   --color-innerground-white: var(--innerground-white);
   --color-innerground-darkgray: var(--innerground-darkgray);
+  --color-innerground-hovergray: var(--innerground-hovergray);
   --color-only-gray: var(--only-gray);
   --color-only-black: var(--only-black);
   --color-logo: var(--logo);
@@ -33,6 +34,21 @@
   --color-excluded-bg: var(--excluded-bg);
   --color-excluded-text: var(--excluded-text);
   /* <<<<<<<<<<<커스텀<<<<<<<<<<<< */
+
+  /* >>>>>>>>>>>태그색상>>>>>>>>>> */
+  --color-tag-red-bg: var(--tag-red-bg);
+  --color-tag-ora-bg: var(--tag-ora-bg);
+  --color-tag-yel-bg: var(--tag-yel-bg);
+  --color-tag-gre-bg: var(--tag-gre-bg);
+  --color-tag-blu-bg: var(--tag-blu-bg);
+  --color-tag-pup-bg: var(--tag-pup-bg);
+  --color-tag-red-text: var(--tag-red-text);
+  --color-tag-ora-text: var(--tag-ora-text);
+  --color-tag-yel-text: var(--tag-yel-text);
+  --color-tag-gre-text: var(--tag-gre-text);
+  --color-tag-blu-text: var(--tag-blu-text);
+  --color-tag-pup-text: var(--tag-pup-text);
+  /* <<<<<<<<<<<태그색상<<<<<<<<<< */
 
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -78,6 +94,7 @@
   --foreground: oklch(0.145 0 0);
   --innerground-white: oklch(1 0 0);
   --innerground-darkgray: #e4e4e4;
+  --innerground-hovergray: #f3f3f3;
   --only-gray: #6b7280;
   --only-black: oklch(0.205 0 0);
   --logo: #e7d8cb;
@@ -98,6 +115,18 @@
   --locked-text: #303030;
   --excluded-bg: #ed6e6e;
   --excluded-text: #5d1111;
+  --tag-red-bg: #ffd0e5;
+  --tag-ora-bg: #faddc0;
+  --tag-yel-bg: #fbedbc;
+  --tag-gre-bg: #d6fbdc;
+  --tag-blu-bg: #e9e9ff;
+  --tag-pup-bg: #fdddff;
+  --tag-red-text: #c06978;
+  --tag-ora-text: #dd8d6a;
+  --tag-yel-text: #cfbf7a;
+  --tag-gre-text: #92a698;
+  --tag-blu-text: #9798aa;
+  --tag-pup-text: #a9a7ad;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -134,6 +163,7 @@
   --foreground: #f3f0f0;
   --innerground-white: #2b2a28;
   --innerground-darkgray: oklch(33.289% 0.00004 271.152);
+  --innerground-hovergray: oklch(33.289% 0.00004 271.152);
   --only-gray: #6b7280;
   --only-black: oklch(0.205 0 0);
   --logo: #e7d8cb;
@@ -144,16 +174,28 @@
   --tier-platinum: #27e2a4;
   --tier-diamond: #00b4fc;
   --tier-ruby: #ff0062;
-  --intermediate-bg: #f9b473;
-  --intermediate-text: #6e4116;
+  --intermediate-bg: #ce8d50;
+  --intermediate-text: #facfa7;
   --advanced-bg: #79ab7c;
-  --advanced-text: #4a5c4c;
-  --master-bg: #47c6f9;
-  --master-text: #0d4961;
-  --locked-bg: #e4e4e4;
-  --locked-text: #303030;
-  --excluded-bg: #ed6e6e;
-  --excluded-text: #ed6e6e;
+  --advanced-text: #b1dab3;
+  --master-bg: #43a6ce;
+  --master-text: #83d7f8;
+  --locked-bg: #e7d8cb;
+  --locked-text: #919191;
+  --excluded-bg: #d36565;
+  --excluded-text: #ff9f9f;
+  --tag-red-bg: #882f23;
+  --tag-ora-bg: #944625;
+  --tag-yel-bg: #938339;
+  --tag-gre-bg: #3f664a;
+  --tag-blu-bg: #494a71;
+  --tag-pup-bg: #60517d;
+  --tag-red-text: #be6357;
+  --tag-ora-text: #dd8d6a;
+  --tag-yel-text: #cfbf7a;
+  --tag-gre-text: #92a698;
+  --tag-blu-text: #9798aa;
+  --tag-pup-text: #a9a7ad;
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
@@ -304,7 +346,7 @@
 }
 
 .small-calendar-wrapper .react-calendar__tile:enabled:hover abbr {
-  background-color: var(--only-gray);
+  background-color: var(--innerground-hovergray);
   border-radius: 50%;
 }
 

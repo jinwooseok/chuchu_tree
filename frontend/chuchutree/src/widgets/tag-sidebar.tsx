@@ -89,7 +89,7 @@ export default function TagSidebar() {
           return (
             <Collapsible key={category.categoryName} open={isOpen} onOpenChange={() => toggleCategory(category.categoryName)}>
               <AppTooltip content={categoryTooltip[category.categoryName]} side="right">
-                <CollapsibleTrigger className="flex w-full items-center justify-between rounded-md p-2 hover:bg-gray-100" aria-label={isOpen ? '섹션 접기' : '섹션 펼치기'}>
+                <CollapsibleTrigger className="hover:bg-innerground-hovergray flex w-full items-center justify-between rounded-md p-2" aria-label={isOpen ? '섹션 접기' : '섹션 펼치기'}>
                   <div className="flex items-center gap-2">
                     {isOpen ? <ChevronDown className="h-4 w-4" aria-hidden="true" /> : <ChevronRight className="h-4 w-4" aria-hidden="true" />}
                     <span className={`${levelColors.bg} ${levelColors.text} rounded px-2 py-0.5 text-xs font-semibold`}>{category.categoryName}</span>
