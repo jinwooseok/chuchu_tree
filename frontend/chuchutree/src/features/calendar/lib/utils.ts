@@ -41,7 +41,7 @@ export function transformToCalendarEvents(monthlyDataArray: MonthlyData[]): Cale
       }
     });
   });
-  console.log('events', events);
+  // console.log('events', events);
 
   return events;
 }
