@@ -2,10 +2,11 @@ import { create } from 'zustand';
 import { CategoryName } from '@/shared/constants/tagSystem';
 
 export const SortByName = {
-  default: '기본순',
+  progress: '승급임박순',
   name: '이름순',
   lastSolved: '마지막 풀이순',
   level: '등급순',
+  default: '풀이수 순',
 };
 export type SortBy = keyof typeof SortByName;
 
@@ -41,15 +42,15 @@ interface TagDashboardStore {
 export const useTagDashboardSidebarStore = create<TagDashboardStore>((set) => ({
   // 초기 상태
   searchQuery: '',
-  sortBy: 'default',
+  sortBy: 'progress',
   sortDirection: 'asc',
   selectedTagId: null,
   categoryVisibility: {
     INTERMEDIATE: true,
     ADVANCED: true,
-    MASTER: true,
+    MASTER: false,
     LOCKED: true,
-    EXCLUDED: true,
+    EXCLUDED: false,
   },
   categoryOrder: DEFAULT_CATEGORY_ORDER,
 
@@ -61,6 +62,16 @@ export const useTagDashboardSidebarStore = create<TagDashboardStore>((set) => ({
   // 정렬 기준 설정
   setSortBy: (sortBy: SortBy) => {
     set({ sortBy });
+    // 승급임박순 선택 시 MASTER와 EXCLUDED 카테고리 자동 off
+    if (sortBy === 'progress') {
+      set((state) => ({
+        categoryVisibility: {
+          ...state.categoryVisibility,
+          MASTER: false,
+          EXCLUDED: false,
+        },
+      }));
+    }
   },
 
   // 정렬 방향 설정
@@ -92,15 +103,15 @@ export const useTagDashboardSidebarStore = create<TagDashboardStore>((set) => ({
   clearFilters: () => {
     set({
       searchQuery: '',
-      sortBy: 'default',
+      sortBy: 'progress',
       sortDirection: 'asc',
       selectedTagId: null,
       categoryVisibility: {
         INTERMEDIATE: true,
         ADVANCED: true,
-        MASTER: true,
+        MASTER: false,
         LOCKED: true,
-        EXCLUDED: true,
+        EXCLUDED: false,
       },
       categoryOrder: DEFAULT_CATEGORY_ORDER,
     });

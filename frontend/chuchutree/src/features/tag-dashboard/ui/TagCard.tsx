@@ -12,7 +12,7 @@ import TagCardProgressBar from '@/features/tag-dashboard/ui/TagCardProgressBar';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { TIER_INFO } from '@/shared/constants/tierSystem';
 
-export default function TagCard({ tag }: { tag: CategoryTags }) {
+export default function TagCard({ tag, progress }: { tag: CategoryTags; progress: number }) {
   const { tagCode, tagDisplayName, accountStat, nextLevelStat, excludedYn, recommendationYn } = tag;
   const { openModal, closeModal } = useModal();
 
@@ -119,7 +119,7 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
         </div>
       </div>
       {/* 게이지 */}
-      <TagCardProgressBar tag={tag} />
+      <TagCardProgressBar tag={tag} progress={progress} />
       {/* 스탯 */}
       <div className="flex flex-col gap-2 rounded border-2 border-dashed px-1 py-2">
         <div className="flex items-center justify-between gap-4">

@@ -1,22 +1,13 @@
 import { CategoryTags } from '@/entities/tag-dashboard';
-import { calculateBoxPosition, calculatePeekPosition, calculateProgress, getLevelColorClasses } from '@/features/tag-dashboard/lib/utils';
+import { calculateBoxPosition, calculatePeekPosition, getLevelColorClasses } from '@/features/tag-dashboard/lib/utils';
 import Image from 'next/image';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid'; // filled
 import { CheckCircleIcon as CheckCircleIconOutline } from '@heroicons/react/24/outline'; // outline
 import { BadgeCheck } from 'lucide-react';
 
-export default function TagCardProgressBar({ tag }: { tag: CategoryTags }) {
+export default function TagCardProgressBar({ tag, progress }: { tag: CategoryTags; progress: number }) {
   const { accountStat, nextLevelStat, lockedYn, excludedYn, requiredStat } = tag;
   const currentLevelColors = getLevelColorClasses(accountStat.currentLevel);
-  // 진행률 계산
-  const progress = calculateProgress({
-    solvedCnt: accountStat.solvedProblemCount,
-    requireSolveCnt: nextLevelStat.solvedProblemCount,
-    userTier: accountStat.requiredMinTier,
-    requireTier: nextLevelStat.requiredMinTier,
-    highest: accountStat.higherProblemTier,
-    requireHighest: nextLevelStat.higherProblemTier,
-  });
 
   // 게이지 위치 계산
   const currentPeekRatio = calculatePeekPosition(progress);

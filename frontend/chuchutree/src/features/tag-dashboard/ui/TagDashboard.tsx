@@ -4,6 +4,7 @@ import { useMemo } from 'react';
 import TagCard from '@/features/tag-dashboard/ui/TagCard';
 import { useTagDashboardSidebarStore } from '@/lib/store/tagDashboard';
 import { useTagDashboard } from '@/entities/tag-dashboard';
+import { calculateProgress } from '@/features/tag-dashboard/lib/utils';
 
 export default function TagDashboard() {
   // TanStack Query에서 태그 데이터 가져오기
@@ -12,11 +13,22 @@ export default function TagDashboard() {
   // store에서 필터/정렬 상태 가져오기
   const { searchQuery, sortBy, sortDirection, selectedTagId, categoryVisibility } = useTagDashboardSidebarStore();
 
-  // 필터링 및 정렬된 태그 목록
+  // 필터링 및 정렬된 태그 목록 (progress 포함)
   const filteredAndSortedTags = useMemo(() => {
     if (!tagDashboard) return [];
 
-    let result = [...tagDashboard.tags];
+    // 각 태그에 progress 계산하여 추가
+    let result = tagDashboard.tags.map((tag) => {
+      const progress = calculateProgress({
+        solvedCnt: tag.accountStat.solvedProblemCount,
+        requireSolveCnt: tag.nextLevelStat.solvedProblemCount,
+        userTier: tag.accountStat.requiredMinTier,
+        requireTier: tag.nextLevelStat.requiredMinTier,
+        highest: tag.accountStat.higherProblemTier,
+        requireHighest: tag.nextLevelStat.higherProblemTier,
+      });
+      return { ...tag, progress };
+    });
 
     // 검색어 필터링
     if (searchQuery) {
@@ -59,9 +71,20 @@ export default function TagDashboard() {
           return sortDirection === 'asc' ? comparison : -comparison;
         });
         break;
+      case 'progress':
+        result.sort((a, b) => {
+          const comparison = b.progress - a.progress; // 높은 progress가 먼저 오도록
+          return sortDirection === 'asc' ? comparison : -comparison; // asc가 기본(높은 순)
+        });
+        break;
       case 'default':
+        result.sort((a, b) => {
+          const comparison = b.accountStat.solvedProblemCount - a.accountStat.solvedProblemCount;
+          return sortDirection === 'asc' ? comparison : -comparison;
+        });
+        break;
       default:
-        // 기본순은 API 응답 순서 유지 (방향 무시)
+        // 알 수 없는 정렬 기준은 그대로 유지
         break;
     }
 
@@ -88,7 +111,7 @@ export default function TagDashboard() {
     <div className="hide-scrollbar flex h-full w-full overflow-y-auto">
       <div className="mx-auto grid w-fit grid-cols-1 content-start gap-x-4 gap-y-8 lg:grid-cols-2 xl:grid-cols-3">
         {filteredAndSortedTags.map((tag) => (
-          <TagCard key={tag.tagId} tag={tag} />
+          <TagCard key={tag.tagId} tag={tag} progress={tag.progress} />
         ))}
       </div>
     </div>
