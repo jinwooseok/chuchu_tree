@@ -54,7 +54,7 @@ export default function DashboardLayout() {
     direction: 'vertical',
     initialSize: topSection === 'tierbar' ? topSectionTierbarHeight : topSectionStreakHeight,
     minSize: topSection === 'streak' ? 240 : 60,
-    maxSize: topSection === 'streak' ? 300 : 240,
+    maxSize: topSection === 'streak' ? 300 : 120,
     onResizeStart: () => setResizing(true),
     onResizeEnd: (height) => {
       if (topSection === 'tierbar') {
