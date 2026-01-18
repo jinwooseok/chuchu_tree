@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { CategoryName } from '@/shared/constants/tagSystem';
 
 export const SortByName = {
   default: '기본순',
@@ -8,16 +9,31 @@ export const SortByName = {
 };
 export type SortBy = keyof typeof SortByName;
 
+export type SortDirection = 'asc' | 'desc';
+
+export const SortDirectionName = {
+  asc: '오름차순',
+  desc: '내림차순',
+};
+
+const DEFAULT_CATEGORY_ORDER: CategoryName[] = ['INTERMEDIATE', 'ADVANCED', 'MASTER', 'LOCKED', 'EXCLUDED'];
+
 interface TagDashboardStore {
   // 상태
   searchQuery: string;
   sortBy: SortBy;
+  sortDirection: SortDirection;
   selectedTagId: number | null;
+  categoryVisibility: Record<CategoryName, boolean>;
+  categoryOrder: CategoryName[];
 
   // 액션
   setSearchQuery: (query: string) => void;
   setSortBy: (sortBy: SortBy) => void;
+  setSortDirection: (direction: SortDirection) => void;
   setSelectedTagId: (tagId: number | null) => void;
+  toggleCategoryVisibility: (category: CategoryName) => void;
+  setCategoryOrder: (order: CategoryName[]) => void;
   clearFilters: () => void;
 }
 
@@ -26,7 +42,16 @@ export const useTagDashboardSidebarStore = create<TagDashboardStore>((set) => ({
   // 초기 상태
   searchQuery: '',
   sortBy: 'default',
+  sortDirection: 'asc',
   selectedTagId: null,
+  categoryVisibility: {
+    INTERMEDIATE: true,
+    ADVANCED: true,
+    MASTER: true,
+    LOCKED: true,
+    EXCLUDED: true,
+  },
+  categoryOrder: DEFAULT_CATEGORY_ORDER,
 
   // 검색어 설정
   setSearchQuery: (query: string) => {
@@ -38,13 +63,46 @@ export const useTagDashboardSidebarStore = create<TagDashboardStore>((set) => ({
     set({ sortBy });
   },
 
+  // 정렬 방향 설정
+  setSortDirection: (direction: SortDirection) => {
+    set({ sortDirection: direction });
+  },
+
   // 선택된 태그 ID 설정
   setSelectedTagId: (tagId: number | null) => {
     set({ selectedTagId: tagId });
   },
 
+  // 카테고리 표시/숨김 토글
+  toggleCategoryVisibility: (category: CategoryName) => {
+    set((state) => ({
+      categoryVisibility: {
+        ...state.categoryVisibility,
+        [category]: !state.categoryVisibility[category],
+      },
+    }));
+  },
+
+  // 카테고리 순서 설정
+  setCategoryOrder: (order: CategoryName[]) => {
+    set({ categoryOrder: order });
+  },
+
   // 필터 초기화
   clearFilters: () => {
-    set({ searchQuery: '', sortBy: 'default', selectedTagId: null });
+    set({
+      searchQuery: '',
+      sortBy: 'default',
+      sortDirection: 'asc',
+      selectedTagId: null,
+      categoryVisibility: {
+        INTERMEDIATE: true,
+        ADVANCED: true,
+        MASTER: true,
+        LOCKED: true,
+        EXCLUDED: true,
+      },
+      categoryOrder: DEFAULT_CATEGORY_ORDER,
+    });
   },
 }));

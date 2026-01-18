@@ -10,7 +10,7 @@ export default function TagDashboard() {
   const { data: tagDashboard } = useTagDashboard();
 
   // store에서 필터/정렬 상태 가져오기
-  const { searchQuery, sortBy, selectedTagId } = useTagDashboardSidebarStore();
+  const { searchQuery, sortBy, sortDirection, selectedTagId, categoryVisibility } = useTagDashboardSidebarStore();
 
   // 필터링 및 정렬된 태그 목록
   const filteredAndSortedTags = useMemo(() => {
@@ -28,26 +28,45 @@ export default function TagDashboard() {
       result = result.filter((tag) => tag.tagId === selectedTagId);
     }
 
+    // 카테고리 visibility 필터링
+    result = result.filter((tag) => {
+      // EXCLUDED는 excludedYn으로 판단
+      if (tag.excludedYn) {
+        return categoryVisibility.EXCLUDED;
+      }
+      // 나머지는 currentLevel로 판단
+      return categoryVisibility[tag.accountStat.currentLevel];
+    });
+
     // 정렬
     switch (sortBy) {
       case 'name':
-        result.sort((a, b) => a.tagDisplayName.localeCompare(b.tagDisplayName));
+        result.sort((a, b) => {
+          const comparison = a.tagDisplayName.localeCompare(b.tagDisplayName);
+          return sortDirection === 'asc' ? comparison : -comparison;
+        });
         break;
       case 'lastSolved':
-        result.sort((a, b) => new Date(b.accountStat.lastSolvedDate).getTime() - new Date(a.accountStat.lastSolvedDate).getTime());
+        result.sort((a, b) => {
+          const comparison = new Date(b.accountStat.lastSolvedDate).getTime() - new Date(a.accountStat.lastSolvedDate).getTime();
+          return sortDirection === 'asc' ? -comparison : comparison;
+        });
         break;
       case 'level':
         const levelOrder = { MASTER: 3, ADVANCED: 2, INTERMEDIATE: 1, EXCLUDED: 0, LOCKED: 4 };
-        result.sort((a, b) => levelOrder[a.accountStat.currentLevel as keyof typeof levelOrder] - levelOrder[b.accountStat.currentLevel as keyof typeof levelOrder]);
+        result.sort((a, b) => {
+          const comparison = levelOrder[a.accountStat.currentLevel as keyof typeof levelOrder] - levelOrder[b.accountStat.currentLevel as keyof typeof levelOrder];
+          return sortDirection === 'asc' ? comparison : -comparison;
+        });
         break;
       case 'default':
       default:
-        // 기본순은 API 응답 순서 유지
+        // 기본순은 API 응답 순서 유지 (방향 무시)
         break;
     }
 
     return result;
-  }, [tagDashboard, searchQuery, sortBy, selectedTagId]);
+  }, [tagDashboard, searchQuery, sortBy, sortDirection, selectedTagId, categoryVisibility]);
 
   // 데이터 로딩 중
   if (!tagDashboard) {
