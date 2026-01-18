@@ -41,7 +41,7 @@ export const useLayoutStore = create<LayoutState>()(
         centerSection: 'calendar',
         bottomSection: null,
         infoSidebarWidth: 280,
-        topSectionTierbarHeight: 80,
+        topSectionTierbarHeight: 120,
         topSectionStreakHeight: 240,
         bottomSectionHeight: 240,
         isResizing: false,
