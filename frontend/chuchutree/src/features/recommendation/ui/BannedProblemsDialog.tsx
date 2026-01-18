@@ -35,23 +35,23 @@ export default function BannedProblemsDialog({ onClose }: props) {
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="flex max-h-[90vh] max-w-2xl flex-col">
         <DialogHeader>
           <DialogTitle>제외된 문제 목록</DialogTitle>
           <DialogDescription>추천에서 제외된 문제들을 확인하고 관리할 수 있습니다.</DialogDescription>
         </DialogHeader>
 
         {isLoading ? (
-          <div className="flex h-64 items-center justify-center">
+          <div className="flex min-h-64 flex-1 items-center justify-center">
             <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
           </div>
         ) : bannedProblemsData && bannedProblemsData.bannedProblems.length > 0 ? (
-          <div className="h-96 overflow-y-auto pr-4">
+          <div className="min-h-0 flex-1 overflow-y-auto pr-4">
             <div className="space-y-2">
               {bannedProblemsData.bannedProblems.map((problem) => (
                 <div
                   key={problem.problemId}
-                  className="bg-innerground-hovergray/50 hover:bg-innerground-darkgray/70 flex items-center justify-between rounded-lg p-3 transition-colors"
+                  className="bg-innerground-hovergray/50 hover:bg-innerground-darkgray/70 flex cursor-pointer items-center justify-between rounded-lg p-3 transition-colors"
                   onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')}
                 >
                   <div className="flex flex-1 items-center gap-3">
@@ -92,12 +92,12 @@ export default function BannedProblemsDialog({ onClose }: props) {
             </div>
           </div>
         ) : (
-          <div className="flex h-64 flex-col items-center justify-center gap-2">
+          <div className="flex min-h-64 flex-1 flex-col items-center justify-center gap-2">
             <p className="text-muted-foreground text-sm">제외된 문제가 없습니다.</p>
           </div>
         )}
 
-        <div className="flex justify-end gap-2 pt-4">
+        <div className="flex shrink-0 justify-end gap-2 pt-4">
           <Button variant="outline" onClick={onClose}>
             닫기
           </Button>

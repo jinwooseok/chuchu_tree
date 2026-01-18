@@ -40,12 +40,12 @@ export function TargetChangeDialog({ currentTarget = 'DAILY', onClose }: TargetC
 
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-md">
         <DialogHeader>
           <DialogTitle>학습 목표 변경</DialogTitle>
           <DialogDescription>학습 목표를 변경하시겠습니까? 변경된 목표에 따라 추천 문제가 달라집니다.</DialogDescription>
         </DialogHeader>
-        <div className="space-y-3 py-4">
+        <div className="flex-1 space-y-3 overflow-y-auto py-4">
           {TARGET_OPTIONS.map((option) => (
             <label
               key={option.code}
@@ -69,7 +69,7 @@ export function TargetChangeDialog({ currentTarget = 'DAILY', onClose }: TargetC
             </label>
           ))}
         </div>
-        <DialogFooter className="sm:justify-end">
+        <DialogFooter className="shrink-0 sm:justify-end">
           <button
             type="button"
             onClick={onClose}
