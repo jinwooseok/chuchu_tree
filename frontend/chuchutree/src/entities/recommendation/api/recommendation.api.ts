@@ -22,7 +22,7 @@ export const RecommendationApi = {
   deleteProblemBan: async (data: BanProblem): Promise<void> => {
     await axiosInstance.delete<void>('/user-accounts/me/problems/banned-list', {
       params: {
-        problemId: data,
+        problemId: data.problemId,
       },
     });
   },
