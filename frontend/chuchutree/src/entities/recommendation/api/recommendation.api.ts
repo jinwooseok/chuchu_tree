@@ -1,4 +1,4 @@
-import { BanProblem, Recommendation } from '@/entities/recommendation/model/types';
+import { BannedProblems, BanProblem, Recommendation } from '@/entities/recommendation/model/types';
 import { axiosInstance } from '@/lib/axios';
 import { ApiResponse } from '@/shared/types/api';
 
@@ -12,7 +12,18 @@ export const RecommendationApi = {
     });
     return data.data;
   },
+  getBannedProblems: async (): Promise<BannedProblems> => {
+    const { data } = await axiosInstance.get<ApiResponse<BannedProblems>>('/user-accounts/me/problems/banned-list');
+    return data.data;
+  },
   postProblemBan: async (data: BanProblem): Promise<void> => {
     await axiosInstance.post<void>('/user-accounts/me/problems/banned-list', data);
+  },
+  deleteProblemBan: async (data: BanProblem): Promise<void> => {
+    await axiosInstance.delete<void>('/user-accounts/me/problems/banned-list', {
+      params: {
+        problemId: data,
+      },
+    });
   },
 };

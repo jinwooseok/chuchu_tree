@@ -18,6 +18,7 @@ import { toast } from 'sonner';
 import { useLogout } from '@/entities/auth';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import BannedProblemsDialog from '@/features/recommendation/ui/BannedProblemsDialog';
 
 const ICON_SIZE = 32;
 
@@ -203,6 +204,14 @@ export function AppSidebar() {
                     }}
                   >
                     <span>목표 변경</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={(e) => {
+                      e.preventDefault();
+                      openModal('banned-problems-list', <BannedProblemsDialog onClose={() => closeModal('banned-problems-list')} />);
+                    }}
+                  >
+                    <span>제외된 문제</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={(e) => {
