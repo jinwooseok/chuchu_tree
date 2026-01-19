@@ -1,0 +1,57 @@
+pipeline {
+    agent { label 'build-node' }
+
+    stages {
+        stage('Build & Deploy Development') {
+            when { 
+                allOf {
+                    branch 'develop'
+                    changeset "frontend/**"
+                }
+            }
+            options { skipDefaultCheckout() }
+            steps {
+                // 여러 개의 변수를 한 번에 가져오기
+                withCredentials([
+                    string(credentialsId: 'PROJECTS_ROOT', variable: 'ROOT_PATH'),
+                    file(credentialsId: 'chuchu-fe-env', variable: 'ENV_FILE_PATH')
+                ]) {
+                    // 변수를 사용할 때는 "${ROOT_PATH}" 형식으로 사용합니다.
+                    dir("${ROOT_PATH}/chuchu-tree-dev") {
+                        checkout scm 
+                        dir('frontend') {
+                            sh "cp ${ENV_FILE_PATH} chuchutree/.env.development"
+                            sh 'docker-compose -f docker-compose-dev.yml up -d --build'
+                            sh 'rm chuchutree/.env.development'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Build & Deploy Production') {
+            when { 
+                allOf {
+                    branch 'main'
+                    changeset "frontend/**"
+                }
+            }
+            options { skipDefaultCheckout() }
+            steps {
+                withCredentials([
+                    string(credentialsId: 'PROJECTS_ROOT', variable: 'ROOT_PATH'),
+                    file(credentialsId: 'chuchu-fe-env', variable: 'ENV_FILE_PATH')
+                ]) {
+                    dir("${ROOT_PATH}/chuchu_tree") {
+                        checkout scm 
+                        dir('frontend') {
+                            sh "cp ${ENV_FILE_PATH} chuchutree/.env.development"
+                            sh 'docker-compose -f docker-compose-prod.yml up -d --build'
+                            sh 'rm chuchutree/.env.development'
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
