@@ -5,7 +5,9 @@ pipeline {
         stage('Build & Deploy Development') {
             when { 
                 allOf {
-                    branch 'develop'
+                    expression { 
+                        return env.GIT_BRANCH?.contains('develop') || env.BRANCH_NAME == 'develop'
+                    }
                     changeset "frontend/**"
                 }
             }
@@ -21,7 +23,7 @@ pipeline {
                         checkout scm 
                         dir('frontend') {
                             sh "cp ${ENV_FILE_PATH} chuchutree/.env.development"
-                            sh 'docker-compose -f docker-compose-dev.yml up -d --build'
+                            sh 'docker-compose -f docker-compose.dev.yml up -d --build'
                             sh 'rm chuchutree/.env.development'
                         }
                     }
@@ -32,7 +34,9 @@ pipeline {
         stage('Build & Deploy Production') {
             when { 
                 allOf {
-                    branch 'main'
+                    expression { 
+                        return env.GIT_BRANCH?.contains('main') || env.BRANCH_NAME == 'main'
+                    }
                     changeset "frontend/**"
                 }
             }
@@ -46,7 +50,7 @@ pipeline {
                         checkout scm 
                         dir('frontend') {
                             sh "cp ${ENV_FILE_PATH} chuchutree/.env.development"
-                            sh 'docker-compose -f docker-compose-prod.yml up -d --build'
+                            sh 'docker-compose -f docker-compose.prod.yml up -d --build'
                             sh 'rm chuchutree/.env.development'
                         }
                     }
