@@ -6,7 +6,7 @@ pipeline {
             when { 
                 allOf {
                     branch 'develop'
-                    changeset "backend/**"
+                    //changeset "backend/**"
                 }
             }
             options { skipDefaultCheckout() }
@@ -33,7 +33,7 @@ pipeline {
             when { 
                 allOf {
                     branch 'main'
-                    changeset "backend/**"
+                    //changeset "backend/**"
                 }
             }
             options { skipDefaultCheckout() }
