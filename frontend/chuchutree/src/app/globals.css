@@ -12,6 +12,10 @@
   /* >>>>>>>>>>>커스텀>>>>>>>>>>> */
   --color-innerground-white: var(--innerground-white);
   --color-innerground-darkgray: var(--innerground-darkgray);
+  --color-innerground-hovergray: var(--innerground-hovergray);
+  --color-antiground: var(--antiground);
+  --color-only-gray: var(--only-gray);
+  --color-only-black: var(--only-black);
   --color-logo: var(--logo);
   --color-tier-undefined: var(--tier-undefined);
   --color-tier-bronze: var(--tier-bronze);
@@ -31,6 +35,21 @@
   --color-excluded-bg: var(--excluded-bg);
   --color-excluded-text: var(--excluded-text);
   /* <<<<<<<<<<<커스텀<<<<<<<<<<<< */
+
+  /* >>>>>>>>>>>태그색상>>>>>>>>>> */
+  --color-tag-red-bg: var(--tag-red-bg);
+  --color-tag-ora-bg: var(--tag-ora-bg);
+  --color-tag-yel-bg: var(--tag-yel-bg);
+  --color-tag-gre-bg: var(--tag-gre-bg);
+  --color-tag-blu-bg: var(--tag-blu-bg);
+  --color-tag-pup-bg: var(--tag-pup-bg);
+  --color-tag-red-text: var(--tag-red-text);
+  --color-tag-ora-text: var(--tag-ora-text);
+  --color-tag-yel-text: var(--tag-yel-text);
+  --color-tag-gre-text: var(--tag-gre-text);
+  --color-tag-blu-text: var(--tag-blu-text);
+  --color-tag-pup-text: var(--tag-pup-text);
+  /* <<<<<<<<<<<태그색상<<<<<<<<<< */
 
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -76,6 +95,10 @@
   --foreground: oklch(0.145 0 0);
   --innerground-white: oklch(1 0 0);
   --innerground-darkgray: #e4e4e4;
+  --innerground-hovergray: #f3f3f3;
+  --antiground: #f3f0f0;
+  --only-gray: #6b7280;
+  --only-black: oklch(0.205 0 0);
   --logo: #e7d8cb;
   --tier-undefined: #2d2d2d;
   --tier-bronze: #ad5600;
@@ -94,6 +117,18 @@
   --locked-text: #303030;
   --excluded-bg: #ed6e6e;
   --excluded-text: #5d1111;
+  --tag-red-bg: #ffd0e5;
+  --tag-ora-bg: #faddc0;
+  --tag-yel-bg: #fbedbc;
+  --tag-gre-bg: #d6fbdc;
+  --tag-blu-bg: #e9e9ff;
+  --tag-pup-bg: #fdddff;
+  --tag-red-text: #c06978;
+  --tag-ora-text: #dd8d6a;
+  --tag-yel-text: #cfbf7a;
+  --tag-gre-text: #92a698;
+  --tag-blu-text: #9798aa;
+  --tag-pup-text: #a9a7ad;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
@@ -130,7 +165,11 @@
   --foreground: #f3f0f0;
   --innerground-white: #2b2a28;
   --innerground-darkgray: oklch(33.289% 0.00004 271.152);
-  --logo: #e7d8cb;
+  --innerground-hovergray: oklch(33.289% 0.00004 271.152);
+  --antiground: #dfdfdf;
+  --only-gray: #6b7280;
+  --only-black: oklch(0.205 0 0);
+  --logo: #ccb5a0;
   --tier-undefined: #2d2d2d;
   --tier-bronze: #ad5600;
   --tier-silver: #435f7a;
@@ -138,16 +177,28 @@
   --tier-platinum: #27e2a4;
   --tier-diamond: #00b4fc;
   --tier-ruby: #ff0062;
-  --intermediate-bg: #f9b473;
-  --intermediate-text: #6e4116;
+  --intermediate-bg: #ce8d50;
+  --intermediate-text: #facfa7;
   --advanced-bg: #79ab7c;
-  --advanced-text: #4a5c4c;
-  --master-bg: #47c6f9;
-  --master-text: #0d4961;
-  --locked-bg: #e4e4e4;
-  --locked-text: #303030;
-  --excluded-bg: #ed6e6e;
-  --excluded-text: #ed6e6e;
+  --advanced-text: #b1dab3;
+  --master-bg: #43a6ce;
+  --master-text: #83d7f8;
+  --locked-bg: #e7d8cb;
+  --locked-text: #919191;
+  --excluded-bg: #d36565;
+  --excluded-text: #ff9f9f;
+  --tag-red-bg: #882f23;
+  --tag-ora-bg: #944625;
+  --tag-yel-bg: #938339;
+  --tag-gre-bg: #3f664a;
+  --tag-blu-bg: #494a71;
+  --tag-pup-bg: #60517d;
+  --tag-red-text: #be6357;
+  --tag-ora-text: #dd8d6a;
+  --tag-yel-text: #cfbf7a;
+  --tag-gre-text: #92a698;
+  --tag-blu-text: #9798aa;
+  --tag-pup-text: #a9a7ad;
   --card: oklch(0.205 0 0);
   --card-foreground: oklch(0.985 0 0);
   --popover: oklch(0.205 0 0);
@@ -160,7 +211,7 @@
   --muted-foreground: oklch(0.708 0 0);
   --accent: oklch(0.269 0 0);
   --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
+  --destructive: #dd5050;
   --border: oklch(1 0 0 / 10%);
   --input: oklch(1 0 0 / 15%);
   --ring: oklch(0.556 0 0);
@@ -231,13 +282,25 @@
   background-color: transparent;
 }
 
-/* 캘린더 그리드 border 설정 */
+/* 캘린더 그리드 header 설정 */
 .calendar-12px .rbc-header {
-  border-left: transparent !important;
+  border: transparent !important;
 }
-
+/* 캘린더 그리드 body 설정 */
 .calendar-12px .rbc-month-view {
   border: transparent !important;
+}
+/* 캘린더 그리드 row 설정 */
+.calendar-12px .rbc-month-row {
+  border-top: 2px solid var(--innerground-darkgray) !important;
+}
+/* 캘린더 그리드 하루 */
+.calendar-12px .rbc-day-bg {
+  border-left: 2px solid var(--innerground-darkgray) !important;
+}
+/* 첫 번째 열의 왼쪽 border 제거 */
+.calendar-12px .rbc-day-bg:first-child {
+  border-left: transparent !important;
 }
 
 .calendar-12px .rbc-today {
@@ -245,6 +308,50 @@
 }
 
 /* ===== React Calendar 커스터마이징 ===== */
+
+/* 다른 달의 날짜 */
+.small-calendar-wrapper .react-calendar__month-view__days__day--neighboringMonth {
+  color: var(--innerground-darkgray);
+}
+
+/* 요일 헤더 스타일 */
+.small-calendar-wrapper .react-calendar__month-view__weekdays {
+  font-size: 0.75rem; /* text-xs */
+  color: var(--only-gray);
+  font-weight: normal;
+  user-select: none;
+}
+
+/* 오늘 날짜 - 빨간 배경 + rounded */
+.small-calendar-wrapper .custom-tile.today-tile abbr {
+  background-color: var(--excluded-bg);
+  color: white;
+  border-radius: 50%;
+}
+
+/* solved가 있는 날짜 */
+.small-calendar-wrapper .custom-tile.solved-tile abbr {
+  background-color: var(--advanced-bg); /* bg-advanced-bg */
+  color: white;
+  border-radius: 50%;
+}
+
+/* will solve만 있는 날짜 */
+.small-calendar-wrapper .custom-tile.willsolve-tile abbr {
+  background-color: var(--innerground-darkgray);
+  border-radius: 50%;
+}
+
+/* 선택된 날짜 (bg-intermediate-bg 배경색) */
+.small-calendar-wrapper .custom-tile.selected-tile abbr {
+  background-color: var(--intermediate-bg) !important; /* bg-intermediate-bg */
+  border-radius: 50%;
+}
+
+.small-calendar-wrapper .react-calendar__tile:enabled:hover abbr {
+  background-color: var(--innerground-hovergray);
+  border-radius: 50%;
+}
 
 /* 기본 스타일 */
 .small-calendar-wrapper .react-calendar {
@@ -257,14 +364,6 @@
 /* 기본 네비게이션 숨기기 */
 .small-calendar-wrapper .react-calendar__navigation {
   display: none;
-}
-
-/* 요일 헤더 스타일 */
-.small-calendar-wrapper .react-calendar__month-view__weekdays {
-  font-size: 0.75rem; /* text-xs */
-  color: #6b7280; /* text-muted-foreground */
-  font-weight: normal;
-  user-select: none;
 }
 
 .small-calendar-wrapper .react-calendar__month-view__weekdays__weekday {
@@ -299,44 +398,9 @@
   padding: 0.25rem;
 }
 
-/* 다른 달의 날짜 */
-.small-calendar-wrapper .react-calendar__month-view__days__day--neighboringMonth {
-  color: #d1d5db;
-}
-
-/* 오늘 날짜 - 빨간 배경 + rounded */
-.small-calendar-wrapper .custom-tile.today-tile abbr {
-  background-color: #ed6e6e;
-  color: white;
-  border-radius: 50%;
-}
-
-/* solved가 있는 날짜 */
-.small-calendar-wrapper .custom-tile.solved-tile abbr {
-  background-color: #79ab7c; /* bg-advanced-bg */
-  border-radius: 50%;
-}
-
-/* will solve만 있는 날짜 */
-.small-calendar-wrapper .custom-tile.willsolve-tile abbr {
-  background-color: #e4e4e4; /* bg-innerground-darkgray */
-  border-radius: 50%;
-}
-
-/* 선택된 날짜 (bg-intermediate-bg 배경색) */
-.small-calendar-wrapper .custom-tile.selected-tile abbr {
-  background-color: #f9b473 !important; /* bg-intermediate-bg */
-  border-radius: 50%;
-}
-
 /* hover 효과 - 동그란 영역에만 회색 배경 */
 .small-calendar-wrapper .react-calendar__tile:enabled:hover {
   background-color: transparent;
-}
-
-.small-calendar-wrapper .react-calendar__tile:enabled:hover abbr {
-  background-color: rgba(0, 0, 0, 0.05);
-  border-radius: 50%;
 }
 
 /* focus 스타일 제거 */

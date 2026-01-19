@@ -42,3 +42,24 @@ export interface Recommendation {
 export interface BanProblem {
   problemId: number;
 }
+
+// 문제 밴 list
+
+interface ShortTag {
+  tagId: number;
+  tagCode: TagKey;
+  tagDisplayName: string;
+}
+
+interface BannedProblem {
+  problemId: number;
+  problemTitle: string;
+  problemTierLevel: TierNumKey;
+  problemTierName: TierKey;
+  problemClassLevel: number;
+  tags: ShortTag[];
+}
+
+export interface BannedProblems {
+  bannedProblems: BannedProblem[];
+}

@@ -4,19 +4,31 @@ import { useMemo } from 'react';
 import TagCard from '@/features/tag-dashboard/ui/TagCard';
 import { useTagDashboardSidebarStore } from '@/lib/store/tagDashboard';
 import { useTagDashboard } from '@/entities/tag-dashboard';
+import { calculateProgress } from '@/features/tag-dashboard/lib/utils';
 
 export default function TagDashboard() {
   // TanStack Query에서 태그 데이터 가져오기
   const { data: tagDashboard } = useTagDashboard();
 
   // store에서 필터/정렬 상태 가져오기
-  const { searchQuery, sortBy, selectedTagId } = useTagDashboardSidebarStore();
+  const { searchQuery, sortBy, sortDirection, selectedTagId, categoryVisibility } = useTagDashboardSidebarStore();
 
-  // 필터링 및 정렬된 태그 목록
+  // 필터링 및 정렬된 태그 목록 (progress 포함)
   const filteredAndSortedTags = useMemo(() => {
     if (!tagDashboard) return [];
 
-    let result = [...tagDashboard.tags];
+    // 각 태그에 progress 계산하여 추가
+    let result = tagDashboard.tags.map((tag) => {
+      const progress = calculateProgress({
+        solvedCnt: tag.accountStat.solvedProblemCount,
+        requireSolveCnt: tag.nextLevelStat.solvedProblemCount,
+        userTier: tag.accountStat.requiredMinTier,
+        requireTier: tag.nextLevelStat.requiredMinTier,
+        highest: tag.accountStat.higherProblemTier,
+        requireHighest: tag.nextLevelStat.higherProblemTier,
+      });
+      return { ...tag, progress };
+    });
 
     // 검색어 필터링
     if (searchQuery) {
@@ -28,26 +40,56 @@ export default function TagDashboard() {
       result = result.filter((tag) => tag.tagId === selectedTagId);
     }
 
+    // 카테고리 visibility 필터링
+    result = result.filter((tag) => {
+      // EXCLUDED는 excludedYn으로 판단
+      if (tag.excludedYn) {
+        return categoryVisibility.EXCLUDED;
+      }
+      // 나머지는 currentLevel로 판단
+      return categoryVisibility[tag.accountStat.currentLevel];
+    });
+
     // 정렬
     switch (sortBy) {
       case 'name':
-        result.sort((a, b) => a.tagDisplayName.localeCompare(b.tagDisplayName));
+        result.sort((a, b) => {
+          const comparison = a.tagDisplayName.localeCompare(b.tagDisplayName);
+          return sortDirection === 'asc' ? comparison : -comparison;
+        });
         break;
       case 'lastSolved':
-        result.sort((a, b) => new Date(b.accountStat.lastSolvedDate).getTime() - new Date(a.accountStat.lastSolvedDate).getTime());
+        result.sort((a, b) => {
+          const comparison = new Date(b.accountStat.lastSolvedDate).getTime() - new Date(a.accountStat.lastSolvedDate).getTime();
+          return sortDirection === 'asc' ? -comparison : comparison;
+        });
         break;
       case 'level':
         const levelOrder = { MASTER: 3, ADVANCED: 2, INTERMEDIATE: 1, EXCLUDED: 0, LOCKED: 4 };
-        result.sort((a, b) => levelOrder[a.accountStat.currentLevel as keyof typeof levelOrder] - levelOrder[b.accountStat.currentLevel as keyof typeof levelOrder]);
+        result.sort((a, b) => {
+          const comparison = levelOrder[a.accountStat.currentLevel as keyof typeof levelOrder] - levelOrder[b.accountStat.currentLevel as keyof typeof levelOrder];
+          return sortDirection === 'asc' ? comparison : -comparison;
+        });
+        break;
+      case 'progress':
+        result.sort((a, b) => {
+          const comparison = b.progress - a.progress; // 높은 progress가 먼저 오도록
+          return sortDirection === 'asc' ? comparison : -comparison; // asc가 기본(높은 순)
+        });
         break;
       case 'default':
+        result.sort((a, b) => {
+          const comparison = b.accountStat.solvedProblemCount - a.accountStat.solvedProblemCount;
+          return sortDirection === 'asc' ? comparison : -comparison;
+        });
+        break;
       default:
-        // 기본순은 API 응답 순서 유지
+        // 알 수 없는 정렬 기준은 그대로 유지
         break;
     }
 
     return result;
-  }, [tagDashboard, searchQuery, sortBy, selectedTagId]);
+  }, [tagDashboard, searchQuery, sortBy, sortDirection, selectedTagId, categoryVisibility]);
 
   // 데이터 로딩 중
   if (!tagDashboard) {
@@ -69,7 +111,7 @@ export default function TagDashboard() {
     <div className="hide-scrollbar flex h-full w-full overflow-y-auto">
       <div className="mx-auto grid w-fit grid-cols-1 content-start gap-x-4 gap-y-8 lg:grid-cols-2 xl:grid-cols-3">
         {filteredAndSortedTags.map((tag) => (
-          <TagCard key={tag.tagId} tag={tag} />
+          <TagCard key={tag.tagId} tag={tag} progress={tag.progress} />
         ))}
       </div>
     </div>

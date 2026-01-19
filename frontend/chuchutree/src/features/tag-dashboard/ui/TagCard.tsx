@@ -12,7 +12,7 @@ import TagCardProgressBar from '@/features/tag-dashboard/ui/TagCardProgressBar';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { TIER_INFO } from '@/shared/constants/tierSystem';
 
-export default function TagCard({ tag }: { tag: CategoryTags }) {
+export default function TagCard({ tag, progress }: { tag: CategoryTags; progress: number }) {
   const { tagCode, tagDisplayName, accountStat, nextLevelStat, excludedYn, recommendationYn } = tag;
   const { openModal, closeModal } = useModal();
 
@@ -69,7 +69,7 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
 
   return (
     <div
-      className={`bg-background flex flex-col gap-2 rounded-lg border-3 ${!excludedYn ? currentLevelColors.border : 'border-excluded-bg'} group relative w-80 p-4 text-xs transition-all duration-100 ease-in-out hover:shadow-md`}
+      className={`bg-innerground-white flex flex-col gap-2 rounded-lg border-3 ${!excludedYn ? currentLevelColors.border : 'border-excluded-bg'} group relative w-80 cursor-default p-4 text-xs transition-all duration-100 ease-in-out hover:shadow-md`}
     >
       {/* 우상단 */}
       <div className="absolute top-0 right-0 overflow-hidden">
@@ -119,9 +119,9 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
         </div>
       </div>
       {/* 게이지 */}
-      <TagCardProgressBar tag={tag} />
+      <TagCardProgressBar tag={tag} progress={progress} />
       {/* 스탯 */}
-      <div className="flex cursor-default flex-col gap-2 rounded border-2 border-dashed px-1 py-2">
+      <div className="flex flex-col gap-2 rounded border-2 border-dashed px-1 py-2">
         <div className="flex items-center justify-between gap-4">
           <AppTooltip content="다음 등급을 위한 문제 수" side="right">
             <div>풀이 수</div>
@@ -141,7 +141,7 @@ export default function TagCard({ tag }: { tag: CategoryTags }) {
             <div>최소 달성 티어</div>
           </AppTooltip>
           <div className={`${excludedYn ? 'text-excluded-text' : isSuccessTier ? 'text-advanced-bg font-semibold' : 'text-muted-foreground'} flex items-center justify-center`}>
-            <Image src={`/tiers/tier_${nextLevelStat.requiredMinTier}.svg`} alt={`Tier ${nextLevelStat.requiredMinTier}`} width={12} height={12} className="h-4 w-4" />
+            <Image src={`/tiers/tier_${nextLevelStat.requiredMinTier}.svg`} alt={`Tier ${nextLevelStat.requiredMinTier}`} width={12} height={12} />
             <div className="ml-2" aria-label={isSuccessTier ? '최소 티어 달성' : '최소 티어 미달성'}>
               {isSuccessTier ? <CheckCircleIconSolid height={12} width={12} aria-hidden="true" /> : <CheckCircleIconOutline height={12} width={12} aria-hidden="true" />}
             </div>

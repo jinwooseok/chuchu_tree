@@ -8,7 +8,7 @@ import { ComponentType, useMemo, useState, useEffect, useRef } from 'react';
 
 import { transformToCalendarEvents, getDisplayTags } from '../lib/utils';
 import { CalendarEvent, useCalendar } from '@/entities/calendar';
-import { TAG_INFO } from '@/shared/constants/tagSystem';
+import { TAG_INFO, TagKey } from '@/shared/constants/tagSystem';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
@@ -34,24 +34,24 @@ function CustomToolbar({ date, onNavigate }: ToolbarProps) {
   return (
     <div className="mb-4 flex items-center justify-between">
       {/* 좌측: 년/월 표시 */}
-      <div className="text-lg font-semibold" suppressHydrationWarning>
+      <div className="cursor-default text-lg font-semibold" suppressHydrationWarning>
         {format(date, 'yyyy M월', { locale: ko })}
       </div>
 
       {/* 우측: 네비게이션 버튼 */}
       <div className="flex gap-2">
         <AppTooltip content="오늘로 이동" side="bottom">
-          <button onClick={() => handleClick('TODAY')} className="hover:bg-background rounded border px-3 py-1 text-xs" aria-label="오늘로 이동">
+          <button onClick={() => handleClick('TODAY')} className="hover:bg-background cursor-pointer rounded border px-3 py-1 text-xs" aria-label="오늘로 이동">
             오늘
           </button>
         </AppTooltip>
         <AppTooltip content="지난달로 이동" side="bottom">
-          <button onClick={() => handleClick('PREV')} className="hover:bg-background rounded px-3 py-1 text-xs" aria-label="지난달로 이동">
+          <button onClick={() => handleClick('PREV')} className="hover:bg-background cursor-pointer rounded px-3 py-1 text-xs" aria-label="지난달로 이동">
             <ChevronUp className="h-4 w-4" />
           </button>
         </AppTooltip>
         <AppTooltip content="다음 달로 이동" side="bottom">
-          <button onClick={() => handleClick('NEXT')} className="hover:bg-background rounded px-3 py-1 text-xs" aria-label="다음 달로 이동">
+          <button onClick={() => handleClick('NEXT')} className="hover:bg-background cursor-pointer rounded px-3 py-1 text-xs" aria-label="다음 달로 이동">
             <ChevronDown className="h-4 w-4" />
           </button>
         </AppTooltip>
@@ -84,22 +84,24 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
 
       {/* 태그 목록 */}
       {displayTags.length > 0 && (
-        <div className="mt-1 flex flex-col gap-1">
+        <div className="mt-1 ml-1 flex flex-col gap-1">
           {displayTags.map((event, index) => {
             const tagCode = event.resource.tagCode;
-            const tagInfo = TAG_INFO[tagCode as keyof typeof TAG_INFO];
+            const tagInfo = TAG_INFO[tagCode as TagKey];
             const isSolved = event.resource.type === 'solved';
 
-            // will solve는 회색, solved는 tag별 색상
-            const bgColorClass = isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300';
+            // solved는 tag별 색상, will solve는 회색
+            const bgColorClass = isSolved && tagInfo ? tagInfo.bgColor : 'bg-innerground-darkgray';
+            const textColorClass = isSolved && tagInfo ? tagInfo.textColor : 'text-only-gray';
 
             return (
-              <div key={`${event.resource.problem.problemId}-${tagCode}-${index}`} className={`rounded px-2 py-0.5 text-xs ${bgColorClass} text-gray-800`}>
+              <div key={`${event.resource.problem.problemId}-${tagCode}-${index}`} className={`rounded px-2 py-0.5 text-xs ${textColorClass} ${bgColorClass} relative`}>
+                {!isSolved && <div className={`absolute top-0 left-0 h-full w-2 rounded-l ${tagInfo ? tagInfo.bgColor : 'bg-only-gray'}`}></div>}
                 {event.title}
               </div>
             );
           })}
-          {hasMore && <div className="rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-600">+{moreCount}개 더보기</div>}
+          {hasMore && <div className="bg-innerground-darkgray text-only-gray rounded px-2 py-0.5 text-xs">+{moreCount}개 더보기</div>}
         </div>
       )}
     </div>

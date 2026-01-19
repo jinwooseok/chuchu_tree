@@ -59,7 +59,8 @@ export async function middleware(request: NextRequest) {
         }
       }
 
-      console.log('[Middleware] refreshToken failed 혹은 401, 404말고 다른에러:', verifyResponse);
+      // console.log('[Middleware] refreshToken failed 혹은 401, 404말고 다른에러:', verifyResponse);
+      console.log('[Middleware] refreshToken failed 혹은 401, 404말고 다른에러:');
 
       // 재발급 실패
       const response = NextResponse.redirect(new URL('/sign-in', request.url));
@@ -71,7 +72,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
   }
-  console.log('[Middleware] 검증필요없는 페이지 (sign-in)');
+  console.log('[Middleware] pass');
   return NextResponse.next();
 }
 

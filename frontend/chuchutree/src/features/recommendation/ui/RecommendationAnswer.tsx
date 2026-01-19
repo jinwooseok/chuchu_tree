@@ -7,8 +7,8 @@ import { useCalendarStore } from '@/lib/store/calendar';
 import { useCalendar, useUpdateWillSolveProblems } from '@/entities/calendar';
 import { toast } from 'sonner';
 import temp from '@/entities/recommendation/mockdata/mock_recommendation.json';
-import { Trash2, CheckCircle } from 'lucide-react';
-import { useBanProblem } from '@/entities/recommendation';
+import { Trash2, CheckCircle, Ban } from 'lucide-react';
+import { useBanProblem, useUnbanProblem, useGetBannedProblems } from '@/entities/recommendation';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { useMemo } from 'react';
 
@@ -27,7 +27,9 @@ export function RecommendationAnswer() {
   const year = selectedDate?.getFullYear() || new Date().getFullYear();
   const month = (selectedDate?.getMonth() || new Date().getMonth()) + 1;
   const { data: calendarData } = useCalendar(year, month);
-  const { mutate: banProblem, isPending } = useBanProblem();
+  const { data: bannedProblemsData } = useGetBannedProblems();
+  const { mutate: banProblem, isPending: isBanPending } = useBanProblem();
+  const { mutate: unbanProblem, isPending: isUnbanPending } = useUnbanProblem();
 
   const willSolveProblems = useMemo(() => {
     if (!calendarData || !selectedDate) return [];
@@ -49,6 +51,12 @@ export function RecommendationAnswer() {
   const isProblemRegistered = (problemId: number): boolean => {
     if (!selectedDate) return false;
     return willSolveProblems.some((p) => p.problemId === problemId);
+  };
+
+  // Check if problem is banned
+  const isProblemBanned = (problemId: number): boolean => {
+    if (!bannedProblemsData) return false;
+    return bannedProblemsData.bannedProblems.some((p) => p.problemId === problemId);
   };
 
   // Toggle problem registration (add or remove)
@@ -90,27 +98,49 @@ export function RecommendationAnswer() {
     );
   };
 
-  const handleBanProblem = (problemId: number, problemTitle: string) => {
-    banProblem(
-      { problemId: problemId },
-      {
-        onSuccess: () => {
-          toast.success(`${problemTitle}문제가 추천에서 제외됩니다.`, {
-            position: 'top-center',
-          });
+  const handleToggleBanProblem = (problemId: number, problemTitle: string) => {
+    const isBanned = isProblemBanned(problemId);
+
+    if (isBanned) {
+      // Unban problem
+      unbanProblem(
+        { problemId },
+        {
+          onSuccess: () => {
+            toast.success(`${problemTitle} 문제가 추천에 포함됩니다.`, {
+              position: 'top-center',
+            });
+          },
+          onError: () => {
+            toast.error('문제 제외 취소에 실패했습니다.', {
+              position: 'top-center',
+            });
+          },
         },
-        onError: () => {
-          toast.error('문제 제외에 실패했습니다.', {
-            position: 'top-center',
-          });
+      );
+    } else {
+      // Ban problem
+      banProblem(
+        { problemId },
+        {
+          onSuccess: () => {
+            toast.success(`${problemTitle} 문제가 추천에서 제외됩니다.`, {
+              position: 'top-center',
+            });
+          },
+          onError: () => {
+            toast.error('문제 제외에 실패했습니다.', {
+              position: 'top-center',
+            });
+          },
         },
-      },
-    );
+      );
+    }
   };
 
   if (isLoading) {
     return (
-      <div className="flex h-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-2">
+      <div className="ml-1 flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-2">
         <div className="text-muted-foreground text-sm">추천 중...</div>
       </div>
     );
@@ -131,10 +161,11 @@ export function RecommendationAnswer() {
     <div className="ml-1 flex h-full flex-1 flex-col gap-2 rounded-lg border-2 border-dashed p-2">
       {problems.map((problem) => {
         const isRegistered = isProblemRegistered(problem.problemId);
+        const isBanned = isProblemBanned(problem.problemId);
         return (
           <div key={problem.problemId} className="flex flex-1">
             <Button
-              className={`${isRegistered ? 'bg-primary hover:bg-primary/90' : 'bg-muted-foreground'} h-full w-8 cursor-pointer items-center justify-center rounded-l-lg rounded-r-none text-xs`}
+              className={`${isRegistered ? 'bg-primary hover:bg-primary/90' : 'bg-innerground-darkgray'} hover:bg-excluded-bg text-muted-foreground hover:text-excluded-text h-full w-8 cursor-pointer items-center justify-center rounded-l-lg rounded-r-none text-xs`}
               onClick={() => handleToggleProblem(problem.problemId)}
               disabled={updateWillSolve.isPending}
             >
@@ -148,18 +179,18 @@ export function RecommendationAnswer() {
               )}
             </Button>
             <div
-              className="bg-background text-foreground hover:bg-innerground-darkgray/70 flex h-full flex-1 cursor-pointer items-center justify-between rounded-l-none rounded-r-lg px-2 text-xs"
+              className="bg-innerground-hovergray/50 text-foreground hover:bg-innerground-darkgray/70 flex h-full flex-1 cursor-pointer items-center justify-between rounded-l-none rounded-r-lg px-2 text-xs"
               onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')}
             >
               <div className="flex items-center gap-2">
                 {showFilters.problemTier && !showFilters.problemNumber && (
                   <div className="flex min-w-4 items-center gap-1">
-                    <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
+                    <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />
                   </div>
                 )}
                 {showFilters.problemTier && showFilters.problemNumber && (
                   <div className="flex min-w-20 items-center gap-1">
-                    <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
+                    <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />
                     <p>{problem.problemId}</p>
                   </div>
                 )}
@@ -174,15 +205,27 @@ export function RecommendationAnswer() {
 
               {!showFilters.algorithm && !showFilters.recommendReason ? (
                 <div className="flex min-w-6 flex-col items-end">
-                  <AppTooltip content="문제 추천에서 제외" side="left">
+                  <AppTooltip content={isBanned ? '문제 추천에 포함' : '문제 추천에서 제외'} side="left">
                     <div
-                      aria-label="문제 추천에서 제외"
+                      aria-label={isBanned ? '문제 추천에 포함' : '문제 추천에서 제외'}
                       role="button"
                       tabIndex={0}
-                      onClick={() => handleBanProblem(problem.problemId, problem.problemTierName)}
-                      onKeyDown={(e) => e.key === 'Enter' && handleBanProblem(problem.problemId, problem.problemTierName)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleToggleBanProblem(problem.problemId, problem.problemTitle);
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.stopPropagation();
+                          handleToggleBanProblem(problem.problemId, problem.problemTitle);
+                        }
+                      }}
                     >
-                      <Trash2 className="text-muted-foreground hover:text-excluded-bg h-4 w-4 cursor-pointer" />
+                      {isBanned ? (
+                        <Ban className="text-excluded-bg hover:text-excluded-text h-4 w-4 cursor-pointer" />
+                      ) : (
+                        <Trash2 className="text-muted-foreground hover:text-excluded-bg h-4 w-4 cursor-pointer" />
+                      )}
                     </div>
                   </AppTooltip>
                 </div>
@@ -190,15 +233,27 @@ export function RecommendationAnswer() {
                 <div className="flex min-w-30 flex-col items-end">
                   <div className="flex items-center justify-center gap-1">
                     {showFilters.algorithm && problem.tags.length > 0 && <p className="line-clamp-1">{problem.tags[0].tagDisplayName}</p>}
-                    <AppTooltip content="문제 추천에서 제외" side="left">
+                    <AppTooltip content={isBanned ? '문제 추천에 포함' : '문제 추천에서 제외'} side="left">
                       <div
-                        aria-label="문제 추천에서 제외"
+                        aria-label={isBanned ? '문제 추천에 포함' : '문제 추천에서 제외'}
                         role="button"
                         tabIndex={0}
-                        onClick={() => handleBanProblem(problem.problemId, problem.problemTierName)}
-                        onKeyDown={(e) => e.key === 'Enter' && handleBanProblem(problem.problemId, problem.problemTierName)}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleBanProblem(problem.problemId, problem.problemTitle);
+                        }}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.stopPropagation();
+                            handleToggleBanProblem(problem.problemId, problem.problemTitle);
+                          }
+                        }}
                       >
-                        <Trash2 className="text-muted-foreground hover:text-excluded-bg h-4 w-4 cursor-pointer" />
+                        {isBanned ? (
+                          <Ban className="text-excluded-bg hover:text-excluded-text h-4 w-4 cursor-pointer" />
+                        ) : (
+                          <Trash2 className="text-muted-foreground hover:text-excluded-bg h-4 w-4 cursor-pointer" />
+                        )}
                       </div>
                     </AppTooltip>
                   </div>

@@ -33,12 +33,12 @@ export function BjAccountChangeDialog({ currentBjAccountId, onClose }: BjAccount
 
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-md">
         <DialogHeader>
           <DialogTitle>연동 계정 재설정</DialogTitle>
           <DialogDescription>백준 계정을 변경하시겠습니까? 재설정은 7일에 한 번만 가능합니다.</DialogDescription>
         </DialogHeader>
-        <div className="space-y-4 py-4">
+        <div className="flex-1 space-y-4 overflow-y-auto py-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">현재 백준 아이디</label>
             <input type="text" value={currentBjAccountId} disabled className="bg-muted text-muted-foreground w-full rounded-md border px-3 py-2 text-sm" />
@@ -55,7 +55,7 @@ export function BjAccountChangeDialog({ currentBjAccountId, onClose }: BjAccount
             />
           </div>
         </div>
-        <DialogFooter className="sm:justify-end">
+        <DialogFooter className="shrink-0 sm:justify-end">
           <button
             type="button"
             onClick={onClose}

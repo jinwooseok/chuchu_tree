@@ -97,10 +97,17 @@ export default function SmallCalendar() {
     if (view === 'month') {
       const classes = ['custom-tile'];
 
-      // 오늘 날짜
+      // 선택된 날짜 - 최우선 (오늘이든 아니든 선택되면 selected-tile)
+      if (selectedDate && isSameDay(date, selectedDate)) {
+        classes.push('selected-tile');
+        return classes.join(' ');
+      }
+
+      // 오늘 날짜 - 선택되지 않았을 때만
       const isToday = isSameDay(date, new Date());
       if (isToday) {
         classes.push('today-tile');
+        return classes.join(' ');
       }
 
       // solved 문제가 있는 날짜
@@ -110,11 +117,6 @@ export default function SmallCalendar() {
       // solved 없고 will solve만 있는 날짜
       else if (hasOnlyWillSolveProblems(date)) {
         classes.push('willsolve-tile');
-      }
-
-      // 선택된 날짜
-      if (selectedDate && isSameDay(date, selectedDate)) {
-        classes.push('selected-tile');
       }
 
       return classes.join(' ');
