@@ -185,12 +185,12 @@ export function RecommendationAnswer() {
               <div className="flex items-center gap-2">
                 {showFilters.problemTier && !showFilters.problemNumber && (
                   <div className="flex min-w-4 items-center gap-1">
-                    <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
+                    <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />
                   </div>
                 )}
                 {showFilters.problemTier && showFilters.problemNumber && (
                   <div className="flex min-w-20 items-center gap-1">
-                    <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
+                    <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />
                     <p>{problem.problemId}</p>
                   </div>
                 )}

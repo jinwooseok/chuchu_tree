@@ -48,7 +48,7 @@ export default function TagCardProgressBar({ tag, progress }: { tag: CategoryTag
           <div className="flex h-full flex-col items-center justify-start">
             <p className="mb-2 font-semibold">최소 시작 티어</p>
             <div className={`flex items-center justify-center ${excludedYn ? 'text-excluded-text' : isStartTier ? 'text-advanced-bg font-semibold' : 'text-muted-foreground'}`}>
-              <Image src={`/tiers/tier_${requiredStat.requiredMinTier}.svg`} alt={`Tier ${requiredStat.requiredMinTier}`} width={24} height={24} className="h-8 w-8" />
+              <Image src={`/tiers/tier_${requiredStat.requiredMinTier}.svg`} alt={`Tier ${requiredStat.requiredMinTier}`} width={24} height={24} />
               <div className="ml-2">{isStartTier ? <CheckCircleIconSolid height={12} width={12} /> : <CheckCircleIconOutline height={12} width={12} />}</div>
             </div>
           </div>
@@ -64,7 +64,10 @@ export default function TagCardProgressBar({ tag, progress }: { tag: CategoryTag
     );
   } else {
     return (
-      <div className="flex min-h-18 flex-1 items-center justify-center rounded border-2 border-dashed p-2" aria-label={`현재 ${accountStat.currentLevel}, 다음 레벨 ${nextLevelStat.nextLevel}까지 진행률 ${Math.round(currentPeekRatio)}%`}>
+      <div
+        className="flex min-h-18 flex-1 items-center justify-center rounded border-2 border-dashed p-2"
+        aria-label={`현재 ${accountStat.currentLevel}, 다음 레벨 ${nextLevelStat.nextLevel}까지 진행률 ${Math.round(currentPeekRatio)}%`}
+      >
         <div className="bg-innerground-darkgray relative h-2 w-full rounded-sm">
           {/* 현재 레벨 라벨 */}
           <div className={`${currentLevelColors.bg} ${currentLevelColors.text} absolute -top-6 -translate-x-1/2 rounded px-4 text-xs`} style={{ left: `calc(${currentBoxRatio}% )` }}>

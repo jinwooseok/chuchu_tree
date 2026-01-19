@@ -63,7 +63,7 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
         {firstTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-innerground-darkgray'}`}>{firstTag.tagDisplayName}</div>}
         {!firstTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300'}`}>Undefined</div>}
         <div className="flex items-center gap-1">
-          <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
+          <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={12} height={12} />
           <span>{problem.problemId}</span>
         </div>
       </div>
@@ -102,7 +102,7 @@ function SearchResultCard({ problem, onClick }: { problem: WillSolveProblems; on
         {firstTag && <div className={`rounded px-2 py-0.5 ${tagInfo ? tagInfo.bgColor : 'bg-only-gray'}`}>{firstTag.tagDisplayName}</div>}
         {!firstTag && <div className="bg-only-gray rounded px-2 py-0.5">Undefined</div>}
         <div className="flex items-center gap-1">
-          <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-4 w-4" />
+          <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={12} height={12} />
           <span>{problem.problemId}</span>
         </div>
       </div>

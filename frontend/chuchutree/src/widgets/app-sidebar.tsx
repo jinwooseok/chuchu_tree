@@ -123,13 +123,7 @@ export function AppSidebar() {
               {/* 서비스아이콘 */}
               <div className="mt-1 mb-8 flex items-center">
                 <div className="absolute top-2 left-3">
-                  <Image
-                    src="/logo/logo.svg"
-                    alt="logo"
-                    width={ICON_SIZE} // 필수: 실제 로고 크기에 맞게 조정
-                    height={ICON_SIZE} // 필수: 실제 로고 크기에 맞게 조정
-                    className="h-8 w-6"
-                  />
+                  <Image src="/logo/logo.svg" alt="logo" width={24} height={32} />
                 </div>
                 <h1 className={`text-md ml-9 font-bold ${sidebarOpenState !== 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>ChuChuTree</h1>
               </div>

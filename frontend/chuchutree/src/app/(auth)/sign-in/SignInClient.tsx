@@ -23,7 +23,7 @@ const SocialLoginButton = ({ theme, ...props }: SocialWay & { theme: string }) =
   };
   return (
     <button onClick={handleLogin} className="hover:bg-background/50 border-innerground-darkgray relative flex w-80 cursor-pointer items-center justify-between rounded border px-2 py-2 text-sm">
-      <Image src={`/socialicon/${props.en}_${theme}.svg`} alt={`social icon ${props.en}_${theme}`} width={16} height={16} className="absolute left-2 h-6 w-6" />
+      <Image src={`/socialicon/${props.en}_${theme}.svg`} alt={`social icon ${props.en}_${theme}`} width={24} height={24} className="absolute left-2" />
       <div className="flex-1 text-center">{props.kr}로 시작하기</div>
     </button>
   );
@@ -41,7 +41,7 @@ export default function SignInClient() {
     <div className="bg-innerground-white flex h-full w-full flex-col rounded-xl p-4">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Image src="/logo/logo.svg" alt="logo" width={16} height={16} className="h-6 w-6" />
+          <Image src="/logo/logo.svg" alt="logo" width={16} height={16} />
           <div>ChuChuTree</div>
         </div>
         <div className="min-w-22">

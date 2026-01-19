@@ -54,8 +54,8 @@ export default function BannedProblemsDialog({ onClose }: props) {
                   className="bg-innerground-hovergray/50 hover:bg-innerground-darkgray/70 flex cursor-pointer items-center justify-between rounded-lg p-3 transition-colors"
                   onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')}
                 >
-                  <div className="flex flex-1 items-center gap-3">
-                    <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={24} height={24} className="h-6 w-6 shrink-0" />
+                  <div className="flex flex-1 items-center gap-5">
+                    <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} className="shrink-0" />
 
                     <div className="flex flex-1 flex-col gap-1">
                       <div className="flex items-center gap-2">

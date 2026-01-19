@@ -81,7 +81,7 @@ export default function BjAccountRegistrationClient() {
     <div className="bg-innerground-white hide-scrollbar flex h-full w-full max-w-md flex-col overflow-auto rounded-xl px-8 py-4">
       <div className="mb-4 flex items-center justify-between">
         <div className="flex cursor-default items-center gap-2">
-          <Image src="/logo/logo.svg" alt="logo" width={16} height={16} className="h-6 w-6" />
+          <Image src="/logo/logo.svg" alt="logo" width={16} height={16} />
           <div>ChuChuTree</div>
         </div>
         <div className="min-w-22">
