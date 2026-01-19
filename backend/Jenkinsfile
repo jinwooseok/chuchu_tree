@@ -5,8 +5,10 @@ pipeline {
         stage('Build & Deploy Development') {
             when { 
                 allOf {
-                    branch 'develop'
-                    //changeset "backend/**"
+                    expression { 
+                        return env.GIT_BRANCH?.contains('develop') || env.BRANCH_NAME == 'develop'
+                    }
+                    changeset "backend/**"
                 }
             }
             options { skipDefaultCheckout() }
@@ -32,8 +34,10 @@ pipeline {
         stage('Build & Deploy Production') {
             when { 
                 allOf {
-                    branch 'main'
-                    //changeset "backend/**"
+                    expression { 
+                        return env.GIT_BRANCH?.contains('main') || env.BRANCH_NAME == 'main'
+                    }
+                    changeset "backend/**"
                 }
             }
             options { skipDefaultCheckout() }
