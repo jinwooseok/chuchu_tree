@@ -23,7 +23,7 @@ pipeline {
                         checkout scm 
                         dir('backend') {
                             sh "cp ${ENV_FILE_PATH} .env"
-                            sh 'docker-compose -f docker-compose-dev.yml up -d --build'
+                            sh 'docker-compose -f docker-compose.dev.yml up -d --build'
                             sh 'rm .env'
                         }
                     }
@@ -50,7 +50,7 @@ pipeline {
                         checkout scm 
                         dir('backend') {
                             sh "cp ${ENV_FILE_PATH} .env"
-                            sh 'docker-compose -f docker-compose-prod.yml up -d --build'
+                            sh 'docker-compose -f docker-compose.prod.yml up -d --build'
                             sh 'rm .env'
                         }
                     }
