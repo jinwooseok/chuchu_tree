@@ -8,7 +8,10 @@ pipeline {
                     expression { 
                         return env.GIT_BRANCH?.contains('develop') || env.BRANCH_NAME == 'develop'
                     }
-                    changeset "frontend/**"
+                    anyOf {
+                        changeset "frontend/**"
+                        triggeredBy 'UserCause'
+                    }
                 }
             }
             options { skipDefaultCheckout() }
@@ -37,7 +40,10 @@ pipeline {
                     expression { 
                         return env.GIT_BRANCH?.contains('main') || env.BRANCH_NAME == 'main'
                     }
-                    changeset "frontend/**"
+                    anyOf {
+                        changeset "frontend/**"
+                        triggeredBy 'UserCause'
+                    }
                 }
             }
             options { skipDefaultCheckout() }
