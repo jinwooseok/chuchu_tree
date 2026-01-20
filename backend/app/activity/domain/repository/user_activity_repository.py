@@ -76,3 +76,21 @@ class UserActivityRepository(ABC):
     @abstractmethod
     async def save_problem_banned_record(self, activity: UserActivity):
         pass
+
+    @abstractmethod
+    async def find_problem_records_by_problem_ids(
+        self,
+        user_id: UserAccountId,
+        problem_ids: list[int]
+    ) -> list[ProblemRecord]:
+        """특정 문제 ID들의 problem_record 조회 (모든 날짜)"""
+        pass
+
+    @abstractmethod
+    async def find_will_solve_problems_by_problem_ids(
+        self,
+        user_id: UserAccountId,
+        problem_ids: list[int]
+    ) -> list[WillSolveProblem]:
+        """특정 문제 ID들의 will_solve_problem 조회 (모든 날짜)"""
+        pass
