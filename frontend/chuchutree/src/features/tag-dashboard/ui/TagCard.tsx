@@ -1,5 +1,6 @@
 'use client';
 
+import { memo } from 'react';
 import { CategoryTags, usePostTagBan, useDeleteTagBan } from '@/entities/tag-dashboard';
 import { getLevelColorClasses, getDaysAgo } from '../lib/utils';
 import Image from 'next/image';
@@ -12,7 +13,8 @@ import TagCardProgressBar from '@/features/tag-dashboard/ui/TagCardProgressBar';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { TIER_INFO } from '@/shared/constants/tierSystem';
 
-export default function TagCard({ tag, progress }: { tag: CategoryTags; progress: number }) {
+const TagCard = memo(
+  function TagCard({ tag, progress }: { tag: CategoryTags; progress: number }) {
   const { tagCode, tagDisplayName, accountStat, nextLevelStat, excludedYn, recommendationYn } = tag;
   const { openModal, closeModal } = useModal();
 
@@ -164,4 +166,31 @@ export default function TagCard({ tag, progress }: { tag: CategoryTags; progress
       </div>
     </div>
   );
-}
+  },
+  (prevProps, nextProps) => {
+    // true를 반환하면 리렌더링 스킵 (props가 같다고 판단)
+    // false를 반환하면 리렌더링 (props가 다르다고 판단)
+
+    // 렌더링에 영향을 주는 주요 속성들만 비교
+    return (
+      prevProps.tag.tagId === nextProps.tag.tagId &&
+      prevProps.tag.tagCode === nextProps.tag.tagCode &&
+      prevProps.tag.tagDisplayName === nextProps.tag.tagDisplayName &&
+      prevProps.tag.recommendationYn === nextProps.tag.recommendationYn &&
+      prevProps.tag.excludedYn === nextProps.tag.excludedYn &&
+      prevProps.tag.lockedYn === nextProps.tag.lockedYn &&
+      prevProps.tag.accountStat.currentLevel === nextProps.tag.accountStat.currentLevel &&
+      prevProps.tag.accountStat.solvedProblemCount === nextProps.tag.accountStat.solvedProblemCount &&
+      prevProps.tag.accountStat.requiredMinTier === nextProps.tag.accountStat.requiredMinTier &&
+      prevProps.tag.accountStat.higherProblemTier === nextProps.tag.accountStat.higherProblemTier &&
+      prevProps.tag.accountStat.lastSolvedDate === nextProps.tag.accountStat.lastSolvedDate &&
+      prevProps.tag.accountStat.recommendation_period === nextProps.tag.accountStat.recommendation_period &&
+      prevProps.tag.nextLevelStat.solvedProblemCount === nextProps.tag.nextLevelStat.solvedProblemCount &&
+      prevProps.tag.nextLevelStat.requiredMinTier === nextProps.tag.nextLevelStat.requiredMinTier &&
+      prevProps.tag.nextLevelStat.higherProblemTier === nextProps.tag.nextLevelStat.higherProblemTier &&
+      prevProps.progress === nextProps.progress
+    );
+  },
+);
+
+export default TagCard;
