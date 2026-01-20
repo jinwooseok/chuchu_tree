@@ -1,7 +1,13 @@
-import axios from 'axios';
+import axios, { AxiosError, InternalAxiosRequestConfig } from 'axios';
+import type { ApiError } from '@/shared/types/api';
 
 // 빈 문자열이면 상대 경로 사용 (프록시 모드)
 const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
+
+// _retry 속성을 포함한 config 타입
+interface CustomAxiosRequestConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
 
 // 기본 Axios 인스턴스
 export const axiosInstance = axios.create({
@@ -18,15 +24,15 @@ axiosInstance.interceptors.request.use(
   (config) => {
     return config;
   },
-  (error) => {
+  (error: AxiosError<ApiError>) => {
     return Promise.reject(error);
   },
 );
 
 axiosInstance.interceptors.response.use(
   (response) => response,
-  async (error) => {
-    const originalRequest = error.config;
+  async (error: AxiosError<ApiError>) => {
+    const originalRequest = error.config as CustomAxiosRequestConfig;
 
     if (
       error.response?.status === 401 &&
@@ -46,7 +52,7 @@ axiosInstance.interceptors.response.use(
         );
 
         return axiosInstance(originalRequest);
-      } catch (refreshError) {
+      } catch (refreshError: unknown) {
         if (typeof window !== 'undefined') {
           window.location.href = '/sign-in';
         }
