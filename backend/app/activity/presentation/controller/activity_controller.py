@@ -3,12 +3,15 @@ from dependency_injector.wiring import inject, Provide
 
 from app.activity.application.command.ban_problem_command import BanProblemCommand
 from app.activity.application.command.tag_custom_command import TagCustomCommand
+from app.activity.application.command.update_solved_problems_command import UpdateSolvedProblemsCommand
+from app.activity.application.command.update_solved_will_solve_problems_command import UpdateSolvedAndWillSolveProblemsCommand
 from app.activity.application.command.update_will_solve_problems import UpdateWillSolveProblemsCommand
 from app.activity.application.query.banned_list_query import BannedProblemsQuery
 from app.activity.application.service.activity_application_service import ActivityApplicationService
 from app.common.domain.vo.current_user import CurrentUser
 from app.common.presentation.dependency.auth_dependencies import get_current_member
 from app.activity.presentation.schema.request.activity_request import (
+    UpdateSolvedAndWillSolveProblemsRequest,
     UpdateWillSolveProblemsRequest,
     UpdateSolvedProblemsRequest,
     ProblemRecordRequest,
@@ -50,10 +53,10 @@ async def update_will_solve_problems(
 
 @router.post("/problems/solved-problems", response_model=ApiResponseSchema[dict])
 @inject
-async def update_solved_problems_order(
+async def update_solved_problems(
     request: UpdateSolvedProblemsRequest,
     current_user: CurrentUser = Depends(get_current_member),
-    # activity_service = Depends(Provide[Container.activity_service])
+    activity_application_service: ActivityApplicationService = Depends(Provide[Container.activity_application_service])
 ):
     """
     풀었던 문제 업데이트 (날짜 단위)
@@ -64,9 +67,32 @@ async def update_solved_problems_order(
     Returns:
         빈 데이터
     """
-    # TODO: Implement update solved problems logic
-    # 1. Validate problem IDs
-    # 2. Update solved problems for the date
+    await activity_application_service.update_solved_problems(UpdateSolvedProblemsCommand(user_account_id = current_user.user_account_id, 
+                                                                                              solved_date = request.date, 
+                                                                                              problem_ids = request.problem_ids))
+
+    return ApiResponse(data={})
+
+@router.post("/problems/solved-and-will-solve-problems", response_model=ApiResponseSchema[dict])
+@inject
+async def update_solved_and_will_solve_problems(
+    request: UpdateSolvedAndWillSolveProblemsRequest,
+    current_user: CurrentUser = Depends(get_current_member),
+    activity_application_service: ActivityApplicationService = Depends(Provide[Container.activity_application_service])
+):
+    """
+    풀었던 문제, 풀 문제 동시 업데이트
+
+    Args:
+        request: 날짜, 문제 ID 목록
+
+    Returns:
+        빈 데이터
+    """
+    await activity_application_service.update_solved_and_will_solve_problems(UpdateSolvedAndWillSolveProblemsCommand(user_account_id = current_user.user_account_id, 
+                                                                                              solved_date = request.date, 
+                                                                                              solved_problem_ids = request.solved_problem_ids,
+                                                                                              will_solve_problem_ids= request.will_solve_problem_ids))
 
     return ApiResponse(data={})
 
@@ -76,7 +102,7 @@ async def update_solved_problems_order(
 async def create_or_update_problem_record(
     request: ProblemRecordRequest,
     current_user: CurrentUser = Depends(get_current_member),
-    # activity_service = Depends(Provide[Container.activity_service])
+    activity_application_service: ActivityApplicationService = Depends(Provide[Container.activity_application_service])
 ):
     """
     문제 기록 생성/업데이트
@@ -87,10 +113,8 @@ async def create_or_update_problem_record(
     Returns:
         빈 데이터
     """
-    # TODO: Implement create or update problem record logic
-    # 1. Check if record exists
-    # 2. Create or update record
-
+    
+    # await activity_application_service.create_problem_record()
     return ApiResponse(data={})
 
 

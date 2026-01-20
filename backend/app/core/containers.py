@@ -307,7 +307,9 @@ class Container(containers.DeclarativeContainer):
     activity_application_service = providers.Singleton(
         ActivityApplicationService,
         user_activity_repository=user_activity_repository,
-        domain_event_bus=domain_event_bus
+        domain_event_bus=domain_event_bus,
+        baekjoon_account_repository=baekjoon_account_repository,
+        problem_history_repository=problem_history_repository
     )
 
     # ========================================================================

@@ -106,3 +106,21 @@ class ProblemHistoryRepository(ABC):
             {problem_id: streak_date} 딕셔너리
         """
         pass
+
+    @abstractmethod
+    async def find_by_problem_ids_with_streak(
+        self,
+        bj_account_id: BaekjoonAccountId,
+        problem_ids: list[int]
+    ) -> list[ProblemHistory]:
+        """
+        특정 문제 ID들의 problem_history를 streak과 함께 조회
+
+        Args:
+            bj_account_id: 백준 계정 ID
+            problem_ids: 조회할 문제 ID 목록
+
+        Returns:
+            ProblemHistory 엔티티 목록 (streak_date 포함)
+        """
+        pass

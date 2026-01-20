@@ -172,3 +172,15 @@ class ErrorCode(Enum):
         message="마지막 계정 변경 이후 7일이 지나지 않았습니다.",
         status_code=400
     )
+
+    ALREADY_SOLVED_PROBLEM = ErrorCodeInfo(
+        code="ALREADY_SOLVED_PROBLEM",
+        message="이미 푼 문제입니다.",
+        status_code=400
+    )
+
+    PROBLEM_ALREADY_RECORDED_ON_DIFFERENT_DATE = ErrorCodeInfo(
+        code="PROBLEM_ALREADY_RECORDED_ON_DIFFERENT_DATE",
+        message="이미 다른 날짜에 기록된 문제입니다.",
+        status_code=400
+    )

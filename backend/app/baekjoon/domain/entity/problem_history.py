@@ -13,6 +13,7 @@ class ProblemHistory:
     streak_id: StreakId | None  # 나중에 연동
     created_at: datetime
     solved_date: date | None = None
+    streak_date: date | None = None  # streak과 연동된 경우 streak의 날짜
 
     @staticmethod
     def create(

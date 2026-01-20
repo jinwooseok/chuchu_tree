@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import Optional, TYPE_CHECKING
 from sqlalchemy import String, DateTime, Enum as SQLEnum, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
-import enum
 
 from app.common.domain.enums import Provider
 from app.core.database import Base
@@ -13,6 +12,7 @@ if TYPE_CHECKING:
     from app.activity.infra.model.problem_banned_record import ProblemBannedRecordModel
     from app.activity.infra.model.tag_custom import TagCustomModel
     from app.activity.infra.model.will_solve_problem import WillSolveProblemModel
+    from app.activity.infra.model.problem_record import ProblemRecordModel
 
 class UserAccountModel(Base):
     __tablename__ = "user_account"
@@ -24,6 +24,7 @@ class UserAccountModel(Base):
     user_account_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     provider: Mapped[Provider] = mapped_column(SQLEnum(Provider), nullable=False)
     provider_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    email: Mapped[str | None] = mapped_column(String(255), nullable=True)
     profile_image: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
     registered_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
@@ -57,6 +58,12 @@ class UserAccountModel(Base):
     will_solve_problems: Mapped[list["WillSolveProblemModel"]] = relationship(
         "WillSolveProblemModel", 
         order_by="WillSolveProblemModel.order",
+        back_populates="user_account",
+        cascade="all, delete-orphan"
+    )
+    
+    problem_records: Mapped[list["ProblemRecordModel"]] = relationship(
+        "ProblemRecordModel", 
         back_populates="user_account",
         cascade="all, delete-orphan"
     )

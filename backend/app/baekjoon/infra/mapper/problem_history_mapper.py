@@ -33,10 +33,16 @@ class ProblemHistoryMapper:
     @staticmethod
     def to_entity(model: ProblemHistoryModel) -> ProblemHistory:
         """SQLAlchemy 모델을 도메인 엔티티로 변환"""
+        # streak이 로드되어 있으면 streak_date 추출
+        streak_date = None
+        if hasattr(model, 'streak') and model.streak is not None:
+            streak_date = model.streak.streak_date
+
         return ProblemHistory(
             problem_history_id=ProblemHistoryId(model.problem_history_id) if model.problem_history_id else None,
             bj_account_id=BaekjoonAccountId(model.bj_account_id),
             problem_id=ProblemId(model.problem_id),
             streak_id=StreakId(model.streak_id) if model.streak_id else None,
-            created_at=model.created_at
+            created_at=model.created_at,
+            streak_date=streak_date
         )

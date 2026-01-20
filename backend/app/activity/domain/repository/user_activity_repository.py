@@ -17,7 +17,15 @@ class UserActivityRepository(ABC):
         target_date: date
     ) -> list['WillSolveProblem']:
         pass
-
+    
+    @abstractmethod
+    async def find_problem_records_by_date(
+        self,
+        user_id: 'UserAccountId',
+        target_date: date
+    ) -> list['ProblemRecord']:
+        pass
+    
     @abstractmethod
     async def find_monthly_problem_records(
         self,
@@ -40,6 +48,13 @@ class UserActivityRepository(ABC):
     
     @abstractmethod
     async def save_all_will_solve_problems(self, will_solve_problems: list['WillSolveProblem']) -> None:
+        pass
+    
+    @abstractmethod
+    async def save_all_problem_records(
+        self, 
+        problem_records: list[ProblemRecord]
+    ) -> None:
         pass
     
     @abstractmethod
