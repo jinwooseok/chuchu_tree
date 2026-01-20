@@ -5,6 +5,7 @@ from typing import override
 
 from sqlalchemy import and_, extract, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import selectinload
 
 from app.baekjoon.domain.entity.problem_history import ProblemHistory
 from app.baekjoon.domain.repository.problem_history_repository import ProblemHistoryRepository
@@ -149,8 +150,34 @@ class ProblemHistoryRepositoryImpl(ProblemHistoryRepository):
         problem_histories: list[ProblemHistory]
     ) -> None:
         models = [ProblemHistoryMapper.to_model(problem_history) for problem_history in problem_histories]
-        
+
         self.session.add_all(models)
 
         # 모든 merge가 끝나면 한 번에 flush하여 DB에 반영
         await self.session.flush()
+
+    @override
+    async def find_by_problem_ids_with_streak(
+        self,
+        bj_account_id: BaekjoonAccountId,
+        problem_ids: list[int]
+    ) -> list[ProblemHistory]:
+        """특정 문제 ID들의 problem_history를 streak과 함께 조회"""
+        if not problem_ids:
+            return []
+
+        stmt = (
+            select(ProblemHistoryModel)
+            .options(selectinload(ProblemHistoryModel.streak))
+            .where(
+                and_(
+                    ProblemHistoryModel.bj_account_id == bj_account_id.value,
+                    ProblemHistoryModel.problem_id.in_(problem_ids)
+                )
+            )
+        )
+
+        result = await self.session.execute(stmt)
+        models = result.scalars().all()
+
+        return [ProblemHistoryMapper.to_entity(model) for model in models]

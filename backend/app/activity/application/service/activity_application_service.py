@@ -6,18 +6,23 @@ from datetime import date
 
 from app.activity.application.command.ban_problem_command import BanProblemCommand
 from app.activity.application.command.tag_custom_command import TagCustomCommand
+from app.activity.application.command.update_solved_problems_command import UpdateSolvedProblemsCommand
+from app.activity.application.command.update_solved_will_solve_problems_command import UpdateSolvedAndWillSolveProblemsCommand
 from app.activity.application.command.update_will_solve_problems import UpdateWillSolveProblemsCommand
 from app.activity.application.query.banned_list_query import BannedProblemsQuery, BannedTagsQuery
 from app.activity.application.query.monthly_activity_data_query import (
     DailyActivityQuery,
     MonthlyActivityDataQuery
 )
+from app.activity.domain.entity.problem_record import ProblemRecord
 from app.problem.application.query.problems_info_query import ProblemsInfoQuery
 from app.activity.domain.entity.user_activity import UserActivity
 from app.activity.domain.entity.will_solve_problem import WillSolveProblem
 from app.activity.domain.event.payloads import GetProblemsInfoPayload, GetTagSummaryPayload, GetTagSummaryResultPayload, GetTagSummarysPayload, GetTagSummarysResultPayload
 from app.activity.domain.repository.user_activity_repository import UserActivityRepository
 from app.baekjoon.domain.event.get_monthly_activity_data_payload import GetMonthlyActivityDataPayload
+from app.baekjoon.domain.repository.baekjoon_account_repository import BaekjoonAccountRepository
+from app.baekjoon.domain.repository.problem_history_repository import ProblemHistoryRepository
 from app.common.domain.entity.domain_event import DomainEvent
 from app.common.domain.enums import ExcludedReason
 from app.common.domain.service.event_publisher import DomainEventBus
@@ -36,10 +41,14 @@ class ActivityApplicationService:
     def __init__(
         self,
         user_activity_repository: UserActivityRepository,
-        domain_event_bus: DomainEventBus
+        domain_event_bus: DomainEventBus,
+        baekjoon_account_repository: BaekjoonAccountRepository,
+        problem_history_repository: ProblemHistoryRepository
     ):
         self.user_activity_repository = user_activity_repository
         self.domain_event_bus = domain_event_bus
+        self.baekjoon_account_repository = baekjoon_account_repository
+        self.problem_history_repository = problem_history_repository
 
     @event_handler("GET_MONTHLY_ACTIVITY_DATA_REQUESTED")
     @transactional
@@ -111,23 +120,53 @@ class ActivityApplicationService:
         self,
         command: UpdateWillSolveProblemsCommand
     ):
-        
+
         # 1. 입력값 정합성 검증 (순서 및 중복 체크)
         self._validate_order_consistency(command.problem_ids)
-    
+
         user_id = UserAccountId(command.user_account_id)
-        
-        # 1. 해당 날짜의 모든 데이터(삭제된 것 포함)를 가져옵니다. 
+
+        # 2. 백준 계정 조회 및 검증 - 이미 실제로 푼 적이 있는지 확인
+        bj_account = await self.baekjoon_account_repository.find_by_user_id(user_id)
+        if bj_account and command.problem_ids:
+            # 이미 실제로 푼 문제 목록 조회 (problem_history)
+            solved_problem_ids = await self.problem_history_repository.find_solved_ids_in_list(
+                bj_account.bj_account_id,
+                command.problem_ids
+            )
+            # 추가하려는 문제 중 이미 실제로 푼 문제가 있으면 에러
+            if solved_problem_ids:
+                raise APIException(
+                    ErrorCode.ALREADY_SOLVED_PROBLEM,
+                    f"이미 해결한 문제입니다."
+                )
+
+        # 3. 이미 푼 문제로 등록된 경우 검증
+        if command.problem_ids:
+            # 해당 문제들의 problem_record 조회 (모든 날짜)
+            existing_records = await self.user_activity_repository.find_problem_records_by_problem_ids(
+                user_id,
+                command.problem_ids
+            )
+
+            # 푼 문제로 이미 등록된 문제가 있으면 에러
+            if existing_records:
+                raise APIException(
+                    ErrorCode.PROBLEM_ALREADY_RECORDED_ON_DIFFERENT_DATE,
+                    f"이미 기록된 문제입니다."
+                )
+
+        # 4. 해당 날짜의 모든 데이터(삭제된 것 포함)를 가져옵니다.
         # (나중에 복구를 위해 deleted_at 포함 조회를 권장)
         existing_problems = await self.user_activity_repository.find_will_solve_problems_by_date(
             user_id, command.solved_date
         )
-        
+
         existing_map = {p.problem_id.value: p for p in existing_problems}
         new_problem_ids = command.problem_ids
         processed_entities = []
 
-        # 2. 요청된 순서(index)대로 처리
+        # 5. 요청된 순서(index)대로 처리
         for index, p_id in enumerate(new_problem_ids):
             if p_id in existing_map:
                 target = existing_map.pop(p_id)
@@ -144,15 +183,114 @@ class ActivityApplicationService:
                 new_item.change_order(index)
                 processed_entities.append(new_item)
 
-        # 3. 요청 리스트에 없는데 기존 DB에 살아있는(deleted_at is None) 데이터들은 삭제 처리
+        # 6. 요청 리스트에 없는데 기존 DB에 살아있는(deleted_at is None) 데이터들은 삭제 처리
         for leftover in existing_map.values():
             if leftover.deleted_at is None:
                 leftover.delete()
                 processed_entities.append(leftover)
 
-        # 4. Repository를 통해 일괄 저장
+        # 7. Repository를 통해 일괄 저장
         await self.user_activity_repository.save_all_will_solve_problems(processed_entities)
+    
+    @transactional
+    async def update_solved_problems(
+        self,
+        command: UpdateSolvedProblemsCommand
+    ):
 
+        # 1. 입력값 정합성 검증 (순서 및 중복 체크)
+        self._validate_order_consistency(command.problem_ids)
+
+        user_id = UserAccountId(command.user_account_id)
+
+        # 2. 백준 계정 조회 및 검증 - 이미 실제로 푼 적이 있는지 확인
+        bj_account = await self.baekjoon_account_repository.find_by_user_id(user_id)
+        if bj_account and command.problem_ids:
+            # 이미 실제로 푼 문제 목록 조회 (problem_history에 있는지 확인)
+            solved_problem_ids = await self.problem_history_repository.find_solved_ids_in_list(
+                bj_account.bj_account_id,
+                command.problem_ids
+            )
+            # 추가하려는 문제 중 이미 실제로 푼 문제가 있으면 에러
+            if solved_problem_ids:
+                raise APIException(
+                    ErrorCode.ALREADY_SOLVED_PROBLEM,
+                    f"이미 해결한 문제입니다."
+                )
+
+        # 3. 이미 푼 문제로 등록된 경우 검증
+        if command.problem_ids:
+            # 해당 문제들의 problem_record 조회 (모든 날짜)
+            existing_records = await self.user_activity_repository.find_problem_records_by_problem_ids(
+                user_id,
+                command.problem_ids
+            )
+
+            # 다른 날짜에 이미 등록된 문제가 있는지 확인
+            for record in existing_records:
+                if record.marked_date != command.solved_date:
+                    raise APIException(
+                        ErrorCode.PROBLEM_ALREADY_RECORDED_ON_DIFFERENT_DATE,
+                        f"이미 기록된 문제입니다."
+                    )
+
+        # 4. 해당 날짜의 모든 데이터(삭제된 것 포함)를 가져옵니다.
+        # (나중에 복구를 위해 deleted_at 포함 조회를 권장)
+        existing_problems = await self.user_activity_repository.find_problem_records_by_date(
+            user_id, command.solved_date
+        )
+
+        existing_map = {p.problem_id.value: p for p in existing_problems}
+        new_problem_ids = command.problem_ids
+        processed_entities = []
+
+        # 5. 요청된 순서(index)대로 처리
+        for index, p_id in enumerate(new_problem_ids):
+            if p_id in existing_map:
+                target = existing_map.pop(p_id)
+                # 순서 변경 (메서드 내부에서 변경 여부 체크)
+                target.change_order(index)
+                processed_entities.append(target)
+            else:
+                # 신규 생성
+                new_item: ProblemRecord = ProblemRecord.create(
+                    user_account_id=user_id,
+                    problem_id=ProblemId(p_id),
+                    marked_date=command.solved_date
+                )
+                new_item.change_order(index)
+                processed_entities.append(new_item)
+
+        # 6. 요청 리스트에 없는데 기존 DB에 살아있는(deleted_at is None) 데이터들은 삭제 처리
+        for leftover in existing_map.values():
+            if leftover.deleted_at is None:
+                leftover.delete()
+                processed_entities.append(leftover)
+
+        # 7. Repository를 통해 일괄 저장
+        await self.user_activity_repository.save_all_problem_records(processed_entities)
+
+    @transactional
+    async def update_solved_and_will_solve_problems(
+        self,
+        command: UpdateSolvedAndWillSolveProblemsCommand
+    ):
+        await self.update_solved_problems(
+            UpdateSolvedProblemsCommand(
+                user_account_id=command.user_account_id,
+                solved_date=command.solved_date,
+                problem_ids=command.solved_problem_ids
+            )
+        )
+        
+        await self.update_will_solve_problems(
+            UpdateWillSolveProblemsCommand(
+                user_account_id=command.user_account_id,
+                solved_date=command.solved_date,
+                problem_ids=command.will_solve_problem_ids
+            )
+        )
+    
     @transactional
     async def ban_tag(self, command: TagCustomCommand):
         # 1. tag code로 tag 정보 요청

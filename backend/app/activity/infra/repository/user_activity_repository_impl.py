@@ -151,6 +151,31 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         models = result.scalars().all()
 
         return [WillSolveProblemMapper.to_entity(model) for model in models]
+    
+    @override
+    async def find_problem_records_by_date(
+        self,
+        user_id: UserAccountId,
+        target_date: date
+    ) -> list[ProblemRecord]:
+        """날짜별 풀 예정 문제 조회"""
+        stmt = (
+            select(ProblemRecordModel)
+            .where(
+                and_(
+                    ProblemRecordModel.user_account_id == user_id.value,
+                    ProblemRecordModel.marked_date == target_date,
+                    ProblemRecordModel.deleted_at.is_(None)
+                )
+            )
+            # 날짜 내에서는 order 순으로 정렬하여 반환
+            .order_by(ProblemRecordModel.order.asc())
+        )
+
+        result = await self.session.execute(stmt)
+        models = result.scalars().all()
+
+        return [ProblemRecordMapper.to_entity(model) for model in models]
 
     @override
     async def save_all_will_solve_problems(
@@ -163,6 +188,20 @@ class UserActivityRepositoryImpl(UserActivityRepository):
 
         for entity in will_solve_problems:
             model = WillSolveProblemMapper.to_model(entity)
+            await self.session.merge(model)
+        await self.session.flush()
+        
+    @override
+    async def save_all_problem_records(
+        self, 
+        problem_records: list[ProblemRecord]
+    ) -> None:
+        """일괄 저장 및 업데이트 (Upsert)"""
+        if not problem_records:
+            return
+
+        for entity in problem_records:
+            model = ProblemRecordMapper.to_model(entity)
             await self.session.merge(model)
         await self.session.flush()
 
@@ -221,4 +260,56 @@ class UserActivityRepositoryImpl(UserActivityRepository):
             model = ProblemBannedRecordMapper.to_model(entity)
             await self.session.merge(model)
 
-        await self.session.flush()   
+        await self.session.flush()
+
+    @override
+    async def find_problem_records_by_problem_ids(
+        self,
+        user_id: UserAccountId,
+        problem_ids: list[int]
+    ) -> list[ProblemRecord]:
+        """특정 문제 ID들의 problem_record 조회 (모든 날짜)"""
+        if not problem_ids:
+            return []
+
+        stmt = (
+            select(ProblemRecordModel)
+            .where(
+                and_(
+                    ProblemRecordModel.user_account_id == user_id.value,
+                    ProblemRecordModel.problem_id.in_(problem_ids),
+                    ProblemRecordModel.deleted_at.is_(None)
+                )
+            )
+        )
+
+        result = await self.session.execute(stmt)
+        models = result.scalars().all()
+
+        return [ProblemRecordMapper.to_entity(model) for model in models]
+
+    @override
+    async def find_will_solve_problems_by_problem_ids(
+        self,
+        user_id: UserAccountId,
+        problem_ids: list[int]
+    ) -> list[WillSolveProblem]:
+        """특정 문제 ID들의 will_solve_problem 조회 (모든 날짜)"""
+        if not problem_ids:
+            return []
+
+        stmt = (
+            select(WillSolveProblemModel)
+            .where(
+                and_(
+                    WillSolveProblemModel.user_account_id == user_id.value,
+                    WillSolveProblemModel.problem_id.in_(problem_ids),
+                    WillSolveProblemModel.deleted_at.is_(None)
+                )
+            )
+        )
+
+        result = await self.session.execute(stmt)
+        models = result.scalars().all()
+
+        return [WillSolveProblemMapper.to_entity(model) for model in models]   

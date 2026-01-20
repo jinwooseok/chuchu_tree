@@ -63,6 +63,19 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    def include_object(object, name, type_, reflected, compare_to):
+        """
+        FK로 자동 생성된 인덱스는 autogenerate에서 무시
+        MySQL은 FK 생성 시 자동으로 인덱스를 만들기 때문에
+        모델에 명시되지 않은 FK 인덱스는 비교하지 않음
+        """
+        # FK 컬럼의 자동 생성 인덱스 무시
+        if type_ == "index" and reflected and compare_to is None:
+            # 데이터베이스에는 있지만 모델에는 없는 인덱스
+            # FK로 자동 생성된 인덱스일 가능성이 높음
+            return False
+        return True
+
     # Override the sqlalchemy.url in config with our constructed URL
     configuration = config.get_section(config.config_ini_section, {})
     configuration["sqlalchemy.url"] = url
@@ -75,7 +88,9 @@ def run_migrations_online() -> None:
 
     with connectable.connect() as connection:
         context.configure(
-            connection=connection, target_metadata=target_metadata
+            connection=connection,
+            target_metadata=target_metadata,
+            include_object=include_object
         )
 
         with context.begin_transaction():
