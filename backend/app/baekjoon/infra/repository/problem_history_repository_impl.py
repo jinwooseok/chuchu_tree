@@ -46,37 +46,6 @@ class ProblemHistoryRepositoryImpl(ProblemHistoryRepository):
         return [ProblemHistoryMapper.to_entity(model) for model in models]
 
     @override
-    async def find_unrecorded_problem_ids(
-        self,
-        user_account_id: UserAccountId,
-        bj_account_id: BaekjoonAccountId
-    ) -> set[int]:
-        """problem_history에는 있지만 problem_record에 기록되지 않은 문제 ID 조회"""
-        # problem_history에서 해당 백준 계정이 푼 모든 문제를 가져오되,
-        # problem_record에 user_account_id로 기록되지 않은 것만 필터링
-        stmt = (
-            select(ProblemHistoryModel.problem_id)
-            .select_from(ProblemHistoryModel)
-            .outerjoin(
-                ProblemRecordModel,
-                and_(
-                    ProblemHistoryModel.problem_id == ProblemRecordModel.problem_id,
-                    ProblemRecordModel.user_account_id == user_account_id.value,
-                    ProblemRecordModel.deleted_at.is_(None)
-                )
-            )
-            .where(
-                and_(
-                    ProblemHistoryModel.bj_account_id == bj_account_id.value,
-                    ProblemRecordModel.problem_record_id.is_(None)  # problem_record에 없는 것만
-                )
-            )
-        )
-
-        result = await self.session.execute(stmt)
-        return set(result.scalars().all())
-
-    @override
     async def find_by_account_and_date_range(
         self,
         bj_account_id: BaekjoonAccountId,
@@ -100,37 +69,6 @@ class ProblemHistoryRepositoryImpl(ProblemHistoryRepository):
         models = result.scalars().all()
 
         return [ProblemHistoryMapper.to_entity(model) for model in models]
-
-    @override
-    async def find_unrecorded_problem_ids(
-        self,
-        user_account_id: UserAccountId,
-        bj_account_id: BaekjoonAccountId
-    ) -> set[int]:
-        """problem_history에는 있지만 problem_record에 기록되지 않은 문제 ID 조회"""
-        # problem_history에서 해당 백준 계정이 푼 모든 문제를 가져오되,
-        # problem_record에 user_account_id로 기록되지 않은 것만 필터링
-        stmt = (
-            select(ProblemHistoryModel.problem_id)
-            .select_from(ProblemHistoryModel)
-            .outerjoin(
-                ProblemRecordModel,
-                and_(
-                    ProblemHistoryModel.problem_id == ProblemRecordModel.problem_id,
-                    ProblemRecordModel.user_account_id == user_account_id.value,
-                    ProblemRecordModel.deleted_at.is_(None)
-                )
-            )
-            .where(
-                and_(
-                    ProblemHistoryModel.bj_account_id == bj_account_id.value,
-                    ProblemRecordModel.problem_record_id.is_(None)  # problem_record에 없는 것만
-                )
-            )
-        )
-
-        result = await self.session.execute(stmt)
-        return set(result.scalars().all())
 
     @override
     async def find_by_account_and_month_with_streak(
@@ -254,7 +192,8 @@ class ProblemHistoryRepositoryImpl(ProblemHistoryRepository):
     ) -> set[int]:
         """problem_history에는 있지만 problem_record에 기록되지 않은 문제 ID 조회"""
         # problem_history에서 해당 백준 계정이 푼 모든 문제를 가져오되,
-        # problem_record에 user_account_id로 기록되지 않은 것만 필터링
+        # 1. streak_id가 NULL인 것만 (스트릭으로 기록되지 않은 것)
+        # 2. problem_record에 user_account_id로 기록되지 않은 것만 필터링
         stmt = (
             select(ProblemHistoryModel.problem_id)
             .select_from(ProblemHistoryModel)
@@ -269,6 +208,7 @@ class ProblemHistoryRepositoryImpl(ProblemHistoryRepository):
             .where(
                 and_(
                     ProblemHistoryModel.bj_account_id == bj_account_id.value,
+                    ProblemHistoryModel.streak_id.is_(None),  # streak과 연동되지 않은 것만
                     ProblemRecordModel.problem_record_id.is_(None)  # problem_record에 없는 것만
                 )
             )

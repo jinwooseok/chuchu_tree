@@ -137,7 +137,10 @@ class ProblemHistoryRepository(ABC):
         problem_history와 problem_record를 조인하여,
         solved.ac에서는 풀었지만 우리 시스템에 기록되지 않은 문제들을 찾습니다.
 
-        bj_account와 user_account는 다대다 관계이므로 둘 다 체크합니다.
+        조건:
+        1. streak_id가 NULL인 것만 (스트릭으로 기록되지 않은 것)
+        2. problem_record에 기록되지 않은 것만
+        3. bj_account와 user_account 둘 다 체크 (다대다 관계)
 
         Args:
             user_account_id: 유저 계정 ID (VO)
