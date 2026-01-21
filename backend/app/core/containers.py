@@ -399,7 +399,9 @@ class Container(containers.DeclarativeContainer):
         tag_skill_repository = tag_skill_repository,
         recommend_filter_repository = recommand_filter_repository,
         problem_repository = problem_repository,
-        tier_repository = tier_repository
+        tier_repository = tier_repository,
+        problem_history_repository = problem_history_repository,
+        target_repository = target_repository
     )
     
     # ========================================================================

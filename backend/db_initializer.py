@@ -299,12 +299,15 @@ class DBMigrator:
             })
 
     def _setup_targets(self, conn, now):
-        for code in ["DAILY", "CT", "BEGINNER"]:
+        codes = {"DAILY": "일상", "CT":"코딩테스트","BEGINNER":"초심자"}
+        for code, dp_name in codes.items():
             conn.execute(text("""
                 INSERT INTO target (target_code, active_yn, target_display_name, created_at, updated_at) 
-                VALUES (:c, :active, :c, :now, :now)
-                ON DUPLICATE KEY UPDATE updated_at = VALUES(updated_at)
-            """), {"c": code, "active": True, "now": now})
+                VALUES (:c, :active, :dp_name, :now, :now)
+                ON DUPLICATE KEY UPDATE 
+                  target_display_name = :dp_name,
+                  updated_at = :now
+            """), {"c": code, "dp_name": dp_name, "active": True, "now": now})
             
             res = conn.execute(text("SELECT target_id FROM target WHERE target_code = :c"), {"c": code}).fetchone()
             self.target_id_map[code] = res[0]
@@ -351,9 +354,9 @@ class DBMigrator:
 
             for g_code in config['goals']:
                 conn.execute(text("""
-                    INSERT IGNORE INTO target_tag (tag_id, target_id, created_at, updated_at) 
-                    VALUES (:tid, :target_id, :now, :now)
-                """), {"tid": tag_id, "target_id": self.target_id_map[g_code], "now": now})
+                    INSERT IGNORE INTO target_tag (tag_id, target_id, active_yn, created_at, updated_at) 
+                    VALUES (:tid, :target_id, :now, :active_yn, :now)
+                """), {"tid": tag_id, "target_id": self.target_id_map[g_code], "active_yn": True, "now": now})
 
     def _determine_excluded_reason(self, tag_item, config):
         """Determine excluded reason based on TODO.md rules"""
@@ -666,12 +669,12 @@ class DBMigrator:
             ("EASY", "쉬움", None, -5, "IM", 100, 0),
             ("EASY", "쉬움", None, -5, "AD", 100, 0),
             ("EASY", "쉬움", None, -5, "MAS", 100, 0),
-            ("NORMAL", "보통", None, None, "IM", 100, 50),
-            ("NORMAL", "보통", None, None, "AD", 50, 20),
-            ("NORMAL", "보통", None, None, "MAS", 20, 0),
-            ("HARD", "어려움", None, None, "IM", 50, 30),
-            ("HARD", "어려움", None, None, "AD", 20, 0),
-            ("HARD", "어려움", None, None, "MAS", 10, 0),
+            ("NORMAL", "보통", -5, 0, "IM", 100, 50),
+            ("NORMAL", "보통", -5, 0, "AD", 50, 20),
+            ("NORMAL", "보통", -5, 0, "MAS", 20, 0),
+            ("HARD", "어려움", 0, 2, "IM", 50, 30),
+            ("HARD", "어려움", 0, 2, "AD", 20, 0),
+            ("HARD", "어려움", 0, 2, "MAS", 10, 0),
             ("EXTREME", "매우 어려움", 2, None, "IM", 10, 0),
             ("EXTREME", "매우 어려움", 2, None, "AD", 10, 0),
             ("EXTREME", "매우 어려움", 2, None, "MAS", 10, 0)

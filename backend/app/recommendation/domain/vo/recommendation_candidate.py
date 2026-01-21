@@ -2,6 +2,7 @@
 
 from dataclasses import dataclass
 
+from app.common.domain.vo.identifiers import TagId
 from app.problem.domain.entity.problem import Problem
 
 
@@ -11,12 +12,14 @@ class RecommendationCandidate:
     problem: Problem
     reasons: list[str]
     tag_name: str
+    primary_tag_id: TagId
 
     @staticmethod
-    def create(problem: Problem, reasons: list[str], tag_name: str) -> 'RecommendationCandidate':
+    def create(problem: Problem, reasons: list[str], tag_name: str, primary_tag_id: TagId) -> 'RecommendationCandidate':
         """팩토리 메서드"""
         return RecommendationCandidate(
             problem=problem,
             reasons=reasons,
-            tag_name=tag_name
+            tag_name=tag_name,
+            primary_tag_id=primary_tag_id
         )
