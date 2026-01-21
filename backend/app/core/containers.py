@@ -1,6 +1,7 @@
 import os
 from dependency_injector import containers, providers
 
+from app.baekjoon.application.usecase.get_unrecorded_problems_usecase import GetUnrecordedProblemsUsecase
 from app.baekjoon.application.usecase.link_bj_account_usecase import LinkBjAccountUsecase
 from app.baekjoon.application.usecase.get_baekjoon_me_usecase import GetBaekjoonMeUsecase
 from app.baekjoon.application.usecase.get_monthly_problems_usecase import GetMonthlyProblemsUsecase
@@ -294,6 +295,13 @@ class Container(containers.DeclarativeContainer):
         streak_repository=streak_repository,
         solvedac_gateway=solvedac_gateway
     )
+    
+    get_unrecorded_problems_usecase = providers.Singleton(
+        GetUnrecordedProblemsUsecase,
+        baekjoon_account_repository=baekjoon_account_repository,
+        problem_history_repository=problem_history_repository,
+        domain_event_bus=domain_event_bus
+    )
 
 
     # ========================================================================
@@ -309,7 +317,7 @@ class Container(containers.DeclarativeContainer):
         user_activity_repository=user_activity_repository,
         domain_event_bus=domain_event_bus,
         baekjoon_account_repository=baekjoon_account_repository,
-        problem_history_repository=problem_history_repository
+        problem_history_repository=problem_history_repository,
     )
 
     # ========================================================================
