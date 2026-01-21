@@ -2,11 +2,14 @@ from datetime import date as date_type
 from fastapi import APIRouter, Depends, Query
 from dependency_injector.wiring import inject, Provide
 
+from app.baekjoon.application.command.get_unrecorded_problems_command import GetUnrecordedProblemsCommand
 from app.baekjoon.application.command.link_bj_account_command import LinkBjAccountCommand
 from app.baekjoon.application.command.get_baekjoon_me_command import GetBaekjoonMeCommand
 from app.baekjoon.application.command.get_monthly_problems_command import GetMonthlyProblemsCommand
 from app.baekjoon.application.command.get_streaks_command import GetStreaksCommand
 from app.baekjoon.application.query.baekjoon_account_info_query import BaekjoonMeQuery
+from app.baekjoon.application.query.get_unrecorded_problems_query import GetUnrecordedProblemsQuery
+from app.baekjoon.application.usecase.get_unrecorded_problems_usecase import GetUnrecordedProblemsUsecase
 from app.baekjoon.application.usecase.link_bj_account_usecase import LinkBjAccountUsecase
 from app.baekjoon.application.usecase.get_baekjoon_me_usecase import GetBaekjoonMeUsecase
 from app.baekjoon.application.usecase.get_monthly_problems_usecase import GetMonthlyProblemsUsecase
@@ -25,6 +28,9 @@ from app.baekjoon.presentation.schema.response.get_monthly_problems_response imp
 )
 from app.baekjoon.presentation.schema.response.get_streaks_response import (
     GetStreaksResponse
+)
+from app.baekjoon.presentation.schema.response.get_unrecorded_problems_response import (
+    GetUnrecordedProblemsResponse
 )
 from app.core.containers import Container
 from app.core.api_response import ApiResponse, ApiResponseSchema
@@ -167,6 +173,25 @@ async def get_monthly_problems(
 
     return ApiResponse(data=response_data)
 
+@router.get("/unrecorded-problems/me", response_model=ApiResponseSchema[GetUnrecordedProblemsResponse])
+@inject
+async def get_unrecorded_problems_me(
+    current_user: CurrentUser = Depends(get_current_member),
+    get_unrecorded_problems_usecase: GetUnrecordedProblemsUsecase = Depends(Provide[Container.get_unrecorded_problems_usecase])
+):
+    """
+    유저의 실제로 푼 문제 조회 (solved.ac 기준)
+
+    Returns:
+        기록되지 않은 문제 목록
+    """
+    # 기록되지 않은 문제 조회
+    query: GetUnrecordedProblemsQuery = await get_unrecorded_problems_usecase.execute(
+        GetUnrecordedProblemsCommand(user_account_id=current_user.user_account_id)
+    )
+
+    # Response 객체로 변환
+    return ApiResponse(data=GetUnrecordedProblemsResponse.from_query(query))
 
 @router.post("/me/refresh", response_model=ApiResponseSchema[dict])
 @inject
