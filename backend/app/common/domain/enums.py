@@ -33,6 +33,11 @@ class FilterCode(str, Enum):
     EXTREME = "EXTREME"
 
 
+class ExclusionMode(str, Enum):
+    LENIENT = "LENIENT"  # Problems can be recommended via non-excluded tags
+    STRICT = "STRICT"    # Problems with ANY excluded tag are filtered out
+
+
 class SkillCode(str, Enum):
     IM = "IM"      # Intermediate
     AD = "AD"      # Advanced

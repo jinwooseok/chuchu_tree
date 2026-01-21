@@ -3,7 +3,7 @@ from dependency_injector.wiring import inject, Provide
 from typing import List, Optional
 import json
 
-from app.common.domain.enums import FilterCode
+from app.common.domain.enums import FilterCode, ExclusionMode
 from app.common.domain.vo.current_user import CurrentUser
 from app.common.domain.vo.identifiers import TagId, UserAccountId
 from app.common.presentation.dependency.auth_dependencies import get_current_member
@@ -23,6 +23,7 @@ async def get_recommended_problems(
     level: Optional[str] = Query("[]", description="난이도 필터 (예: [\"EASY\", \"NORMAL\"])"),
     tags: Optional[str] = Query("[]", description="태그 필터 (예: [1, 2, 3])"),
     count: Optional[int] = Query(3, description="문제 개수"),
+    exclusion_mode: Optional[str] = Query("LENIENT", description="제외 모드 (LENIENT|STRICT)"),
     current_user: CurrentUser = Depends(get_current_member),
     recommendation_usecase: RecommendProblemsUsecase = Depends(Provide[Container.recommand_problems_usecase])
 ):
@@ -46,12 +47,16 @@ async def get_recommended_problems(
     if tags:
         tag_filter_codes = json.loads(tags)
 
+    # Parse exclusion_mode
+    exclusion_mode_enum = ExclusionMode(exclusion_mode) if exclusion_mode else ExclusionMode.LENIENT
+
     # 2. Usecase 실행 (Query 객체 반환)
     query = await recommendation_usecase.execute(
         user_account_id=UserAccountId(current_user.user_account_id),
         level_filter_codes=level_filter_codes,
         tag_filter_codes=tag_filter_codes,
-        count=count
+        count=count,
+        exclusion_mode=exclusion_mode_enum
     )
 
     # 3. Response 변환
