@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { CategoryTags, TagBan, TagDashboard } from './tagDashboard.types';
 import { UseMutationCallback } from '@/shared/types/api';
 import { tagDashboardKeys } from './keys';
+import '@/shared/types/query';
 
 export const useTagDashboard = () => {
   return useQuery({

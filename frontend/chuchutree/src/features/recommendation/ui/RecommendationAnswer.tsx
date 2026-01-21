@@ -6,7 +6,6 @@ import { useRecommendationStore } from '@/lib/store/recommendation';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { useCalendar, useUpdateWillSolveProblems } from '@/entities/calendar';
 import { toast } from 'sonner';
-import temp from '@/entities/recommendation/mockdata/mock_recommendation.json';
 import { Trash2, CheckCircle, Ban } from 'lucide-react';
 import { useBanProblem, useUnbanProblem, useGetBannedProblems } from '@/entities/recommendation';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
@@ -39,7 +38,7 @@ export function RecommendationAnswer() {
   }, [calendarData, selectedDate]);
 
   const updateWillSolve = useUpdateWillSolveProblems({
-    onError: (error: any) => {
+    onError: (error) => {
       const errorMessage = error?.response?.data?.message || '문제 등록에 실패했습니다.';
       toast.error(errorMessage, {
         position: 'top-center',

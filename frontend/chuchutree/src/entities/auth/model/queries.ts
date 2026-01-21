@@ -3,6 +3,7 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '../api/auth.api';
 import { UseMutationCallback } from '@/shared/types/api';
+import '@/shared/types/query';
 
 export const authKeys = {
   all: ['auth'],

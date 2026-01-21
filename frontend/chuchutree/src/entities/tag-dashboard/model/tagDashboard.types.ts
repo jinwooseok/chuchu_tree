@@ -47,13 +47,13 @@ export interface CategoryTags {
   recommendationYn: boolean;
 }
 
-interface CategoryInfoTags {
+export interface CategoryInfoTags {
   tagId: number;
   tagCode: TagKey;
   tagDisplayName: string;
 }
 
-interface Categories {
+export interface Categories {
   categoryName: CategoryName;
   tags: CategoryInfoTags[];
 }

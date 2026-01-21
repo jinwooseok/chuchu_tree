@@ -2,9 +2,10 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { calendarApi } from '../api/calendar.api';
-import { UpdateProblemsData } from './calendar.types';
+import type { UpdateProblemsData, Calendar } from './calendar.types';
 import { UseMutationCallback } from '@/shared/types/api';
 import { calendarKeys } from './keys';
+import '@/shared/types/query';
 
 export const useCalendar = (year: number, month: number) => {
   return useQuery({
@@ -45,21 +46,17 @@ export const useUpdateWillSolveProblems = (callbacks?: UseMutationCallback) => {
       const previousData = queryClient.getQueryData(queryKey);
 
       // 낙관적 업데이트
-      queryClient.setQueryData(queryKey, (old: any) => {
+      queryClient.setQueryData(queryKey, (old: Calendar) => {
         if (!old) return old;
 
         return {
           ...old,
-          monthlyData: old.monthlyData.map((day: any) => {
+          monthlyData: old.monthlyData.map((day) => {
             if (day.targetDate === variables.date) {
               // 기존 문제 + 새 문제 병합
               const existingProblems = day.willSolveProblems || [];
-              const newProblemsMap = new Map(
-                (variables.newProblems || []).map((p) => [p.problemId, p])
-              );
-              const allProblemsMap = new Map(
-                existingProblems.map((p: any) => [p.problemId, p])
-              );
+              const newProblemsMap = new Map((variables.newProblems || []).map((p) => [p.problemId, p]));
+              const allProblemsMap = new Map(existingProblems.map((p) => [p.problemId, p]));
 
               // 새 문제 추가
               newProblemsMap.forEach((problem, id) => {
@@ -67,9 +64,7 @@ export const useUpdateWillSolveProblems = (callbacks?: UseMutationCallback) => {
               });
 
               // willSolveProblems를 업데이트된 순서로 재구성
-              const newWillSolveProblems = variables.problemIds
-                .map((id) => allProblemsMap.get(id))
-                .filter(Boolean);
+              const newWillSolveProblems = variables.problemIds.map((id) => allProblemsMap.get(id)).filter(Boolean);
 
               return {
                 ...day,
@@ -123,17 +118,15 @@ export const useUpdateSolvedProblems = (callbacks?: UseMutationCallback) => {
       const previousData = queryClient.getQueryData(queryKey);
 
       // 낙관적 업데이트
-      queryClient.setQueryData(queryKey, (old: any) => {
+      queryClient.setQueryData(queryKey, (old: Calendar) => {
         if (!old) return old;
 
         return {
           ...old,
-          monthlyData: old.monthlyData.map((day: any) => {
+          monthlyData: old.monthlyData.map((day) => {
             if (day.targetDate === variables.date) {
               // solvedProblems를 업데이트된 순서로 재구성
-              const newSolvedProblems = variables.problemIds
-                .map((id) => day.solvedProblems.find((p: any) => p.problemId === id))
-                .filter(Boolean);
+              const newSolvedProblems = variables.problemIds.map((id) => day.solvedProblems.find((p) => p.problemId === id)).filter(Boolean);
 
               return {
                 ...day,

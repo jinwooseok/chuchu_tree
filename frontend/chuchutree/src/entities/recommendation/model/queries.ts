@@ -1,7 +1,8 @@
 import { RecommendationApi } from '@/entities/recommendation/api/recommendation.api';
-import { BanProblem } from '@/entities/recommendation/model/types';
+import { BanProblem, Recommendation } from '@/entities/recommendation/model/types';
 import { UseMutationCallback } from '@/shared/types/api';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import '@/shared/types/query';
 
 export const RecommendationKeys = {
   all: ['recommendation'],

@@ -6,6 +6,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Input } from '@/components/ui/input';
 import { useTagDashboardSidebarStore, SortBy, SortByName, SortDirection, SortDirectionName } from '@/lib/store/tagDashboard';
 import { useTagDashboard } from '@/entities/tag-dashboard';
+import type { Categories, CategoryInfoTags } from '@/entities/tag-dashboard';
 import { CategoryName } from '@/shared/constants/tagSystem';
 import { getLevelColorClasses } from '@/features/tag-dashboard/lib/utils';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
@@ -19,7 +20,7 @@ import { Switch } from '@/components/ui/switch';
 // 드래그 가능한 카테고리 컴포넌트
 interface DraggableCategoryProps {
   categoryName: CategoryName;
-  category: any;
+  category: Categories;
   isOpen: boolean;
   isVisible: boolean;
   onToggleOpen: () => void;
@@ -67,7 +68,7 @@ function DraggableCategory({ categoryName, category, isOpen, isVisible, onToggle
         </div>
 
         <CollapsibleContent className="mt-1 flex flex-col gap-1 pl-6">
-          {category.tags.map((tag: any) => (
+          {category.tags.map((tag) => (
             <button
               key={tag.tagId}
               onClick={() => onTagClick(tag.tagId)}
