@@ -1,3 +1,5 @@
+import type { AxiosError } from 'axios';
+
 export interface ApiResponse<T = any> {
   status: number;
   message: string;
@@ -12,7 +14,7 @@ export interface ApiError {
 
 export type UseMutationCallback = {
   onSuccess?: () => void;
-  onError?: (error: Error) => void;
+  onError?: (error: AxiosError<ApiError>) => void;
   onMutate?: () => void;
   onSettled?: () => void;
 };

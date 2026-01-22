@@ -3,6 +3,7 @@
 import { refreshApi } from '@/entities/refresh/api/refresh.api';
 import { UseMutationCallback } from '@/shared/types/api';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import '@/shared/types/query';
 
 export const useRefresh = (callbacks: UseMutationCallback) => {
   const queryClient = useQueryClient();

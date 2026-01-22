@@ -127,7 +127,7 @@ export default function CalendarSidebar() {
   const { data: calendarData } = useCalendar(year, month);
 
   const updateWillSolve = useUpdateWillSolveProblems({
-    onError: (error: any) => {
+    onError: (error) => {
       const errorMessage = error?.response?.data?.message || '업데이트에 실패했습니다.';
       toast.error(errorMessage, {
         position: 'top-center',

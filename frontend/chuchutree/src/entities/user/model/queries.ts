@@ -5,6 +5,7 @@ import { userApi } from '../api/user.api';
 import { PostTargetType } from './types';
 import { UseMutationCallback } from '@/shared/types/api';
 import { userKeys } from './keys';
+import '@/shared/types/query';
 
 export const useUser = () => {
   return useQuery({

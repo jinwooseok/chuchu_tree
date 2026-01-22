@@ -5,6 +5,7 @@ import { baekjoonApi } from '../api/bj.api';
 import { LinkBjAccountRequest } from './types';
 import { UseMutationCallback } from '@/shared/types/api';
 import { userKeys } from '@/entities/user/model/keys';
+import '@/shared/types/query';
 
 export const baekjoonKeys = {
   all: ['baekjoon'],

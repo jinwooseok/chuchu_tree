@@ -1,5 +1,13 @@
 // src/lib/auth-utils.ts
 
+// 쿠키 옵션 타입 정의
+interface CookieOptions {
+  path?: string;
+  httpOnly?: boolean;
+  secure?: boolean;
+  sameSite?: 'strict' | 'lax' | 'none';
+}
+
 /**
  * 토큰 재발급을 시도하는 공통 유틸 함수
  */
@@ -43,11 +51,17 @@ export async function refreshAccessToken(
   }
 }
 
+// 파싱된 쿠키 타입 정의
+interface ParsedCookie {
+  name: string;
+  value: string;
+  options: CookieOptions;
+}
+
 /**
  * 쿠키 파싱 유틸 (Middleware용)
  */
-export function parseCookiesForMiddleware(setCookieHeader: string) {
-  const cookieOptions: Record<string, any> = {};
+export function parseCookiesForMiddleware(setCookieHeader: string): (ParsedCookie | null)[] {
   const cookies = setCookieHeader.split(',').map((c) => c.trim());
 
   return cookies.map((cookie) => {
@@ -56,13 +70,23 @@ export function parseCookiesForMiddleware(setCookieHeader: string) {
 
     if (!name || !value) return null;
 
-    const options: any = {};
+    const options: CookieOptions = {};
     attributes.forEach((attr) => {
       const [key, val] = attr.trim().split('=');
-      if (key.toLowerCase() === 'path') options.path = val;
-      if (key.toLowerCase() === 'httponly') options.httpOnly = true;
-      if (key.toLowerCase() === 'secure') options.secure = true;
-      if (key.toLowerCase() === 'samesite') options.sameSite = val?.toLowerCase();
+      const lowerKey = key.toLowerCase();
+
+      if (lowerKey === 'path') {
+        options.path = val;
+      } else if (lowerKey === 'httponly') {
+        options.httpOnly = true;
+      } else if (lowerKey === 'secure') {
+        options.secure = true;
+      } else if (lowerKey === 'samesite') {
+        const sameSiteValue = val?.toLowerCase();
+        if (sameSiteValue === 'strict' || sameSiteValue === 'lax' || sameSiteValue === 'none') {
+          options.sameSite = sameSiteValue;
+        }
+      }
     });
 
     return { name, value, options };

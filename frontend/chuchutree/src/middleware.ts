@@ -43,7 +43,7 @@ export async function middleware(request: NextRequest) {
       if (verifyResponse.status === 401 && refreshToken) {
         // 공통 함수 사용
         console.log('[Middleware] 토큰2개있음');
-        const { success, newCookies } = await refreshAccessToken(refreshToken, '');
+        const { success, newCookies } = await refreshAccessToken(refreshToken, backendUrl);
 
         if (success && newCookies) {
           const response = NextResponse.next();
@@ -58,15 +58,16 @@ export async function middleware(request: NextRequest) {
           return response;
         }
       }
-
-      // console.log('[Middleware] refreshToken failed 혹은 401, 404말고 다른에러:', verifyResponse);
-      console.log('[Middleware] refreshToken failed 혹은 401, 404말고 다른에러:');
-
-      // 재발급 실패
+      if (verifyResponse.status === 401) {
+        console.log('[Middleware] 401맞음 refreshToken 없었거나 failed함');
+      } else {
+        console.log('[Middleware] 401, 404말고 다른에러:');
+      }
       const response = NextResponse.redirect(new URL('/sign-in', request.url));
       response.cookies.delete('access_token');
       response.cookies.delete('refresh_token');
       return response;
+      // 재발급 실패
     } catch (error) {
       console.error('[Middleware] anothor Error (fetch 실패):', error);
       return NextResponse.next();

@@ -3,6 +3,7 @@ import { isAuthenticated } from '@/lib/server';
 import { userServerApi } from '@/entities/user/api/user.server';
 import { ApiResponseError } from '@/lib/server';
 import BjAccountRegistrationClient from './BjAccountRegistrationClient';
+import { User } from '@/entities/user';
 
 export default async function BjAccountRegistration() {
   // 1. 인증 체크
@@ -13,7 +14,7 @@ export default async function BjAccountRegistration() {
   }
 
   // 2. 사용자 정보 체크
-  let userData = null;
+  let userData: User | null = null;
 
   try {
     userData = await userServerApi.getMe();
