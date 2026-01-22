@@ -16,13 +16,13 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(new URL('/sign-in', request.url));
     }
     // access_token이 있는 경우, 유효성 검증
-    // local환경: rewrites에 의해 https://chuchu-tree-dev.duckdns.org/api/v1/bj-accounts/me로 프록시
-    // 배포 dev 환경: 상대 경로이므로 현재 도메인 기준 https://chuchu-tree-dev.duckdns.org/api/v1/bj-accounts/me 요청 후 Nginx가 이를 FastAPI:8002로 라우팅
-    // 배포 production 환경: 상대 경로이므로 https://chuchu-tree.duckdns.org/api/v1/bj-accounts/me 요청 후 Nginx가 FastAPI로 FastAPI:8001(추정)로 라우팅
+    // local환경: rewrites에 의해 https://chuchu-tree-dev.duckdns.org/api/v1/auth/me로 프록시
+    // 배포 dev 환경: 상대 경로이므로 현재 도메인 기준 https://chuchu-tree-dev.duckdns.org/api/v1/auth/me 요청 후 Nginx가 이를 FastAPI:8002로 라우팅
+    // 배포 production 환경: 상대 경로이므로 https://chuchu-tree.duckdns.org/api/v1/auth/me 요청 후 Nginx가 FastAPI로 FastAPI:8001(추정)로 라우팅
 
     try {
       const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || request.nextUrl.origin;
-      const verifyUrl = `${backendUrl}/api/v1/bj-accounts/me`;
+      const verifyUrl = `${backendUrl}/api/v1/auth/me`;
 
       const verifyResponse = await fetch(verifyUrl, {
         headers: {

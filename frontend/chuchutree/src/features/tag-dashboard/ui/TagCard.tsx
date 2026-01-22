@@ -6,7 +6,7 @@ import { getLevelColorClasses, getDaysAgo } from '../lib/utils';
 import Image from 'next/image';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid'; // filled
 import { CheckCircleIcon as CheckCircleIconOutline } from '@heroicons/react/24/outline'; // outline
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 import { useModal } from '@/lib/providers/modal-provider';
 import { TagBanAlertDialog } from './TagBanAlertDialog';
 import TagCardProgressBar from '@/features/tag-dashboard/ui/TagCardProgressBar';
@@ -21,21 +21,21 @@ const TagCard = memo(
   // Tag Ban mutations
   const { mutate: postTagBan, isPending: isPostPending } = usePostTagBan({
     onSuccess: () => {
-      toast.success('추천 목록에서 제외되었습니다.', { position: 'top-center' });
+      toast.success('추천 목록에서 제외되었습니다.');
       closeModal('tag-ban-alert');
     },
     onError: () => {
-      toast.error('제외 처리에 실패했습니다.', { position: 'top-center' });
+      toast.error('제외 처리에 실패했습니다.');
     },
   });
 
   const { mutate: deleteTagBan, isPending: isDeletePending } = useDeleteTagBan({
     onSuccess: () => {
-      toast.success('추천 목록에 추가되었습니다.', { position: 'top-center' });
+      toast.success('추천 목록에 추가되었습니다.');
       closeModal('tag-ban-alert');
     },
     onError: () => {
-      toast.error('추가 처리에 실패했습니다.', { position: 'top-center' });
+      toast.error('추가 처리에 실패했습니다.');
     },
   });
 

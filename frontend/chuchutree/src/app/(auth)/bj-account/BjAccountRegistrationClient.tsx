@@ -6,8 +6,9 @@ import { useState } from 'react';
 import { useLinkBjAccount } from '@/entities/bj-account';
 import { usePostTarget } from '@/entities/user';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 import { TargetCode } from '@/shared/constants/tagSystem';
+import { getErrorMessage } from '@/lib/utils/error';
 import { TARGET_OPTIONS } from '@/shared/constants/target';
 import { useLogout } from '@/entities/auth';
 
@@ -25,38 +26,28 @@ export default function BjAccountRegistrationClient() {
         { targetCode: selectedTarget },
         {
           onSuccess: () => {
-            toast.success('계정이 등록되었습니다.', {
-              position: 'top-center',
-            });
+            toast.success('계정이 등록되었습니다.');
             router.push('/');
           },
           onError: () => {
-            toast.warning('계정은 등록되었으나 목표 설정에 실패했습니다.', {
-              position: 'top-center',
-            });
+            toast.warning('계정은 등록되었으나 목표 설정에 실패했습니다.');
             router.push('/');
           },
         },
       );
     },
     onError: (error) => {
-      const errorMessage = error?.response?.data?.message || '계정 등록에 실패했습니다. 다시 시도해주세요.';
-      toast.error(errorMessage, {
-        position: 'top-center',
-      });
+      const errorMessage = getErrorMessage(error, '계정 등록에 실패했습니다. 다시 시도해주세요.');
+      toast.error(errorMessage);
     },
   });
   const { mutate: logout, isPending: isLogoutPending } = useLogout({
     onSuccess: () => {
-      toast.success('로그아웃되었습니다.', {
-        position: 'top-center',
-      });
+      toast.success('로그아웃되었습니다.');
       router.push('/sign-in');
     },
     onError: () => {
-      toast.error('로그아웃에 실패했습니다. 다시 시도해주세요.', {
-        position: 'top-center',
-      });
+      toast.error('로그아웃에 실패했습니다. 다시 시도해주세요.');
     },
   });
 
@@ -65,9 +56,7 @@ export default function BjAccountRegistrationClient() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!bjHandle.trim()) {
-      toast.info('백준 아이디를 입력해주세요.', {
-        position: 'top-center',
-      });
+      toast.info('백준 아이디를 입력해주세요.');
       return;
     }
     linkBjAccount({ bjAccount: bjHandle.trim() });

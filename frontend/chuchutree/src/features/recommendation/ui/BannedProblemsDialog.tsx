@@ -3,7 +3,7 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { useGetBannedProblems, useUnbanProblem } from '@/entities/recommendation';
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 import Image from 'next/image';
 import { X, Loader2 } from 'lucide-react';
 
@@ -20,14 +20,10 @@ export default function BannedProblemsDialog({ onClose }: props) {
       { problemId },
       {
         onSuccess: () => {
-          toast.success(`${problemTitle} 문제가 추천에 포함됩니다.`, {
-            position: 'top-center',
-          });
+          toast.success(`${problemTitle} 문제가 추천에 포함됩니다.`);
         },
         onError: () => {
-          toast.error('문제 제외 취소에 실패했습니다.', {
-            position: 'top-center',
-          });
+          toast.error('문제 제외 취소에 실패했습니다.');
         },
       },
     );

@@ -1,20 +1,16 @@
 import { useRefresh } from '@/entities/refresh';
 import { Spinner } from '@/shared/ui';
 import { RefreshCw } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 
 export default function RefreshButton() {
   const { mutate: refresh, isPending: isRefreshPending } = useRefresh({
     onSuccess: () => {
-      toast.success('프로필이 갱신되었습니다.', {
-        position: 'top-center',
-      });
+      toast.success('프로필이 갱신되었습니다.');
     },
     onError: () => {
-      toast.error('프로필 갱신에 실패했습니다', {
-        position: 'top-center',
-      });
+      toast.error('프로필 갱신에 실패했습니다');
     },
   });
 

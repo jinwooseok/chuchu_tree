@@ -5,19 +5,13 @@ import Image from 'next/image';
 import { useRecommendationStore } from '@/lib/store/recommendation';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { useCalendar, useUpdateWillSolveProblems } from '@/entities/calendar';
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 import { Trash2, CheckCircle, Ban } from 'lucide-react';
 import { useBanProblem, useUnbanProblem, useGetBannedProblems } from '@/entities/recommendation';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { useMemo } from 'react';
-
-// Date to YYYY-MM-DD format
-const formatDateString = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
+import { formatDateString } from '@/lib/utils/date';
+import { getErrorCode, getErrorMessage } from '@/lib/utils/error';
 
 export function RecommendationAnswer() {
   const { problems, isLoading, showFilters } = useRecommendationStore();
@@ -39,10 +33,9 @@ export function RecommendationAnswer() {
 
   const updateWillSolve = useUpdateWillSolveProblems({
     onError: (error) => {
-      const errorMessage = error?.response?.data?.message || '문제 등록에 실패했습니다.';
-      toast.error(errorMessage, {
-        position: 'top-center',
-      });
+      const errorCode = getErrorCode(error);
+      const errorMessage = errorCode === 'ALREADY_SOLVED_PROBLEM' ? getErrorMessage(error) : '문제 추가에 실패했습니다.';
+      toast.error(errorMessage);
     },
   });
 
@@ -61,9 +54,7 @@ export function RecommendationAnswer() {
   // Toggle problem registration (add or remove)
   const handleToggleProblem = (problemId: number) => {
     if (!selectedDate) {
-      toast.error('날짜를 먼저 선택해주세요.', {
-        position: 'top-center',
-      });
+      toast.error('날짜를 먼저 선택해주세요.');
       return;
     }
 
@@ -89,9 +80,7 @@ export function RecommendationAnswer() {
       },
       {
         onSuccess: () => {
-          toast.success(successMessage, {
-            position: 'top-center',
-          });
+          toast.success(successMessage);
         },
       },
     );
@@ -106,14 +95,10 @@ export function RecommendationAnswer() {
         { problemId },
         {
           onSuccess: () => {
-            toast.success(`${problemTitle} 문제가 추천에 포함됩니다.`, {
-              position: 'top-center',
-            });
+            toast.success(`${problemTitle} 문제가 추천에 포함됩니다.`);
           },
           onError: () => {
-            toast.error('문제 제외 취소에 실패했습니다.', {
-              position: 'top-center',
-            });
+            toast.error('문제 제외 취소에 실패했습니다.');
           },
         },
       );
@@ -123,14 +108,10 @@ export function RecommendationAnswer() {
         { problemId },
         {
           onSuccess: () => {
-            toast.success(`${problemTitle} 문제가 추천에서 제외됩니다.`, {
-              position: 'top-center',
-            });
+            toast.success(`${problemTitle} 문제가 추천에서 제외됩니다.`);
           },
           onError: () => {
-            toast.error('문제 제외에 실패했습니다.', {
-              position: 'top-center',
-            });
+            toast.error('문제 제외에 실패했습니다.');
           },
         },
       );

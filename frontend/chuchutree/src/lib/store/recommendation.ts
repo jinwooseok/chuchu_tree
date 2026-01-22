@@ -33,6 +33,7 @@ type State = {
   // Filter state
   selectedLevel: LevelType | null;
   selectedTags: string;
+  selectedExcludedMode: string;
 
   // Recommendation result
   problems: RecommendedProblems[];
@@ -51,11 +52,13 @@ type State = {
   showLevelSection: boolean;
   showTagSection: boolean;
   showFilterSection: boolean;
+  showExcludedModeSection: boolean;
 };
 
 const initialState: State = {
   selectedLevel: null,
   selectedTags: '',
+  selectedExcludedMode: 'LENIENT',
   problems: [],
   isLoading: false,
   error: null,
@@ -68,6 +71,7 @@ const initialState: State = {
   showLevelSection: false,
   showTagSection: false,
   showFilterSection: false,
+  showExcludedModeSection: false,
 };
 
 const recommendationStoreInternal = create(
@@ -82,11 +86,16 @@ const recommendationStoreInternal = create(
                 state.selectedLevel = level;
               });
             },
-
             // Set selected tags
             setSelectedTags: (tags: string) => {
               set((state) => {
                 state.selectedTags = tags;
+              });
+            },
+            // set Selected ExcludedMode
+            setSelectedExcludedMode: (mode: string) => {
+              set((state) => {
+                state.selectedExcludedMode = mode;
               });
             },
 
@@ -135,6 +144,7 @@ const recommendationStoreInternal = create(
               set((state) => {
                 state.showLevelSection = !state.showLevelSection;
                 state.showFilterSection = false;
+                state.showExcludedModeSection = false;
               });
             },
 
@@ -148,9 +158,16 @@ const recommendationStoreInternal = create(
               set((state) => {
                 state.showFilterSection = !state.showFilterSection;
                 state.showLevelSection = false;
+                state.showExcludedModeSection = false;
               });
             },
-
+            toggleExcludedModeSection: () => {
+              set((state) => {
+                state.showExcludedModeSection = !state.showExcludedModeSection;
+                state.showLevelSection = false;
+                state.showFilterSection = false;
+              });
+            },
             // Clear recommendation
             clearRecommendation: () => {
               set((state) => {
@@ -172,10 +189,12 @@ const recommendationStoreInternal = create(
         partialize: (state) => ({
           selectedLevel: state.selectedLevel,
           selectedTags: state.selectedTags,
+          selectedExcludedMode: state.selectedExcludedMode,
           showFilters: state.showFilters,
           showLevelSection: state.showLevelSection,
           showTagSection: state.showTagSection,
           showFilterSection: state.showFilterSection,
+          showExcludedModeSection: state.showExcludedModeSection,
         }),
       },
     ),

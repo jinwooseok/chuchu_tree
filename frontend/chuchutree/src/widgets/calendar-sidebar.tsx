@@ -10,8 +10,10 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { GripVertical, X, Search } from 'lucide-react';
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
+import { formatDateString } from '@/lib/utils/date';
+import { getErrorCode, getErrorMessage } from '@/lib/utils/error';
 
 // 클라이언트 전용 렌더링 (hydration mismatch 방지)
 const SmallCalendar = dynamic(() => import('@/features/calendar/ui/SmallCalendar'), {
@@ -22,14 +24,6 @@ const SmallCalendar = dynamic(() => import('@/features/calendar/ui/SmallCalendar
     </div>
   ),
 });
-
-// 날짜를 YYYY-MM-DD 형식으로 변환
-const formatDateString = (date: Date): string => {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-};
 
 // 드래그 가능한 문제 카드
 function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Problem; isSolved: boolean; onDelete?: () => void }) {
@@ -128,10 +122,9 @@ export default function CalendarSidebar() {
 
   const updateWillSolve = useUpdateWillSolveProblems({
     onError: (error) => {
-      const errorMessage = error?.response?.data?.message || '업데이트에 실패했습니다.';
-      toast.error(errorMessage, {
-        position: 'top-center',
-      });
+      const errorCode = getErrorCode(error);
+      const errorMessage = errorCode === 'ALREADY_SOLVED_PROBLEM' ? getErrorMessage(error) : '문제 추가에 실패했습니다.';
+      toast.error(errorMessage);
     },
   });
   const updateSolved = useUpdateSolvedProblems();
@@ -232,9 +225,7 @@ export default function CalendarSidebar() {
         onSuccess: () => {
           setSearchKeyword('');
           setShowAddInput(false);
-          toast.success('문제 추가 완료!', {
-            position: 'top-center',
-          });
+          toast.success('문제 추가 완료!');
         },
       },
     );
@@ -253,9 +244,7 @@ export default function CalendarSidebar() {
       },
       {
         onSuccess: () => {
-          toast.success('문제 삭제 완료!', {
-            position: 'top-center',
-          });
+          toast.success('문제 삭제 완료!');
         },
       },
     );

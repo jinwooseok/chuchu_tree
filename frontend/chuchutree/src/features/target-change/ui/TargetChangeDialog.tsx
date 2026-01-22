@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, D
 import { usePostTarget } from '@/entities/user';
 import { TARGET_OPTIONS } from '@/shared/constants/target';
 import { TargetCode } from '@/shared/constants/tagSystem';
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 
 interface TargetChangeDialogProps {
   currentTarget?: TargetCode;
@@ -22,15 +22,11 @@ export function TargetChangeDialog({ currentTarget = 'DAILY', onClose }: TargetC
 
   const { mutate: postTarget, isPending: isPostTargetPending } = usePostTarget({
     onSuccess: () => {
-      toast.success('목표가 변경되었습니다.', {
-        position: 'top-center',
-      });
+      toast.success('목표가 변경되었습니다.');
       onClose();
     },
     onError: () => {
-      toast.error('목표 변경에 실패했습니다. 다시 시도해주세요.', {
-        position: 'top-center',
-      });
+      toast.error('목표 변경에 실패했습니다. 다시 시도해주세요.');
     },
   });
 
