@@ -216,6 +216,23 @@ export function AppSidebar() {
                   >
                     <span>{isLogoutPending ? '로그아웃 중...' : '로그아웃'}</span>
                   </DropdownMenuItem>
+                  <div className="text-muted-foreground mx-1 mt-2 flex cursor-default justify-center gap-3 text-xs">
+                    <span
+                      onClick={() => {
+                        router.push('/policies/terms-of-service');
+                      }}
+                    >
+                      이용약관
+                    </span>
+                    <span>|</span>
+                    <span
+                      onClick={() => {
+                        router.push('/policies/privacy');
+                      }}
+                    >
+                      개인정보처리방침
+                    </span>
+                  </div>
                 </DropdownMenuContent>
               </DropdownMenu>
             </SidebarMenuItem>

@@ -5,6 +5,7 @@ import { ThemeButton } from '@/shared/ui';
 import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import { useSyncExternalStore } from 'react';
+import { useRouter } from 'next/navigation';
 
 type SocialWay = (typeof SocialWays)[number];
 
@@ -31,6 +32,7 @@ const SocialLoginButton = ({ theme, ...props }: SocialWay & { theme: string }) =
 
 export default function SignInClient() {
   const { resolvedTheme } = useTheme();
+  const router = useRouter();
   // SSR 안전한 mounted 상태 체크
   const mounted = useSyncExternalStore(
     subscribe,
@@ -71,9 +73,29 @@ export default function SignInClient() {
           </div>
         )}
         <div className="text-muted-foreground mt-4 flex cursor-default gap-1 text-xs">
-          <span className="hover:text-foreground/50">이용약관</span>
-          <span>|</span>
-          <span className="hover:text-foreground/50">개인정보처리방침</span>
+          <div className="text-muted-foreground mx-1 mt-2 flex w-80 cursor-default justify-center gap-1 text-xs">
+            <div>
+              <span>계속 진행하면 만 14세 이상이며, </span>
+              <span
+                className="hover:text-primary/60 cursor-pointer underline"
+                onClick={() => {
+                  router.push('/policies/terms-of-service');
+                }}
+              >
+                이용약관
+              </span>
+              <span> 및 </span>
+              <span
+                className="hover:text-primary/60 cursor-pointer underline"
+                onClick={() => {
+                  router.push('/policies/privacy');
+                }}
+              >
+                개인정보처리방침
+              </span>
+              <span>을 이해하고 동의하는 것으로 간주됩니다.</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
