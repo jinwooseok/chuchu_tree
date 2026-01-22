@@ -1,0 +1,27 @@
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+
+/**
+ * Next.js 16 Proxy
+ * API 요청을 백엔드 서버로 라우팅
+ * - Local 환경: 다른 도메인이므로 프록시 필요
+ * - 배포 환경: Nginx가 처리하므로 실제로는 동작하지 않음
+ */
+export function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  // API 요청을 백엔드로 프록시
+  if (pathname.startsWith('/api/')) {
+    const backendUrl =
+      process.env.NEXT_PUBLIC_BACKEND_URL || 'https://chuchu-tree-dev.duckdns.org';
+    const url = new URL(pathname, backendUrl);
+
+    return NextResponse.rewrite(url);
+  }
+
+  return NextResponse.next();
+}
+
+export const config = {
+  matcher: '/api/:path*',
+};

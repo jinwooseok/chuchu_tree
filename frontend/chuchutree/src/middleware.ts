@@ -43,7 +43,7 @@ export async function middleware(request: NextRequest) {
       if (verifyResponse.status === 401 && refreshToken) {
         // 공통 함수 사용
         console.log('[Middleware] 토큰2개있음');
-        const { success, newCookies } = await refreshAccessToken(refreshToken, '');
+        const { success, newCookies } = await refreshAccessToken(refreshToken, backendUrl);
 
         if (success && newCookies) {
           const response = NextResponse.next();

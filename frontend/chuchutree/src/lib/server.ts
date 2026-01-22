@@ -23,14 +23,11 @@ export async function serverFetch<T>(endpoint: string, options?: RequestInit): P
   const accessToken = cookieStore.get('access_token')?.value;
   const refreshToken = cookieStore.get('refresh_token')?.value;
 
-  let cookieString = [
-    accessToken && `access_token=${accessToken}`,
-    refreshToken && `refresh_token=${refreshToken}`
-  ].filter(Boolean).join('; ');
+  const cookieString = [accessToken && `access_token=${accessToken}`, refreshToken && `refresh_token=${refreshToken}`].filter(Boolean).join('; ');
 
   const requestUrl = `${API_URL}/api/v1/${endpoint}`;
 
-  let response = await fetch(requestUrl, {
+  const response = await fetch(requestUrl, {
     ...options,
     headers: {
       'Content-Type': 'application/json',
@@ -40,52 +37,64 @@ export async function serverFetch<T>(endpoint: string, options?: RequestInit): P
     cache: options?.cache || 'no-store',
   });
 
-  // 401 에러 처리
-  if (response.status === 401 && refreshToken) {
-    const errorData: ApiResponse<any> = await response.json().catch(() => ({}));
-
-    if (errorData.error?.code === 'EXPIRED_TOKEN') {
-      // 공통 함수 사용
-      const { success, newCookies } = await refreshAccessToken(refreshToken, API_URL);
-
-      if (success && newCookies) {
-        cookieString = newCookies;
-
-        // 원래 요청 재시도
-        response = await fetch(requestUrl, {
-          ...options,
-          headers: {
-            'Content-Type': 'application/json',
-            ...options?.headers,
-            Cookie: cookieString,
-          },
-          cache: options?.cache || 'no-store',
-        });
-      } else {
-        throw new ApiResponseError(401, 'REFRESH_FAILED', 'Token refresh failed');
-      }
-    }
-  }
-
+  // 에러 처리 (401 재발급은 isAuthenticated()에서 처리)
   if (!response.ok) {
     const errorData: ApiResponse<any> = await response.json().catch(() => ({}));
-    throw new ApiResponseError(
-      response.status,
-      errorData.error?.code,
-      errorData.error?.message || errorData.message
-    );
+    throw new ApiResponseError(response.status, errorData.error?.code, errorData.error?.message || errorData.message);
   }
 
   const result: ApiResponse<T> = await response.json();
   return result.data;
 }
 
-
-// 인증 여부 확인 헬퍼 함수
+// 인증 여부 확인 헬퍼 함수 (토큰 검증 + 재발급)
 export async function isAuthenticated(): Promise<boolean> {
   const cookieStore = await cookies();
   const accessToken = cookieStore.get('access_token')?.value;
-  return !!accessToken;
+  const refreshToken = cookieStore.get('refresh_token')?.value;
+
+  // 1. 토큰이 없으면 false
+  if (!accessToken) {
+    console.log('[isAuthenticated] No access token');
+    return false;
+  }
+
+  // 2. 토큰 유효성 검증 (백준 계정 조회 API 활용)
+  const verifyUrl = `${API_URL}/api/v1/bj-accounts/me`;
+  try {
+    const verifyResponse = await fetch(verifyUrl, {
+      headers: {
+        Cookie: `access_token=${accessToken}${refreshToken ? `; refresh_token=${refreshToken}` : ''}`,
+      },
+    });
+
+    // 3. 유효하면 true (404는 백준 미연동이지만 인증은 성공)
+    if (verifyResponse.ok || verifyResponse.status === 404) {
+      console.log('[isAuthenticated] Token valid, status:', verifyResponse.status);
+      return true;
+    }
+
+    // 4. 401이면 재발급 시도
+    if (verifyResponse.status === 401 && refreshToken) {
+      console.log('[isAuthenticated] Token expired, attempting refresh');
+      const { success } = await refreshAccessToken(refreshToken, API_URL);
+
+      if (success) {
+        console.log('[isAuthenticated] Token refresh successful');
+      } else {
+        console.log('[isAuthenticated] Token refresh failed');
+      }
+
+      return success;
+    }
+
+    // 5. 기타 에러
+    console.log('[isAuthenticated] Verification failed, status:', verifyResponse.status);
+    return false;
+  } catch (error) {
+    console.error('[isAuthenticated] Error during verification:', error);
+    return false;
+  }
 }
 
 // 쿠키 가져오기 헬퍼 함수
