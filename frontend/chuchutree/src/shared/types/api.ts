@@ -8,8 +8,10 @@ export interface ApiResponse<T = any> {
 }
 
 export interface ApiError {
-  code?: string;
-  message?: string;
+  error: {
+    code?: string;
+    message?: string;
+  };
 }
 
 export type UseMutationCallback = {

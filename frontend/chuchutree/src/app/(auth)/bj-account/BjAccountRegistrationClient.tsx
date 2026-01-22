@@ -40,7 +40,7 @@ export default function BjAccountRegistrationClient() {
       );
     },
     onError: (error) => {
-      const errorMessage = error?.response?.data?.message || '계정 등록에 실패했습니다. 다시 시도해주세요.';
+      const errorMessage = error?.response?.data?.error?.message || '계정 등록에 실패했습니다. 다시 시도해주세요.';
       toast.error(errorMessage, {
         position: 'top-center',
       });

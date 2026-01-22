@@ -39,7 +39,8 @@ export function RecommendationAnswer() {
 
   const updateWillSolve = useUpdateWillSolveProblems({
     onError: (error) => {
-      const errorMessage = error?.response?.data?.message || '문제 등록에 실패했습니다.';
+      const errorCode = error?.response?.data?.error?.code;
+      const errorMessage = errorCode === 'ALREADY_SOLVED_PROBLEM' ? error?.response?.data?.error?.message : '문제 추가에 실패했습니다.';
       toast.error(errorMessage, {
         position: 'top-center',
       });
