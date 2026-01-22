@@ -8,7 +8,7 @@ from fastapi import Response
 
 from app.common.application.command.social_login_command import SocialLoginCommand
 from app.common.application.command.social_login_callback_command import SocialLoginCallbackCommand
-from app.common.domain.entity.auth_event_payloads import FindUserAccountResultPayload, SocialLoginSuccessedPayload
+from app.common.domain.entity.auth_event_payloads import FindUserAccountResultPayload, SocialLoginSuccessedPayload, UserAccountWithdrawalPayload
 from app.common.domain.entity.domain_event import DomainEvent
 from app.common.domain.enums import Provider
 from app.common.domain.service.cookie_service import CookieService
@@ -19,6 +19,8 @@ from app.common.domain.service.token_service import TokenService
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
+from app.user.application.command.get_user_account_info_command import GetUserAccountInfoCommand
+from app.user.application.query.user_account_info_query import GetUserAccountInfoQuery
 
 logger = logging.getLogger()
 class AuthApplicationService:
@@ -77,6 +79,7 @@ class AuthApplicationService:
             state_data = json.loads(base64.b64decode(command.state.encode()).decode())
             csrf_token = state_data.get("csrf_token")
             frontend_redirect_url = state_data.get("frontend_redirect_url")
+            action = state_data.get("action")
         except Exception as e:
             logger.error(f"State 디코딩 실패: {e}")
             raise APIException(ErrorCode.INVALID_REQUEST)
@@ -102,22 +105,72 @@ class AuthApplicationService:
             event_type="SOCIAL_LOGIN_SUCCESSED",
             data=SocialLoginSuccessedPayload(
                 provider=user_info.provider.value,
-                provider_id=user_info.provider_id
+                provider_id=user_info.provider_id,
+                email=user_info.email
             ),
             result_type=FindUserAccountResultPayload
         )
-
+    
         user_account:FindUserAccountResultPayload = await self.domain_event_bus.publish(event)
+        
+        if action == "withdraw":
+            try:
+                await oauth_client.unlink(oauth_token.access_token)
+                logger.info(f"OAuth 연동 해제 성공: provider={provider_enum}, user_id={user_account.user_account_id}")
+            except Exception as e:
+                logger.warning(f"OAuth 연동 해제 실패 (계속 진행): {e}")
 
-        # JWT 토큰 생성 및 쿠키 설정
-        self._create_and_set_tokens(command.response, user_account.user_account_id)
+            if not user_account:
+                logger.error(f"사용자를 찾을 수 없음: provider={provider_enum}, provider_id={user_info.provider_id}")
+                raise APIException(ErrorCode.INVALID_REQUEST)
 
+            # 회원 탈퇴 이벤트 발행 (User, Activity 도메인에서 각자 데이터 삭제)
+            withdrawal_event = DomainEvent(
+                event_type="USER_ACCOUNT_WITHDRAWAL_REQUESTED",
+                data=UserAccountWithdrawalPayload(user_account_id=user_account.user_account_id),
+                result_type=None  # Fire-and-Forget
+            )
+            await self.domain_event_bus.publish(withdrawal_event)
+            logger.info(f"회원 탈퇴 처리 완료: user_id={user_account.user_account_id}")
+
+            # 쿠키 삭제
+            self._clear_auth_cookies(command.response)
+        else:
+            # JWT 토큰 생성 및 쿠키 설정
+            self._create_and_set_tokens(command.response, user_account.user_account_id)
+        
         return frontend_redirect_url
     
     @transactional
     async def logout(self, response: Response):
         self._clear_auth_cookies(response)
-        
+    
+    @transactional
+    async def get_withdraw_url(self, user_account_id: int, frontend_redirect_url: str | None) -> str:
+        """
+        회원탈퇴용 OAuth 인증 URL 생성
+
+        Args:
+            user_account_id: 사용자 계정 ID
+            frontend_redirect_url: 프론트엔드 리다이렉트 URL
+
+        Returns:
+            OAuth 인증 URL
+        """
+        # 사용자 계정 정보 조회 이벤트 발행
+        event = DomainEvent(
+            event_type="GET_USER_ACCOUNT_INFO_REQUESTED",
+            data=GetUserAccountInfoCommand(user_account_id=user_account_id),
+            result_type=GetUserAccountInfoQuery
+        )
+
+        user_account_info: GetUserAccountInfoQuery = await self.domain_event_bus.publish(event)
+
+        # provider 문자열을 enum으로 변환
+        provider_enum = Provider(user_account_info.provider)
+        oauth_client = self._get_oauth_client(provider_enum)
+        return await oauth_client.get_social_login_url(frontend_redirect_url, action="withdraw")
+
     @transactional
     async def refresh_access_token(self, response: Response, refresh_token: Optional[str]):
         if refresh_token is None:

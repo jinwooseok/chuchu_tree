@@ -12,9 +12,9 @@ class GoogleOAuthClient(OAuthClient):
     USER_INFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo"
     REVOKE_URL = "https://oauth2.googleapis.com/revoke"
 
-    async def get_social_login_url(self, frontend_redirect_url: str | None) -> str:
+    async def get_social_login_url(self, frontend_redirect_url: str | None, action: str = "login") -> str:
 
-        encoded_state = await self.encode_redirect_url_to_state(frontend_redirect_url)
+        encoded_state = await self.encode_redirect_url_to_state(frontend_redirect_url, action)
 
         params = {
             "client_id": self.settings.GOOGLE_CLIENT_ID,

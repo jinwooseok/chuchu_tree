@@ -9,6 +9,7 @@ class OAuthUserInfo:
     nickname: str | None
     profile_image_url: str | None
     provider: Provider
+    email: str | None = None
 
 @dataclass(frozen=True)
 class NaverUserInfo(OAuthUserInfo):
@@ -28,7 +29,8 @@ class NaverUserInfo(OAuthUserInfo):
             "response": {
                 "id": "123456789",
                 "nickname": "홍길동",
-                "profile_image": "https://..."
+                "profile_image": "https://...",
+                "email": "user@naver.com"
             }
         }
         """
@@ -37,7 +39,8 @@ class NaverUserInfo(OAuthUserInfo):
         return cls(
             provider_id=user_data.get("id", ""),
             nickname=user_data.get("nickname"),
-            profile_image_url=user_data.get("profile_image")
+            profile_image_url=user_data.get("profile_image"),
+            email=user_data.get("email")
         )
 
 @dataclass(frozen=True)
@@ -51,14 +54,15 @@ class KakaoUserInfo(OAuthUserInfo):
         """
         카카오 API 응답을 KakaoUserInfo 객체로 변환
 
-        카카오 응답 형식 (scope: profile_nickname):
+        카카오 응답 형식 (scope: profile_nickname account_email):
         {
             "id": 123456789,
             "kakao_account": {
                 "profile": {
                     "nickname": "홍길동",
                     "profile_image_url": "https://..."
-                }
+                },
+                "email": "user@kakao.com"
             }
         }
         """
@@ -68,7 +72,8 @@ class KakaoUserInfo(OAuthUserInfo):
         return cls(
             provider_id=str(response.get("id", "")),
             nickname=profile.get("nickname"),
-            profile_image_url=profile.get("profile_image_url")
+            profile_image_url=profile.get("profile_image_url"),
+            email=kakao_account.get("email")
         )
 
 @dataclass(frozen=True)
@@ -86,13 +91,16 @@ class GoogleUserInfo(OAuthUserInfo):
         {
             "sub": "1234567890",
             "name": "홍길동",
-            "picture": "https://..."
+            "picture": "https://...",
+            "email": "user@gmail.com"
         }
         """
+        print(response)
         return cls(
-            provider_id=response.get("sub", ""),
+            provider_id=response.get("id", ""),
             nickname=response.get("name"),
-            profile_image_url=response.get("picture")
+            profile_image_url=response.get("picture"),
+            email=response.get("email")
         )
 
 @dataclass(frozen=True)
@@ -111,11 +119,13 @@ class GitHubUserInfo(OAuthUserInfo):
             "id": 1234567,
             "login": "username",
             "name": "홍길동",
-            "avatar_url": "https://..."
+            "avatar_url": "https://...",
+            "email": "user@example.com"
         }
         """
         return cls(
             provider_id=str(response.get("id", "")),
             nickname=response.get("name") or response.get("login"),
-            profile_image_url=response.get("avatar_url")
+            profile_image_url=response.get("avatar_url"),
+            email=response.get("email")
         )

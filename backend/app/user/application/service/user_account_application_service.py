@@ -11,7 +11,7 @@ from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
 from app.user.application.command.link_bj_account_command import LinkBjAccountCommand
 from app.user.application.command.update_user_target_command import UpdateUserTargetCommand
-from app.user.application.command.user_account_command import CreateUserAccountCommand
+from app.user.application.command.user_account_command import CreateUserAccountCommand, DeleteUserAccountCommand
 from app.user.application.command.get_user_account_info_command import GetUserAccountInfoCommand
 from app.user.application.query.user_account_query import CreateUserAccountQuery
 from app.user.application.query.user_account_info_query import GetUserAccountInfoQuery
@@ -56,9 +56,14 @@ class UserAccountApplicationService:
             provider=provider,
             provider_id=command.provider_id
         )
-        
         # 유저가 이미 존재한다면 새로운 유저가 아님을 알림
         if existing_user:
+            # 기존 사용자의 이메일 업데이트 (변경된 경우만)
+            if command.email and existing_user.email != command.email:
+                existing_user.email = command.email
+                existing_user.updated_at = existing_user.updated_at  # Mapper에서 자동으로 갱신될 수도 있음
+                await self.user_account_repository.update(existing_user)
+
             return CreateUserAccountQuery(
                 user_account_id=existing_user.user_account_id.value,
                 new_user_yn=False
@@ -67,7 +72,8 @@ class UserAccountApplicationService:
         # 3. 신규 사용자 생성
         new_user = UserAccount.create(
             provider=provider,
-            provider_id=command.provider_id
+            provider_id=command.provider_id,
+            email=command.email
         )
 
         saved_user = await self.user_account_repository.insert(new_user)
@@ -188,3 +194,31 @@ class UserAccountApplicationService:
         user_account.set_target(TargetId(value=target_info.target_id))
         print(user_account.targets)
         await self.user_account_repository.update(user_account)
+
+    @event_handler("USER_ACCOUNT_WITHDRAWAL_REQUESTED")
+    async def delete_user_account(
+        self,
+        command: DeleteUserAccountCommand
+    ) -> bool:
+        """
+        사용자 계정 삭제 (Hard Delete)
+
+        Args:
+            command: 사용자 계정 삭제 명령
+
+        Returns:
+            bool: 삭제 성공 여부
+        """
+        user_account_id = UserAccountId(command.user_account_id)
+
+        # 1. 사용자 계정 조회
+        user_account = await self.user_account_repository.find_by_id(user_account_id)
+        if not user_account:
+            logger.warning(f"삭제할 사용자를 찾을 수 없음: user_account_id={command.user_account_id}")
+            return False
+
+        # 2. 사용자 계정 삭제 (Hard Delete)
+        await self.user_account_repository.delete(user_account)
+        logger.info(f"UserAccount 삭제 완료: user_id={command.user_account_id}")
+
+        return True

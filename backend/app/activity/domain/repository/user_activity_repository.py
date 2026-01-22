@@ -94,3 +94,27 @@ class UserActivityRepository(ABC):
     ) -> list[WillSolveProblem]:
         """특정 문제 ID들의 will_solve_problem 조회 (모든 날짜)"""
         pass
+
+    @abstractmethod
+    async def delete_all_by_user_account_id(self, user_account_id: UserAccountId) -> None:
+        """
+        사용자와 연관된 모든 활동 데이터 삭제 (Hard Delete)
+        - tag_custom
+        - problem_record
+        - will_solve_problem
+        - problem_banned_record
+        """
+        pass
+    
+    @abstractmethod
+    async def save_problem_record(
+        self, 
+        problem_record: ProblemRecord
+    ) -> None:
+        """
+        save_problem_record의 Docstring
+        
+        :param problem_record: 문제 기록 엔티티
+        :type problem_record: ProblemRecord
+        """
+        pass
