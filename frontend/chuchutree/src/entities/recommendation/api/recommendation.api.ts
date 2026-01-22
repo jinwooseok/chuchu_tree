@@ -3,11 +3,13 @@ import { axiosInstance } from '@/lib/axios';
 import { ApiResponse } from '@/shared/types/api';
 
 export const RecommendationApi = {
-  getRecommendation: async ({ level, tags }: { level: string; tags: string }): Promise<Recommendation> => {
+  getRecommendation: async ({ level, tags, count, exclusion_mode }: { level: string; tags: string; count: number; exclusion_mode: string }): Promise<Recommendation> => {
     const { data } = await axiosInstance.get<ApiResponse<Recommendation>>('/user-accounts/me/problems', {
       params: {
         level,
         tags,
+        count,
+        exclusion_mode,
       },
     });
     return data.data;

@@ -13,7 +13,8 @@ export const RecommendationKeys = {
 
 export const useGetRecommendation = (callbacks?: UseMutationCallback) => {
   return useMutation({
-    mutationFn: ({ level, tags }: { level: string; tags: string }) => RecommendationApi.getRecommendation({ level, tags }),
+    mutationFn: ({ level, tags, count, exclusion_mode }: { level: string; tags: string; count: number; exclusion_mode: string }) =>
+      RecommendationApi.getRecommendation({ level, tags, count, exclusion_mode }),
     onSuccess: () => {
       if (callbacks?.onSuccess) callbacks?.onSuccess();
     },
