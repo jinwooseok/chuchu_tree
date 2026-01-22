@@ -40,7 +40,7 @@ export async function serverFetch<T>(endpoint: string, options?: RequestInit): P
   // 에러 처리 (401 재발급은 isAuthenticated()에서 처리)
   if (!response.ok) {
     const errorData: ApiResponse<any> = await response.json().catch(() => ({}));
-    throw new ApiResponseError(response.status, errorData.error?.code, errorData.error?.message || errorData.message);
+    throw new ApiResponseError(response.status, errorData.error?.error?.code, errorData.error?.error?.message || errorData.message);
   }
 
   const result: ApiResponse<T> = await response.json();
