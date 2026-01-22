@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { usePatchBjAccount } from '@/entities/bj-account';
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 
 interface BjAccountChangeDialogProps {
   currentBjAccountId: string;
@@ -15,17 +15,17 @@ export function BjAccountChangeDialog({ currentBjAccountId, onClose }: BjAccount
 
   const { mutate: patchAccount, isPending } = usePatchBjAccount({
     onSuccess: () => {
-      toast.success('백준 계정이 변경되었습니다.', { position: 'top-center' });
+      toast.success('백준 계정이 변경되었습니다.');
       onClose();
     },
     onError: () => {
-      toast.error('계정 변경에 실패했습니다. 다시 시도해주세요.', { position: 'top-center' });
+      toast.error('계정 변경에 실패했습니다. 다시 시도해주세요.');
     },
   });
 
   const handleSubmit = () => {
     if (!newBjAccountId.trim()) {
-      toast.error('백준 아이디를 입력해주세요.', { position: 'top-center' });
+      toast.error('백준 아이디를 입력해주세요.');
       return;
     }
     patchAccount({ bjAccount: newBjAccountId.trim() });

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { useRecommendationStore } from '@/lib/store/recommendation';
 import { useGetRecommendation } from '@/entities/recommendation';
 import { useCalendarStore } from '@/lib/store/calendar';
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 import { EyeOff, Search, SlidersHorizontal, ChevronDown, EllipsisVertical } from 'lucide-react';
 import { useState } from 'react';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -34,16 +34,12 @@ export function RecommendationButton() {
       onSuccess: (data) => {
         setProblems(data.problems);
         setLoading(false);
-        toast.success('문제 추천을 받았습니다.', {
-          position: 'top-center',
-        });
+        toast.success('문제 추천을 받았습니다.');
       },
       onError: (error) => {
         setError(error);
         setLoading(false);
-        toast.error('문제 추천에 실패했습니다.', {
-          position: 'top-center',
-        });
+        toast.error('문제 추천에 실패했습니다.');
       },
     });
   };

@@ -14,7 +14,7 @@ import { TargetChangeDialog } from '@/features/target-change';
 import { BjAccountChangeDialog } from '@/features/bj-account-change';
 import { TargetCode } from '@/shared/constants/tagSystem';
 import { useModal } from '@/lib/providers/modal-provider';
-import { toast } from 'sonner';
+import { toast } from '@/lib/utils/toast';
 import { useLogout } from '@/entities/auth';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
@@ -45,9 +45,7 @@ export function AppSidebar() {
       availableDate.setDate(availableDate.getDate() + 7);
       const dateString = availableDate.toLocaleDateString().split('.').slice(1);
       const dateStringKr = `${dateString[0]}월${dateString[1]}일` || '';
-      toast.error(`계정 재설정은 7일에 한 번만 가능합니다. ${dateStringKr} 이후에 다시 시도해주세요.`, {
-        position: 'top-center',
-      });
+      toast.error(`계정 재설정은 7일에 한 번만 가능합니다. ${dateStringKr} 이후에 다시 시도해주세요.`);
       return;
     }
     openModal('bj-account-change', <BjAccountChangeDialog currentBjAccountId={user?.bjAccount?.bjAccountId || ''} onClose={() => closeModal('bj-account-change')} />);
@@ -56,15 +54,11 @@ export function AppSidebar() {
   // 로그아웃 훅 및 핸들러
   const { mutate: logout, isPending: isLogoutPending } = useLogout({
     onSuccess: () => {
-      toast.success('로그아웃되었습니다.', {
-        position: 'top-center',
-      });
+      toast.success('로그아웃되었습니다.');
       router.push('/sign-in');
     },
     onError: () => {
-      toast.error('로그아웃에 실패했습니다. 다시 시도해주세요.', {
-        position: 'top-center',
-      });
+      toast.error('로그아웃에 실패했습니다. 다시 시도해주세요.');
     },
   });
 
