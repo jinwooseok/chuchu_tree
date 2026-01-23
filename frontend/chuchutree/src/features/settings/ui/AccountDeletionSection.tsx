@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
-import { toast } from '@/lib/utils/toast';
 
 export default function AccountDeletionSection() {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -33,8 +32,16 @@ export default function AccountDeletionSection() {
   };
 
   const handleAccountDeletion = () => {
-    toast.info('계정 삭제 기능은 준비 중입니다.');
-    handleDialogClose();
+    // 백엔드 OAuth 재인증 플로우 시작
+    // 브라우저가 직접 백엔드 URL로 이동 (소셜 로그인과 동일한 방식)
+    const API_URL = process.env.NEXT_PUBLIC_API_URL || '';
+    const baseUrl = API_URL ? `${API_URL}/api/v1` : '/api/v1';
+
+    // local 환경에서만 redirectUrl 파라미터 추가
+    const redirectUrl = process.env.NODE_ENV === 'development' ? '?redirectUrl=http://localhost:3000' : '';
+
+    // 백엔드로 이동 → 소셜 재로그인 → callback → 계정 삭제 → 홈 리다이렉트
+    window.location.href = `${baseUrl}/auth/withdraw${redirectUrl}`;
   };
 
   return (
