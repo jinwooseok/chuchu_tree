@@ -121,8 +121,11 @@ export default function BjAccountRegistrationClient() {
                     className="text-primary focus:ring-primary mt-1 h-4 w-4"
                   />
                   <div className="flex-1">
-                    <div className="font-medium">{option.label}</div>
-                    <div className="text-muted-foreground text-xs">{option.description}</div>
+                    <div className="mb-2 flex items-center gap-2">
+                      <div className="font-medium">{option.label}</div>
+                      <div className="text-muted-foreground text-xs">{option.description}</div>
+                    </div>
+                    <div className="text-muted-foreground text-xs">{option.description2}</div>
                   </div>
                 </label>
               ))}

@@ -16,17 +16,9 @@ export const useLogout = (callbacks?: UseMutationCallback) => {
   return useMutation({
     mutationFn: authApi.logout,
     onSuccess: () => {
-      // Clear all query cache on logout
       queryClient.clear();
-      // 특정 쿠키만 삭제 (accessToken, refreshToken 등)
-      const cookiesToDelete = ['access_token', 'refresh_token'];
-      cookiesToDelete.forEach((cookieName) => {
-        document.cookie = `${cookieName}=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
-      });
-      // storage clear
       localStorage.clear();
       sessionStorage.clear();
-
       if (callbacks?.onSuccess) callbacks.onSuccess();
     },
     onError: (error) => {

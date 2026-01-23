@@ -26,6 +26,8 @@ export function RecommendationButton() {
   const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
   const [selectedTagsList, setSelectedTagsList] = useState<string[]>([]);
   const [selectedExclusionMode, setSelectedExclusionMode] = useState<string>('LENIENT');
+  const [selectedCount, setSelectedCount] = useState<number>(3);
+  const [isCountPopoverOpen, setIsCountPopoverOpen] = useState(false);
 
   const { mutate: getRecommendation, isPending } = useGetRecommendation();
 
@@ -52,12 +54,11 @@ export function RecommendationButton() {
     const levelParam = selectedLevels.length === 0 ? '[]' : JSON.stringify(selectedLevels.map((l) => l.toUpperCase()));
 
     const tagsParam = selectedTagsList.length === 0 ? '[]' : JSON.stringify(selectedTagsList);
-    const count = 3;
 
     handleGetRecommendation({
       level: levelParam,
       tags: tagsParam,
-      count: count,
+      count: selectedCount,
       exclusion_mode: selectedExclusionMode,
     });
   };
@@ -74,6 +75,11 @@ export function RecommendationButton() {
   // ExclusionMode 토글 핸들러
   const toggleExclusionMode = (mode: string) => {
     setSelectedExclusionMode(() => mode);
+  };
+  // count 토글 핸들러
+  const toggleCount = (cnt: number) => {
+    setSelectedCount(() => cnt);
+    setIsCountPopoverOpen(false);
   };
 
   const levels = ['easy', 'normal', 'hard', 'extreme'] as const;
@@ -104,6 +110,8 @@ export function RecommendationButton() {
     const day = selectedDate.getDate();
     return `${month}월 ${day}일`;
   };
+
+  const etcIsChanged = selectedExclusionMode !== 'LENIENT' || selectedCount !== 3;
 
   return (
     <div className="flex h-full gap-1">
@@ -237,8 +245,8 @@ export function RecommendationButton() {
         )}
         {showExcludedModeSection && (
           <div>
-            <div className="text-muted-foreground mb-4 cursor-default text-xs font-semibold">제외된 태그 설정</div>
-            <div className="space-y-5">
+            <div className="text-muted-foreground mb-2 cursor-default text-xs font-semibold">제외된 태그 설정</div>
+            <div className="space-y-2">
               <label key="ExcludedModeSTRICT" aria-label="ExcludedModeSTRICT" className="hover:bg-background/60 flex cursor-pointer items-start gap-2 rounded">
                 <input
                   type="checkbox"
@@ -247,7 +255,7 @@ export function RecommendationButton() {
                   className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 shrink-0 cursor-pointer appearance-none rounded border-2"
                 />
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs">완전 제외</span>
+                  <span className="text-xs">엄격한 제외</span>
                   <span className="text-muted-foreground text-xs">제외된 유형이 절대 추천되지 않음</span>
                 </div>
               </label>
@@ -259,14 +267,46 @@ export function RecommendationButton() {
                   className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 shrink-0 cursor-pointer appearance-none rounded border-2"
                 />
                 <div className="flex flex-col gap-1">
-                  <span className="text-xs">추천 기준 제외</span>
+                  <span className="text-xs">느슨한 제외</span>
                   <span className="text-muted-foreground text-xs">제외된 유형 때문에 추천되지는 않음</span>
                 </div>
               </label>
             </div>
-            {selectedExclusionMode !== 'LENIENT' && (
-              <div className="mt-4 mr-2 flex justify-end">
-                <button onClick={() => toggleExclusionMode('LENIENT')} aria-label="제외된 태그 설정 초기화" className="text-muted-foreground hover:text-foreground text-xs underline">
+            <div className="mt-2 mr-2 flex items-center justify-between text-xs">
+              <div className="text-muted-foreground cursor-default font-semibold">추천 문제수</div>
+              <Popover open={isCountPopoverOpen} onOpenChange={setIsCountPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button aria-label="문제수 선택" variant="outline" className="h-6 w-4 cursor-pointer text-xs">
+                    {selectedCount}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-16 p-2">
+                  <div className="max-h-64 space-y-2 overflow-y-auto">
+                    {[1, 2, 3, 4, 5, 6].map((cnt) => (
+                      <label key={`문제수${cnt}`} aria-label={`문제수${cnt}`} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded p-1">
+                        <input
+                          type="checkbox"
+                          checked={selectedCount === cnt}
+                          onChange={() => toggleCount(cnt)}
+                          className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 cursor-pointer appearance-none rounded border-2"
+                        />
+                        <span className="text-xs">{cnt}</span>
+                      </label>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+            {etcIsChanged && (
+              <div className="mt-2 mr-2 flex justify-end">
+                <button
+                  onClick={() => {
+                    toggleExclusionMode('LENIENT');
+                    setSelectedCount(3);
+                  }}
+                  aria-label="제외된 태그 설정 초기화"
+                  className="text-muted-foreground hover:text-foreground text-xs underline"
+                >
                   초기화
                 </button>
               </div>

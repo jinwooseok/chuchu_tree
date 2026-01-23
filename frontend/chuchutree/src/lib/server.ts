@@ -59,8 +59,8 @@ export async function isAuthenticated(): Promise<boolean> {
     return false;
   }
 
-  // 2. 토큰 유효성 검증 (백준 계정 조회 API 활용)
-  const verifyUrl = `${API_URL}/api/v1/bj-accounts/me`;
+  // 2. 토큰 유효성 검증
+  const verifyUrl = `${API_URL}/api/v1/auth/me`;
   try {
     const verifyResponse = await fetch(verifyUrl, {
       headers: {
