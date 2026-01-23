@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, ChevronUp, Dices, Gem, Leaf, LibraryBig, PanelLeft, User2 } from 'lucide-react';
+import { Calendar, ChevronUp, Dices, Gem, Leaf, LibraryBig, PanelLeft, User2, Settings, Ban, LogOut } from 'lucide-react';
 import { useLayoutStore } from '@/lib/store/layout';
 import { useUser } from '@/entities/user/model/queries';
 import { useRouter } from 'next/navigation';
@@ -9,9 +9,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupActio
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSidebar } from '@/components/ui/sidebar';
 import Image from 'next/image';
-import { ThemeButton } from '@/shared/ui';
-import { TargetChangeDialog } from '@/features/target-change';
-import { BjAccountChangeDialog } from '@/features/bj-account-change';
+import { SettingsDialog } from '@/features/settings';
 import { TargetCode } from '@/shared/constants/tagSystem';
 import { useModal } from '@/lib/providers/modal-provider';
 import { toast } from '@/lib/utils/toast';
@@ -28,28 +26,6 @@ export function AppSidebar() {
   const { data: user } = useUser();
   const { openModal, closeModal } = useModal();
   const router = useRouter();
-
-  // 7일 체크 함수
-  const canChangeAccount = () => {
-    if (!user?.linkedAt) return false;
-    const linkedDate = new Date(user.linkedAt);
-    const now = new Date();
-    const diffInDays = Math.floor((now.getTime() - linkedDate.getTime()) / (1000 * 60 * 60 * 24));
-    return diffInDays >= 7;
-  };
-
-  const handleAccountChange = () => {
-    if (!canChangeAccount()) {
-      const linkedDate = new Date(user?.linkedAt || '');
-      const availableDate = new Date(linkedDate);
-      availableDate.setDate(availableDate.getDate() + 7);
-      const dateString = availableDate.toLocaleDateString().split('.').slice(1);
-      const dateStringKr = `${dateString[0]}월${dateString[1]}일` || '';
-      toast.error(`계정 재설정은 7일에 한 번만 가능합니다. ${dateStringKr} 이후에 다시 시도해주세요.`);
-      return;
-    }
-    openModal('bj-account-change', <BjAccountChangeDialog currentBjAccountId={user?.bjAccount?.bjAccountId || ''} onClose={() => closeModal('bj-account-change')} />);
-  };
 
   // 로그아웃 훅 및 핸들러
   const { mutate: logout } = useLogout({
@@ -176,22 +152,22 @@ export function AppSidebar() {
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
-                  <ThemeButton />
                   <DropdownMenuItem
                     onSelect={(e) => {
                       e.preventDefault();
-                      handleAccountChange();
+                      openModal(
+                        'settings',
+                        <SettingsDialog
+                          currentBjAccountId={user?.bjAccount?.bjAccountId || ''}
+                          currentTarget={user?.userAccount?.target?.targetCode as TargetCode}
+                          linkedAt={user?.linkedAt}
+                          onClose={() => closeModal('settings')}
+                        />
+                      );
                     }}
                   >
-                    <span>연동 계정 재설정</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      openModal('target-change', <TargetChangeDialog currentTarget={user?.userAccount?.target?.targetCode as TargetCode} onClose={() => closeModal('target-change')} />);
-                    }}
-                  >
-                    <span>목표 변경</span>
+                    <Settings className="mr-2 h-4 w-4" />
+                    <span>설정</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={(e) => {
@@ -199,6 +175,7 @@ export function AppSidebar() {
                       openModal('banned-problems-list', <BannedProblemsDialog onClose={() => closeModal('banned-problems-list')} />);
                     }}
                   >
+                    <Ban className="mr-2 h-4 w-4" />
                     <span>제외된 문제</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
@@ -207,25 +184,9 @@ export function AppSidebar() {
                       handleLogout();
                     }}
                   >
+                    <LogOut className="mr-2 h-4 w-4" />
                     <span>로그아웃</span>
                   </DropdownMenuItem>
-                  <div className="text-muted-foreground mx-1 mt-2 flex cursor-default justify-center gap-3 text-xs">
-                    <span
-                      onClick={() => {
-                        router.push('/policies/terms-of-service');
-                      }}
-                    >
-                      이용약관
-                    </span>
-                    <span>|</span>
-                    <span
-                      onClick={() => {
-                        router.push('/policies/privacy');
-                      }}
-                    >
-                      개인정보처리방침
-                    </span>
-                  </div>
                 </DropdownMenuContent>
               </DropdownMenu>
             </SidebarMenuItem>
