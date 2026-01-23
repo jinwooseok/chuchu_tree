@@ -101,9 +101,35 @@ class UserAccountRepositoryImpl(UserAccountRepository):
     async def update(self, user_account: UserAccount) -> None:
         # 1. 엔티티를 (자식이 포함된) 모델로 변환
         model = UserAccountMapper.to_model(user_account)
-        
+
         # 2. 세션에 병합
         await self.session.merge(model)
-        
+
         # 3. 변경사항 확정
         await self.session.flush()
+
+    async def delete(self, user_account: UserAccount) -> None:
+        """
+        사용자 계정 삭제 (Hard Delete)
+        연관 데이터(targets, account_links)도 함께 삭제
+        """
+        from sqlalchemy import delete
+        from app.user.infra.model.user_target import UserTargetModel
+        from app.user.infra.model.account_link import AccountLinkModel
+
+        user_id_value = user_account.user_account_id.value
+
+        # 1. user_target 삭제
+        await self.session.execute(
+            delete(UserTargetModel).where(UserTargetModel.user_account_id == user_id_value)
+        )
+
+        # 2. account_link 삭제
+        await self.session.execute(
+            delete(AccountLinkModel).where(AccountLinkModel.user_account_id == user_id_value)
+        )
+
+        # 3. user_account 삭제
+        await self.session.execute(
+            delete(UserAccountModel).where(UserAccountModel.user_account_id == user_id_value)
+        )

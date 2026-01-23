@@ -144,7 +144,7 @@ class GetUserTagsUsecase:
             recommendation_yn = not (excluded_yn or locked_yn)
 
             # DTO 생성
-            account_stat = self._create_account_stat(stat, current_level, tiers_dict)
+            account_stat = self._create_account_stat(stat, current_level, tiers_dict, bj_account.current_tier_id.value)
             next_level_stat = self._create_next_level_stat(current_level, tag, tag_skills_dict, tiers_dict)
             
             # Fix alias query: tag.aliases is list[str], not list[dict]
@@ -219,6 +219,7 @@ class GetUserTagsUsecase:
         stat: TagAccountStat | None,
         current_level: SkillCode,
         tiers_dict: dict[int, Tier],
+        user_current_tier_id: int
     ) -> AccountStatQuery:
         """유저 통계 생성"""
         if not stat:
@@ -236,7 +237,7 @@ class GetUserTagsUsecase:
         return AccountStatQuery(
             current_level=self._skill_code_full_names.get(current_level, current_level.value),
             solved_problem_count=stat.solved_problem_count,
-            required_min_tier=highest_tier_id_str,
+            required_min_tier=user_current_tier_id,
             higher_problem_tier=highest_tier_id_str,
             last_solved_date=stat.last_solved_date,
         )

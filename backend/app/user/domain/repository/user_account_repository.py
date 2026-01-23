@@ -35,3 +35,11 @@ class UserAccountRepository(ABC):
     async def update(self, user_account: UserAccount) -> UserAccount:
         """유저 업데이트"""
         pass
+
+    @abstractmethod
+    async def delete(self, user_account: UserAccount) -> None:
+        """
+        사용자 계정 삭제 (Hard Delete)
+        연관 데이터(targets, account_links)도 함께 삭제
+        """
+        pass

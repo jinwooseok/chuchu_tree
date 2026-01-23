@@ -5,6 +5,7 @@ from collections import defaultdict
 from datetime import date
 
 from app.activity.application.command.ban_problem_command import BanProblemCommand
+from app.activity.application.command.delete_user_activity_command import DeleteUserActivityCommand
 from app.activity.application.command.tag_custom_command import TagCustomCommand
 from app.activity.application.command.update_solved_problems_command import UpdateSolvedProblemsCommand
 from app.activity.application.command.update_solved_will_solve_problems_command import UpdateSolvedAndWillSolveProblemsCommand
@@ -366,7 +367,7 @@ class ActivityApplicationService:
         # 중복된 ID가 포함되어 있는지 체크
         if len(problem_ids) != len(set(problem_ids)):
             raise APIException(ErrorCode.DUPLICATED_ORDER)
-        
+
     @transactional
     async def get_banned_problems(self, user_account_id: int):
         user_id = UserAccountId(user_account_id)
@@ -390,8 +391,8 @@ class ActivityApplicationService:
 
         # ProblemsInfoQuery의 problems dict를 list로 변환
         banned_problem_list = list(problems_info.problems.values())
-        return BannedProblemsQuery(banned_problem_list=banned_problem_list) 
-    
+        return BannedProblemsQuery(banned_problem_list=banned_problem_list)
+
     @transactional
     async def get_banned_tags(self, user_account_id: int):
         user_id = UserAccountId(user_account_id)
@@ -414,3 +415,25 @@ class ActivityApplicationService:
             return BannedTagsQuery(banned_tag_list=[])
 
         return BannedTagsQuery(banned_tag_list=result.tags)
+
+    @event_handler("USER_ACCOUNT_WITHDRAWAL_REQUESTED")
+    async def delete_user_activity(
+        self,
+        command: DeleteUserActivityCommand
+    ) -> bool:
+        """
+        사용자 활동 데이터 삭제 (Hard Delete)
+
+        Args:
+            command: 사용자 활동 데이터 삭제 명령
+
+        Returns:
+            bool: 삭제 성공 여부
+        """
+        user_account_id = UserAccountId(command.user_account_id)
+
+        # 사용자 활동 데이터 삭제 (problem_record, will_solve_problem, tag_custom, problem_banned_record)
+        await self.user_activity_repository.delete_all_by_user_account_id(user_account_id)
+        logger.info(f"UserActivity 데이터 삭제 완료: user_id={command.user_account_id}")
+
+        return True

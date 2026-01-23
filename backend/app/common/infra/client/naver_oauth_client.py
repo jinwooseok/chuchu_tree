@@ -10,9 +10,9 @@ class NaverOAuthClient(OAuthClient):
     TOKEN_URL = "https://nid.naver.com/oauth2.0/token"
     USER_INFO_URL = "https://openapi.naver.com/v1/nid/me"
     
-    async def get_social_login_url(self, frontend_redirect_url: str | None) -> str:
+    async def get_social_login_url(self, frontend_redirect_url: str | None, action: str = "login") -> str:
 
-        encoded_state = await self.encode_redirect_url_to_state(frontend_redirect_url)
+        encoded_state = await self.encode_redirect_url_to_state(frontend_redirect_url, action)
 
         params = {
             "response_type": "code",

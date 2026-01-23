@@ -110,8 +110,8 @@ async def health_check():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("app.main:app",
-                host="127.0.0.1",
+                host="localhost",
                 port=8000,
                 reload=True, # 개발버전용 reload=True / 배포버전은 False
                 log_config=None # uvicorn 기본 로깅 비활성화
-)
+) 

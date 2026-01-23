@@ -10,11 +10,20 @@ class SocialLoginSuccessedPayload(BaseModel):
 
     provider: str = Field(..., description="OAuth 제공자 (KAKAO, NAVER, GOOGLE)")
     provider_id: str = Field(..., description="제공자의 고유 사용자 ID")
+    email: str | None = Field(None, description="사용자 이메일")
 
 
 class FindUserAccountResultPayload(BaseModel):
     """
     사용자 계정 결과 페이로드 (User → Auth)
     """
-    
+
     user_account_id: int = Field(..., description="사용자 계정 ID")
+
+
+class UserAccountWithdrawalPayload(BaseModel):
+    """
+    사용자 탈퇴 요청 페이로드 (Auth → User, Activity)
+    """
+
+    user_account_id: int = Field(..., description="탈퇴할 사용자 계정 ID")

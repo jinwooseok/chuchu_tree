@@ -20,6 +20,7 @@ class ProblemRecordModel(Base):
     user_account_id: Mapped[int] = mapped_column(Integer, ForeignKey('user_account.user_account_id'), nullable=False)
     problem_id: Mapped[int] = mapped_column(Integer, ForeignKey('problem.problem_id'), nullable=False)
     marked_date: Mapped[Optional[date]] = mapped_column(Date, nullable=True)
+    representative_tag_id: Mapped[int|None] = mapped_column(Integer, nullable=True)
     order: Mapped[int] = mapped_column(Integer, nullable=False)
     solved_yn: Mapped[bool] = mapped_column(Boolean, nullable=False)
     memo_title: Mapped[str|None] = mapped_column(String(500), nullable=True)

@@ -198,20 +198,6 @@ class Container(containers.DeclarativeContainer):
     )
 
     # ========================================================================
-    # Application Services
-    # ========================================================================
-    auth_application_service = providers.Singleton(
-        AuthApplicationService,
-        token_service=token_service,
-        cookie_service=cookie_service,
-        domain_event_bus=domain_event_bus,
-        kakao_oauth_client=kakao_oauth_client,
-        naver_oauth_client=naver_oauth_client,
-        google_oauth_client=google_oauth_client,
-        github_oauth_client=github_oauth_client
-    )
-
-    # ========================================================================
     # UserAccount (유저의 계정 도메인) 
     # ========================================================================
 
@@ -318,6 +304,20 @@ class Container(containers.DeclarativeContainer):
         domain_event_bus=domain_event_bus,
         baekjoon_account_repository=baekjoon_account_repository,
         problem_history_repository=problem_history_repository,
+    )
+    
+    # ========================================================================
+    # Application Services
+    # ========================================================================
+    auth_application_service = providers.Singleton(
+        AuthApplicationService,
+        token_service=token_service,
+        cookie_service=cookie_service,
+        domain_event_bus=domain_event_bus,
+        kakao_oauth_client=kakao_oauth_client,
+        naver_oauth_client=naver_oauth_client,
+        google_oauth_client=google_oauth_client,
+        github_oauth_client=github_oauth_client
     )
 
     # ========================================================================

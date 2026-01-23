@@ -14,6 +14,7 @@ class UserAccount:
     user_account_id: UserAccountId|None
     provider: Provider
     provider_id: str|None
+    email: str|None
     profile_image: str|None
     registered_at: datetime
     created_at: datetime
@@ -23,13 +24,14 @@ class UserAccount:
     targets: list[UserTarget] = field(default_factory=list)
     
     @staticmethod
-    def create(provider: Provider, provider_id: str|None) -> 'UserAccount':
+    def create(provider: Provider, provider_id: str|None, email: str|None = None) -> 'UserAccount':
         now = datetime.now()
         return UserAccount(
             user_account_id=None,  # DB에서 할당
             provider=provider,
-            profile_image=None,
             provider_id=provider_id,
+            email=email,
+            profile_image=None,
             registered_at=now,
             created_at=now,
             updated_at=now,

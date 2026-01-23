@@ -22,7 +22,7 @@ class OAuthClient(ABC):
         await self.client.aclose()
     
     @abstractmethod
-    async def get_social_login_url(frontend_redirect_url: str | None) -> str:
+    async def get_social_login_url(self, frontend_redirect_url: str | None, action: str = "login") -> str:
         pass
     
     @abstractmethod
@@ -40,29 +40,34 @@ class OAuthClient(ABC):
         """OAuth 연동 해제"""
         pass
     
-    async def encode_redirect_url_to_state(self, url: str):
+    async def encode_redirect_url_to_state(self, url: str, action: str = "login"):
         """
-        CSRF 토큰과 redirect URL을 state에 인코딩
+        CSRF 토큰과 redirect URL, action을 state에 인코딩
         CSRF 토큰은 Gateway를 통해 15분간 저장되어 콜백에서 검증됨
+
+        Args:
+            url: 프론트엔드 리다이렉트 URL
+            action: "login" 또는 "withdraw" (기본값: "login")
         """
         import base64
         import json
 
         # CSRF 토큰 생성 (32바이트 URL-safe 랜덤 문자열)
         csrf_token = secrets.token_urlsafe(32)
-    
+
         # Gateway를 통해 CSRF 토큰 저장 (15분 만료)
         if self.csrf_gateway:
             await self.csrf_gateway.store_token(csrf_token, ttl_minutes=15)
-        
+
         # Redirect URL 결정
         redirect_url = url if (url and os.getenv("environment") != "prod") else self.settings.FRONTEND_REDIRECT_URI
 
-                
+
         # State 데이터 구성
         state_data = {
             "csrf_token": csrf_token,
-            "frontend_redirect_url": redirect_url
+            "frontend_redirect_url": redirect_url,
+            "action": action
         }
 
         # Base64 인코딩

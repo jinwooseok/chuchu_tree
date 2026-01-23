@@ -55,6 +55,11 @@ class RecommendProblemsUsecase:
         self.tier_repository = tier_repository
         self.problem_history_repository = problem_history_repository
         self.target_repository = target_repository
+        self.skill_name_map = {
+            "AD": "ADVANCED",
+            "MAS": "MASTER",
+            "IM": "INTERMEDIATE"
+        }
     
     @transactional
     async def execute(
@@ -406,9 +411,9 @@ class RecommendProblemsUsecase:
         # 0. 타겟 태그 체크
         if target_tag_ids and tag_stat.tag_id.value in target_tag_ids:
             if target_display_name:
-                reasons.append(f"'{target_display_name}' 목표에 잘 어울리는 문제입니다.")
+                reasons.append(f"{target_display_name} 목표에 잘 어울리는 문제입니다.")
             else:
-                reasons.append(f"'{tag_name}'은(는) 현재 목표에 포함된 태그입니다!")
+                reasons.append(f"{tag_name}은(는) 현재 목표에 포함된 태그입니다!")
 
         # 1. 처음 푸는 태그 체크 (solved_problem_count로 정확히 확인)
         if tag_stat.solved_problem_count == 0:
@@ -450,7 +455,7 @@ class RecommendProblemsUsecase:
 
         # 5. 기본 메시지 (사유가 없을 때만)
         if not reasons:
-            reasons.append(f"'{tag_name}' 숙련도를 높일 시간입니다.")
+            reasons.append(f"'{self.skill_name_map[tag_name]}' 숙련도를 높일 시간입니다.")
 
         if len(reasons) > 1:
             random.shuffle(reasons)

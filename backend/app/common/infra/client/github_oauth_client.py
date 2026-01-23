@@ -11,14 +11,14 @@ class GitHubOAuthClient(OAuthClient):
     TOKEN_URL = "https://github.com/login/oauth/access_token"
     USER_INFO_URL = "https://api.github.com/user"
 
-    async def get_social_login_url(self, frontend_redirect_url: str | None) -> str:
+    async def get_social_login_url(self, frontend_redirect_url: str | None, action: str = "login") -> str:
 
-        encoded_state = await self.encode_redirect_url_to_state(frontend_redirect_url)
+        encoded_state = await self.encode_redirect_url_to_state(frontend_redirect_url, action)
 
         params = {
             "client_id": self.settings.GITHUB_CLIENT_ID,
             "redirect_uri": self.settings.GITHUB_REDIRECT_URI,
-            "scope": "read:user",
+            "scope": "read:user user:email",
             "state": encoded_state,
         }
 
@@ -61,7 +61,31 @@ class GitHubOAuthClient(OAuthClient):
         return GitHubUserInfo.from_api_response(user_data)
 
     async def unlink(self, access_token: str) -> bool:
-        """깃허브 연동 해제 (GitHub는 revoke endpoint가 없으므로 토큰을 로컬에서만 삭제)"""
-        # GitHub doesn't provide a revoke endpoint
-        # In a real implementation, you would delete the token from your database
-        return True
+        """
+        깃허브 연동 해제
+
+        API: DELETE https://api.github.com/applications/{CLIENT_ID}/grant
+        Headers: Basic Auth (CLIENT_ID, CLIENT_SECRET)
+        Body: {"access_token": "..."}
+        성공 시: 204 No Content
+        """
+        import base64
+
+        url = f"https://api.github.com/applications/{self.settings.GITHUB_CLIENT_ID}/grant"
+
+        # Basic Auth 인증 헤더 생성
+        credentials = f"{self.settings.GITHUB_CLIENT_ID}:{self.settings.GITHUB_CLIENT_SECRET}"
+        basic_auth = base64.b64encode(credentials.encode()).decode()
+
+        headers = {
+            "Authorization": f"Basic {basic_auth}",
+            "Accept": "application/json",
+            "Content-Type": "application/json"
+        }
+
+        body = {"access_token": access_token}
+
+        response = await self.client.delete(url, headers=headers, json=body)
+        response.raise_for_status()
+
+        return response.status_code == 204

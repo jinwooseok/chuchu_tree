@@ -6,6 +6,7 @@ from app.common.application.command.social_login_command import SocialLoginComma
 from app.common.application.command.social_login_callback_command import SocialLoginCallbackCommand
 from app.common.application.service.auth_application_service import AuthApplicationService
 from app.common.domain.vo.current_user import CurrentUser
+from app.common.domain.vo.identifiers import UserAccountId
 from app.common.presentation.dependency.auth_dependencies import get_current_member
 from app.core.containers import Container
 from app.core.api_response import ApiResponse, ApiResponseSchema
@@ -51,7 +52,6 @@ async def handle_social_login_callback(
     # 기존 response의 쿠키 복사
     for cookie in response.headers.getlist("set-cookie"):
         redirect_response.headers.append("set-cookie", cookie)
-
     return redirect_response
 
 @router.get("/login/{provider}", response_model=ApiResponseSchema[dict])
@@ -116,3 +116,24 @@ async def me(
     current_user: CurrentUser = Depends(get_current_member),
 ):
     return ApiResponse()
+
+@router.get("/withdraw", response_model=ApiResponseSchema[dict])
+@inject
+async def get_withdraw_url(
+    request: Request,
+    frontend_redirect_url: str | None = Query(None, alias="redirectUrl"),
+    current_user: CurrentUser = Depends(get_current_member),
+    auth_application_service: AuthApplicationService = Depends(Provide[Container.auth_application_service]),
+):
+    """
+    회원탈퇴용 OAuth 재인증 URL 생성
+
+    Args:
+        frontend_redirect_url: 탈퇴 완료 후 리다이렉트할 프론트엔드 URL
+
+    Returns:
+        OAuth 인증 URL (사용자를 이 URL로 리다이렉트해야 함)
+    """
+    withdraw_url = await auth_application_service.get_withdraw_url(current_user.user_account_id, frontend_redirect_url)
+
+    return RedirectResponse(url=withdraw_url, status_code=302)

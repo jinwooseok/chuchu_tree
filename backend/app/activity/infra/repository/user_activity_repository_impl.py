@@ -204,6 +204,19 @@ class UserActivityRepositoryImpl(UserActivityRepository):
             model = ProblemRecordMapper.to_model(entity)
             await self.session.merge(model)
         await self.session.flush()
+    
+    @override
+    async def save_problem_record(
+        self, 
+        problem_record: ProblemRecord
+    ) -> None:
+        """저장 및 업데이트 (Upsert)"""
+        if not problem_record:
+            return
+
+        model = ProblemRecordMapper.to_model(problem_record)
+        await self.session.merge(model)
+        await self.session.flush()
 
     @override
     async def find_only_tag_custom_by_user_account_id(
@@ -312,4 +325,37 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         result = await self.session.execute(stmt)
         models = result.scalars().all()
 
-        return [WillSolveProblemMapper.to_entity(model) for model in models]   
+        return [WillSolveProblemMapper.to_entity(model) for model in models]
+
+    @override
+    async def delete_all_by_user_account_id(self, user_account_id: UserAccountId) -> None:
+        """
+        사용자와 연관된 모든 활동 데이터 삭제 (Hard Delete)
+        - tag_custom
+        - problem_record
+        - will_solve_problem
+        - problem_banned_record
+        """
+        from sqlalchemy import delete
+
+        user_id_value = user_account_id.value
+
+        # 1. tag_custom 삭제
+        await self.session.execute(
+            delete(TagCustomModel).where(TagCustomModel.user_account_id == user_id_value)
+        )
+
+        # 2. problem_record 삭제
+        await self.session.execute(
+            delete(ProblemRecordModel).where(ProblemRecordModel.user_account_id == user_id_value)
+        )
+
+        # 3. will_solve_problem 삭제
+        await self.session.execute(
+            delete(WillSolveProblemModel).where(WillSolveProblemModel.user_account_id == user_id_value)
+        )
+
+        # 4. problem_banned_record 삭제
+        await self.session.execute(
+            delete(ProblemBannedRecordModel).where(ProblemBannedRecordModel.user_account_id == user_id_value)
+        )   
