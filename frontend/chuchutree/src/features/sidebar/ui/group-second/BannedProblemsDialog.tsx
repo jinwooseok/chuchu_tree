@@ -11,7 +11,7 @@ interface props {
   onClose: () => void;
 }
 
-export default function BannedProblemsDialog({ onClose }: props) {
+export function BannedProblemsDialog({ onClose }: props) {
   const { data: bannedProblemsData, isLoading } = useGetBannedProblems();
   const { mutate: unbanProblem, isPending } = useUnbanProblem();
 

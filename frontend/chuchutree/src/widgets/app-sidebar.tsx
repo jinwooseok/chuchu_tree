@@ -9,14 +9,13 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupActio
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSidebar } from '@/components/ui/sidebar';
 import Image from 'next/image';
-import { SettingsDialog } from '@/features/sidebar';
+import { AddPrevProblemsDialog, BannedProblemsDialog, SettingsDialog } from '@/features/sidebar';
 import { TargetCode } from '@/shared/constants/tagSystem';
 import { useModal } from '@/lib/providers/modal-provider';
 import { toast } from '@/lib/utils/toast';
 import { useLogout } from '@/entities/auth';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import BannedProblemsDialog from '@/features/sidebar/ui/group-second/BannedProblemsDialog';
 
 const ICON_SIZE = 32;
 
@@ -148,12 +147,12 @@ export function AppSidebar() {
                   <SidebarMenuButton asChild>
                     <div
                       onClick={() => {
-                        openModal('add-prev-problems', <BannedProblemsDialog onClose={() => closeModal('add-prev-problems')} />);
+                        openModal('add-prev-problems', <AddPrevProblemsDialog onClose={() => closeModal('add-prev-problems')} />);
                       }}
                       className="cursor-pointer"
                     >
                       <BookOpen size={ICON_SIZE} />
-                      <span>가입일 이전 문제 등록하기</span>
+                      <span>가입 전 풀이 등록하기</span>
                     </div>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
