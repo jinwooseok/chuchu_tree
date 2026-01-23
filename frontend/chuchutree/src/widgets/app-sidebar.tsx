@@ -52,7 +52,7 @@ export function AppSidebar() {
   };
 
   // 로그아웃 훅 및 핸들러
-  const { mutate: logout, isPending: isLogoutPending } = useLogout({
+  const { mutate: logout } = useLogout({
     onSuccess: () => {
       toast.success('로그아웃되었습니다.');
       router.push('/sign-in');
@@ -206,9 +206,8 @@ export function AppSidebar() {
                       e.preventDefault();
                       handleLogout();
                     }}
-                    disabled={isLogoutPending}
                   >
-                    <span>{isLogoutPending ? '로그아웃 중...' : '로그아웃'}</span>
+                    <span>로그아웃</span>
                   </DropdownMenuItem>
                   <div className="text-muted-foreground mx-1 mt-2 flex cursor-default justify-center gap-3 text-xs">
                     <span
