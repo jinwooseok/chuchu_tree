@@ -47,3 +47,11 @@ class BanTagRequest(BaseModel):
 
     class Config:
         populate_by_name = True
+
+
+class SetRepresentativeTagRequest(BaseModel):
+    """대표 태그 설정 요청"""
+    representative_tag_code: str | None = Field(None, alias="representativeTagCode", description="대표 태그 코드 (null이면 대표 태그 해제)")
+
+    class Config:
+        populate_by_name = True

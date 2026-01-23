@@ -13,6 +13,7 @@ class ProblemRecordModel(Base):
     __tablename__ = "problem_record"
     __table_args__ = (
         Index('idx_marked_date', 'marked_date'),
+        Index('idx_user_status', 'user_account_id', 'banned_yn', 'solved_yn'),
         {'comment': '유저의 문제 기록'}
     )
 
@@ -23,6 +24,7 @@ class ProblemRecordModel(Base):
     representative_tag_id: Mapped[int|None] = mapped_column(Integer, nullable=True)
     order: Mapped[int] = mapped_column(Integer, nullable=False)
     solved_yn: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    banned_yn: Mapped[bool] = mapped_column(Boolean, nullable=False)
     memo_title: Mapped[str|None] = mapped_column(String(500), nullable=True)
     content: Mapped[str|None] = mapped_column(String(500), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)

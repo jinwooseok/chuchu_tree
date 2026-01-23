@@ -6,6 +6,10 @@ from datetime import date
 
 from app.activity.application.command.ban_problem_command import BanProblemCommand
 from app.activity.application.command.delete_user_activity_command import DeleteUserActivityCommand
+from app.activity.application.command.set_representative_tag_command import (
+    SetSolvedProblemRepresentativeTagCommand,
+    SetWillSolveProblemRepresentativeTagCommand
+)
 from app.activity.application.command.tag_custom_command import TagCustomCommand
 from app.activity.application.command.update_solved_problems_command import UpdateSolvedProblemsCommand
 from app.activity.application.command.update_solved_will_solve_problems_command import UpdateSolvedAndWillSolveProblemsCommand
@@ -235,6 +239,19 @@ class ActivityApplicationService:
                         f"이미 기록된 문제입니다."
                     )
 
+        # 3-1. solved로 등록 시, 해당 problem_id의 will_solve 레코드 모두 삭제 처리
+        if command.problem_ids:
+            existing_will_solves = await self.user_activity_repository.find_will_solve_problems_by_problem_ids(
+                user_id,
+                command.problem_ids
+            )
+            # 기존 will_solve 삭제 처리
+            for will_solve in existing_will_solves:
+                if will_solve.deleted_at is None:
+                    will_solve.delete()
+            if existing_will_solves:
+                await self.user_activity_repository.save_all_will_solve_problems(existing_will_solves)
+
         # 4. 해당 날짜의 모든 데이터(삭제된 것 포함)를 가져옵니다.
         # (나중에 복구를 위해 deleted_at 포함 조회를 권장)
         existing_problems = await self.user_activity_repository.find_problem_records_by_date(
@@ -437,3 +454,107 @@ class ActivityApplicationService:
         logger.info(f"UserActivity 데이터 삭제 완료: user_id={command.user_account_id}")
 
         return True
+
+    @transactional
+    async def set_solved_problem_representative_tag(
+        self,
+        command: SetSolvedProblemRepresentativeTagCommand
+    ):
+        """
+        푼 문제의 대표 태그 설정
+
+        Args:
+            command: 대표 태그 설정 명령
+
+        Raises:
+            APIException: 문제를 찾을 수 없거나 태그가 유효하지 않은 경우
+        """
+        user_id = UserAccountId(command.user_account_id)
+
+        # 1. 문제 기록 조회
+        problem_record = await self.user_activity_repository.find_problem_record_by_problem_id(
+            user_id, command.problem_id
+        )
+
+        if not problem_record:
+            raise APIException(
+                ErrorCode.INVALID_REQUEST,
+                f"문제 기록을 찾을 수 없습니다. problem_id={command.problem_id}"
+            )
+
+        # 2. tag_code가 있으면 tag_id로 변환
+        if command.representative_tag_code:
+            event = DomainEvent(
+                event_type="GET_TAG_INFO_REQUESTED",
+                data=GetTagSummaryPayload(tag_code=command.representative_tag_code),
+                result_type=GetTagSummaryResultPayload
+            )
+            tag_info: GetTagSummaryResultPayload = await self.domain_event_bus.publish(event)
+
+            if not tag_info:
+                raise APIException(
+                    ErrorCode.INVALID_REQUEST,
+                    f"태그를 찾을 수 없습니다. tag_code={command.representative_tag_code}"
+                )
+
+            tag_id = TagId(tag_info.tag_id)
+        else:
+            tag_id = None
+
+        # 3. 대표 태그 설정
+        problem_record.set_representative_tag(tag_id)
+
+        # 4. 저장
+        await self.user_activity_repository.save_problem_record(problem_record)
+
+    @transactional
+    async def set_will_solve_problem_representative_tag(
+        self,
+        command: SetWillSolveProblemRepresentativeTagCommand
+    ):
+        """
+        풀 예정 문제의 대표 태그 설정
+
+        Args:
+            command: 대표 태그 설정 명령
+
+        Raises:
+            APIException: 문제를 찾을 수 없거나 태그가 유효하지 않은 경우
+        """
+        user_id = UserAccountId(command.user_account_id)
+
+        # 1. 풀 예정 문제 조회
+        will_solve_problem = await self.user_activity_repository.find_will_solve_problem_by_problem_id(
+            user_id, command.problem_id
+        )
+
+        if not will_solve_problem:
+            raise APIException(
+                ErrorCode.INVALID_REQUEST,
+                f"풀 예정 문제 기록을 찾을 수 없습니다. problem_id={command.problem_id}"
+            )
+
+        # 2. tag_code가 있으면 tag_id로 변환
+        if command.representative_tag_code:
+            event = DomainEvent(
+                event_type="GET_TAG_INFO_REQUESTED",
+                data=GetTagSummaryPayload(tag_code=command.representative_tag_code),
+                result_type=GetTagSummaryResultPayload
+            )
+            tag_info: GetTagSummaryResultPayload = await self.domain_event_bus.publish(event)
+
+            if not tag_info:
+                raise APIException(
+                    ErrorCode.INVALID_REQUEST,
+                    f"태그를 찾을 수 없습니다. tag_code={command.representative_tag_code}"
+                )
+
+            tag_id = TagId(tag_info.tag_id)
+        else:
+            tag_id = None
+
+        # 3. 대표 태그 설정
+        will_solve_problem.set_representative_tag(tag_id)
+
+        # 4. 저장
+        await self.user_activity_repository.save_will_solve_problem(will_solve_problem)

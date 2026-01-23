@@ -18,6 +18,8 @@ from app.baekjoon.infra.model.streak import StreakModel
 from app.activity.infra.model.problem_record import ProblemRecordModel
 from app.activity.infra.model.problem_banned_record import ProblemBannedRecordModel
 from app.activity.infra.model.will_solve_problem import WillSolveProblemModel
+from app.activity.infra.model.problem_date_record import ProblemDateRecordModel
+from app.activity.infra.model.user_problem_status import UserProblemStatusModel
 from app.activity.infra.model.tag_custom import TagCustomModel
 
 # Tag Domain
@@ -55,6 +57,8 @@ __all__ = [
     "ProblemBannedRecordModel",
     "WillSolveProblemModel",
     "TagCustomModel",
+    "UserProblemStatus",
+    "ProblemDateRecord",
     # Tag
     "TagModel",
     "TagRelationModel",
