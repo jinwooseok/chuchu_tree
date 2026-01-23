@@ -202,6 +202,7 @@ class ProblemHistoryRepositoryImpl(ProblemHistoryRepository):
                 and_(
                     ProblemHistoryModel.problem_id == ProblemRecordModel.problem_id,
                     ProblemRecordModel.user_account_id == user_account_id.value,
+                    ProblemRecordModel.banned_yn == False,  # banned 레코드 제외
                     ProblemRecordModel.deleted_at.is_(None)
                 )
             )

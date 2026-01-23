@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import date, datetime
 
-from app.common.domain.vo.identifiers import ProblemId, UserAccountId
+from app.common.domain.vo.identifiers import ProblemId, TagId, UserAccountId
 
 
 @dataclass
@@ -13,6 +13,7 @@ class ProblemRecord:
     marked_date: date
     solved: bool
     order: int
+    representative_tag_id: TagId|None
     memo_title: str|None
     content: str|None
     created_at: datetime
@@ -34,6 +35,7 @@ class ProblemRecord:
             marked_date=marked_date,
             solved=solved,
             order=0,
+            representative_tag_id=None,
             memo_title=None,
             content=None,
             created_at=now,
@@ -57,3 +59,8 @@ class ProblemRecord:
         if self.order != new_order:
             self.order = new_order
             self.updated_at = datetime.now()
+
+    def set_representative_tag(self, tag_id: TagId | None) -> None:
+        """대표 태그 설정"""
+        self.representative_tag_id = tag_id
+        self.updated_at = datetime.now()

@@ -96,6 +96,24 @@ class UserActivityRepository(ABC):
         pass
 
     @abstractmethod
+    async def find_problem_record_by_problem_id(
+        self,
+        user_id: UserAccountId,
+        problem_id: int
+    ) -> ProblemRecord | None:
+        """특정 문제 ID의 problem_record 조회 (단일 조회)"""
+        pass
+
+    @abstractmethod
+    async def find_will_solve_problem_by_problem_id(
+        self,
+        user_id: UserAccountId,
+        problem_id: int
+    ) -> WillSolveProblem | None:
+        """특정 문제 ID의 will_solve_problem 조회 (단일 조회)"""
+        pass
+
+    @abstractmethod
     async def delete_all_by_user_account_id(self, user_account_id: UserAccountId) -> None:
         """
         사용자와 연관된 모든 활동 데이터 삭제 (Hard Delete)
@@ -108,13 +126,26 @@ class UserActivityRepository(ABC):
     
     @abstractmethod
     async def save_problem_record(
-        self, 
+        self,
         problem_record: ProblemRecord
     ) -> None:
         """
         save_problem_record의 Docstring
-        
+
         :param problem_record: 문제 기록 엔티티
         :type problem_record: ProblemRecord
+        """
+        pass
+
+    @abstractmethod
+    async def save_will_solve_problem(
+        self,
+        will_solve_problem: WillSolveProblem
+    ) -> None:
+        """
+        풀 예정 문제 개별 저장
+
+        :param will_solve_problem: 풀 예정 문제 엔티티
+        :type will_solve_problem: WillSolveProblem
         """
         pass

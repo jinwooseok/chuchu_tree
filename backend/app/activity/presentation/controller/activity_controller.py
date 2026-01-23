@@ -2,6 +2,10 @@ from fastapi import APIRouter, Depends, Query
 from dependency_injector.wiring import inject, Provide
 
 from app.activity.application.command.ban_problem_command import BanProblemCommand
+from app.activity.application.command.set_representative_tag_command import (
+    SetSolvedProblemRepresentativeTagCommand,
+    SetWillSolveProblemRepresentativeTagCommand
+)
 from app.activity.application.command.tag_custom_command import TagCustomCommand
 from app.activity.application.command.update_solved_problems_command import UpdateSolvedProblemsCommand
 from app.activity.application.command.update_solved_will_solve_problems_command import UpdateSolvedAndWillSolveProblemsCommand
@@ -16,7 +20,8 @@ from app.activity.presentation.schema.request.activity_request import (
     UpdateSolvedProblemsRequest,
     ProblemRecordRequest,
     BanProblemRequest,
-    BanTagRequest
+    BanTagRequest,
+    SetRepresentativeTagRequest
 )
 from app.activity.presentation.schema.response.activity_response import (
     BannedProblemsResponse,
@@ -259,5 +264,63 @@ async def get_banned_tags(
     activity_application_service: ActivityApplicationService = Depends(Provide[Container.activity_application_service])
 ):
     query = await activity_application_service.get_banned_tags(current_user.user_account_id)
-    
+
     return ApiResponse(data=BannedTagsResponse.from_query(query))
+
+
+@router.put("/problems/solved-problems/{problem_id}/representative-tag", response_model=ApiResponseSchema[dict])
+@inject
+async def set_solved_problem_representative_tag(
+    problem_id: int,
+    request: SetRepresentativeTagRequest,
+    current_user: CurrentUser = Depends(get_current_member),
+    activity_application_service: ActivityApplicationService = Depends(Provide[Container.activity_application_service])
+):
+    """
+    푼 문제의 대표 태그 설정
+
+    Args:
+        problem_id: 문제 ID
+        request: 대표 태그 코드 (null이면 대표 태그 해제)
+
+    Returns:
+        빈 데이터
+    """
+    await activity_application_service.set_solved_problem_representative_tag(
+        SetSolvedProblemRepresentativeTagCommand(
+            user_account_id=current_user.user_account_id,
+            problem_id=problem_id,
+            representative_tag_code=request.representative_tag_code
+        )
+    )
+
+    return ApiResponse(data={})
+
+
+@router.put("/problems/will-solve-problems/{problem_id}/representative-tag", response_model=ApiResponseSchema[dict])
+@inject
+async def set_will_solve_problem_representative_tag(
+    problem_id: int,
+    request: SetRepresentativeTagRequest,
+    current_user: CurrentUser = Depends(get_current_member),
+    activity_application_service: ActivityApplicationService = Depends(Provide[Container.activity_application_service])
+):
+    """
+    풀 예정 문제의 대표 태그 설정
+
+    Args:
+        problem_id: 문제 ID
+        request: 대표 태그 코드 (null이면 대표 태그 해제)
+
+    Returns:
+        빈 데이터
+    """
+    await activity_application_service.set_will_solve_problem_representative_tag(
+        SetWillSolveProblemRepresentativeTagCommand(
+            user_account_id=current_user.user_account_id,
+            problem_id=problem_id,
+            representative_tag_code=request.representative_tag_code
+        )
+    )
+
+    return ApiResponse(data={})

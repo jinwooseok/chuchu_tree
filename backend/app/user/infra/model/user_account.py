@@ -3,6 +3,7 @@ from typing import Optional, TYPE_CHECKING
 from sqlalchemy import String, DateTime, Enum as SQLEnum, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.activity.infra.model.user_problem_status import UserProblemStatusModel
 from app.common.domain.enums import Provider
 from app.core.database import Base
 
@@ -30,21 +31,33 @@ class UserAccountModel(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
-    
+
     account_links: Mapped[list["AccountLinkModel"]] = relationship(
-        "AccountLinkModel", 
+        "AccountLinkModel",
         back_populates="user_account",
-        cascade="all, delete-orphan" 
+        cascade="all, delete-orphan"
     )
-    
+
     targets: Mapped[list["UserTargetModel"]] = relationship(
-        "UserTargetModel", 
+        "UserTargetModel",
+        back_populates="user_account",
+        cascade="all, delete-orphan"
+    )
+
+    tag_customs: Mapped[list["TagCustomModel"]] = relationship(
+        "TagCustomModel",
+        back_populates="user_account",
+        cascade="all, delete-orphan"
+    )
+
+    problem_statuses: Mapped[list["UserProblemStatusModel"]] = relationship(
+        "UserProblemStatusModel",
         back_populates="user_account",
         cascade="all, delete-orphan"
     )
     
-    tag_customs: Mapped[list["TagCustomModel"]] = relationship(
-        "TagCustomModel", 
+    problem_records: Mapped[list["ProblemRecordModel"]] = relationship(
+        "ProblemRecordModel", 
         back_populates="user_account",
         cascade="all, delete-orphan"
     )
@@ -58,12 +71,6 @@ class UserAccountModel(Base):
     will_solve_problems: Mapped[list["WillSolveProblemModel"]] = relationship(
         "WillSolveProblemModel", 
         order_by="WillSolveProblemModel.order",
-        back_populates="user_account",
-        cascade="all, delete-orphan"
-    )
-    
-    problem_records: Mapped[list["ProblemRecordModel"]] = relationship(
-        "ProblemRecordModel", 
         back_populates="user_account",
         cascade="all, delete-orphan"
     )
