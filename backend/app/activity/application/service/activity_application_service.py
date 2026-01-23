@@ -6,10 +6,7 @@ from datetime import date
 
 from app.activity.application.command.ban_problem_command import BanProblemCommand
 from app.activity.application.command.delete_user_activity_command import DeleteUserActivityCommand
-from app.activity.application.command.set_representative_tag_command import (
-    SetSolvedProblemRepresentativeTagCommand,
-    SetWillSolveProblemRepresentativeTagCommand
-)
+from app.activity.application.command.set_representative_tag_command import SetProblemRepresentativeTagCommand
 from app.activity.application.command.tag_custom_command import TagCustomCommand
 from app.activity.application.command.update_solved_problems_command import UpdateSolvedProblemsCommand
 from app.activity.application.command.update_solved_will_solve_problems_command import UpdateSolvedAndWillSolveProblemsCommand
@@ -17,7 +14,8 @@ from app.activity.application.command.update_will_solve_problems import UpdateWi
 from app.activity.application.query.banned_list_query import BannedProblemsQuery, BannedTagsQuery
 from app.activity.application.query.monthly_activity_data_query import (
     DailyActivityQuery,
-    MonthlyActivityDataQuery
+    MonthlyActivityDataQuery,
+    ProblemActivityInfo
 )
 from app.activity.domain.entity.problem_record import ProblemRecord
 from app.problem.application.query.problems_info_query import ProblemsInfoQuery
@@ -76,23 +74,32 @@ class ActivityApplicationService:
             year=payload.year,
             month=payload.month
         )
-        # print(will_solve_problems)
-        # 3. 날짜별로 그룹화 (set 대신 list 사용)
+        # 3. 날짜별로 그룹화 (ProblemActivityInfo 사용)
         # 순서를 보존하기 위해 list를 사용합니다.
         daily_map = defaultdict(lambda: {"solved": [], "will_solve": []})
+        seen_solved = defaultdict(set)  # 날짜별 중복 체크용
+        seen_will_solve = defaultdict(set)
 
         for record in problem_records:
             if record.solved:
                 pid = record.problem_id.value
                 # 중복 체크를 하며 리스트에 추가 (이미 정렬된 순서 유지)
-                if pid not in daily_map[record.marked_date]["solved"]:
-                    daily_map[record.marked_date]["solved"].append(pid)
+                if pid not in seen_solved[record.marked_date]:
+                    seen_solved[record.marked_date].add(pid)
+                    rep_tag_id = record.representative_tag_id.value if record.representative_tag_id else None
+                    daily_map[record.marked_date]["solved"].append(
+                        ProblemActivityInfo(problem_id=pid, representative_tag_id=rep_tag_id)
+                    )
 
         for will_solve in will_solve_problems:
             pid = will_solve.problem_id.value
             # 중복 체크를 하며 리스트에 추가 (이미 정렬된 순서 유지)
-            if pid not in daily_map[will_solve.marked_date]["will_solve"]:
-                daily_map[will_solve.marked_date]["will_solve"].append(pid)
+            if pid not in seen_will_solve[will_solve.marked_date]:
+                seen_will_solve[will_solve.marked_date].add(pid)
+                rep_tag_id = will_solve.representative_tag_id.value if will_solve.representative_tag_id else None
+                daily_map[will_solve.marked_date]["will_solve"].append(
+                    ProblemActivityInfo(problem_id=pid, representative_tag_id=rep_tag_id)
+                )
 
         # 4. 해당 월의 모든 날짜 생성
         _, last_day = monthrange(payload.year, payload.month)
@@ -100,20 +107,19 @@ class ActivityApplicationService:
 
         for day in range(1, last_day + 1):
             target_date = date(payload.year, payload.month, day)
-            # 이미 3번에서 list로 만들었으므로 그대로 사용합니다.
             day_data = daily_map.get(target_date, {"solved": [], "will_solve": []})
 
             daily_activities.append(DailyActivityQuery(
                 target_date=target_date,
-                solved_problem_ids=day_data["solved"],
-                will_solve_problem_ids=day_data["will_solve"]
+                solved_problems=day_data["solved"],
+                will_solve_problems=day_data["will_solve"]
             ))
 
         # 5. 전체 문제 수 계산 (고유 ID 수이므로 여기선 set을 써도 무방)
         total_problem_ids = set()
         for day_data in daily_map.values():
-            total_problem_ids.update(day_data["solved"])
-            total_problem_ids.update(day_data["will_solve"])
+            total_problem_ids.update(p.problem_id for p in day_data["solved"])
+            total_problem_ids.update(p.problem_id for p in day_data["will_solve"])
 
         return MonthlyActivityDataQuery(
             daily_activities=daily_activities,
@@ -131,19 +137,23 @@ class ActivityApplicationService:
 
         user_id = UserAccountId(command.user_account_id)
 
-        # 2. 백준 계정 조회 및 검증 - 이미 실제로 푼 적이 있는지 확인
+        # 2. 백준 계정 조회 및 검증 - streak이 있고 다른 날짜에 기록된 문제인지 확인
         bj_account = await self.baekjoon_account_repository.find_by_user_id(user_id)
         if bj_account and command.problem_ids:
-            # 이미 실제로 푼 문제 목록 조회 (problem_history)
-            solved_problem_ids = await self.problem_history_repository.find_solved_ids_in_list(
+            # streak 정보와 함께 문제 이력 조회
+            problem_histories = await self.problem_history_repository.find_by_problem_ids_with_streak(
                 bj_account.bj_account_id,
                 command.problem_ids
             )
-            # 추가하려는 문제 중 이미 실제로 푼 문제가 있으면 에러
-            if solved_problem_ids:
+            # streak이 있고 다른 날짜에 기록된 문제만 필터링
+            conflicting = [
+                ph for ph in problem_histories
+                if ph.streak_id is not None and ph.streak_date != command.solved_date
+            ]
+            if conflicting:
                 raise APIException(
                     ErrorCode.ALREADY_SOLVED_PROBLEM,
-                    f"이미 해결한 문제입니다."
+                    f"이미 다른 날짜에 스트릭으로 기록된 문제입니다."
                 )
 
         # 3. 이미 푼 문제로 등록된 경우 검증
@@ -208,19 +218,23 @@ class ActivityApplicationService:
 
         user_id = UserAccountId(command.user_account_id)
 
-        # 2. 백준 계정 조회 및 검증 - 이미 실제로 푼 적이 있는지 확인
+        # 2. 백준 계정 조회 및 검증 - streak이 있고 다른 날짜에 기록된 문제인지 확인
         bj_account = await self.baekjoon_account_repository.find_by_user_id(user_id)
         if bj_account and command.problem_ids:
-            # 이미 실제로 푼 문제 목록 조회 (problem_history에 있는지 확인)
-            solved_problem_ids = await self.problem_history_repository.find_solved_ids_in_list(
+            # streak 정보와 함께 문제 이력 조회
+            problem_histories = await self.problem_history_repository.find_by_problem_ids_with_streak(
                 bj_account.bj_account_id,
                 command.problem_ids
             )
-            # 추가하려는 문제 중 이미 실제로 푼 문제가 있으면 에러
-            if solved_problem_ids:
+            # streak이 있고 다른 날짜에 기록된 문제만 필터링
+            conflicting = [
+                ph for ph in problem_histories
+                if ph.streak_id is not None and ph.streak_date != command.solved_date
+            ]
+            if conflicting:
                 raise APIException(
                     ErrorCode.ALREADY_SOLVED_PROBLEM,
-                    f"이미 해결한 문제입니다."
+                    f"이미 다른 날짜에 스트릭으로 기록된 문제입니다."
                 )
 
         # 3. 이미 푼 문제로 등록된 경우 검증
@@ -456,12 +470,15 @@ class ActivityApplicationService:
         return True
 
     @transactional
-    async def set_solved_problem_representative_tag(
+    async def set_problem_representative_tag(
         self,
-        command: SetSolvedProblemRepresentativeTagCommand
+        command: SetProblemRepresentativeTagCommand
     ):
         """
-        푼 문제의 대표 태그 설정
+        문제의 대표 태그 설정 (자동 감지)
+
+        solved_problem과 will_solve_problem 모두 조회하여 존재하는 엔티티에 설정.
+        둘 다 없으면 problem_history에서 확인 후 새로운 problem_record 생성.
 
         Args:
             command: 대표 태그 설정 명령
@@ -471,71 +488,51 @@ class ActivityApplicationService:
         """
         user_id = UserAccountId(command.user_account_id)
 
-        # 1. 문제 기록 조회
+        # 1. 두 엔티티 모두 조회
         problem_record = await self.user_activity_repository.find_problem_record_by_problem_id(
             user_id, command.problem_id
         )
-
-        if not problem_record:
-            raise APIException(
-                ErrorCode.INVALID_REQUEST,
-                f"문제 기록을 찾을 수 없습니다. problem_id={command.problem_id}"
-            )
-
-        # 2. tag_code가 있으면 tag_id로 변환
-        if command.representative_tag_code:
-            event = DomainEvent(
-                event_type="GET_TAG_INFO_REQUESTED",
-                data=GetTagSummaryPayload(tag_code=command.representative_tag_code),
-                result_type=GetTagSummaryResultPayload
-            )
-            tag_info: GetTagSummaryResultPayload = await self.domain_event_bus.publish(event)
-
-            if not tag_info:
-                raise APIException(
-                    ErrorCode.INVALID_REQUEST,
-                    f"태그를 찾을 수 없습니다. tag_code={command.representative_tag_code}"
-                )
-
-            tag_id = TagId(tag_info.tag_id)
-        else:
-            tag_id = None
-
-        # 3. 대표 태그 설정
-        problem_record.set_representative_tag(tag_id)
-
-        # 4. 저장
-        await self.user_activity_repository.save_problem_record(problem_record)
-
-    @transactional
-    async def set_will_solve_problem_representative_tag(
-        self,
-        command: SetWillSolveProblemRepresentativeTagCommand
-    ):
-        """
-        풀 예정 문제의 대표 태그 설정
-
-        Args:
-            command: 대표 태그 설정 명령
-
-        Raises:
-            APIException: 문제를 찾을 수 없거나 태그가 유효하지 않은 경우
-        """
-        user_id = UserAccountId(command.user_account_id)
-
-        # 1. 풀 예정 문제 조회
         will_solve_problem = await self.user_activity_repository.find_will_solve_problem_by_problem_id(
             user_id, command.problem_id
         )
 
-        if not will_solve_problem:
-            raise APIException(
-                ErrorCode.INVALID_REQUEST,
-                f"풀 예정 문제 기록을 찾을 수 없습니다. problem_id={command.problem_id}"
-            )
+        # 2. 둘 다 없으면 problem_history에서 확인 후 새로운 problem_record 생성
+        if not problem_record and not will_solve_problem:
+            bj_account = await self.baekjoon_account_repository.find_by_user_id(user_id)
+            if bj_account:
+                # problem_history에서 해당 문제 조회 (streak 정보 포함)
+                problem_histories = await self.problem_history_repository.find_by_problem_ids_with_streak(
+                    bj_account.bj_account_id,
+                    [command.problem_id]
+                )
 
-        # 2. tag_code가 있으면 tag_id로 변환
+                if problem_histories:
+                    # streak이 있는 기록 찾기
+                    history_with_streak = next(
+                        (ph for ph in problem_histories if ph.streak_id is not None),
+                        None
+                    )
+
+                    if history_with_streak and history_with_streak.streak_date:
+                        # streak_date를 기준으로 새로운 problem_record 생성
+                        problem_record = ProblemRecord.create(
+                            user_account_id=user_id,
+                            problem_id=ProblemId(command.problem_id),
+                            marked_date=history_with_streak.streak_date,
+                            solved=True
+                        )
+
+            # 여전히 없으면 에러
+            if not problem_record:
+                raise APIException(
+                    ErrorCode.INVALID_REQUEST,
+                    f"문제 기록을 찾을 수 없습니다. problem_id={command.problem_id}"
+                )
+
+        # 3. tag_code가 있으면 tag_id로 변환 및 문제 태그 검증
+        tag_id = None
         if command.representative_tag_code:
+            # 3-1. 태그 정보 조회
             event = DomainEvent(
                 event_type="GET_TAG_INFO_REQUESTED",
                 data=GetTagSummaryPayload(tag_code=command.representative_tag_code),
@@ -549,12 +546,31 @@ class ActivityApplicationService:
                     f"태그를 찾을 수 없습니다. tag_code={command.representative_tag_code}"
                 )
 
+            # 3-2. 문제 정보 조회하여 해당 태그가 문제의 태그 목록에 포함되는지 검증
+            problem_info_event = DomainEvent(
+                event_type="GET_PROBLEM_INFOS_REQUESTED",
+                data=GetProblemsInfoPayload(problem_ids=[command.problem_id]),
+                result_type=ProblemsInfoQuery
+            )
+            problems_info: ProblemsInfoQuery = await self.domain_event_bus.publish(problem_info_event)
+
+            if problems_info and command.problem_id in problems_info.problems:
+                problem_info = problems_info.problems[command.problem_id]
+                problem_tag_codes = {tag.tag_code for tag in problem_info.tags}
+
+                if command.representative_tag_code not in problem_tag_codes:
+                    raise APIException(
+                        ErrorCode.INVALID_REQUEST,
+                        f"해당 태그는 문제의 태그 목록에 포함되지 않습니다. tag_code={command.representative_tag_code}"
+                    )
+
             tag_id = TagId(tag_info.tag_id)
-        else:
-            tag_id = None
 
-        # 3. 대표 태그 설정
-        will_solve_problem.set_representative_tag(tag_id)
+        # 4. 존재하는 엔티티에 대표 태그 설정 및 저장
+        if problem_record:
+            problem_record.set_representative_tag(tag_id)
+            await self.user_activity_repository.save_problem_record(problem_record)
 
-        # 4. 저장
-        await self.user_activity_repository.save_will_solve_problem(will_solve_problem)
+        if will_solve_problem:
+            will_solve_problem.set_representative_tag(tag_id)
+            await self.user_activity_repository.save_will_solve_problem(will_solve_problem)

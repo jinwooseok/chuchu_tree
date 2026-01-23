@@ -3,17 +3,17 @@ from datetime import date
 from pydantic import BaseModel, Field
 
 
-class DailyActivityItemQuery(BaseModel):
-    """일별 활동 항목 쿼리"""
+class ProblemActivityInfo(BaseModel):
+    """문제별 활동 정보 (대표 태그 ID 포함)"""
     problem_id: int = Field(..., description="문제 ID")
-    marked_date: date = Field(..., description="마킹 날짜")
+    representative_tag_id: int | None = Field(None, description="대표 태그 ID")
 
 
 class DailyActivityQuery(BaseModel):
     """일별 활동 쿼리"""
     target_date: date = Field(..., description="날짜")
-    solved_problem_ids: list[int] = Field(default_factory=list, description="푼 문제 ID 목록")
-    will_solve_problem_ids: list[int] = Field(default_factory=list, description="풀 예정 문제 ID 목록")
+    solved_problems: list[ProblemActivityInfo] = Field(default_factory=list, description="푼 문제 목록")
+    will_solve_problems: list[ProblemActivityInfo] = Field(default_factory=list, description="풀 예정 문제 목록")
 
 
 class MonthlyActivityDataQuery(BaseModel):
