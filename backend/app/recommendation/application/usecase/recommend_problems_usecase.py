@@ -455,7 +455,7 @@ class RecommendProblemsUsecase:
 
         # 5. 기본 메시지 (사유가 없을 때만)
         if not reasons:
-            reasons.append(f"'{self.skill_name_map[tag_name]}' 숙련도를 높일 시간입니다.")
+            reasons.append(f"'{tag_name}' 숙련도를 높일 시간입니다.")
 
         if len(reasons) > 1:
             random.shuffle(reasons)
@@ -485,8 +485,8 @@ class RecommendProblemsUsecase:
         problems_needed = required_solved - current_solved
 
         if 0 < problems_needed < 5:
-            skill_name = next_skill.skill_code.value
-            return f"'{tag_name}' {problems_needed}문제만 더 풀면 {skill_name} 달성!"
+            skill_code = next_skill.skill_code.value
+            return f"'{tag_name}' {problems_needed}문제만 더 풀면 {self.skill_name_map[skill_code]} 달성!"
 
         return None
     
