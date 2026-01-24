@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { calendarApi } from '../api/calendar.api';
-import type { UpdateProblemsData, Calendar, UpdateRepresentativeTagData } from './calendar.types';
+import type { UpdateProblemsData, Calendar, UpdateRepresentativeTagData, BatchSolvedProblems } from './calendar.types';
 import { UseMutationCallback } from '@/shared/types/api';
 import { calendarKeys } from './keys';
 import '@/shared/types/query';
@@ -237,6 +237,26 @@ export const useUpdateRepresentativeTag = (callbacks?: UseMutationCallback) => {
     },
     onSuccess: () => {
       if (callbacks?.onSuccess) callbacks.onSuccess();
+    },
+  });
+};
+
+// 가입일 이전 문제 일괄 등록 mutation
+export const useBatchSolvedProblems = (callbacks?: UseMutationCallback) => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (data: BatchSolvedProblems[]) => calendarApi.batchSolvedProblems(data),
+    onSuccess: () => {
+      // 여러 달에 걸쳐 분포된 문제들이 추가되므로 모든 캐싱 데이터를 invalidate
+      queryClient.invalidateQueries({ queryKey: ['calendar'] });
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+      queryClient.invalidateQueries({ queryKey: ['tagDashboard'] });
+
+      if (callbacks?.onSuccess) callbacks.onSuccess();
+    },
+    onError: (error) => {
+      if (callbacks?.onError) callbacks.onError(error);
     },
   });
 };

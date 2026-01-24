@@ -97,3 +97,8 @@ export interface SearchProblems {
     titleBase: WillSolveProblems[];
   };
 }
+
+export interface BatchSolvedProblems {
+  date: string;
+  problemIds: number[];
+}

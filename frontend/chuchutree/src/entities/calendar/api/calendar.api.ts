@@ -1,5 +1,5 @@
 import { ApiResponse } from '@/shared/types/api';
-import { Calendar, UpdateProblemsData, SearchProblems } from '../model/calendar.types';
+import { Calendar, UpdateProblemsData, SearchProblems, BatchSolvedProblems } from '../model/calendar.types';
 import { axiosInstance } from '@/lib/axios';
 
 export const calendarApi = {
@@ -30,5 +30,8 @@ export const calendarApi = {
     await axiosInstance.put(`/user-accounts/me/problems/${problemId}/representative-tag`, {
       representativeTagCode,
     });
+  },
+  batchSolvedProblems: async (data: BatchSolvedProblems[]): Promise<void> => {
+    await axiosInstance.post('/user-accounts/me/problems/solved-problems/batch', data);
   },
 };
