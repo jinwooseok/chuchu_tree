@@ -55,3 +55,12 @@ class SetRepresentativeTagRequest(BaseModel):
 
     class Config:
         populate_by_name = True
+
+
+class SolvedProblemBatchItem(BaseModel):
+    """배치 생성용 개별 항목"""
+    date: date_ = Field(..., description="날짜 (YYYY-MM-DD)")
+    problem_ids: list[int] = Field(..., alias="problemIds", description="문제 ID 목록")
+
+    class Config:
+        populate_by_name = True

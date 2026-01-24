@@ -5,6 +5,7 @@ from collections import defaultdict
 from datetime import date
 
 from app.activity.application.command.ban_problem_command import BanProblemCommand
+from app.activity.application.command.batch_create_solved_problems_command import BatchCreateSolvedProblemsCommand
 from app.activity.application.command.delete_user_activity_command import DeleteUserActivityCommand
 from app.activity.application.command.set_representative_tag_command import SetProblemRepresentativeTagCommand
 from app.activity.application.command.tag_custom_command import TagCustomCommand
@@ -237,7 +238,7 @@ class ActivityApplicationService:
                     f"이미 다른 날짜에 스트릭으로 기록된 문제입니다."
                 )
 
-        # 3. 이미 푼 문제로 등록된 경우 검증
+        # 3. 이미 푼 문제로 등록된 경우 검증 - 케이스 C, D 처리
         if command.problem_ids:
             # 해당 문제들의 problem_record 조회 (모든 날짜)
             existing_records = await self.user_activity_repository.find_problem_records_by_problem_ids(
@@ -245,13 +246,50 @@ class ActivityApplicationService:
                 command.problem_ids
             )
 
-            # 다른 날짜에 이미 등록된 문제가 있는지 확인
-            for record in existing_records:
-                if record.marked_date != command.solved_date:
-                    raise APIException(
-                        ErrorCode.PROBLEM_ALREADY_RECORDED_ON_DIFFERENT_DATE,
-                        f"이미 기록된 문제입니다."
+            # 다른 날짜에 이미 등록된 문제 필터링
+            records_on_different_date = [
+                record for record in existing_records
+                if record.marked_date != command.solved_date
+            ]
+
+            if records_on_different_date:
+                # streak 연동 여부 확인을 위해 problem_history 조회
+                problem_ids_to_check = [r.problem_id.value for r in records_on_different_date]
+
+                # bj_account가 있으면 streak 확인
+                streak_date_map: dict[int, date] = {}
+                if bj_account:
+                    streak_histories = await self.problem_history_repository.find_by_problem_ids_with_streak(
+                        bj_account.bj_account_id,
+                        problem_ids_to_check
                     )
+                    # streak이 연동된 문제들의 날짜 매핑
+                    streak_date_map = {
+                        ph.problem_id.value: ph.streak_date
+                        for ph in streak_histories
+                        if ph.streak_id is not None and ph.streak_date is not None
+                    }
+
+                records_to_delete = []
+                for record in records_on_different_date:
+                    pid = record.problem_id.value
+                    streak_date = streak_date_map.get(pid)
+
+                    # 케이스 D: 다른 날에 solved_problem 존재 + streak 날짜와 일치 → 불가능
+                    if streak_date and record.marked_date == streak_date:
+                        raise APIException(
+                            ErrorCode.PROBLEM_ALREADY_RECORDED_ON_DIFFERENT_DATE,
+                            f"스트릭과 연동된 기록은 날짜를 변경할 수 없습니다."
+                        )
+
+                    # 케이스 C: 다른 날에 solved_problem만 존재 (streak 연동 없음) → 가능 (기존 삭제 후 새로 생성)
+                    if record.deleted_at is None:
+                        record.delete()
+                        records_to_delete.append(record)
+
+                # 케이스 C에 해당하는 기존 레코드 삭제 처리
+                if records_to_delete:
+                    await self.user_activity_repository.save_all_problem_records(records_to_delete)
 
         # 3-1. solved로 등록 시, 해당 problem_id의 will_solve 레코드 모두 삭제 처리
         if command.problem_ids:
@@ -314,7 +352,7 @@ class ActivityApplicationService:
                 problem_ids=command.solved_problem_ids
             )
         )
-        
+
         await self.update_will_solve_problems(
             UpdateWillSolveProblemsCommand(
                 user_account_id=command.user_account_id,
@@ -322,7 +360,147 @@ class ActivityApplicationService:
                 problem_ids=command.will_solve_problem_ids
             )
         )
-    
+
+    @transactional
+    async def batch_create_solved_problems(
+        self,
+        command: BatchCreateSolvedProblemsCommand
+    ):
+        """
+        여러 날짜의 문제를 한번에 추가 (기존 레코드 유지, 새 레코드만 추가)
+
+        Args:
+            command: 배치 생성 명령 (user_account_id, records: [(날짜, [문제ID들]), ...])
+        """
+        user_id = UserAccountId(command.user_account_id)
+
+        # 0. 전체 문제 ID 추출 및 중복 체크
+        all_problem_ids = [pid for _, pids in command.records for pid in pids]
+        if len(all_problem_ids) != len(set(all_problem_ids)):
+            raise APIException(ErrorCode.DUPLICATED_ORDER, "요청 내에 중복된 문제 ID가 존재합니다.")
+
+        if not all_problem_ids:
+            return  # 빈 요청이면 바로 종료
+
+        # 1. 백준 계정 조회 및 검증 - streak이 있고 다른 날짜에 기록된 문제인지 확인
+        bj_account = await self.baekjoon_account_repository.find_by_user_id(user_id)
+
+        # 문제ID -> 요청된 날짜 매핑
+        requested_date_map: dict[int, date] = {}
+        for solved_date, problem_ids in command.records:
+            for pid in problem_ids:
+                requested_date_map[pid] = solved_date
+
+        if bj_account:
+            # streak 정보와 함께 문제 이력 조회
+            problem_histories = await self.problem_history_repository.find_by_problem_ids_with_streak(
+                bj_account.bj_account_id,
+                all_problem_ids
+            )
+            # 케이스 A: streak이 있고 다른 날짜에 기록된 문제만 필터링
+            conflicting = [
+                ph for ph in problem_histories
+                if ph.streak_id is not None and ph.streak_date != requested_date_map.get(ph.problem_id.value)
+            ]
+            if conflicting:
+                raise APIException(
+                    ErrorCode.ALREADY_SOLVED_PROBLEM,
+                    f"이미 다른 날짜에 스트릭으로 기록된 문제입니다."
+                )
+
+        # 2. 케이스 C, D 검증: 이미 푼 문제로 등록된 경우 처리
+        existing_records = await self.user_activity_repository.find_problem_records_by_problem_ids(
+            user_id,
+            all_problem_ids
+        )
+
+        # 다른 날짜에 이미 등록된 문제 필터링
+        records_on_different_date = [
+            record for record in existing_records
+            if record.marked_date != requested_date_map.get(record.problem_id.value)
+        ]
+
+        if records_on_different_date:
+            problem_ids_to_check = [r.problem_id.value for r in records_on_different_date]
+
+            # streak 확인
+            streak_date_map: dict[int, date] = {}
+            if bj_account:
+                streak_histories = await self.problem_history_repository.find_by_problem_ids_with_streak(
+                    bj_account.bj_account_id,
+                    problem_ids_to_check
+                )
+                streak_date_map = {
+                    ph.problem_id.value: ph.streak_date
+                    for ph in streak_histories
+                    if ph.streak_id is not None and ph.streak_date is not None
+                }
+
+            records_to_delete = []
+            for record in records_on_different_date:
+                pid = record.problem_id.value
+                streak_date = streak_date_map.get(pid)
+
+                # 케이스 D: 다른 날에 solved_problem 존재 + streak 날짜와 일치 → 불가능
+                if streak_date and record.marked_date == streak_date:
+                    raise APIException(
+                        ErrorCode.PROBLEM_ALREADY_RECORDED_ON_DIFFERENT_DATE,
+                        f"스트릭과 연동된 기록은 날짜를 변경할 수 없습니다."
+                    )
+
+                # 케이스 C: 다른 날에 solved_problem만 존재 (streak 연동 없음) → 가능 (기존 삭제 후 새로 생성)
+                if record.deleted_at is None:
+                    record.delete()
+                    records_to_delete.append(record)
+
+            if records_to_delete:
+                await self.user_activity_repository.save_all_problem_records(records_to_delete)
+
+        # 3. will_solve 삭제 처리: solved로 등록되는 문제의 will_solve 삭제
+        existing_will_solves = await self.user_activity_repository.find_will_solve_problems_by_problem_ids(
+            user_id,
+            all_problem_ids
+        )
+        for will_solve in existing_will_solves:
+            if will_solve.deleted_at is None:
+                will_solve.delete()
+        if existing_will_solves:
+            await self.user_activity_repository.save_all_will_solve_problems(existing_will_solves)
+
+        # 4. 이미 동일 날짜에 등록된 문제 ID 집합 생성 (중복 생성 방지)
+        existing_same_date_pids: set[int] = set()
+        for record in existing_records:
+            if record.marked_date == requested_date_map.get(record.problem_id.value) and record.deleted_at is None:
+                existing_same_date_pids.add(record.problem_id.value)
+
+        # 5. 날짜별로 새 레코드 생성 (기존 order 뒤에 추가)
+        all_new_records = []
+        for solved_date, problem_ids in command.records:
+            # 해당 날짜에 이미 존재하는 레코드 조회
+            existing_on_date = await self.user_activity_repository.find_problem_records_by_date(
+                user_id, solved_date
+            )
+            max_order = max((r.order for r in existing_on_date if r.deleted_at is None), default=-1)
+
+            order_offset = 0
+            for pid in problem_ids:
+                # 동일 날짜에 이미 존재하면 스킵 (중복 방지)
+                if pid in existing_same_date_pids:
+                    continue
+
+                new_record = ProblemRecord.create(
+                    user_account_id=user_id,
+                    problem_id=ProblemId(pid),
+                    marked_date=solved_date
+                )
+                new_record.change_order(max_order + 1 + order_offset)
+                all_new_records.append(new_record)
+                order_offset += 1
+
+        # 6. 일괄 저장
+        if all_new_records:
+            await self.user_activity_repository.save_all_problem_records(all_new_records)
+
     @transactional
     async def ban_tag(self, command: TagCustomCommand):
         # 1. tag code로 tag 정보 요청

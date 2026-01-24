@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Query
 from dependency_injector.wiring import inject, Provide
 
 from app.activity.application.command.ban_problem_command import BanProblemCommand
+from app.activity.application.command.batch_create_solved_problems_command import BatchCreateSolvedProblemsCommand
 from app.activity.application.command.set_representative_tag_command import SetProblemRepresentativeTagCommand
 from app.activity.application.command.tag_custom_command import TagCustomCommand
 from app.activity.application.command.update_solved_problems_command import UpdateSolvedProblemsCommand
@@ -18,7 +19,8 @@ from app.activity.presentation.schema.request.activity_request import (
     ProblemRecordRequest,
     BanProblemRequest,
     BanTagRequest,
-    SetRepresentativeTagRequest
+    SetRepresentativeTagRequest,
+    SolvedProblemBatchItem
 )
 from app.activity.presentation.schema.response.activity_response import (
     BannedProblemsResponse,
@@ -91,10 +93,37 @@ async def update_solved_and_will_solve_problems(
     Returns:
         빈 데이터
     """
-    await activity_application_service.update_solved_and_will_solve_problems(UpdateSolvedAndWillSolveProblemsCommand(user_account_id = current_user.user_account_id, 
-                                                                                              solved_date = request.date, 
+    await activity_application_service.update_solved_and_will_solve_problems(UpdateSolvedAndWillSolveProblemsCommand(user_account_id = current_user.user_account_id,
+                                                                                              solved_date = request.date,
                                                                                               solved_problem_ids = request.solved_problem_ids,
                                                                                               will_solve_problem_ids= request.will_solve_problem_ids))
+
+    return ApiResponse(data={})
+
+
+@router.post("/problems/solved-problems/batch", response_model=ApiResponseSchema[dict])
+@inject
+async def batch_create_solved_problems(
+    request: list[SolvedProblemBatchItem],
+    current_user: CurrentUser = Depends(get_current_member),
+    activity_application_service: ActivityApplicationService = Depends(Provide[Container.activity_application_service])
+):
+    """
+    여러 날짜의 풀었던 문제를 한번에 추가 (기존 레코드 유지)
+
+    Args:
+        request: [{date: "2025-02-07", problemIds: [1234, 1235]}, ...] 형태의 배열
+
+    Returns:
+        빈 데이터
+    """
+    records = [(item.date, item.problem_ids) for item in request]
+    await activity_application_service.batch_create_solved_problems(
+        BatchCreateSolvedProblemsCommand(
+            user_account_id=current_user.user_account_id,
+            records=records
+        )
+    )
 
     return ApiResponse(data={})
 
