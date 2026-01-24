@@ -13,7 +13,7 @@ export function transformToCalendarEvents(monthlyDataArray: MonthlyData[]): Cale
     dayData.solvedProblems.forEach((problem: SolvedProblems) => {
       if (problem.tags.length > 0) {
         events.push({
-          title: problem.tags[0].tagDisplayName,
+          title: problem.representativeTag || problem.tags[0].tagDisplayName,
           start: date,
           end: date,
           resource: {
@@ -29,7 +29,7 @@ export function transformToCalendarEvents(monthlyDataArray: MonthlyData[]): Cale
     dayData.willSolveProblems.forEach((problem: WillSolveProblems) => {
       if (problem.tags.length > 0) {
         events.push({
-          title: problem.tags[0].tagDisplayName,
+          title: problem.representativeTag || problem.tags[0].tagDisplayName,
           start: date,
           end: date,
           resource: {
@@ -41,7 +41,6 @@ export function transformToCalendarEvents(monthlyDataArray: MonthlyData[]): Cale
       }
     });
   });
-  // console.log('events', events);
 
   return events;
 }
@@ -57,10 +56,6 @@ export function getDisplayTags(events: CalendarEvent[]) {
   // solved와 willSolve를 분리하고, solved를 우선순위로
   const solvedEvents = events.filter((e) => e.resource.type === 'solved');
   const willSolveEvents = events.filter((e) => e.resource.type === 'willSolve');
-
-  // 중복 제거 (같은 tagCode는 한 번만 표시)
-  // const uniqueSolved = Array.from(new Map(solvedEvents.map((e) => [e.resource.tagCode, e])).values());
-  // const uniqueWillSolve = Array.from(new Map(willSolveEvents.map((e) => [e.resource.tagCode, e])).values());
 
   const allTags = [...solvedEvents, ...willSolveEvents];
   const totalCount = allTags.length;

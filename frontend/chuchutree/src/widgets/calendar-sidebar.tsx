@@ -9,11 +9,12 @@ import { useState, useEffect, useMemo, useId } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, X, Search } from 'lucide-react';
+import { GripVertical, X, Search, PencilLine } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { formatDateString } from '@/lib/utils/date';
 import { getErrorCode, getErrorMessage } from '@/lib/utils/error';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
 // 클라이언트 전용 렌더링 (hydration mismatch 방지)
 const SmallCalendar = dynamic(() => import('@/features/calendar/ui/SmallCalendar'), {
@@ -28,6 +29,11 @@ const SmallCalendar = dynamic(() => import('@/features/calendar/ui/SmallCalendar
 // 드래그 가능한 문제 카드
 function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Problem; isSolved: boolean; onDelete?: () => void }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: problem.problemId });
+  const [isTagOpen, setIsTagOpen] = useState<boolean>(false);
+  const handleMRepresentativeTag = (tagCode: string) => {
+    // 변경로직
+    setIsTagOpen(false);
+  };
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -36,7 +42,7 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
   };
 
   const firstTag = problem.tags[0];
-  const tagInfo = TAG_INFO[firstTag?.tagCode as keyof typeof TAG_INFO];
+  const tagInfo = TAG_INFO[problem.representativeTag || firstTag?.tagCode];
 
   return (
     <div
@@ -54,7 +60,34 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
 
       {/* 문제 기본정보 */}
       <div className="mr-2 flex shrink-0 flex-col gap-1 text-center">
-        {firstTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-innerground-darkgray'}`}>{firstTag.tagDisplayName}</div>}
+        {firstTag && (
+          <Popover open={isTagOpen} onOpenChange={setIsTagOpen}>
+            <PopoverTrigger asChild>
+              <div className={`group relative flex items-center gap-1 rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-innerground-darkgray'}`} onClick={(e) => e.stopPropagation()}>
+                {firstTag.tagDisplayName}
+                <PencilLine className="text-muted-foreground group-hover:text-primary h-2 w-2" />
+              </div>
+            </PopoverTrigger>
+            <PopoverContent className="w-fit p-2" side="top" align="start" onClick={(e) => e.stopPropagation()}>
+              <div className="flex flex-col items-start gap-0.5 text-xs">
+                {problem.tags.map((onetag) => (
+                  <div
+                    key={onetag.tagCode}
+                    aria-label={onetag.tagCode}
+                    className="hover:bg-background w-full cursor-pointer rounded px-1 text-start"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleMRepresentativeTag(onetag.tagCode);
+                    }}
+                  >
+                    {onetag.tagDisplayName}
+                  </div>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
+        )}
+
         {!firstTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300'}`}>Undefined</div>}
         <div className="flex items-center gap-1">
           <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={12} height={12} />
