@@ -95,13 +95,13 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
             const textColorClass = isSolved && tagInfo ? tagInfo.textColor : 'text-only-gray';
 
             return (
-              <div key={`${event.resource.problem.problemId}-${tagCode}-${index}`} className={`rounded px-2 py-0.5 text-xs ${textColorClass} ${bgColorClass} relative`}>
+              <div key={`${event.resource.problem.problemId}-${tagCode}-${index}`} className={`rounded px-2 py-0.5 text-xs ${textColorClass} ${bgColorClass} relative line-clamp-1`}>
                 {!isSolved && <div className={`absolute top-0 left-0 h-full w-2 rounded-l ${tagInfo ? tagInfo.bgColor : 'bg-only-gray'}`}></div>}
                 {event.title}
               </div>
             );
           })}
-          {hasMore && <div className="bg-innerground-darkgray text-only-gray rounded px-2 py-0.5 text-xs">+{moreCount}개 더보기</div>}
+          {hasMore && <div className="bg-innerground-darkgray text-only-gray line-clamp-1 rounded px-2 py-0.5 text-xs">+{moreCount}개 더보기</div>}
         </div>
       )}
     </div>

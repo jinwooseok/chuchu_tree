@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
-import { Problem, useUpdateWillSolveProblems, useUpdateSolvedProblems, useSearchProblems, WillSolveProblems, useCalendar } from '@/entities/calendar';
+import { Problem, useUpdateWillSolveProblems, useUpdateSolvedProblems, useSearchProblems, WillSolveProblems, useCalendar, useUpdateRepresentativeTag } from '@/entities/calendar';
 import Image from 'next/image';
 import { useState, useEffect, useMemo, useId } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
@@ -27,11 +27,23 @@ const SmallCalendar = dynamic(() => import('@/features/calendar/ui/SmallCalendar
 });
 
 // 드래그 가능한 문제 카드
-function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Problem; isSolved: boolean; onDelete?: () => void }) {
+function DraggableProblemCard({
+  problem,
+  isSolved,
+  onDelete,
+  onUpdateRepresentativeTag,
+}: {
+  problem: Problem;
+  isSolved: boolean;
+  onDelete?: () => void;
+  onUpdateRepresentativeTag?: (tagCode: string) => void;
+}) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: problem.problemId });
   const [isTagOpen, setIsTagOpen] = useState<boolean>(false);
-  const handleMRepresentativeTag = (tagCode: string) => {
-    // 변경로직
+  const handleRepresentativeTag = (tagCode: string) => {
+    if (onUpdateRepresentativeTag) {
+      onUpdateRepresentativeTag(tagCode);
+    }
     setIsTagOpen(false);
   };
 
@@ -42,7 +54,7 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
   };
 
   const firstTag = problem.tags[0];
-  const tagInfo = TAG_INFO[problem.representativeTag || firstTag?.tagCode];
+  const tagInfo = TAG_INFO[problem.representativeTag?.tagCode || firstTag?.tagCode];
 
   return (
     <div
@@ -59,12 +71,12 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
       </AppTooltip>
 
       {/* 문제 기본정보 */}
-      <div className="mr-2 flex shrink-0 flex-col gap-1 text-center">
+      <div className="mr-2 flex max-w-[calc(50%-10px)] flex-col gap-1 text-center">
         {firstTag && (
           <Popover open={isTagOpen} onOpenChange={setIsTagOpen}>
             <PopoverTrigger asChild>
               <div className={`group relative flex items-center gap-1 rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-innerground-darkgray'}`} onClick={(e) => e.stopPropagation()}>
-                {firstTag.tagDisplayName}
+                <span className="line-clamp-1">{problem.representativeTag?.tagDisplayName || firstTag.tagDisplayName}</span>
                 <PencilLine className="text-muted-foreground group-hover:text-primary h-2 w-2" />
               </div>
             </PopoverTrigger>
@@ -77,7 +89,7 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
                     className="hover:bg-background w-full cursor-pointer rounded px-1 text-start"
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleMRepresentativeTag(onetag.tagCode);
+                      handleRepresentativeTag(onetag.tagCode);
                     }}
                   >
                     {onetag.tagDisplayName}
@@ -120,7 +132,7 @@ function DraggableProblemCard({ problem, isSolved, onDelete }: { problem: Proble
 // 검색 결과 문제 카드 (클릭 가능)
 function SearchResultCard({ problem, onClick }: { problem: WillSolveProblems; onClick: () => void }) {
   const firstTag = problem.tags[0];
-  const tagInfo = TAG_INFO[firstTag?.tagCode as keyof typeof TAG_INFO];
+  const tagInfo = TAG_INFO[problem.representativeTag?.tagCode || firstTag?.tagCode];
 
   return (
     <button onClick={onClick} className="bg-background hover:bg-accent flex w-full items-center gap-2 rounded-md p-2 text-left text-xs transition-colors">
@@ -161,6 +173,14 @@ export default function CalendarSidebar() {
     },
   });
   const updateSolved = useUpdateSolvedProblems();
+  const updateRepresentativeTag = useUpdateRepresentativeTag({
+    onSuccess: () => {
+      toast.success('대표 태그 변경 완료!');
+    },
+    onError: () => {
+      toast.error('대표 태그 변경에 실패했습니다.');
+    },
+  });
 
   // Debounce 로직 (400ms)
   useEffect(() => {
@@ -283,6 +303,17 @@ export default function CalendarSidebar() {
     );
   };
 
+  // 문제 대표태그 변경
+  const handleUpdateRepresentativeTag = (problemId: number, tagCode: string) => {
+    if (!selectedDate) return;
+
+    updateRepresentativeTag.mutate({
+      date: formatDateString(selectedDate),
+      problemId,
+      representativeTagCode: tagCode,
+    });
+  };
+
   // 검색 결과 병합 (idBase + titleBase)
   const allSearchResults = searchResults ? [...searchResults.problems.idBase, ...searchResults.problems.titleBase] : [];
 
@@ -310,7 +341,7 @@ export default function CalendarSidebar() {
             <SortableContext items={solvedProblems.map((p) => p.problemId)} strategy={verticalListSortingStrategy}>
               <div className="flex flex-col gap-2">
                 {solvedProblems.map((problem) => (
-                  <DraggableProblemCard key={problem.problemId} problem={problem} isSolved={true} />
+                  <DraggableProblemCard key={problem.problemId} problem={problem} isSolved={true} onUpdateRepresentativeTag={(tagCode) => handleUpdateRepresentativeTag(problem.problemId, tagCode)} />
                 ))}
               </div>
             </SortableContext>
@@ -332,7 +363,13 @@ export default function CalendarSidebar() {
             <SortableContext items={willSolveProblems.map((p) => p.problemId)} strategy={verticalListSortingStrategy}>
               <div className="flex flex-col gap-2">
                 {willSolveProblems.map((problem) => (
-                  <DraggableProblemCard key={problem.problemId} problem={problem} isSolved={false} onDelete={() => handleDeleteProblem(problem.problemId)} />
+                  <DraggableProblemCard
+                    key={problem.problemId}
+                    problem={problem}
+                    isSolved={false}
+                    onDelete={() => handleDeleteProblem(problem.problemId)}
+                    onUpdateRepresentativeTag={(tagCode) => handleUpdateRepresentativeTag(problem.problemId, tagCode)}
+                  />
                 ))}
               </div>
             </SortableContext>

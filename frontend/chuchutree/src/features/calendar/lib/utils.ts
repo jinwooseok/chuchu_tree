@@ -13,13 +13,13 @@ export function transformToCalendarEvents(monthlyDataArray: MonthlyData[]): Cale
     dayData.solvedProblems.forEach((problem: SolvedProblems) => {
       if (problem.tags.length > 0) {
         events.push({
-          title: problem.representativeTag || problem.tags[0].tagDisplayName,
+          title: problem.representativeTag?.tagDisplayName || problem.tags[0].tagDisplayName,
           start: date,
           end: date,
           resource: {
             type: 'solved',
             problem,
-            tagCode: problem.tags[0].tagCode,
+            tagCode: problem.representativeTag?.tagCode || problem.tags[0].tagCode,
           },
         });
       }
@@ -29,13 +29,13 @@ export function transformToCalendarEvents(monthlyDataArray: MonthlyData[]): Cale
     dayData.willSolveProblems.forEach((problem: WillSolveProblems) => {
       if (problem.tags.length > 0) {
         events.push({
-          title: problem.representativeTag || problem.tags[0].tagDisplayName,
+          title: problem.representativeTag?.tagDisplayName || problem.tags[0].tagDisplayName,
           start: date,
           end: date,
           resource: {
             type: 'willSolve',
             problem,
-            tagCode: problem.tags[0].tagCode,
+            tagCode: problem.representativeTag?.tagCode || problem.tags[0].tagCode,
           },
         });
       }

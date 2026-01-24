@@ -26,4 +26,9 @@ export const calendarApi = {
     });
     return data.data;
   },
+  updateRepresentativeTag: async ({ problemId, representativeTagCode }: { problemId: number; representativeTagCode: string }): Promise<void> => {
+    await axiosInstance.put(`/user-accounts/me/problems/${problemId}/representative-tag`, {
+      representativeTagCode,
+    });
+  },
 };
