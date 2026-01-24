@@ -231,11 +231,11 @@ export default function CalendarSidebar() {
     const newIndex = solvedProblems.findIndex((p) => p.problemId === over.id);
 
     const reorderedProblems = arrayMove(solvedProblems, oldIndex, newIndex);
-    const problemIds = reorderedProblems.map((p) => p.problemId);
+    const problemId = reorderedProblems.map((p) => p.problemId);
 
     updateSolved.mutate({
       date: formatDateString(selectedDate),
-      problemIds,
+      problemId,
     });
   };
 

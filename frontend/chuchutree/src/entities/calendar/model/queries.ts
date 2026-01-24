@@ -2,7 +2,7 @@
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { calendarApi } from '../api/calendar.api';
-import type { UpdateProblemsData, Calendar, UpdateRepresentativeTagData, BatchSolvedProblems } from './calendar.types';
+import type { UpdateSolvedProblemsData, UpdateWillSolveProblemsData, Calendar, UpdateRepresentativeTagData, BatchSolvedProblems } from './calendar.types';
 import { UseMutationCallback } from '@/shared/types/api';
 import { calendarKeys } from './keys';
 import '@/shared/types/query';
@@ -32,7 +32,7 @@ export const useUpdateWillSolveProblems = (callbacks?: UseMutationCallback) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: UpdateProblemsData) => calendarApi.updateWillSolveProblems(data),
+    mutationFn: (data: UpdateWillSolveProblemsData) => calendarApi.updateWillSolveProblems(data),
     onMutate: async (variables) => {
       const date = new Date(variables.date);
       const year = date.getFullYear();
@@ -104,7 +104,7 @@ export const useUpdateSolvedProblems = (callbacks?: UseMutationCallback) => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (data: UpdateProblemsData) => calendarApi.updateSolvedProblems(data),
+    mutationFn: (data: UpdateSolvedProblemsData) => calendarApi.updateSolvedProblems(data),
     onMutate: async (variables) => {
       const date = new Date(variables.date);
       const year = date.getFullYear();
@@ -126,7 +126,7 @@ export const useUpdateSolvedProblems = (callbacks?: UseMutationCallback) => {
           monthlyData: old.monthlyData.map((day) => {
             if (day.targetDate === variables.date) {
               // solvedProblems를 업데이트된 순서로 재구성
-              const newSolvedProblems = variables.problemIds.map((id) => day.solvedProblems.find((p) => p.problemId === id)).filter(Boolean);
+              const newSolvedProblems = variables.problemId.map((id) => day.solvedProblems.find((p) => p.problemId === id)).filter(Boolean);
 
               return {
                 ...day,

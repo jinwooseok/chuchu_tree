@@ -73,8 +73,15 @@ export interface CalendarEvent {
   };
 }
 
-// 풀문제 업데이트, 푼문제 업데이트 request data
-export interface UpdateProblemsData {
+// solved 문제 업데이트 request data
+export interface UpdateSolvedProblemsData {
+  date: string;
+  problemId: number[];
+  // 낙관적 업데이트를 위한 새 문제 정보 (추가 시에만 사용)
+  newProblems?: WillSolveProblems[];
+}
+// will solve 문제 업데이트 request data
+export interface UpdateWillSolveProblemsData {
   date: string;
   problemIds: number[];
   // 낙관적 업데이트를 위한 새 문제 정보 (추가 시에만 사용)
