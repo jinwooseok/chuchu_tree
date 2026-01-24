@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, ChevronUp, Dices, Gem, Leaf, LibraryBig, PanelLeft, User2, Settings, Ban, LogOut } from 'lucide-react';
+import { Calendar, ChevronUp, Dices, Gem, Leaf, LibraryBig, PanelLeft, User2, Settings, LogOut, BookX, BookOpen } from 'lucide-react';
 import { useLayoutStore } from '@/lib/store/layout';
 import { useUser } from '@/entities/user/model/queries';
 import { useRouter } from 'next/navigation';
@@ -9,14 +9,13 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupActio
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useSidebar } from '@/components/ui/sidebar';
 import Image from 'next/image';
-import { SettingsDialog } from '@/features/settings';
+import { AddPrevProblemsDialog, BannedProblemsDialog, SettingsDialog } from '@/features/sidebar';
 import { TargetCode } from '@/shared/constants/tagSystem';
 import { useModal } from '@/lib/providers/modal-provider';
 import { toast } from '@/lib/utils/toast';
 import { useLogout } from '@/entities/auth';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
-import BannedProblemsDialog from '@/features/recommendation/ui/BannedProblemsDialog';
 
 const ICON_SIZE = 32;
 
@@ -139,6 +138,40 @@ export function AppSidebar() {
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
+          <div className="mt-10" />
+          {/* 그룹2 */}
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem key="addPrevProblems" aria-label={'가입일 이전 문제 등록하기'}>
+                  <SidebarMenuButton asChild>
+                    <div
+                      onClick={() => {
+                        openModal('add-prev-problems', <AddPrevProblemsDialog onClose={() => closeModal('add-prev-problems')} />);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <BookOpen size={ICON_SIZE} />
+                      <span>가입 전 풀이 등록하기</span>
+                    </div>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+                <SidebarMenuItem key="bannedProblemsList" aria-label={'bannedProblemsList'}>
+                  <SidebarMenuButton asChild>
+                    <div
+                      onClick={() => {
+                        openModal('banned-problems-list', <BannedProblemsDialog onClose={() => closeModal('banned-problems-list')} />);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <BookX size={ICON_SIZE} />
+                      <span>제외된 문제 확인하기</span>
+                    </div>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
         </SidebarContent>
         {/* footer */}
         <SidebarFooter>
@@ -162,21 +195,12 @@ export function AppSidebar() {
                           currentTarget={user?.userAccount?.target?.targetCode as TargetCode}
                           linkedAt={user?.linkedAt}
                           onClose={() => closeModal('settings')}
-                        />
+                        />,
                       );
                     }}
                   >
                     <Settings className="mr-2 h-4 w-4" />
                     <span>설정</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      openModal('banned-problems-list', <BannedProblemsDialog onClose={() => closeModal('banned-problems-list')} />);
-                    }}
-                  >
-                    <Ban className="mr-2 h-4 w-4" />
-                    <span>제외된 문제</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     onSelect={(e) => {
