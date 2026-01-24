@@ -5,7 +5,9 @@ from pydantic.alias_generators import to_camel
 from app.baekjoon.application.query.monthly_problems_query import (
     MonthlyDayDataQuery,
     MonthlyProblemsQuery,
-    SolvedProblemQuery
+    RepresentativeTagSummary,
+    SolvedProblemQuery,
+    WillSolveProblemQuery
 )
 from app.problem.application.query.problems_info_query import (
     ProblemInfoQuery,
@@ -99,12 +101,34 @@ class ProblemInfoResponse(BaseModel):
         )
 
 
+class RepresentativeTagSummaryResponse(BaseModel):
+    """대표 태그 요약 응답"""
+    tag_id: int = Field(..., description="태그 ID")
+    tag_code: str = Field(..., description="태그 코드")
+    tag_display_name: str = Field(..., description="태그 표시 이름")
+
+    model_config = ConfigDict(
+        alias_generator=to_camel,
+        populate_by_name=True
+    )
+
+    @classmethod
+    def from_query(cls, query: RepresentativeTagSummary) -> "RepresentativeTagSummaryResponse":
+        return cls(
+            tag_id=query.tag_id,
+            tag_code=query.tag_code,
+            tag_display_name=query.tag_display_name
+        )
+
+
 class SolvedProblemResponse(ProblemInfoResponse):
-    """푼 문제 응답 (realSolvedYn 포함)"""
+    """푼 문제 응답 (realSolvedYn, 대표태그 포함)"""
     real_solved_yn: bool = Field(..., description="실제 solved.ac에서 푼 문제 여부")
+    representative_tag: RepresentativeTagSummaryResponse | None = Field(None, description="대표 태그 정보")
 
     @classmethod
     def from_query(cls, query: SolvedProblemQuery) -> "SolvedProblemResponse":
+        rep_tag = RepresentativeTagSummaryResponse.from_query(query.representative_tag) if query.representative_tag else None
         return cls(
             problem_id=query.problem_id,
             problem_title=query.problem_title,
@@ -112,7 +136,26 @@ class SolvedProblemResponse(ProblemInfoResponse):
             problem_tier_name=query.problem_tier_name,
             problem_class_level=query.problem_class_level,
             tags=[TagInfoResponse.from_query(t) for t in query.tags],
-            real_solved_yn=query.real_solved_yn
+            real_solved_yn=query.real_solved_yn,
+            representative_tag=rep_tag
+        )
+
+
+class WillSolveProblemResponse(ProblemInfoResponse):
+    """풀 예정 문제 응답 (대표태그 포함)"""
+    representative_tag: RepresentativeTagSummaryResponse | None = Field(None, description="대표 태그 정보")
+
+    @classmethod
+    def from_query(cls, query: WillSolveProblemQuery) -> "WillSolveProblemResponse":
+        rep_tag = RepresentativeTagSummaryResponse.from_query(query.representative_tag) if query.representative_tag else None
+        return cls(
+            problem_id=query.problem_id,
+            problem_title=query.problem_title,
+            problem_tier_level=query.problem_tier_level,
+            problem_tier_name=query.problem_tier_name,
+            problem_class_level=query.problem_class_level,
+            tags=[TagInfoResponse.from_query(t) for t in query.tags],
+            representative_tag=rep_tag
         )
 
 
@@ -122,7 +165,7 @@ class MonthlyDayDataResponse(BaseModel):
     solved_problem_count: int = Field(..., description="푼 문제 수")
     will_solve_problem_count: int = Field(..., description="풀 예정 문제 수")
     solved_problems: list[SolvedProblemResponse] = Field(default_factory=list, description="푼 문제 목록")
-    will_solve_problems: list[ProblemInfoResponse] = Field(default_factory=list, description="풀 예정 문제 목록")
+    will_solve_problems: list[WillSolveProblemResponse] = Field(default_factory=list, description="풀 예정 문제 목록")
 
     model_config = ConfigDict(
         alias_generator=to_camel,
@@ -136,7 +179,7 @@ class MonthlyDayDataResponse(BaseModel):
             solved_problem_count=query.solved_problem_count,
             will_solve_problem_count=query.will_solve_problem_count,
             solved_problems=[SolvedProblemResponse.from_query(p) for p in query.solved_problems],
-            will_solve_problems=[ProblemInfoResponse.from_query(p) for p in query.will_solve_problems]
+            will_solve_problems=[WillSolveProblemResponse.from_query(p) for p in query.will_solve_problems]
         )
 
 

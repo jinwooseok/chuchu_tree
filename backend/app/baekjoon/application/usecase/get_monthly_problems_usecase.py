@@ -1,7 +1,7 @@
 # 필요한 임포트 추가
 from collections import defaultdict
 from datetime import date
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from calendar import monthrange
 
 # 기존 임포트 유지
@@ -13,7 +13,9 @@ from app.baekjoon.application.command.get_monthly_problems_command import GetMon
 from app.baekjoon.application.query.monthly_problems_query import (
     MonthlyDayDataQuery,
     MonthlyProblemsQuery,
-    SolvedProblemQuery
+    RepresentativeTagSummary,
+    SolvedProblemQuery,
+    WillSolveProblemQuery
 )
 from app.baekjoon.domain.event.get_monthly_activity_data_payload import GetMonthlyActivityDataPayload
 from app.baekjoon.domain.event.get_problems_info_payload import GetProblemsInfoPayload
@@ -21,11 +23,13 @@ from app.baekjoon.domain.repository.baekjoon_account_repository import BaekjoonA
 from app.baekjoon.domain.repository.problem_history_repository import ProblemHistoryRepository
 from app.common.domain.entity.domain_event import DomainEvent
 from app.common.domain.service.event_publisher import DomainEventBus
-from app.common.domain.vo.identifiers import UserAccountId
+from app.common.domain.vo.identifiers import TagId, UserAccountId
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
 from app.problem.application.query.problems_info_query import ProblemsInfoQuery, ProblemInfoQuery
+from app.tag.application.command.tag_command import GetTagInfosCommand
+from app.tag.application.query.tag_query import TagInfosQuery
 
 logger = logging.getLogger(__name__)
 
@@ -38,6 +42,7 @@ class ProblemEntry:
     is_solved: bool     # True if solved (streak or problem record), False if will_solve
     is_streak: bool     # True if it originated from a streak
     source: str         # 'streak', 'record', 'will_solve' (for debugging/clarity)
+    representative_tag_id: int | None = None  # 대표 태그 ID
 
 class GetMonthlyProblemsUsecase:
     """월간 문제 조회 Usecase"""
@@ -58,7 +63,7 @@ class GetMonthlyProblemsUsecase:
 
         # 1. Activity domain 데이터 요청 (월간 활동 계획 및 기록)
         activity_data = await self._fetch_activity_data(command)
-        
+
         # 2. 백준 계정 조회
         bj_account = await self.baekjoon_account_repository.find_by_user_id(user_account_id)
         if not bj_account:
@@ -70,25 +75,24 @@ class GetMonthlyProblemsUsecase:
             bj_account.bj_account_id, command.year, command.month
         )
 
-        # 4. 계획된 문제(Will Solve) 중 전체 이력에서 해결 여부 확인 (기존 로직 유지)
-        all_planned_ids = {pid for daily in activity_data.daily_activities for pid in daily.will_solve_problem_ids}
-        # 실제로 풀었는지 여부는 이제 merging logic에서 최종적으로 결정되므로, 여기서 필터링은 제거함.
-        # 기존 코드에서 `actually_solved_ids_ever`는 사용처가 사라지므로 필요없으나,
-        # _fetch_problems_info에서 모든 problem id를 모을때 사용될 수 있으므로 일단 남겨둡니다.
-        # 다만 현재 로직상 all_problem_ids_for_detail에 이미 포함될 것이므로 제거해도 무방합니다.
-        # 여기서는 단순히 _fetch_problems_info에서 사용할 모든 ID를 모으는 용도로만 사용.
-        
+        # 4. 대표 태그 ID 맵 생성 (problem_id -> representative_tag_id)
+        representative_tag_map: dict[int, int | None] = {}
+        for daily in activity_data.daily_activities:
+            for p in daily.solved_problems:
+                representative_tag_map[p.problem_id] = p.representative_tag_id
+            for p in daily.will_solve_problems:
+                representative_tag_map[p.problem_id] = p.representative_tag_id
+
         # 5. 문제 상세 정보 조회 (Problem Domain)
         # 모든 가능한 문제 ID를 수집하여 상세 정보를 한 번에 조회합니다.
         all_problem_ids_for_detail = set()
         for daily in activity_data.daily_activities:
-            all_problem_ids_for_detail.update(daily.solved_problem_ids)
-            all_problem_ids_for_detail.update(daily.will_solve_problem_ids)
+            all_problem_ids_for_detail.update(p.problem_id for p in daily.solved_problems)
+            all_problem_ids_for_detail.update(p.problem_id for p in daily.will_solve_problems)
         all_problem_ids_for_detail.update(real_solved_by_date.keys())
-        # 이전 all_planned_ids | set(real_solved_by_date.keys()) 대신 위 로직으로 변경.
-        
+
         problems_info = await self._fetch_problems_info(all_problem_ids_for_detail)
-        
+
         # 6. 데이터 병합 및 우선순위 적용
         merged_problem_map: dict[int, ProblemEntry] = {}
 
@@ -100,35 +104,40 @@ class GetMonthlyProblemsUsecase:
                 order=-1,  # Placeholder, will be updated by record if available on same day
                 is_solved=True,
                 is_streak=True,
-                source='streak'
+                source='streak',
+                representative_tag_id=representative_tag_map.get(problem_id)
             )
 
         # b. Problem Records 처리 (streak보다 후순위, will_solve보다 선순위)
         for daily in activity_data.daily_activities:
             current_date = daily.target_date
-            for index, problem_id in enumerate(daily.solved_problem_ids):
+            for index, p in enumerate(daily.solved_problems):
+                problem_id = p.problem_id
                 if problem_id in merged_problem_map:
                     existing_entry = merged_problem_map[problem_id]
                     # Rule 6 (Order priority): 동일 날짜에 streak과 record가 있으면 record의 order를 따름
                     if existing_entry.display_date == current_date:
                         existing_entry.order = index
-                    # Rule 7 (Date priority): 날짜가 다른 경우 streak 날짜를 따름 (이미 streak이 설정했으므로 변경 없음)
-                    # solved_yn은 이미 True로 유지. is_streak도 기존값을 유지.
+                    # 대표 태그는 record의 것을 우선 사용
+                    if p.representative_tag_id is not None:
+                        existing_entry.representative_tag_id = p.representative_tag_id
                 else:
                     # Streak이 없는 Problem Record
                     merged_problem_map[problem_id] = ProblemEntry(
                         problem_id=problem_id,
                         display_date=current_date,
                         order=index,
-                        is_solved=True, # ProblemRecord.solved=True인 경우만 여기에 들어옴
+                        is_solved=True,
                         is_streak=False,
-                        source='record'
+                        source='record',
+                        representative_tag_id=p.representative_tag_id
                     )
 
         # c. Will Solve Problems 처리 (가장 낮은 우선순위)
         for daily in activity_data.daily_activities:
             current_date = daily.target_date
-            for index, problem_id in enumerate(daily.will_solve_problem_ids):
+            for index, p in enumerate(daily.will_solve_problems):
+                problem_id = p.problem_id
                 # Rule 8 (Record/Streak priority over will_solve):
                 # merged_problem_map에 없어야만 will_solve로 추가
                 if problem_id not in merged_problem_map:
@@ -136,12 +145,21 @@ class GetMonthlyProblemsUsecase:
                         problem_id=problem_id,
                         display_date=current_date,
                         order=index,
-                        is_solved=False, # Will solve 문제이므로 solved는 False
+                        is_solved=False,
                         is_streak=False,
-                        source='will_solve'
+                        source='will_solve',
+                        representative_tag_id=p.representative_tag_id
                     )
-        
-        # 7. 일별 데이터 재조립 및 최종 형식으로 변환
+
+        # 7. 대표 태그 정보 일괄 조회
+        all_tag_ids = {
+            entry.representative_tag_id
+            for entry in merged_problem_map.values()
+            if entry.representative_tag_id is not None
+        }
+        tag_info_map = await self._fetch_tag_infos(all_tag_ids)
+
+        # 8. 일별 데이터 재조립 및 최종 형식으로 변환
         final_daily_data = defaultdict(lambda: {'solved_problems': [], 'will_solve_problems': []})
         all_processed_problem_ids = set()
 
@@ -153,13 +171,30 @@ class GetMonthlyProblemsUsecase:
 
             all_processed_problem_ids.add(entry.problem_id)
 
+            # 대표 태그 정보 조회
+            rep_tag_summary = None
+            if entry.representative_tag_id and entry.representative_tag_id in tag_info_map:
+                tag_info = tag_info_map[entry.representative_tag_id]
+                rep_tag_summary = RepresentativeTagSummary(
+                    tag_id=tag_info.tag_id,
+                    tag_code=tag_info.tag_code,
+                    tag_display_name=tag_info.tag_display_name
+                )
+
             if entry.is_solved:
                 final_daily_data[entry.display_date]['solved_problems'].append(
-                    (entry.order, SolvedProblemQuery(**problem_info.model_dump(), real_solved_yn=entry.is_streak))
+                    (entry.order, SolvedProblemQuery(
+                        **problem_info.model_dump(),
+                        real_solved_yn=entry.is_streak,
+                        representative_tag=rep_tag_summary
+                    ))
                 )
-            else: # is_solved is False, meaning it's a will_solve problem
+            else:
                 final_daily_data[entry.display_date]['will_solve_problems'].append(
-                    (entry.order, problem_info) # ProblemInfoQuery is sufficient for will_solve
+                    (entry.order, WillSolveProblemQuery(
+                        **problem_info.model_dump(),
+                        representative_tag=rep_tag_summary
+                    ))
                 )
 
         monthly_data_list = []
@@ -213,3 +248,20 @@ class GetMonthlyProblemsUsecase:
             result_type=ProblemsInfoQuery
         )
         return await self.domain_event_bus.publish(event)
+
+    async def _fetch_tag_infos(self, tag_ids: set[int]) -> dict[int, any]:
+        """태그 ID 목록으로 태그 정보를 조회하여 {tag_id: TagSummaryQuery} 맵 반환"""
+        if not tag_ids:
+            return {}
+
+        event = DomainEvent(
+            event_type="GET_TAG_INFOS_REQUESTED",
+            data=GetTagInfosCommand(tag_ids=[TagId(tid) for tid in tag_ids]),
+            result_type=TagInfosQuery
+        )
+        result: TagInfosQuery | None = await self.domain_event_bus.publish(event)
+
+        if not result:
+            return {}
+
+        return {tag.tag_id: tag for tag in result.tags}
