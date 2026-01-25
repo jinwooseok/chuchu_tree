@@ -4,7 +4,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { userApi } from '../api/user.api';
 import { PostTargetType } from './types';
 import { UseMutationCallback } from '@/shared/types/api';
-import { userKeys } from './keys';
+import { streakKeys, userKeys } from './keys';
 import '@/shared/types/query';
 
 export const useUser = () => {
@@ -26,5 +26,12 @@ export const usePostTarget = (callbacks?: UseMutationCallback) => {
     onError: (error) => {
       if (callbacks?.onError) callbacks.onError(error);
     },
+  });
+};
+
+export const useSteaks = (startDate: string, endDate: string) => {
+  return useQuery({
+    queryKey: streakKeys.list(startDate, endDate),
+    queryFn: () => userApi.getStreak({ startDate, endDate }),
   });
 };

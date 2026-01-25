@@ -48,3 +48,10 @@ export interface User {
 export interface PostTargetType {
   targetCode: TargetCode;
 }
+
+// 추가 스트릭 get
+
+export interface Streak {
+  bjAccountId: string;
+  streaks: Streaks[];
+}
