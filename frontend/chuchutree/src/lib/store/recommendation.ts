@@ -4,7 +4,7 @@ import { immer } from 'zustand/middleware/immer';
 
 type LevelType = 'easy' | 'normal' | 'hard' | 'extreme';
 
-interface RecommendedProblems {
+export interface RecommendedProblems {
   problemId: number;
   problemTitle: string;
   problemTierLevel: number;
@@ -29,6 +29,11 @@ interface RecommendedProblems {
   }[];
 }
 
+interface RecommendationHistoryItem {
+  timestamp: number;
+  problems: RecommendedProblems[];
+}
+
 type State = {
   // Filter state
   selectedLevel: LevelType | null;
@@ -39,6 +44,9 @@ type State = {
   problems: RecommendedProblems[];
   isLoading: boolean;
   error: Error | null;
+
+  // Recommendation history
+  recommendationHistory: RecommendationHistoryItem[];
 
   // Display options
   showFilters: {
@@ -62,6 +70,7 @@ const initialState: State = {
   problems: [],
   isLoading: false,
   error: null,
+  recommendationHistory: [],
   showFilters: {
     problemNumber: true,
     problemTier: true,
@@ -177,6 +186,27 @@ const recommendationStoreInternal = create(
               });
             },
 
+            // Add recommendation to history
+            addRecommendationHistory: (problems: RecommendedProblems[]) => {
+              set((state) => {
+                state.recommendationHistory.unshift({
+                  timestamp: Date.now(),
+                  problems,
+                });
+                // Keep only last 50 records
+                if (state.recommendationHistory.length > 50) {
+                  state.recommendationHistory = state.recommendationHistory.slice(0, 50);
+                }
+              });
+            },
+
+            // Clear recommendation history
+            clearRecommendationHistory: () => {
+              set((state) => {
+                state.recommendationHistory = [];
+              });
+            },
+
             // Reset all state
             reset: () => {
               set(initialState);
@@ -195,6 +225,7 @@ const recommendationStoreInternal = create(
           showTagSection: state.showTagSection,
           showFilterSection: state.showFilterSection,
           showExcludedModeSection: state.showExcludedModeSection,
+          recommendationHistory: state.recommendationHistory,
         }),
       },
     ),

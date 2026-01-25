@@ -5,8 +5,10 @@ import { useRecommendationStore } from '@/lib/store/recommendation';
 import { useGetRecommendation } from '@/entities/recommendation';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { toast } from '@/lib/utils/toast';
-import { EyeOff, Search, SlidersHorizontal, ChevronDown, EllipsisVertical } from 'lucide-react';
+import { EyeOff, Search, SlidersHorizontal, ChevronDown, EllipsisVertical, History } from 'lucide-react';
 import { useState } from 'react';
+import { RecommendationHistoryDialog } from './RecommendationHistoryDialog';
+import { useModal } from '@/lib/providers/modal-provider';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
@@ -19,7 +21,7 @@ export function RecommendationButton() {
     showTagSection,
     showFilterSection,
     showExcludedModeSection,
-    actions: { setProblems, setLoading, setError, toggleFilter, resetFilters, toggleLevelSection, toggleTagSection, toggleFilterSection, toggleExcludedModeSection },
+    actions: { setProblems, setLoading, setError, toggleFilter, resetFilters, toggleLevelSection, toggleTagSection, toggleFilterSection, toggleExcludedModeSection, addRecommendationHistory },
   } = useRecommendationStore();
 
   // 로컬 state로 복수 선택 관리
@@ -30,12 +32,14 @@ export function RecommendationButton() {
   const [isCountPopoverOpen, setIsCountPopoverOpen] = useState(false);
 
   const { mutate: getRecommendation, isPending } = useGetRecommendation();
+  const { openModal, closeModal } = useModal();
 
   const handleGetRecommendation = (params: { level: string; tags: string; count: number; exclusion_mode: string }) => {
     getRecommendation(params, {
       onSuccess: (data) => {
         setProblems(data.problems);
         setLoading(false);
+        addRecommendationHistory(data.problems);
         toast.success('문제 추천을 받았습니다.');
       },
       onError: (error) => {
@@ -154,6 +158,19 @@ export function RecommendationButton() {
         {/* 추천받기 */}
         <Button aria-label="알고리즘 문제 추천받기" className="selcect-none flex-1 cursor-pointer" onClick={handleRecommend} disabled={isPending}>
           {isPending ? '추천 중...' : '추천 받기'}
+        </Button>
+        {/* 추천 기록 버튼 */}
+        <Button
+          aria-label="추천 기록 보기"
+          variant="outline"
+          size="sm"
+          className="text-muted-foreground hover:text-muted-foreground h-7 cursor-pointer text-xs"
+          onClick={() => {
+            openModal('recommendation-history', <RecommendationHistoryDialog onClose={() => closeModal('recommendation-history')} />);
+          }}
+        >
+          <History className="mr-1 h-3 w-3" />
+          추천 기록
         </Button>
         {/* 알고리즘 유형 멀티셀렉트 */}
         {showTagSection && (
