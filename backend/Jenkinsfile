@@ -35,17 +35,6 @@ pipeline {
         }
 
         stage('Build & Deploy Production') {
-            when { 
-                allOf {
-                    expression { 
-                        return env.GIT_BRANCH?.contains('main') || env.BRANCH_NAME == 'main'
-                    }
-                    anyOf {
-                        changeset "backend/**"
-                        triggeredBy 'UserCause'
-                    }
-                }
-            }
             options { skipDefaultCheckout() }
             steps {
                 withCredentials([
