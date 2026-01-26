@@ -17,8 +17,9 @@ import { useModal } from '@/lib/providers/modal-provider';
 import { toast } from '@/lib/utils/toast';
 import { useLogout } from '@/entities/auth';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Spinner } from '@/shared/ui';
+import { useGlobalShortcuts } from '@/lib/hooks/useGlobalShortcuts';
+import { useRecommend } from '@/features/recommendation/hooks/useRecommend';
 
 const ICON_SIZE = 32;
 
@@ -53,10 +54,105 @@ export function AppSidebar() {
     logout();
   };
 
+  // 추천받기 훅
+  const { recommend } = useRecommend();
+
+  // 설정 모달 열기
+  const handleOpenSettings = () => {
+    openModal(
+      'settings',
+      <SettingsDialog
+        currentBjAccountId={user?.bjAccount?.bjAccountId || ''}
+        currentTarget={user?.userAccount?.target?.targetCode as TargetCode}
+        linkedAt={user?.linkedAt}
+        onClose={() => closeModal('settings')}
+      />,
+    );
+  };
+
+  // 전역 단축키 등록
+  useGlobalShortcuts({
+    shortcuts: [
+      // Shift + C: 캘린더 뷰로 전환
+      {
+        key: 'c',
+        shift: true,
+        action: () => setCenterSection('calendar'),
+        description: '캘린더 뷰로 전환',
+      },
+      // Shift + D: 대시보드 뷰로 전환
+      {
+        key: 'd',
+        shift: true,
+        action: () => setCenterSection('dashboard'),
+        description: '대시보드 뷰로 전환',
+      },
+      // Shift + 1: 티어바 토글
+      {
+        key: '1',
+        code: 'Digit1',
+        shift: true,
+        action: () => toggleTopSection('tierbar'),
+        description: '티어바 토글',
+      },
+      // Shift + 2: 스트릭바 토글
+      {
+        key: '2',
+        code: 'Digit2',
+        shift: true,
+        action: () => toggleTopSection('streak'),
+        description: '스트릭바 토글',
+      },
+      // Shift + 3: 추천 섹션 토글
+      {
+        key: '3',
+        code: 'Digit3',
+        shift: true,
+        action: () => toggleBottomSection(),
+        description: '추천 섹션 토글',
+      },
+      // Shift + E: 추천받기
+      {
+        key: 'e',
+        shift: true,
+        action: () => {
+          // 추천 섹션이 닫혀있으면 먼저 열기
+          if (bottomSection !== 'recommend') {
+            toggleBottomSection();
+          }
+          // store 상태를 사용하여 추천받기 실행
+          recommend();
+        },
+        description: '추천받기',
+      },
+      // Shift + R: 프로필 갱신
+      {
+        key: 'r',
+        shift: true,
+        action: () => {
+          if (!isRefreshPending) {
+            refresh();
+          }
+        },
+        description: '프로필 갱신',
+      },
+      // Ctrl + `: 설정 열기
+      {
+        key: '`',
+        code: 'Backquote',
+        ctrl: true,
+        action: handleOpenSettings,
+        description: '설정 열기',
+      },
+    ],
+  });
+
   // Menu items.
   const items = [
     {
       title: '티어',
+      short1: 'Shift',
+      short2: '1',
       action: () => toggleTopSection('tierbar'),
       icon: Gem,
       isActive: topSection === 'tierbar',
@@ -64,6 +160,8 @@ export function AppSidebar() {
     },
     {
       title: '스트릭',
+      short1: 'Shift',
+      short2: '2',
       action: () => toggleTopSection('streak'),
       icon: Leaf,
       isActive: topSection === 'streak',
@@ -71,6 +169,8 @@ export function AppSidebar() {
     },
     {
       title: '캘린더',
+      short1: 'Shift',
+      short2: 'C',
       action: () => setCenterSection('calendar'),
       icon: Calendar,
       isActive: centerSection === 'calendar',
@@ -78,6 +178,8 @@ export function AppSidebar() {
     },
     {
       title: '유형별 숙련도',
+      short1: 'Shift',
+      short2: 'D',
       action: () => setCenterSection('dashboard'),
       icon: LibraryBig,
       isActive: centerSection === 'dashboard',
@@ -85,6 +187,8 @@ export function AppSidebar() {
     },
     {
       title: '오늘의 문제',
+      short1: 'Shift',
+      short2: '3',
       action: () => toggleBottomSection(),
       icon: Dices,
       isActive: bottomSection === 'recommend',
@@ -109,7 +213,7 @@ export function AppSidebar() {
                 <h1 className={`text-md ml-9 font-bold ${sidebarOpenState !== 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>ChuChuTree</h1>
               </div>
               {/* 사이드 바 토글 (header) */}
-              <AppTooltip content="사이드바 닫기" side="right">
+              <AppTooltip content="사이드바 닫기" side="right" shortCut1="Shift" shortCut2="B">
                 <SidebarGroupAction aria-label="사이드바 닫기">
                   <PanelLeft onClick={setSidebarOpenState} size={ICON_SIZE} className={`cursor-pointer`} /> <span className="sr-only">Toggle Sidebar OpenState</span>
                 </SidebarGroupAction>
@@ -121,30 +225,24 @@ export function AppSidebar() {
                 {/* 사이드바 토글버튼 (inside) */}
                 <div className={`transition-all duration-200 ease-in-out ${sidebarOpenState === 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>
                   <SidebarMenuItem key="toggleSidebarOpenState">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <SidebarMenuButton asChild>
-                          <PanelLeft onClick={setSidebarOpenState} size={ICON_SIZE} className="cursor-pointer" />
-                        </SidebarMenuButton>
-                      </TooltipTrigger>
-                      <TooltipContent side="right">사이드바 열기</TooltipContent>
-                    </Tooltip>
+                    <AppTooltip content="사이드바 닫기" side="right" shortCut1="Shift" shortCut2="B">
+                      <SidebarMenuButton asChild>
+                        <PanelLeft onClick={setSidebarOpenState} size={ICON_SIZE} className="cursor-pointer" />
+                      </SidebarMenuButton>
+                    </AppTooltip>
                   </SidebarMenuItem>
                 </div>
                 {/* 나머지 link */}
                 {items.map((item) => (
                   <SidebarMenuItem key={item.title} aria-label={item.tooltipText}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <SidebarMenuButton asChild isActive={item.isActive}>
-                          <div onClick={item.action} className="cursor-pointer">
-                            <item.icon size={ICON_SIZE} />
-                            <span>{item.title}</span>
-                          </div>
-                        </SidebarMenuButton>
-                      </TooltipTrigger>
-                      <TooltipContent side="right">{item.tooltipText}</TooltipContent>
-                    </Tooltip>
+                    <AppTooltip content={item.tooltipText} side="right" shortCut1={item.short1} shortCut2={item.short2}>
+                      <SidebarMenuButton asChild isActive={item.isActive}>
+                        <div onClick={item.action} className="cursor-pointer">
+                          <item.icon size={ICON_SIZE} />
+                          <span>{item.title}</span>
+                        </div>
+                      </SidebarMenuButton>
+                    </AppTooltip>
                   </SidebarMenuItem>
                 ))}
               </SidebarMenu>
@@ -156,67 +254,55 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem key="addPrevProblems" aria-label={'가입일 이전 문제 등록하기'}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <SidebarMenuButton asChild>
-                        <div
-                          onClick={() => {
-                            openModal('add-prev-problems', <AddPrevProblemsDialog onClose={() => closeModal('add-prev-problems')} />);
-                          }}
-                          className="cursor-pointer"
-                        >
-                          <BookOpen size={ICON_SIZE} />
-                          <span>가입 전 풀이 등록하기</span>
-                        </div>
-                      </SidebarMenuButton>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">가입일 이전 문제 등록하기</TooltipContent>
-                  </Tooltip>
+                  <AppTooltip content="가입일 이전 문제 등록하기" side="right">
+                    <SidebarMenuButton asChild>
+                      <div
+                        onClick={() => {
+                          openModal('add-prev-problems', <AddPrevProblemsDialog onClose={() => closeModal('add-prev-problems')} />);
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <BookOpen size={ICON_SIZE} />
+                        <span>가입 전 풀이 등록하기</span>
+                      </div>
+                    </SidebarMenuButton>
+                  </AppTooltip>
                 </SidebarMenuItem>
                 <SidebarMenuItem key="bannedProblemsList" aria-label={'bannedProblemsList'}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <SidebarMenuButton asChild>
-                        <div
-                          onClick={() => {
-                            openModal('banned-problems-list', <BannedProblemsDialog onClose={() => closeModal('banned-problems-list')} />);
-                          }}
-                          className="cursor-pointer"
-                        >
-                          <BookX size={ICON_SIZE} />
-                          <span>제외된 문제 확인하기</span>
-                        </div>
-                      </SidebarMenuButton>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">제외된 문제 확인하기</TooltipContent>
-                  </Tooltip>
+                  <AppTooltip content="제외된 문제 확인하기" side="right">
+                    <SidebarMenuButton asChild>
+                      <div
+                        onClick={() => {
+                          openModal('banned-problems-list', <BannedProblemsDialog onClose={() => closeModal('banned-problems-list')} />);
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <BookX size={ICON_SIZE} />
+                        <span>제외된 문제 확인하기</span>
+                      </div>
+                    </SidebarMenuButton>
+                  </AppTooltip>
                 </SidebarMenuItem>
                 <SidebarMenuItem key="refresh" aria-label={'프로필 갱신'}>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <SidebarMenuButton asChild>
-                        <div onClick={() => refresh()} className="cursor-pointer">
-                          {isRefreshPending ? <Spinner /> : <RefreshCw className="text-foreground h-5 w-5" />}
-                          <span>프로필 갱신</span>
-                        </div>
-                      </SidebarMenuButton>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">프로필 갱신</TooltipContent>
-                  </Tooltip>
+                  <AppTooltip content="프로필 갱신" side="right" shortCut1="Shift" shortCut2="R">
+                    <SidebarMenuButton asChild>
+                      <div onClick={() => refresh()} className="cursor-pointer">
+                        {isRefreshPending ? <Spinner /> : <RefreshCw className="text-foreground h-5 w-5" />}
+                        <span>프로필 갱신</span>
+                      </div>
+                    </SidebarMenuButton>
+                  </AppTooltip>
                 </SidebarMenuItem>
                 {!isRefreshButtonVisible && (
                   <SidebarMenuItem key="showRefreshButton" aria-label={'버튼 꺼내기'}>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <SidebarMenuButton asChild>
-                          <div onClick={() => showRefreshButton()} className="cursor-pointer">
-                            <PackageOpen size={ICON_SIZE} />
-                            <span>버튼 꺼내기</span>
-                          </div>
-                        </SidebarMenuButton>
-                      </TooltipTrigger>
-                      <TooltipContent side="right">RefreshButton 꺼내기</TooltipContent>
-                    </Tooltip>
+                    <AppTooltip content="프로필 갱신 버튼 꺼내기" side="right">
+                      <SidebarMenuButton asChild>
+                        <div onClick={() => showRefreshButton()} className="cursor-pointer">
+                          <PackageOpen size={ICON_SIZE} />
+                          <span>버튼 꺼내기</span>
+                        </div>
+                      </SidebarMenuButton>
+                    </AppTooltip>
                   </SidebarMenuItem>
                 )}
               </SidebarMenu>
@@ -234,24 +320,26 @@ export function AppSidebar() {
                     <ChevronUp className="ml-auto" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
-                  <DropdownMenuItem
-                    onSelect={(e) => {
-                      e.preventDefault();
-                      openModal(
-                        'settings',
-                        <SettingsDialog
-                          currentBjAccountId={user?.bjAccount?.bjAccountId || ''}
-                          currentTarget={user?.userAccount?.target?.targetCode as TargetCode}
-                          linkedAt={user?.linkedAt}
-                          onClose={() => closeModal('settings')}
-                        />,
-                      );
-                    }}
-                  >
-                    <Settings className="mr-2 h-4 w-4" />
-                    <span>설정</span>
-                  </DropdownMenuItem>
+                <DropdownMenuContent side="top" className="w-[radix-popper-anchor-width]">
+                  <AppTooltip content="설정" side="right" shortCut1="Ctrl" shortCut2="`">
+                    <DropdownMenuItem
+                      onSelect={(e) => {
+                        e.preventDefault();
+                        openModal(
+                          'settings',
+                          <SettingsDialog
+                            currentBjAccountId={user?.bjAccount?.bjAccountId || ''}
+                            currentTarget={user?.userAccount?.target?.targetCode as TargetCode}
+                            linkedAt={user?.linkedAt}
+                            onClose={() => closeModal('settings')}
+                          />,
+                        );
+                      }}
+                    >
+                      <Settings className="mr-2 h-4 w-4" />
+                      <span>설정</span>
+                    </DropdownMenuItem>
+                  </AppTooltip>
                   <DropdownMenuItem
                     onSelect={(e) => {
                       e.preventDefault();

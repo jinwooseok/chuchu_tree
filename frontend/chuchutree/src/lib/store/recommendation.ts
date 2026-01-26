@@ -36,9 +36,10 @@ interface RecommendationHistoryItem {
 
 type State = {
   // Filter state
-  selectedLevel: LevelType | null;
-  selectedTags: string;
-  selectedExcludedMode: string;
+  selectedLevels: string[]; // 복수 선택 지원 (기존 selectedLevel 대체)
+  selectedTagsList: string[]; // 복수 선택 지원 (기존 selectedTags 대체)
+  selectedExclusionMode: string; // 기존 selectedExcludedMode → selectedExclusionMode
+  selectedCount: number; // 추천 문제 개수
 
   // Recommendation result
   problems: RecommendedProblems[];
@@ -64,9 +65,10 @@ type State = {
 };
 
 const initialState: State = {
-  selectedLevel: null,
-  selectedTags: '',
-  selectedExcludedMode: 'LENIENT',
+  selectedLevels: [],
+  selectedTagsList: [],
+  selectedExclusionMode: 'LENIENT',
+  selectedCount: 3,
   problems: [],
   isLoading: false,
   error: null,
@@ -89,22 +91,28 @@ const recommendationStoreInternal = create(
       immer(
         combine(initialState, (set, get) => ({
           actions: {
-            // Set selected level
-            setSelectedLevel: (level: LevelType | null) => {
+            // Set selected levels (복수 선택)
+            setSelectedLevels: (levels: string[]) => {
               set((state) => {
-                state.selectedLevel = level;
+                state.selectedLevels = levels;
               });
             },
-            // Set selected tags
-            setSelectedTags: (tags: string) => {
+            // Set selected tags list (복수 선택)
+            setSelectedTagsList: (tags: string[]) => {
               set((state) => {
-                state.selectedTags = tags;
+                state.selectedTagsList = tags;
               });
             },
-            // set Selected ExcludedMode
-            setSelectedExcludedMode: (mode: string) => {
+            // Set selected exclusion mode
+            setSelectedExclusionMode: (mode: string) => {
               set((state) => {
-                state.selectedExcludedMode = mode;
+                state.selectedExclusionMode = mode;
+              });
+            },
+            // Set selected count
+            setSelectedCount: (count: number) => {
+              set((state) => {
+                state.selectedCount = count;
               });
             },
 
@@ -217,9 +225,10 @@ const recommendationStoreInternal = create(
       {
         name: 'recommendation-storage',
         partialize: (state) => ({
-          selectedLevel: state.selectedLevel,
-          selectedTags: state.selectedTags,
-          selectedExcludedMode: state.selectedExcludedMode,
+          selectedLevels: state.selectedLevels,
+          selectedTagsList: state.selectedTagsList,
+          selectedExclusionMode: state.selectedExclusionMode,
+          selectedCount: state.selectedCount,
           showFilters: state.showFilters,
           showLevelSection: state.showLevelSection,
           showTagSection: state.showTagSection,
@@ -239,14 +248,24 @@ export const useRecommendationStore = () => {
   return store as typeof store & State;
 };
 
-export const useSetSelectedLevel = () => {
-  const setSelectedLevel = recommendationStoreInternal((s) => s.actions.setSelectedLevel);
-  return setSelectedLevel;
+export const useSetSelectedLevels = () => {
+  const setSelectedLevels = recommendationStoreInternal((s) => s.actions.setSelectedLevels);
+  return setSelectedLevels;
 };
 
-export const useSetSelectedTags = () => {
-  const setSelectedTags = recommendationStoreInternal((s) => s.actions.setSelectedTags);
-  return setSelectedTags;
+export const useSetSelectedTagsList = () => {
+  const setSelectedTagsList = recommendationStoreInternal((s) => s.actions.setSelectedTagsList);
+  return setSelectedTagsList;
+};
+
+export const useSetSelectedExclusionMode = () => {
+  const setSelectedExclusionMode = recommendationStoreInternal((s) => s.actions.setSelectedExclusionMode);
+  return setSelectedExclusionMode;
+};
+
+export const useSetSelectedCount = () => {
+  const setSelectedCount = recommendationStoreInternal((s) => s.actions.setSelectedCount);
+  return setSelectedCount;
 };
 
 export const useSetProblems = () => {
