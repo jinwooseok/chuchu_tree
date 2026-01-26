@@ -40,10 +40,6 @@ pipeline {
                     expression { 
                         return env.GIT_BRANCH?.contains('main') || env.BRANCH_NAME == 'main'
                     }
-                    anyOf {
-                        changeset "backend/**"
-                        triggeredBy 'UserCause'
-                    }
                 }
             }
             options { skipDefaultCheckout() }
