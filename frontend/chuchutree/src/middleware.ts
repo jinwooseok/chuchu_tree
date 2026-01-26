@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server';
 import { refreshAccessToken, parseCookiesForMiddleware } from '@/lib/auth-utils';
 
 // 인증이 필요한 경로
-const protectedPaths = ['/', '/bj-account'];
+const protectedPaths = ['/chu', '/bj-account'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
   if (protectedPaths.includes(pathname)) {
     if (!accessToken) {
       console.log('[Middleware] access토큰 없음');
-      return NextResponse.redirect(new URL('/sign-in', request.url));
+      return NextResponse.redirect(new URL('/', request.url));
     }
     // access_token이 있는 경우, 유효성 검증
     // local환경: rewrites에 의해 https://chuchu-tree-dev.duckdns.org/api/v1/auth/me로 프록시
@@ -63,7 +63,7 @@ export async function middleware(request: NextRequest) {
       } else {
         console.log('[Middleware] 401, 404말고 다른에러:');
       }
-      const response = NextResponse.redirect(new URL('/sign-in', request.url));
+      const response = NextResponse.redirect(new URL('/', request.url));
       response.cookies.delete('access_token');
       response.cookies.delete('refresh_token');
       return response;

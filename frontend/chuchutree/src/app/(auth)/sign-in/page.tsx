@@ -7,7 +7,7 @@ export default async function SignIn() {
   const isLoggedIn = await isAuthenticated();
 
   if (isLoggedIn) {
-    redirect('/');
+    redirect('/chu');
   }
 
   return <SignInClient />;

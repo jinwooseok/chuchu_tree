@@ -13,7 +13,7 @@ export default function PrivacyPolicyClient({ markdownContent }: PrivacyPolicyCl
   const router = useRouter();
 
   const handleLogoClick = () => {
-    router.push('/');
+    router.push('/chu');
   };
 
   const handleNavigateToTerms = () => {

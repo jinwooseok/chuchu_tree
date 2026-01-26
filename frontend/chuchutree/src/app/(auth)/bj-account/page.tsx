@@ -31,7 +31,7 @@ export default async function BjAccountRegistration() {
 
   // 이미 백준 계정이 등록되어 있으면 홈으로 리다이렉트
   if (userData?.bjAccount?.bjAccountId) {
-    redirect('/');
+    redirect('/chu');
   }
 
   return <BjAccountRegistrationClient />;
