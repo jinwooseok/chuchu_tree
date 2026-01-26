@@ -29,6 +29,8 @@ services:
       - "${LOCAL_MYSQL_PORT}:3306"
     networks:
       - chuchu-network
+    volumes:
+      - /chuchu-db-data:/var/lib/mysql
     restart: always
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]

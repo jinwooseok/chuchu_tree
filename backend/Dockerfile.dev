@@ -1,0 +1,46 @@
+FROM python:3.13.5-slim
+
+ENV TZ=Asia/Seoul
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+WORKDIR /project
+
+# 시스템 패키지 업데이트 및 필요한 패키지 설치
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    pkg-config \
+    libmariadb-dev \
+    libmariadb-dev-compat \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Poetry 설치
+RUN pip install --no-cache-dir poetry
+
+# Poetry 설정: 가상환경을 컨테이너 내부에 생성하지 않음
+ENV POETRY_NO_INTERACTION=1 \
+    POETRY_VENV_IN_PROJECT=0 \
+    POETRY_CACHE_DIR=/tmp/poetry_cache
+    
+# 의존성 파일 복사
+COPY pyproject.toml poetry.lock* /project/
+
+# 의존성 설치 (캐시 최적화)
+RUN poetry config virtualenvs.create false \
+    && poetry install --only=main --no-root \
+    && rm -rf $POETRY_CACHE_DIR
+
+# 애플리케이션 코드 복사
+COPY . /project
+
+# 권한 설정
+RUN chmod +x /project/app/main.py
+
+EXPOSE 8002
+
+CMD ["uvicorn", "app.main:app", \
+     "--host", "0.0.0.0", \
+     "--port", "8002", \
+     "--workers", "1"]
