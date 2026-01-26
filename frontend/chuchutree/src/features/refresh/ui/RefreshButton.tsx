@@ -15,7 +15,7 @@ export default function RefreshButton() {
   });
 
   return (
-    <AppTooltip content="프로필 갱신" side="bottom">
+    <AppTooltip content="프로필 갱신(드래그 가능)" side="bottom">
       <button
         onClick={() => refresh()}
         disabled={isRefreshPending}

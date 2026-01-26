@@ -1,9 +1,11 @@
 'use client';
 
-import { Calendar, ChevronUp, Dices, Gem, Leaf, LibraryBig, PanelLeft, User2, Settings, LogOut, BookX, BookOpen } from 'lucide-react';
+import { Calendar, ChevronUp, Dices, Gem, Leaf, LibraryBig, PanelLeft, User2, Settings, LogOut, BookX, BookOpen, RefreshCw, PackageOpen } from 'lucide-react';
 import { useLayoutStore } from '@/lib/store/layout';
 import { useUser } from '@/entities/user/model/queries';
 import { useRouter } from 'next/navigation';
+import { useRefreshButtonStore } from '@/lib/store/refreshButton';
+import { useRefresh } from '@/entities/refresh';
 
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -16,6 +18,7 @@ import { toast } from '@/lib/utils/toast';
 import { useLogout } from '@/entities/auth';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
+import { Spinner } from '@/shared/ui';
 
 const ICON_SIZE = 32;
 
@@ -25,6 +28,15 @@ export function AppSidebar() {
   const { data: user } = useUser();
   const { openModal, closeModal } = useModal();
   const router = useRouter();
+  const { isRefreshButtonVisible, showRefreshButton } = useRefreshButtonStore();
+  const { mutate: refresh, isPending: isRefreshPending } = useRefresh({
+    onSuccess: () => {
+      toast.success('프로필이 갱신되었습니다.');
+    },
+    onError: () => {
+      toast.error('프로필 갱신에 실패했습니다');
+    },
+  });
 
   // 로그아웃 훅 및 핸들러
   const { mutate: logout } = useLogout({
@@ -144,31 +156,69 @@ export function AppSidebar() {
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem key="addPrevProblems" aria-label={'가입일 이전 문제 등록하기'}>
-                  <SidebarMenuButton asChild>
-                    <div
-                      onClick={() => {
-                        openModal('add-prev-problems', <AddPrevProblemsDialog onClose={() => closeModal('add-prev-problems')} />);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      <BookOpen size={ICON_SIZE} />
-                      <span>가입 전 풀이 등록하기</span>
-                    </div>
-                  </SidebarMenuButton>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton asChild>
+                        <div
+                          onClick={() => {
+                            openModal('add-prev-problems', <AddPrevProblemsDialog onClose={() => closeModal('add-prev-problems')} />);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <BookOpen size={ICON_SIZE} />
+                          <span>가입 전 풀이 등록하기</span>
+                        </div>
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">가입일 이전 문제 등록하기</TooltipContent>
+                  </Tooltip>
                 </SidebarMenuItem>
                 <SidebarMenuItem key="bannedProblemsList" aria-label={'bannedProblemsList'}>
-                  <SidebarMenuButton asChild>
-                    <div
-                      onClick={() => {
-                        openModal('banned-problems-list', <BannedProblemsDialog onClose={() => closeModal('banned-problems-list')} />);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      <BookX size={ICON_SIZE} />
-                      <span>제외된 문제 확인하기</span>
-                    </div>
-                  </SidebarMenuButton>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton asChild>
+                        <div
+                          onClick={() => {
+                            openModal('banned-problems-list', <BannedProblemsDialog onClose={() => closeModal('banned-problems-list')} />);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <BookX size={ICON_SIZE} />
+                          <span>제외된 문제 확인하기</span>
+                        </div>
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">제외된 문제 확인하기</TooltipContent>
+                  </Tooltip>
                 </SidebarMenuItem>
+                <SidebarMenuItem key="refresh" aria-label={'프로필 갱신'}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <SidebarMenuButton asChild>
+                        <div onClick={() => refresh()} className="cursor-pointer">
+                          {isRefreshPending ? <Spinner /> : <RefreshCw className="text-foreground h-5 w-5" />}
+                          <span>프로필 갱신</span>
+                        </div>
+                      </SidebarMenuButton>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">프로필 갱신</TooltipContent>
+                  </Tooltip>
+                </SidebarMenuItem>
+                {!isRefreshButtonVisible && (
+                  <SidebarMenuItem key="showRefreshButton" aria-label={'버튼 꺼내기'}>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <SidebarMenuButton asChild>
+                          <div onClick={() => showRefreshButton()} className="cursor-pointer">
+                            <PackageOpen size={ICON_SIZE} />
+                            <span>버튼 꺼내기</span>
+                          </div>
+                        </SidebarMenuButton>
+                      </TooltipTrigger>
+                      <TooltipContent side="right">RefreshButton 꺼내기</TooltipContent>
+                    </Tooltip>
+                  </SidebarMenuItem>
+                )}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

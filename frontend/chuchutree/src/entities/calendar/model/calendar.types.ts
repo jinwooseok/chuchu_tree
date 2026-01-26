@@ -3,7 +3,7 @@ import { TierKey, TierNumKey } from '@/shared/constants/tierSystem';
 
 export interface TagTargets {
   targetId: number;
-  targetCode: string;
+  targetCode: TagKey;
   targetDisplayName: string;
 }
 
@@ -32,7 +32,7 @@ export interface SolvedProblems {
   problemTierName: TierKey;
   problemClassLevel: number;
   tags: Tags[];
-  representativeTag: TagKey;
+  representativeTag: { tagId: number; tagCode: TagKey; tagDisplayName: string };
 }
 
 export interface WillSolveProblems {
@@ -42,7 +42,7 @@ export interface WillSolveProblems {
   problemTierName: TierKey;
   problemClassLevel: number;
   tags: Tags[];
-  representativeTag: TagKey;
+  representativeTag: { tagId: number; tagCode: TagKey; tagDisplayName: string };
 }
 
 // Problem: SolvedProblems와 WillSolveProblems의 공통 타입
@@ -73,12 +73,26 @@ export interface CalendarEvent {
   };
 }
 
-// 풀문제 업데이트, 푼문제 업데이트 request data
-export interface UpdateProblemsData {
+// solved 문제 업데이트 request data
+export interface UpdateSolvedProblemsData {
+  date: string;
+  problemId: number[];
+  // 낙관적 업데이트를 위한 새 문제 정보 (추가 시에만 사용)
+  newProblems?: WillSolveProblems[];
+}
+// will solve 문제 업데이트 request data
+export interface UpdateWillSolveProblemsData {
   date: string;
   problemIds: number[];
   // 낙관적 업데이트를 위한 새 문제 정보 (추가 시에만 사용)
   newProblems?: WillSolveProblems[];
+}
+
+// 문제 대표태그 변경 request data
+export interface UpdateRepresentativeTagData {
+  date: string;
+  problemId: number;
+  representativeTagCode: string;
 }
 
 // 문제 검색
@@ -89,4 +103,9 @@ export interface SearchProblems {
     idBase: WillSolveProblems[];
     titleBase: WillSolveProblems[];
   };
+}
+
+export interface BatchSolvedProblems {
+  date: string;
+  problemIds: number[];
 }

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { useRecommendationStore } from '@/lib/store/recommendation';
 import { useCalendarStore } from '@/lib/store/calendar';
-import { useCalendar, useUpdateWillSolveProblems } from '@/entities/calendar';
+import { useCalendar, useUpdateWillSolveProblems, useUpdateRepresentativeTag } from '@/entities/calendar';
 import { toast } from '@/lib/utils/toast';
 import { Trash2, CheckCircle, Ban } from 'lucide-react';
 import { useBanProblem, useUnbanProblem, useGetBannedProblems } from '@/entities/recommendation';
@@ -38,6 +38,8 @@ export function RecommendationAnswer() {
       toast.error(errorMessage);
     },
   });
+
+  const updateRepresentativeTag = useUpdateRepresentativeTag();
 
   // Check if problem is already registered
   const isProblemRegistered = (problemId: number): boolean => {
@@ -81,6 +83,18 @@ export function RecommendationAnswer() {
       {
         onSuccess: () => {
           toast.success(successMessage);
+
+          // 문제 추가 시에만 대표 태그 자동 설정
+          if (!isRegistered) {
+            const problem = problems.find((p) => p.problemId === problemId);
+            if (problem && problem.tags.length > 0) {
+              updateRepresentativeTag.mutate({
+                date: formatDateString(selectedDate),
+                problemId,
+                representativeTagCode: problem.tags[0].tagCode,
+              });
+            }
+          }
         },
       },
     );

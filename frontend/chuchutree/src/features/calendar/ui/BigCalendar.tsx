@@ -12,6 +12,7 @@ import { TAG_INFO, TagKey } from '@/shared/constants/tagSystem';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
+import { useSidebar } from '@/components/ui/sidebar';
 
 const locales = {
   ko: ko,
@@ -95,13 +96,13 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
             const textColorClass = isSolved && tagInfo ? tagInfo.textColor : 'text-only-gray';
 
             return (
-              <div key={`${event.resource.problem.problemId}-${tagCode}-${index}`} className={`rounded px-2 py-0.5 text-xs ${textColorClass} ${bgColorClass} relative`}>
+              <div key={`${event.resource.problem.problemId}-${tagCode}-${index}`} className={`rounded px-2 py-0.5 text-xs ${textColorClass} ${bgColorClass} relative line-clamp-1`}>
                 {!isSolved && <div className={`absolute top-0 left-0 h-full w-2 rounded-l ${tagInfo ? tagInfo.bgColor : 'bg-only-gray'}`}></div>}
                 {event.title}
               </div>
             );
           })}
-          {hasMore && <div className="bg-innerground-darkgray text-only-gray rounded px-2 py-0.5 text-xs">+{moreCount}개 더보기</div>}
+          {hasMore && <div className="bg-innerground-darkgray text-only-gray line-clamp-1 rounded px-2 py-0.5 text-xs">+{moreCount}개 더보기</div>}
         </div>
       )}
     </div>
@@ -112,6 +113,7 @@ export default function BigCalendar() {
   // Zustand에서 UI 상태만 가져오기
   const { selectedDate, bigCalendarDate, actions } = useCalendarStore();
   const { setSelectedDate, setBigCalendarDate } = actions;
+  const { setOpen: setCloseAppSidebar } = useSidebar();
 
   // 안정적인 초기 날짜 (한 번만 생성)
   const [initialDate] = useState(new Date());
@@ -158,6 +160,7 @@ export default function BigCalendar() {
   // 날짜 클릭 핸들러
   const handleSelectSlot = ({ start }: { start: Date }) => {
     setSelectedDate(start);
+    setCloseAppSidebar(false);
   };
 
   // 네비게이션 핸들러 - single source of truth
