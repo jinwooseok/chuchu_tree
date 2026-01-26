@@ -24,7 +24,18 @@ export function RecommendationButton() {
     showTagSection,
     showFilterSection,
     showExcludedModeSection,
-    actions: { setSelectedLevels, setSelectedTagsList, setSelectedExclusionMode, setSelectedCount, toggleFilter, resetFilters, toggleLevelSection, toggleTagSection, toggleFilterSection, toggleExcludedModeSection },
+    actions: {
+      setSelectedLevels,
+      setSelectedTagsList,
+      setSelectedExclusionMode,
+      setSelectedCount,
+      toggleFilter,
+      resetFilters,
+      toggleLevelSection,
+      toggleTagSection,
+      toggleFilterSection,
+      toggleExcludedModeSection,
+    },
   } = useRecommendationStore();
 
   const [isCountPopoverOpen, setIsCountPopoverOpen] = useState(false);
@@ -125,9 +136,11 @@ export function RecommendationButton() {
           </div>
         </div>
         {/* 추천받기 */}
-        <Button aria-label="알고리즘 문제 추천받기" className="selcect-none flex-1 cursor-pointer" onClick={handleRecommend} disabled={isPending}>
-          {isPending ? '추천 중...' : '추천 받기'}
-        </Button>
+        <AppTooltip content="추천받기" side="top" shortCut1="Shift" shortCut2="E">
+          <Button aria-label="알고리즘 문제 추천받기" className="selcect-none flex-1 cursor-pointer" onClick={handleRecommend} disabled={isPending}>
+            {isPending ? '추천 중...' : '추천 받기'}
+          </Button>
+        </AppTooltip>
         {/* 추천 기록 버튼 */}
         <Button
           aria-label="추천 기록 보기"

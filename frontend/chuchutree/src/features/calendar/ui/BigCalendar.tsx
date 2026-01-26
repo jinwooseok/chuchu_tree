@@ -13,6 +13,8 @@ import { useCalendarStore } from '@/lib/store/calendar';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { useSidebar } from '@/components/ui/sidebar';
+import { useGlobalShortcuts } from '@/lib/hooks/useGlobalShortcuts';
+import { useLayoutStore } from '@/lib/store/layout';
 
 const locales = {
   ko: ko,
@@ -41,17 +43,17 @@ function CustomToolbar({ date, onNavigate }: ToolbarProps) {
 
       {/* 우측: 네비게이션 버튼 */}
       <div className="flex gap-2">
-        <AppTooltip content="오늘로 이동" side="bottom">
+        <AppTooltip content="오늘로 이동" side="bottom" shortCut1="Alt" shortCut2="T">
           <button onClick={() => handleClick('TODAY')} className="hover:bg-background cursor-pointer rounded border px-3 py-1 text-xs" aria-label="오늘로 이동">
             오늘
           </button>
         </AppTooltip>
-        <AppTooltip content="지난달로 이동" side="bottom">
+        <AppTooltip content="지난달로 이동" side="bottom" shortCut1="Alt" shortCut2="↑">
           <button onClick={() => handleClick('PREV')} className="hover:bg-background cursor-pointer rounded px-3 py-1 text-xs" aria-label="지난달로 이동">
             <ChevronUp className="h-4 w-4" />
           </button>
         </AppTooltip>
-        <AppTooltip content="다음 달로 이동" side="bottom">
+        <AppTooltip content="다음 달로 이동" side="bottom" shortCut1="Alt" shortCut2="↓">
           <button onClick={() => handleClick('NEXT')} className="hover:bg-background cursor-pointer rounded px-3 py-1 text-xs" aria-label="다음 달로 이동">
             <ChevronDown className="h-4 w-4" />
           </button>
@@ -114,6 +116,7 @@ export default function BigCalendar() {
   const { selectedDate, bigCalendarDate, actions } = useCalendarStore();
   const { setSelectedDate, setBigCalendarDate } = actions;
   const { setOpen: setCloseAppSidebar } = useSidebar();
+  const { centerSection } = useLayoutStore();
 
   // 안정적인 초기 날짜 (한 번만 생성)
   const [initialDate] = useState(new Date());
@@ -167,6 +170,52 @@ export default function BigCalendar() {
   const handleBigCalendarNavigate = (newDate: Date) => {
     setBigCalendarDate(newDate);
   };
+
+  // 캘린더 전용 단축키 (캘린더 뷰에서만 작동)
+  useGlobalShortcuts({
+    enabled: centerSection === 'calendar',
+    shortcuts: [
+      // Alt + Left: 이전 주 (실제로는 이전 월로 구현)
+      {
+        key: 'ArrowLeft',
+        code: 'ArrowLeft',
+        alt: true,
+        action: () => handleBigCalendarNavigate(subMonths(currentDate, 1)),
+        description: '이전 월로 이동',
+      },
+      // Alt + Right: 다음 주 (실제로는 다음 월로 구현)
+      {
+        key: 'ArrowRight',
+        code: 'ArrowRight',
+        alt: true,
+        action: () => handleBigCalendarNavigate(addMonths(currentDate, 1)),
+        description: '다음 월로 이동',
+      },
+      // Alt + Up: 이전 월
+      {
+        key: 'ArrowUp',
+        code: 'ArrowUp',
+        alt: true,
+        action: () => handleBigCalendarNavigate(subMonths(currentDate, 1)),
+        description: '이전 월로 이동',
+      },
+      // Alt + Down: 다음 월
+      {
+        key: 'ArrowDown',
+        code: 'ArrowDown',
+        alt: true,
+        action: () => handleBigCalendarNavigate(addMonths(currentDate, 1)),
+        description: '다음 월로 이동',
+      },
+      // Alt + T: 오늘로 이동
+      {
+        key: 't',
+        alt: true,
+        action: () => handleBigCalendarNavigate(new Date()),
+        description: '오늘로 이동',
+      },
+    ],
+  });
 
   // 스크롤로 월 이동 (throttle 적용)
   const lastScrollTime = useRef(0);
