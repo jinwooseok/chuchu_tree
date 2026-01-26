@@ -3,7 +3,8 @@
 import { useEffect, useCallback } from 'react';
 
 export interface ShortcutConfig {
-  key: string;
+  key: string; // event.key 값 (예: 'c', '1', ',')
+  code?: string; // event.code 값 (예: 'KeyC', 'Digit1', 'Comma') - 더 정확함
   shift?: boolean;
   ctrl?: boolean;
   alt?: boolean;
@@ -36,8 +37,13 @@ const isInputFocused = (): boolean => {
  * 단축키가 현재 이벤트와 일치하는지 확인
  */
 const matchesShortcut = (event: KeyboardEvent, config: ShortcutConfig): boolean => {
-  // key 비교 (대소문자 구분 없이)
-  const keyMatches = event.key.toLowerCase() === config.key.toLowerCase();
+  // code가 있으면 code로 비교 (더 정확), 없으면 key로 비교
+  let keyMatches = false;
+  if (config.code) {
+    keyMatches = event.code === config.code;
+  } else {
+    keyMatches = event.key.toLowerCase() === config.key.toLowerCase();
+  }
 
   // 수정자 키 비교
   const shiftMatches = !!config.shift === event.shiftKey;

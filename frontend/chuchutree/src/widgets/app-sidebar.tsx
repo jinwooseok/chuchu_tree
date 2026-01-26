@@ -54,6 +54,82 @@ export function AppSidebar() {
     logout();
   };
 
+  // 설정 모달 열기
+  const handleOpenSettings = () => {
+    openModal(
+      'settings',
+      <SettingsDialog
+        currentBjAccountId={user?.bjAccount?.bjAccountId || ''}
+        currentTarget={user?.userAccount?.target?.targetCode as TargetCode}
+        linkedAt={user?.linkedAt}
+        onClose={() => closeModal('settings')}
+      />,
+    );
+  };
+
+  // 전역 단축키 등록
+  useGlobalShortcuts({
+    shortcuts: [
+      // Shift + C: 캘린더 뷰로 전환
+      {
+        key: 'c',
+        shift: true,
+        action: () => setCenterSection('calendar'),
+        description: '캘린더 뷰로 전환',
+      },
+      // Shift + D: 대시보드 뷰로 전환
+      {
+        key: 'd',
+        shift: true,
+        action: () => setCenterSection('dashboard'),
+        description: '대시보드 뷰로 전환',
+      },
+      // Shift + 1: 티어바 토글
+      {
+        key: '1',
+        code: 'Digit1',
+        shift: true,
+        action: () => toggleTopSection('tierbar'),
+        description: '티어바 토글',
+      },
+      // Shift + 2: 스트릭바 토글
+      {
+        key: '2',
+        code: 'Digit2',
+        shift: true,
+        action: () => toggleTopSection('streak'),
+        description: '스트릭바 토글',
+      },
+      // Shift + 3: 추천 섹션 토글
+      {
+        key: '3',
+        code: 'Digit3',
+        shift: true,
+        action: () => toggleBottomSection(),
+        description: '추천 섹션 토글',
+      },
+      // Shift + R: 프로필 갱신
+      {
+        key: 'r',
+        shift: true,
+        action: () => {
+          if (!isRefreshPending) {
+            refresh();
+          }
+        },
+        description: '프로필 갱신',
+      },
+      // Ctrl + `: 설정 열기
+      {
+        key: '`',
+        code: 'Backquote',
+        ctrl: true,
+        action: handleOpenSettings,
+        description: '설정 열기',
+      },
+    ],
+  });
+
   // Menu items.
   const items = [
     {
@@ -235,7 +311,7 @@ export function AppSidebar() {
                     <ChevronUp className="ml-auto" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent side="top" className="w-[--radix-popper-anchor-width]">
+                <DropdownMenuContent side="top" className="w-[radix-popper-anchor-width]">
                   <DropdownMenuItem
                     onSelect={(e) => {
                       e.preventDefault();
