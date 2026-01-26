@@ -36,14 +36,8 @@ pipeline {
 
         stage('Build & Deploy Production') {
             when { 
-                allOf {
-                    expression { 
-                        return env.GIT_BRANCH?.contains('main') || env.BRANCH_NAME == 'main'
-                    }
-                    anyOf {
-                        changeset "frontend/**"
-                        triggeredBy 'UserCause'
-                    }
+                expression { 
+                        return env.GIT_BRANCH?.contains('develop') || env.BRANCH_NAME == 'develop'
                 }
             }
             options { skipDefaultCheckout() }
