@@ -24,7 +24,7 @@ services:
         reservations:
           memory: 512M
     depends_on:
-      chuchu-mysql:
+      chuchu-mysql-prod:
         condition: service_healthy
         
   # FastAPI 서버용 서비스
@@ -43,9 +43,9 @@ services:
     volumes:
       - ./logs:/project/logs
     depends_on:
-      chuchu-fastapi-migrate:
+      chuchu-fastapi-migrate-prod:
         condition: service_completed_successfully
-      chuchu-redis:
+      chuchu-redis-prod:
         condition: service_started
   
   chuchu-mysql-prod:
