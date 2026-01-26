@@ -1,5 +1,7 @@
 services:
-  chuchu-fastapi-migrate:
+  chuchu-fastapi-migrate-prod:
+    env_file:
+        - ./.env
     environment:
       - environment=prod
     build:
@@ -26,7 +28,9 @@ services:
         condition: service_healthy
         
   # FastAPI 서버용 서비스
-  chuchu-fastapi:
+  chuchu-fastapi-prod:
+    env_file:
+        - ./.env
     environment:
       - environment=prod
     container_name: chuchu-fastapi-prod
@@ -44,7 +48,7 @@ services:
       chuchu-redis:
         condition: service_started
   
-  chuchu-mysql:
+  chuchu-mysql-prod:
     container_name: chuchu-mysql-prod
     image: mysql/mysql-server:8.0.27
     environment:
@@ -82,7 +86,7 @@ services:
       start_period: 30s
       interval: 30s
   
-  chuchu-redis:
+  chuchu-redis-prod:
     container_name: chuchu-redis-prod
     image: redis:latest
     environment:
@@ -99,7 +103,7 @@ services:
       start_period: 10s
       interval: 30s
   
-  chuchu-minio:
+  chuchu-minio-prod:
     image: minio/minio:latest
     command: server /data --console-address ":9001"
     container_name: chuchu-minio-prod
