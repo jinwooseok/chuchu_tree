@@ -19,6 +19,7 @@ import { useLogout } from '@/entities/auth';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Spinner } from '@/shared/ui';
+import { useGlobalShortcuts } from '@/lib/hooks/useGlobalShortcuts';
 
 const ICON_SIZE = 32;
 
