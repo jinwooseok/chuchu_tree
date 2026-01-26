@@ -1,7 +1,7 @@
 # ChuChuTree FrontEnd
 
 > Next.js 기반 프론트엔드 서버
->
+> 1
 
 ## 담당자
 
