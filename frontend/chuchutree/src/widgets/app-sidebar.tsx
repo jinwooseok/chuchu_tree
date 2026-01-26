@@ -20,6 +20,7 @@ import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Spinner } from '@/shared/ui';
 import { useGlobalShortcuts } from '@/lib/hooks/useGlobalShortcuts';
+import { useRecommend } from '@/features/recommendation/hooks/useRecommend';
 
 const ICON_SIZE = 32;
 
@@ -53,6 +54,9 @@ export function AppSidebar() {
   const handleLogout = () => {
     logout();
   };
+
+  // 추천받기 훅
+  const { recommend } = useRecommend();
 
   // 설정 모달 열기
   const handleOpenSettings = () => {
@@ -107,6 +111,20 @@ export function AppSidebar() {
         shift: true,
         action: () => toggleBottomSection(),
         description: '추천 섹션 토글',
+      },
+      // Shift + E: 추천받기
+      {
+        key: 'e',
+        shift: true,
+        action: () => {
+          // 추천 섹션이 닫혀있으면 먼저 열기
+          if (bottomSection !== 'recommend') {
+            toggleBottomSection();
+          }
+          // store 상태를 사용하여 추천받기 실행
+          recommend();
+        },
+        description: '추천받기',
       },
       // Shift + R: 프로필 갱신
       {

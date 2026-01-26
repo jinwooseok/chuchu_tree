@@ -2,9 +2,7 @@
 
 import { Button } from '@/components/ui/button';
 import { useRecommendationStore } from '@/lib/store/recommendation';
-import { useGetRecommendation } from '@/entities/recommendation';
 import { useCalendarStore } from '@/lib/store/calendar';
-import { toast } from '@/lib/utils/toast';
 import { EyeOff, Search, SlidersHorizontal, ChevronDown, EllipsisVertical, History } from 'lucide-react';
 import { useState } from 'react';
 import { RecommendationHistoryDialog } from './RecommendationHistoryDialog';
@@ -12,77 +10,48 @@ import { useModal } from '@/lib/providers/modal-provider';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
+import { useRecommend } from '../hooks/useRecommend';
 
 export function RecommendationButton() {
   const { selectedDate } = useCalendarStore();
   const {
+    selectedLevels,
+    selectedTagsList,
+    selectedExclusionMode,
+    selectedCount,
     showFilters,
     showLevelSection,
     showTagSection,
     showFilterSection,
     showExcludedModeSection,
-    actions: { setProblems, setLoading, setError, toggleFilter, resetFilters, toggleLevelSection, toggleTagSection, toggleFilterSection, toggleExcludedModeSection, addRecommendationHistory },
+    actions: { setSelectedLevels, setSelectedTagsList, setSelectedExclusionMode, setSelectedCount, toggleFilter, resetFilters, toggleLevelSection, toggleTagSection, toggleFilterSection, toggleExcludedModeSection },
   } = useRecommendationStore();
 
-  // 로컬 state로 복수 선택 관리
-  const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
-  const [selectedTagsList, setSelectedTagsList] = useState<string[]>([]);
-  const [selectedExclusionMode, setSelectedExclusionMode] = useState<string>('LENIENT');
-  const [selectedCount, setSelectedCount] = useState<number>(3);
   const [isCountPopoverOpen, setIsCountPopoverOpen] = useState(false);
 
-  const { mutate: getRecommendation, isPending } = useGetRecommendation();
+  const { recommend, isPending } = useRecommend();
   const { openModal, closeModal } = useModal();
 
-  const handleGetRecommendation = (params: { level: string; tags: string; count: number; exclusion_mode: string }) => {
-    getRecommendation(params, {
-      onSuccess: (data) => {
-        setProblems(data.problems);
-        setLoading(false);
-        addRecommendationHistory(data.problems);
-        toast.success('문제 추천을 받았습니다.');
-      },
-      onError: (error) => {
-        setError(error);
-        setLoading(false);
-        toast.error('문제 추천에 실패했습니다.');
-      },
-    });
-  };
-
   const handleRecommend = () => {
-    setLoading(true);
-    setError(null);
-
-    // 배열을 JSON 문자열로 변환 (level은 대문자로)
-    const levelParam = selectedLevels.length === 0 ? '[]' : JSON.stringify(selectedLevels.map((l) => l.toUpperCase()));
-
-    const tagsParam = selectedTagsList.length === 0 ? '[]' : JSON.stringify(selectedTagsList);
-
-    handleGetRecommendation({
-      level: levelParam,
-      tags: tagsParam,
-      count: selectedCount,
-      exclusion_mode: selectedExclusionMode,
-    });
+    recommend();
   };
 
   // Level 토글 핸들러
   const toggleLevel = (level: string) => {
-    setSelectedLevels((prev) => (prev.includes(level) ? prev.filter((l) => l !== level) : [...prev, level]));
+    setSelectedLevels(selectedLevels.includes(level) ? selectedLevels.filter((l) => l !== level) : [...selectedLevels, level]);
   };
 
   // Tag 토글 핸들러
   const toggleTag = (tag: string) => {
-    setSelectedTagsList((prev) => (prev.includes(tag) ? prev.filter((t) => t !== tag) : [...prev, tag]));
+    setSelectedTagsList(selectedTagsList.includes(tag) ? selectedTagsList.filter((t) => t !== tag) : [...selectedTagsList, tag]);
   };
   // ExclusionMode 토글 핸들러
   const toggleExclusionMode = (mode: string) => {
-    setSelectedExclusionMode(() => mode);
+    setSelectedExclusionMode(mode);
   };
   // count 토글 핸들러
   const toggleCount = (cnt: number) => {
-    setSelectedCount(() => cnt);
+    setSelectedCount(cnt);
     setIsCountPopoverOpen(false);
   };
 
