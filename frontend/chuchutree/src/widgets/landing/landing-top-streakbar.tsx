@@ -1,9 +1,9 @@
-import { useUser, useSteaks } from '@/entities/user/model/queries';
 import { ChevronLeft, ChevronRight, Leaf } from 'lucide-react';
 import { ActivityCalendar, Props as CalendarProps, ThemeInput } from 'react-activity-calendar';
 import { useTheme } from 'next-themes';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { useState, useMemo } from 'react';
+import { useLandingStreak, useLandingUser } from '@/features/landing';
 
 const lightTheme: ThemeInput = {
   light: ['#e4e4e4', '#A1E4AC', '#78CB94', '#4EB17C', '#007950'],
@@ -23,23 +23,21 @@ interface ActivityData {
 
 /**
  * streaks 데이터를 ActivityCalendar 형식으로 변환
- * 시작 날짜와 끝 날짜가 없으면 추가
+ * startDate와 endDate 범위 내의 데이터만 필터링하여 반환
  */
-const transformStreaksData = (
-  streaks: Array<{ streakDate: string; solvedCount: number; solvedLevel: number }>,
-  startDate: string,
-  endDate: string,
-): ActivityData[] => {
+const transformStreaksData = (streaks: Array<{ streakDate: string; solvedCount: number; solvedLevel: number }>, startDate: string, endDate: string): ActivityData[] => {
   // streaks를 Map으로 변환 (날짜를 key로)
   const dataMap = new Map<string, ActivityData>();
   streaks.forEach((streak) => {
-    // solvedDate가 유효한 경우만 추가 (방어 코드)
+    // 유효한 날짜이고, startDate와 endDate 범위 내에 있는 경우만 추가
     if (streak?.streakDate && typeof streak.streakDate === 'string') {
-      dataMap.set(streak.streakDate, {
-        date: streak.streakDate,
-        count: streak.solvedCount || 0,
-        level: streak.solvedLevel || 0,
-      });
+      if (streak.streakDate >= startDate && streak.streakDate <= endDate) {
+        dataMap.set(streak.streakDate, {
+          date: streak.streakDate,
+          count: streak.solvedCount || 0,
+          level: streak.solvedLevel || 0,
+        });
+      }
     }
   });
 
@@ -58,7 +56,7 @@ const transformStreaksData = (
 };
 
 export default function LandingTopStreakbar() {
-  const { data: user } = useUser();
+  const user = useLandingUser();
   const { resolvedTheme } = useTheme();
   const currentTheme = resolvedTheme === 'dark' ? darkTheme : lightTheme;
 
@@ -73,14 +71,13 @@ export default function LandingTopStreakbar() {
     };
   });
 
-  const { data: streakData, isLoading } = useSteaks(dateRange.startDate, dateRange.endDate);
-  const streaksData = streakData?.streaks || user?.bjAccount?.streaks || [];
+  const streaksData = useLandingStreak();
 
-  // 이전 버튼 비활성화 여부 (오늘 기준 5년 전까지만 가능)
+  // 이전 버튼 비활성화 여부 (오늘 기준 1년 전까지만 가능)
   const isDisabledPrev = useMemo(() => {
     const today = new Date();
     const fiveYearsAgo = new Date();
-    fiveYearsAgo.setFullYear(today.getFullYear() - 5);
+    fiveYearsAgo.setFullYear(today.getFullYear() - 3);
     const prevStartDate = new Date(dateRange.startDate);
     prevStartDate.setFullYear(prevStartDate.getFullYear() - 1);
     return prevStartDate < fiveYearsAgo;
@@ -115,7 +112,7 @@ export default function LandingTopStreakbar() {
   };
 
   // 데이터가 없거나 배열이 아니면 로딩 상태 표시
-  if (!user?.bjAccount?.streaks || !Array.isArray(user.bjAccount.streaks)) {
+  if (!streaksData || !Array.isArray(streaksData)) {
     return (
       <div className="bg-innerground-white flex h-full items-center justify-center overflow-hidden p-4">
         <div className="text-muted-foreground text-sm">스트릭 데이터를 불러오는 중...</div>
@@ -123,7 +120,7 @@ export default function LandingTopStreakbar() {
     );
   }
 
-  const longestStreak = user.bjAccount.stat.longestStreak || 0;
+  const longestStreak = user?.bjAccount?.stat?.longestStreak || 0;
   const activityData = transformStreaksData(streaksData, dateRange.startDate, dateRange.endDate);
 
   const labels = {
@@ -149,7 +146,7 @@ export default function LandingTopStreakbar() {
             <AppTooltip content={isDisabledPrev ? '더 이상 이전 데이터가 없습니다' : '이전으로 이동'} side="bottom">
               <button
                 onClick={() => handleClick('PREV')}
-                disabled={isDisabledPrev || isLoading}
+                disabled={isDisabledPrev}
                 className="text-muted-foreground hover:bg-background cursor-pointer rounded px-3 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="이전으로 이동"
               >
@@ -159,7 +156,7 @@ export default function LandingTopStreakbar() {
             <AppTooltip content={isDisabledNext ? '더 이상 다음 데이터가 없습니다' : '다음으로 이동'} side="bottom">
               <button
                 onClick={() => handleClick('NEXT')}
-                disabled={isDisabledNext || isLoading}
+                disabled={isDisabledNext}
                 className="text-muted-foreground hover:bg-background cursor-pointer rounded px-3 py-1 text-xs disabled:cursor-not-allowed disabled:opacity-40"
                 aria-label="다음으로 이동"
               >
