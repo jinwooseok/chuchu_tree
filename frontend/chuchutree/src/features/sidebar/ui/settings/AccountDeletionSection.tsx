@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 
-export default function AccountDeletionSection() {
+export default function AccountDeletionSection({ isLanding = false }: { isLanding?: boolean }) {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [confirmText, setConfirmText] = useState('');
   const [checks, setChecks] = useState({
@@ -58,7 +58,7 @@ export default function AccountDeletionSection() {
               <div className="text-sm font-medium">계정 삭제</div>
               <div className="text-muted-foreground text-xs">모든 활동 기록과 개인 정보가 삭제됩니다.</div>
             </div>
-            <Button variant="destructive" onClick={handleDialogOpen}>
+            <Button variant="destructive" onClick={handleDialogOpen} disabled={isLanding}>
               계정 삭제
             </Button>
           </div>

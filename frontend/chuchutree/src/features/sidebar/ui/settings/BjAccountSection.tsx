@@ -9,6 +9,7 @@ import { toast } from '@/lib/utils/toast';
 interface BjAccountSectionProps {
   currentBjAccountId: string;
   linkedAt?: string;
+  isLanding?: boolean;
   onClose: () => void;
 }
 
@@ -29,7 +30,7 @@ const getAvailableDate = (linkedAt?: string) => {
   return `${dateString[0]}월${dateString[1]}일`;
 };
 
-export default function BjAccountSection({ currentBjAccountId, linkedAt, onClose }: BjAccountSectionProps) {
+export default function BjAccountSection({ currentBjAccountId, linkedAt, isLanding, onClose }: BjAccountSectionProps) {
   const [newBjAccountId, setNewBjAccountId] = useState('');
   const canChange = canChangeAccount(linkedAt);
   const availableDateString = getAvailableDate(linkedAt);
@@ -73,7 +74,7 @@ export default function BjAccountSection({ currentBjAccountId, linkedAt, onClose
         </div>
 
         <div className="flex justify-end">
-          <Button onClick={handleSubmit} disabled={!canChange || isPending || !newBjAccountId.trim()}>
+          <Button onClick={handleSubmit} disabled={!canChange || isPending || !newBjAccountId.trim() || isLanding}>
             {isPending ? '변경 중...' : '저장'}
           </Button>
         </div>
