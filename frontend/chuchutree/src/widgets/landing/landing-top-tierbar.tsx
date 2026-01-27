@@ -1,5 +1,5 @@
-import { useLandingUser } from '@/features/landing/hooks/useLandingUser';
 // import NextTier from '@/features/top-tierbar/ui/NextTier';
+import { useLandingUser } from '@/features/landing';
 import Tierbar from '@/features/top-tierbar/ui/Tierbar';
 
 export default function LandingTopTierbar() {

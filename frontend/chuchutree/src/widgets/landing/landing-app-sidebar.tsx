@@ -15,8 +15,8 @@ import { toast } from '@/lib/utils/toast';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { Spinner } from '@/shared/ui';
 import { useGlobalShortcuts } from '@/lib/hooks/useGlobalShortcuts';
-import { useLandingRecommend } from '@/features/landing/hooks/useLandingRecommend';
 import { useState } from 'react';
+import { useLandingRecommend } from '@/features/landing';
 
 const ICON_SIZE = 32;
 

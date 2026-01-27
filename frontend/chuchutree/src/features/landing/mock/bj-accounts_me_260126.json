@@ -3,7 +3,7 @@
   "message": "ok",
   "data": {
     "userAccount": {
-      "userAccountId": 2,
+      "userAccountId": 1,
       "profileImageUrl": null,
       "target": {
         "targetId": 3,
@@ -13,7 +13,7 @@
       "registeredAt": "2026-01-04T16:31:07"
     },
     "bjAccount": {
-      "bjAccountId": "happynj2697",
+      "bjAccountId": "guest",
       "stat": {
         "tierId": 17,
         "tierName": "P4",
