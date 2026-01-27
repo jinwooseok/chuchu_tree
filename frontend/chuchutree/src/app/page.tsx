@@ -16,7 +16,7 @@ import LandingMainCalendar from '@/widgets/landing/landing-main-calendar';
 import LandingMainTagDashboard from '@/widgets/landing/landing-main-tag-dashboard';
 import LandingBottomRecommend from '@/widgets/landing/landing-bottom-recommend';
 
-export default function LandingPage() {
+function LandingPageContent() {
   const {
     topSection,
     centerSection,
@@ -106,44 +106,50 @@ export default function LandingPage() {
   const showInfoSidebar = sidebarState === 'collapsed';
 
   return (
+    <div className="bg-background flex h-[calc(100vh-16px)] gap-2 overflow-hidden">
+      {/* Info 사이드바 - AppSidebar가 닫혔을 때만 표시 */}
+      {showInfoSidebar && (
+        <div className={cn('relative h-full border-r', !isResizing && 'transition-all delay-200 duration-300 ease-in-out')} style={{ width: `${sidebarWidth}px` }}>
+          <div className="bg-innerground-white h-full overflow-hidden">{centerSection === 'calendar' ? <LandingCalendarSidebar /> : <LandingTagSidebar />}</div>
+          <ResizeHandle direction="horizontal" onMouseDown={handleSidebarResize} className="absolute top-0 right-0 h-full" />
+        </div>
+      )}
+
+      {/* 메인 영역 */}
+      <main className="flex min-w-0 flex-1 flex-col">
+        <div
+          className={cn('hide-scrollbar relative overflow-scroll', !isResizing && 'transition-all duration-300 ease-in-out')}
+          style={topSection ? { height: `${topHeight}px`, marginBottom: '0.5rem' } : { height: 0 }}
+        >
+          <div className={cn('bg-background h-full', !isResizing && 'transition-transform duration-300 ease-in-out', topTranslate, topInnerHeight)}>
+            {displayTopSection === 'tierbar' && <LandingTopTierbar />}
+            {displayTopSection === 'streak' && <LandingTopStreakbar />}
+          </div>
+          {topSection && <ResizeHandle direction="vertical" onMouseDown={handleTopResize} className="absolute bottom-0 left-0 w-full" />}
+        </div>
+
+        <div className="flex-1 overflow-hidden transition-all duration-300 ease-in-out">{centerSection === 'calendar' ? <LandingMainCalendar /> : <LandingMainTagDashboard />}</div>
+
+        <div
+          className={cn('hide-scrollbar relative overflow-scroll', !isResizing && 'transition-all duration-300 ease-in-out')}
+          style={bottomSection ? { height: `${bottomHeight}px`, marginTop: '0.5rem' } : { height: 0 }}
+        >
+          <div className={cn('bg-background h-full', !isResizing && 'transition-transform duration-300 ease-in-out', bottomTranslate, bottomInnerHeight)}>
+            {displayBottomSection === 'recommend' && <LandingBottomRecommend />}
+          </div>
+          {bottomSection && <ResizeHandle direction="vertical" onMouseDown={handleBottomResize} className="absolute top-0 left-0 w-full" />}
+        </div>
+      </main>
+    </div>
+  );
+}
+
+export default function LandingPage() {
+  return (
     <SidebarProvider defaultOpen={false}>
       <LandingAppSidebar />
       <SidebarInset>
-        <div className="bg-background flex h-[calc(100vh-16px)] gap-2 overflow-hidden">
-          {/* Info 사이드바 - AppSidebar가 닫혔을 때만 표시 */}
-          {/* {showInfoSidebar && (
-            <div className={cn('relative h-full border-r', !isResizing && 'transition-all delay-200 duration-300 ease-in-out')} style={{ width: `${sidebarWidth}px` }}>
-              <div className="bg-innerground-white h-full overflow-hidden">{centerSection === 'calendar' ? <LandingCalendarSidebar /> : <LandingTagSidebar />}</div>
-              <ResizeHandle direction="horizontal" onMouseDown={handleSidebarResize} className="absolute top-0 right-0 h-full" />
-            </div>
-          )} */}
-
-          {/* 메인 영역 */}
-          <main className="flex min-w-0 flex-1 flex-col">
-            <div
-              className={cn('hide-scrollbar relative overflow-scroll', !isResizing && 'transition-all duration-300 ease-in-out')}
-              style={topSection ? { height: `${topHeight}px`, marginBottom: '0.5rem' } : { height: 0 }}
-            >
-              <div className={cn('bg-background h-full', !isResizing && 'transition-transform duration-300 ease-in-out', topTranslate, topInnerHeight)}>
-                {displayTopSection === 'tierbar' && <LandingTopTierbar />}
-                {displayTopSection === 'streak' && <LandingTopStreakbar />}
-              </div>
-              {topSection && <ResizeHandle direction="vertical" onMouseDown={handleTopResize} className="absolute bottom-0 left-0 w-full" />}
-            </div>
-
-            <div className="flex-1 overflow-hidden transition-all duration-300 ease-in-out">{centerSection === 'calendar' ? <LandingMainCalendar /> : <LandingMainTagDashboard />}</div>
-
-            <div
-              className={cn('hide-scrollbar relative overflow-scroll', !isResizing && 'transition-all duration-300 ease-in-out')}
-              style={bottomSection ? { height: `${bottomHeight}px`, marginTop: '0.5rem' } : { height: 0 }}
-            >
-              <div className={cn('bg-background h-full', !isResizing && 'transition-transform duration-300 ease-in-out', bottomTranslate, bottomInnerHeight)}>
-                {displayBottomSection === 'recommend' && <LandingBottomRecommend />}
-              </div>
-              {bottomSection && <ResizeHandle direction="vertical" onMouseDown={handleBottomResize} className="absolute top-0 left-0 w-full" />}
-            </div>
-          </main>
-        </div>
+        <LandingPageContent />
       </SidebarInset>
     </SidebarProvider>
   );

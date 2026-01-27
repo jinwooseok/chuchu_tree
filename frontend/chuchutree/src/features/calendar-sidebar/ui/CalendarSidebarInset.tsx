@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
-import { Problem, useUpdateWillSolveProblems, useUpdateSolvedProblems, useSearchProblems, WillSolveProblems, useCalendar, useUpdateRepresentativeTag } from '@/entities/calendar';
+import { Problem, useUpdateWillSolveProblems, useUpdateSolvedProblems, useSearchProblems, WillSolveProblems, useUpdateRepresentativeTag, Calendar } from '@/entities/calendar';
 import Image from 'next/image';
 import { useState, useEffect, useMemo, useId } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
@@ -16,15 +16,15 @@ import { formatDateString } from '@/lib/utils/date';
 import { getErrorCode, getErrorMessage } from '@/lib/utils/error';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
-// 클라이언트 전용 렌더링 (hydration mismatch 방지)
-const SmallCalendar = dynamic(() => import('@/features/calendar/ui/SmallCalendar'), {
-  ssr: false,
-  loading: () => (
-    <div className="flex items-center justify-center" style={{ minHeight: '300px' }}>
-      <div className="text-sm text-gray-400">Loading...</div>
-    </div>
-  ),
-});
+// // 클라이언트 전용 렌더링 (hydration mismatch 방지)
+// const SmallCalendar = dynamic(() => import('@/features/calendar/ui/SmallCalendar'), {
+//   ssr: false,
+//   loading: () => (
+//     <div className="flex items-center justify-center" style={{ minHeight: '300px' }}>
+//       <div className="text-sm text-gray-400">Loading...</div>
+//     </div>
+//   ),
+// });
 
 // 드래그 가능한 문제 카드
 function DraggableProblemCard({
@@ -152,7 +152,7 @@ function SearchResultCard({ problem, onClick }: { problem: WillSolveProblems; on
   );
 }
 
-export function CalendarSidebarInset() {
+export function CalendarSidebarInset({ isLanding = false, calendarData }: { calendarData?: Calendar; isLanding?: boolean }) {
   const { selectedDate } = useCalendarStore();
   const [showAddInput, setShowAddInput] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
@@ -161,9 +161,9 @@ export function CalendarSidebarInset() {
   const willsolveContextId = useId();
 
   // 현재 선택된 날짜의 년/월로 calendar 데이터 fetch
-  const year = selectedDate?.getFullYear() || new Date().getFullYear();
-  const month = (selectedDate?.getMonth() || new Date().getMonth()) + 1;
-  const { data: calendarData } = useCalendar(year, month);
+  // const year = selectedDate?.getFullYear() || new Date().getFullYear();
+  // const month = (selectedDate?.getMonth() || new Date().getMonth()) + 1;
+  // const { data: calendarData } = useCalendar(year, month);
 
   const updateWillSolve = useUpdateWillSolveProblems({
     onError: (error) => {
@@ -223,6 +223,10 @@ export function CalendarSidebarInset() {
 
   // Solved 문제 순서 변경
   const handleSolvedDragEnd = (event: DragEndEvent) => {
+    if (isLanding) {
+      toast.info('로그인 후 이용해주세요');
+      return;
+    }
     const { active, over } = event;
 
     if (!over || active.id === over.id || !selectedDate) return;
@@ -241,6 +245,10 @@ export function CalendarSidebarInset() {
 
   // WillSolve 문제 순서 변경
   const handleWillSolveDragEnd = (event: DragEndEvent) => {
+    if (isLanding) {
+      toast.info('로그인 후 이용해주세요');
+      return;
+    }
     const { active, over } = event;
 
     if (!over || active.id === over.id || !selectedDate) return;
@@ -259,6 +267,10 @@ export function CalendarSidebarInset() {
 
   // WillSolve 문제 추가 (검색 결과 클릭 시)
   const handleAddProblemFromSearch = (problemId: number) => {
+    if (isLanding) {
+      toast.info('로그인 후 이용해주세요');
+      return;
+    }
     if (!selectedDate) return;
 
     // 검색 결과에서 추가할 문제 찾기
@@ -286,6 +298,10 @@ export function CalendarSidebarInset() {
 
   // WillSolve 문제 삭제
   const handleDeleteProblem = (problemId: number) => {
+    if (isLanding) {
+      toast.info('로그인 후 이용해주세요');
+      return;
+    }
     if (!selectedDate) return;
 
     const problemIds = willSolveProblems.filter((p) => p.problemId !== problemId).map((p) => p.problemId);
@@ -305,6 +321,10 @@ export function CalendarSidebarInset() {
 
   // 문제 대표태그 변경
   const handleUpdateRepresentativeTag = (problemId: number, tagCode: string) => {
+    if (isLanding) {
+      toast.info('로그인 후 이용해주세요');
+      return;
+    }
     if (!selectedDate) return;
 
     updateRepresentativeTag.mutate({
@@ -321,12 +341,7 @@ export function CalendarSidebarInset() {
   const uniqueSearchResults = Array.from(new Map(allSearchResults.map((p) => [p.problemId, p])).values());
 
   return (
-    <div className="hide-scrollbar flex h-full flex-col gap-8 overflow-y-auto p-4">
-      {/* 미니 캘린더 */}
-      <div>
-        <SmallCalendar />
-      </div>
-
+    <div className="flex flex-col gap-8">
       {/* Solved 문제 목록 */}
       <div className="flex cursor-default flex-col gap-2">
         <div className="flex items-center justify-between">
@@ -378,7 +393,7 @@ export function CalendarSidebarInset() {
 
         {/* 문제 추가하기 */}
         {!showAddInput ? (
-          <button onClick={() => setShowAddInput(true)} className="hover:bg-innerground-hovergray text-muted-foreground my-4 cursor-pointer rounded px-2 py-2 text-start text-sm">
+          <button onClick={() => setShowAddInput(true)} disabled={isLanding} className="hover:bg-innerground-hovergray text-muted-foreground my-4 cursor-pointer rounded px-2 py-2 text-start text-sm">
             + 오늘 풀 문제 등록하기
           </button>
         ) : (
