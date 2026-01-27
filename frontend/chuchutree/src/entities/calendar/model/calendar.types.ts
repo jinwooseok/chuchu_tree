@@ -32,7 +32,7 @@ export interface SolvedProblems {
   problemTierName: TierKey;
   problemClassLevel: number | null;
   tags: Tags[];
-  representativeTag: { tagId: number; tagCode: TagKey; tagDisplayName: string };
+  representativeTag: { tagId: number; tagCode: TagKey; tagDisplayName: string } | null;
 }
 
 export interface WillSolveProblems {
@@ -42,7 +42,7 @@ export interface WillSolveProblems {
   problemTierName: TierKey;
   problemClassLevel: number | null;
   tags: Tags[];
-  representativeTag: { tagId: number; tagCode: TagKey; tagDisplayName: string };
+  representativeTag: { tagId: number; tagCode: TagKey; tagDisplayName: string } | null;
 }
 
 // Problem: SolvedProblems와 WillSolveProblems의 공통 타입

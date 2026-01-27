@@ -131,7 +131,7 @@ export default function LandingPage() {
               {topSection && <ResizeHandle direction="vertical" onMouseDown={handleTopResize} className="absolute bottom-0 left-0 w-full" />}
             </div>
 
-            {/* <div className="flex-1 overflow-hidden transition-all duration-300 ease-in-out">{centerSection === 'calendar' ? <LandingMainCalendar /> : <LandingMainTagDashboard />}</div> */}
+            <div className="flex-1 overflow-hidden transition-all duration-300 ease-in-out">{centerSection === 'calendar' ? <LandingMainCalendar /> : <LandingMainTagDashboard />}</div>
 
             <div
               className={cn('hide-scrollbar relative overflow-scroll', !isResizing && 'transition-all duration-300 ease-in-out')}

@@ -1,13 +1,13 @@
 'use client';
 
-import { Calendar, dateFnsLocalizer, ToolbarProps, EventProps } from 'react-big-calendar';
+import { Calendar, dateFnsLocalizer, ToolbarProps } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay, isSameDay, isToday, isSameMonth, addMonths, subMonths } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { ComponentType, useMemo, useState, useEffect, useRef } from 'react';
 
 import { transformToCalendarEvents, getDisplayTags } from '../lib/utils';
-import { CalendarEvent, useCalendar } from '@/entities/calendar';
+import { CalendarEvent, Calendar as CalendarType } from '@/entities/calendar';
 import { TAG_INFO, TagKey } from '@/shared/constants/tagSystem';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { ChevronDown, ChevronUp } from 'lucide-react';
@@ -111,7 +111,7 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
   );
 }
 
-export default function BigCalendar() {
+export default function BigCalendar({ calendarData }: { calendarData?: CalendarType }) {
   // Zustand에서 UI 상태만 가져오기
   const { selectedDate, bigCalendarDate, actions } = useCalendarStore();
   const { setSelectedDate, setBigCalendarDate } = actions;
@@ -131,11 +131,6 @@ export default function BigCalendar() {
 
   // 현재 표시 중인 월 (store에서 관리, fallback은 initialDate)
   const currentDate = bigCalendarDate || initialDate;
-  const year = currentDate.getFullYear();
-  const month = currentDate.getMonth() + 1;
-
-  // 해당 월의 calendar 데이터 fetch (TanStack Query가 자동으로 캐시 관리)
-  const { data: calendarData, isLoading } = useCalendar(year, month);
 
   // selectedDate가 변경되면 BigCalendar도 해당 월로 이동
   useEffect(() => {
