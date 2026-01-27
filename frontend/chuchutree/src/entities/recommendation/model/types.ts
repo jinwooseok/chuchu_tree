@@ -21,7 +21,7 @@ interface Tags {
 
 interface RecommandReasons {
   reason: string;
-  additionalData: string;
+  additionalData: string | null;
 }
 
 interface RecommendedProblems {

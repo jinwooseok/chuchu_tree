@@ -12,7 +12,7 @@ export interface RecommendedProblems {
   problemClassLevel: number;
   recommandReasons: {
     reason: string;
-    additionalData: string;
+    additionalData: string | null;
   }[];
   tags: {
     tagId: number;
