@@ -1,0 +1,2844 @@
+{
+  "status": 200,
+  "message": "ok",
+  "data": {
+    "totalProblemCount": 33,
+    "monthlyData": [
+      {
+        "targetDate": "2025-12-01",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 2448,
+            "problemTitle": "별 찍기 - 11",
+            "problemTierLevel": 12,
+            "problemTierName": "G4",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 52,
+                "tagCode": "recursion",
+                "tagDisplayName": "재귀",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": null
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-02",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 15663,
+            "problemTitle": "N과 M (9)",
+            "problemTierLevel": 9,
+            "problemTierName": "S2",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 31,
+                "tagCode": "backtracking",
+                "tagDisplayName": "백트래킹",
+                "tagAliases": [
+                  {
+                    "alias": "백트래킹"
+                  },
+                  {
+                    "alias": "퇴각검색"
+                  },
+                  {
+                    "alias": "퇴각 검색"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": null
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-03",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 10950,
+            "problemTitle": "A+B - 3",
+            "problemTierLevel": 1,
+            "problemTierName": "B5",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 1,
+                "tagCode": "math",
+                "tagDisplayName": "수학",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 2,
+                "tagCode": "implementation",
+                "tagDisplayName": "구현",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 19,
+                "tagCode": "arithmetic",
+                "tagDisplayName": "사칙연산",
+                "tagAliases": [
+                  {
+                    "alias": "덧셈"
+                  },
+                  {
+                    "alias": "뺄셈"
+                  },
+                  {
+                    "alias": "곱셈"
+                  },
+                  {
+                    "alias": "나눗셈"
+                  },
+                  {
+                    "alias": "더하기"
+                  },
+                  {
+                    "alias": "빼기"
+                  },
+                  {
+                    "alias": "곱하기"
+                  },
+                  {
+                    "alias": "나누기"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": null
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-04",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 1002,
+            "problemTitle": "터렛",
+            "problemTierLevel": 8,
+            "problemTierName": "S3",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 1,
+                "tagCode": "math",
+                "tagDisplayName": "수학",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 12,
+                "tagCode": "geometry",
+                "tagDisplayName": "기하학",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 24,
+                "tagCode": "case_work",
+                "tagDisplayName": "많은 조건 분기",
+                "tagAliases": [
+                  {
+                    "alias": "케이스"
+                  },
+                  {
+                    "alias": "케이스워크"
+                  },
+                  {
+                    "alias": "케이스 워크"
+                  }
+                ],
+                "tagTargets": []
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": {
+              "tagId": 24,
+              "tagCode": "case_work",
+              "tagDisplayName": "많은 조건 분기"
+            }
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-05",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 2752,
+            "problemTitle": "세수정렬",
+            "problemTierLevel": 2,
+            "problemTierName": "B4",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 2,
+                "tagCode": "implementation",
+                "tagDisplayName": "구현",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 10,
+                "tagCode": "sorting",
+                "tagDisplayName": "정렬",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": {
+              "tagId": 10,
+              "tagCode": "sorting",
+              "tagDisplayName": "정렬"
+            }
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-06",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 18111,
+            "problemTitle": "마인크래프트",
+            "problemTierLevel": 9,
+            "problemTierName": "S2",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 2,
+                "tagCode": "implementation",
+                "tagDisplayName": "구현",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 8,
+                "tagCode": "bruteforcing",
+                "tagDisplayName": "브루트포스 알고리즘",
+                "tagAliases": [
+                  {
+                    "alias": "완전탐색"
+                  },
+                  {
+                    "alias": "완전 탐색"
+                  },
+                  {
+                    "alias": "브루트포스"
+                  },
+                  {
+                    "alias": "bruteforce"
+                  },
+                  {
+                    "alias": "brute force"
+                  },
+                  {
+                    "alias": "완탐"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": {
+              "tagId": 8,
+              "tagCode": "bruteforcing",
+              "tagDisplayName": "브루트포스 알고리즘"
+            }
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-07",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 2475,
+            "problemTitle": "검증수",
+            "problemTierLevel": 1,
+            "problemTierName": "B5",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 1,
+                "tagCode": "math",
+                "tagDisplayName": "수학",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 2,
+                "tagCode": "implementation",
+                "tagDisplayName": "구현",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 19,
+                "tagCode": "arithmetic",
+                "tagDisplayName": "사칙연산",
+                "tagAliases": [
+                  {
+                    "alias": "덧셈"
+                  },
+                  {
+                    "alias": "뺄셈"
+                  },
+                  {
+                    "alias": "곱셈"
+                  },
+                  {
+                    "alias": "나눗셈"
+                  },
+                  {
+                    "alias": "더하기"
+                  },
+                  {
+                    "alias": "빼기"
+                  },
+                  {
+                    "alias": "곱하기"
+                  },
+                  {
+                    "alias": "나누기"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": {
+              "tagId": 19,
+              "tagCode": "arithmetic",
+              "tagDisplayName": "사칙연산"
+            }
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-08",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 30804,
+            "problemTitle": "과일 탕후루",
+            "problemTierLevel": 9,
+            "problemTierName": "S2",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 2,
+                "tagCode": "implementation",
+                "tagDisplayName": "구현",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 8,
+                "tagCode": "bruteforcing",
+                "tagDisplayName": "브루트포스 알고리즘",
+                "tagAliases": [
+                  {
+                    "alias": "완전탐색"
+                  },
+                  {
+                    "alias": "완전 탐색"
+                  },
+                  {
+                    "alias": "브루트포스"
+                  },
+                  {
+                    "alias": "bruteforce"
+                  },
+                  {
+                    "alias": "brute force"
+                  },
+                  {
+                    "alias": "완탐"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 40,
+                "tagCode": "two_pointer",
+                "tagDisplayName": "두 포인터",
+                "tagAliases": [
+                  {
+                    "alias": "투포인터"
+                  },
+                  {
+                    "alias": "인치웜"
+                  },
+                  {
+                    "alias": "inchworm"
+                  },
+                  {
+                    "alias": "twopointer"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": {
+              "tagId": 40,
+              "tagCode": "two_pointer",
+              "tagDisplayName": "두 포인터"
+            }
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-09",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 1152,
+            "problemTitle": "단어의 개수",
+            "problemTierLevel": 4,
+            "problemTierName": "B2",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 2,
+                "tagCode": "implementation",
+                "tagDisplayName": "구현",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 7,
+                "tagCode": "string",
+                "tagDisplayName": "문자열",
+                "tagAliases": [
+                  {
+                    "alias": "스트링"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": {
+              "tagId": 7,
+              "tagCode": "string",
+              "tagDisplayName": "문자열"
+            }
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-10",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 5525,
+            "problemTitle": "IOIOI",
+            "problemTierLevel": 10,
+            "problemTierName": "S1",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 7,
+                "tagCode": "string",
+                "tagDisplayName": "문자열",
+                "tagAliases": [
+                  {
+                    "alias": "스트링"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": null
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-11",
+        "solvedProblemCount": 5,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 2667,
+            "problemTitle": "단지번호붙이기",
+            "problemTierLevel": 10,
+            "problemTierName": "S1",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 5,
+                "tagCode": "graphs",
+                "tagDisplayName": "그래프 이론",
+                "tagAliases": [
+                  {
+                    "alias": "그래프이론"
+                  },
+                  {
+                    "alias": "그래프"
+                  }
+                ],
+                "tagTargets": []
+              },
+              {
+                "tagId": 9,
+                "tagCode": "graph_traversal",
+                "tagDisplayName": "그래프 탐색",
+                "tagAliases": [
+                  {
+                    "alias": "bfs"
+                  },
+                  {
+                    "alias": "dfs"
+                  }
+                ],
+                "tagTargets": []
+              },
+              {
+                "tagId": 23,
+                "tagCode": "bfs",
+                "tagDisplayName": "너비 우선 탐색",
+                "tagAliases": [
+                  {
+                    "alias": "breadthfirst"
+                  },
+                  {
+                    "alias": "breadth first"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 27,
+                "tagCode": "dfs",
+                "tagDisplayName": "깊이 우선 탐색",
+                "tagAliases": [
+                  {
+                    "alias": "depth first"
+                  },
+                  {
+                    "alias": "depthfirst"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 62,
+                "tagCode": "grid_graph",
+                "tagDisplayName": "격자 그래프",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  }
+                ]
+              },
+              {
+                "tagId": 109,
+                "tagCode": "flood_fill",
+                "tagDisplayName": "플러드 필",
+                "tagAliases": [],
+                "tagTargets": []
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": null
+          },
+          {
+            "problemId": 11726,
+            "problemTitle": "2×n 타일링",
+            "problemTierLevel": 8,
+            "problemTierName": "S3",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 3,
+                "tagCode": "dp",
+                "tagDisplayName": "다이나믹 프로그래밍",
+                "tagAliases": [
+                  {
+                    "alias": "동적계획법"
+                  },
+                  {
+                    "alias": "동적 계획법"
+                  },
+                  {
+                    "alias": "다이나믹프로그래밍"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": null
+          },
+          {
+            "problemId": 11333,
+            "problemTitle": "4×n 타일링",
+            "problemTierLevel": 14,
+            "problemTierName": "G2",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 3,
+                "tagCode": "dp",
+                "tagDisplayName": "다이나믹 프로그래밍",
+                "tagAliases": [
+                  {
+                    "alias": "동적계획법"
+                  },
+                  {
+                    "alias": "동적 계획법"
+                  },
+                  {
+                    "alias": "다이나믹프로그래밍"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": null
+          },
+          {
+            "problemId": 21736,
+            "problemTitle": "헌내기는 친구가 필요해",
+            "problemTierLevel": 9,
+            "problemTierName": "S2",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 5,
+                "tagCode": "graphs",
+                "tagDisplayName": "그래프 이론",
+                "tagAliases": [
+                  {
+                    "alias": "그래프이론"
+                  },
+                  {
+                    "alias": "그래프"
+                  }
+                ],
+                "tagTargets": []
+              },
+              {
+                "tagId": 9,
+                "tagCode": "graph_traversal",
+                "tagDisplayName": "그래프 탐색",
+                "tagAliases": [
+                  {
+                    "alias": "bfs"
+                  },
+                  {
+                    "alias": "dfs"
+                  }
+                ],
+                "tagTargets": []
+              },
+              {
+                "tagId": 23,
+                "tagCode": "bfs",
+                "tagDisplayName": "너비 우선 탐색",
+                "tagAliases": [
+                  {
+                    "alias": "breadthfirst"
+                  },
+                  {
+                    "alias": "breadth first"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 27,
+                "tagCode": "dfs",
+                "tagDisplayName": "깊이 우선 탐색",
+                "tagAliases": [
+                  {
+                    "alias": "depth first"
+                  },
+                  {
+                    "alias": "depthfirst"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 62,
+                "tagCode": "grid_graph",
+                "tagDisplayName": "격자 그래프",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": null
+          },
+          {
+            "problemId": 1793,
+            "problemTitle": "타일링",
+            "problemTierLevel": 9,
+            "problemTierName": "S2",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 3,
+                "tagCode": "dp",
+                "tagDisplayName": "다이나믹 프로그래밍",
+                "tagAliases": [
+                  {
+                    "alias": "동적계획법"
+                  },
+                  {
+                    "alias": "동적 계획법"
+                  },
+                  {
+                    "alias": "다이나믹프로그래밍"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  }
+                ]
+              },
+              {
+                "tagId": 53,
+                "tagCode": "arbitrary_precision",
+                "tagDisplayName": "임의 정밀도 / 큰 수 연산",
+                "tagAliases": [
+                  {
+                    "alias": "빅인티저"
+                  },
+                  {
+                    "alias": "빅데시멀"
+                  },
+                  {
+                    "alias": "biginteger"
+                  },
+                  {
+                    "alias": "bigdecimal"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": null
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-12",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 1,
+        "solvedProblems": [
+          {
+            "problemId": 2156,
+            "problemTitle": "포도주 시식",
+            "problemTierLevel": 10,
+            "problemTierName": "S1",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 3,
+                "tagCode": "dp",
+                "tagDisplayName": "다이나믹 프로그래밍",
+                "tagAliases": [
+                  {
+                    "alias": "동적계획법"
+                  },
+                  {
+                    "alias": "동적 계획법"
+                  },
+                  {
+                    "alias": "다이나믹프로그래밍"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": null
+          }
+        ],
+        "willSolveProblems": [
+          {
+            "problemId": 2010,
+            "problemTitle": "플러그",
+            "problemTierLevel": 3,
+            "problemTierName": "B3",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 1,
+                "tagCode": "math",
+                "tagDisplayName": "수학",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 19,
+                "tagCode": "arithmetic",
+                "tagDisplayName": "사칙연산",
+                "tagAliases": [
+                  {
+                    "alias": "덧셈"
+                  },
+                  {
+                    "alias": "뺄셈"
+                  },
+                  {
+                    "alias": "곱셈"
+                  },
+                  {
+                    "alias": "나눗셈"
+                  },
+                  {
+                    "alias": "더하기"
+                  },
+                  {
+                    "alias": "빼기"
+                  },
+                  {
+                    "alias": "곱하기"
+                  },
+                  {
+                    "alias": "나누기"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "representativeTag": null
+          }
+        ]
+      },
+      {
+        "targetDate": "2025-12-13",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 1966,
+            "problemTitle": "프린터 큐",
+            "problemTierLevel": 8,
+            "problemTierName": "S3",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 2,
+                "tagCode": "implementation",
+                "tagDisplayName": "구현",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 4,
+                "tagCode": "data_structures",
+                "tagDisplayName": "자료 구조",
+                "tagAliases": [
+                  {
+                    "alias": "자료구조"
+                  },
+                  {
+                    "alias": "자구"
+                  }
+                ],
+                "tagTargets": []
+              },
+              {
+                "tagId": 20,
+                "tagCode": "simulation",
+                "tagDisplayName": "시뮬레이션",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 111,
+                "tagCode": "queue",
+                "tagDisplayName": "큐",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": {
+              "tagId": 20,
+              "tagCode": "simulation",
+              "tagDisplayName": "시뮬레이션"
+            }
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-14",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 11866,
+            "problemTitle": "요세푸스 문제 0",
+            "problemTierLevel": 7,
+            "problemTierName": "S4",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 2,
+                "tagCode": "implementation",
+                "tagDisplayName": "구현",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 4,
+                "tagCode": "data_structures",
+                "tagDisplayName": "자료 구조",
+                "tagAliases": [
+                  {
+                    "alias": "자료구조"
+                  },
+                  {
+                    "alias": "자구"
+                  }
+                ],
+                "tagTargets": []
+              },
+              {
+                "tagId": 111,
+                "tagCode": "queue",
+                "tagDisplayName": "큐",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": {
+              "tagId": 111,
+              "tagCode": "queue",
+              "tagDisplayName": "큐"
+            }
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-15",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 2231,
+            "problemTitle": "분해합",
+            "problemTierLevel": 4,
+            "problemTierName": "B2",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 8,
+                "tagCode": "bruteforcing",
+                "tagDisplayName": "브루트포스 알고리즘",
+                "tagAliases": [
+                  {
+                    "alias": "완전탐색"
+                  },
+                  {
+                    "alias": "완전 탐색"
+                  },
+                  {
+                    "alias": "브루트포스"
+                  },
+                  {
+                    "alias": "bruteforce"
+                  },
+                  {
+                    "alias": "brute force"
+                  },
+                  {
+                    "alias": "완탐"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": null
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-16",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 2338,
+            "problemTitle": "긴자리 계산",
+            "problemTierLevel": 1,
+            "problemTierName": "B5",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 1,
+                "tagCode": "math",
+                "tagDisplayName": "수학",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 19,
+                "tagCode": "arithmetic",
+                "tagDisplayName": "사칙연산",
+                "tagAliases": [
+                  {
+                    "alias": "덧셈"
+                  },
+                  {
+                    "alias": "뺄셈"
+                  },
+                  {
+                    "alias": "곱셈"
+                  },
+                  {
+                    "alias": "나눗셈"
+                  },
+                  {
+                    "alias": "더하기"
+                  },
+                  {
+                    "alias": "빼기"
+                  },
+                  {
+                    "alias": "곱하기"
+                  },
+                  {
+                    "alias": "나누기"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 53,
+                "tagCode": "arbitrary_precision",
+                "tagDisplayName": "임의 정밀도 / 큰 수 연산",
+                "tagAliases": [
+                  {
+                    "alias": "빅인티저"
+                  },
+                  {
+                    "alias": "빅데시멀"
+                  },
+                  {
+                    "alias": "biginteger"
+                  },
+                  {
+                    "alias": "bigdecimal"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": {
+              "tagId": 53,
+              "tagCode": "arbitrary_precision",
+              "tagDisplayName": "임의 정밀도 / 큰 수 연산"
+            }
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-17",
+        "solvedProblemCount": 3,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 16978,
+            "problemTitle": "수열과 쿼리 22",
+            "problemTierLevel": 17,
+            "problemTierName": "P4",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 4,
+                "tagCode": "data_structures",
+                "tagDisplayName": "자료 구조",
+                "tagAliases": [
+                  {
+                    "alias": "자료구조"
+                  },
+                  {
+                    "alias": "자구"
+                  }
+                ],
+                "tagTargets": []
+              },
+              {
+                "tagId": 15,
+                "tagCode": "segtree",
+                "tagDisplayName": "세그먼트 트리",
+                "tagAliases": [
+                  {
+                    "alias": "구간트리"
+                  },
+                  {
+                    "alias": "세그트리"
+                  },
+                  {
+                    "alias": "fenwick"
+                  },
+                  {
+                    "alias": "펜윅"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  }
+                ]
+              },
+              {
+                "tagId": 47,
+                "tagCode": "offline_queries",
+                "tagDisplayName": "오프라인 쿼리",
+                "tagAliases": [
+                  {
+                    "alias": "offlinequery"
+                  }
+                ],
+                "tagTargets": []
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": {
+              "tagId": 15,
+              "tagCode": "segtree",
+              "tagDisplayName": "세그먼트 트리"
+            }
+          },
+          {
+            "problemId": 4195,
+            "problemTitle": "친구 네트워크",
+            "problemTierLevel": 14,
+            "problemTierName": "G2",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 4,
+                "tagCode": "data_structures",
+                "tagDisplayName": "자료 구조",
+                "tagAliases": [
+                  {
+                    "alias": "자료구조"
+                  },
+                  {
+                    "alias": "자구"
+                  }
+                ],
+                "tagTargets": []
+              },
+              {
+                "tagId": 17,
+                "tagCode": "set",
+                "tagDisplayName": "집합과 맵",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 28,
+                "tagCode": "hash_set",
+                "tagDisplayName": "해시를 사용한 집합과 맵",
+                "tagAliases": [
+                  {
+                    "alias": "집합"
+                  },
+                  {
+                    "alias": "맵"
+                  },
+                  {
+                    "alias": "셋"
+                  },
+                  {
+                    "alias": "딕셔너리"
+                  },
+                  {
+                    "alias": "dictionary"
+                  },
+                  {
+                    "alias": "map"
+                  },
+                  {
+                    "alias": "set"
+                  },
+                  {
+                    "alias": "해싱"
+                  },
+                  {
+                    "alias": "hashing"
+                  },
+                  {
+                    "alias": "dict"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 32,
+                "tagCode": "disjoint_set",
+                "tagDisplayName": "분리 집합",
+                "tagAliases": [
+                  {
+                    "alias": "union"
+                  },
+                  {
+                    "alias": "find"
+                  },
+                  {
+                    "alias": "유니온"
+                  },
+                  {
+                    "alias": "파인드"
+                  },
+                  {
+                    "alias": "dsu"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": {
+              "tagId": 32,
+              "tagCode": "disjoint_set",
+              "tagDisplayName": "분리 집합"
+            }
+          },
+          {
+            "problemId": 16975,
+            "problemTitle": "수열과 쿼리 21",
+            "problemTierLevel": 17,
+            "problemTierName": "P4",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 4,
+                "tagCode": "data_structures",
+                "tagDisplayName": "자료 구조",
+                "tagAliases": [
+                  {
+                    "alias": "자료구조"
+                  },
+                  {
+                    "alias": "자구"
+                  }
+                ],
+                "tagTargets": []
+              },
+              {
+                "tagId": 15,
+                "tagCode": "segtree",
+                "tagDisplayName": "세그먼트 트리",
+                "tagAliases": [
+                  {
+                    "alias": "구간트리"
+                  },
+                  {
+                    "alias": "세그트리"
+                  },
+                  {
+                    "alias": "fenwick"
+                  },
+                  {
+                    "alias": "펜윅"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  }
+                ]
+              },
+              {
+                "tagId": 43,
+                "tagCode": "lazyprop",
+                "tagDisplayName": "느리게 갱신되는 세그먼트 트리",
+                "tagAliases": [
+                  {
+                    "alias": "레이지"
+                  },
+                  {
+                    "alias": "레이지프로퍼게이션"
+                  },
+                  {
+                    "alias": "레이지프로파게이션"
+                  },
+                  {
+                    "alias": "구간트리"
+                  },
+                  {
+                    "alias": "fenwick"
+                  },
+                  {
+                    "alias": "펜윅"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  }
+                ]
+              },
+              {
+                "tagId": 103,
+                "tagCode": "difference_array",
+                "tagDisplayName": "차분 배열 트릭",
+                "tagAliases": [],
+                "tagTargets": []
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": {
+              "tagId": 43,
+              "tagCode": "lazyprop",
+              "tagDisplayName": "느리게 갱신되는 세그먼트 트리"
+            }
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-18",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 2,
+        "solvedProblems": [
+          {
+            "problemId": 1051,
+            "problemTitle": "숫자 정사각형",
+            "problemTierLevel": 8,
+            "problemTierName": "S3",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 2,
+                "tagCode": "implementation",
+                "tagDisplayName": "구현",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 8,
+                "tagCode": "bruteforcing",
+                "tagDisplayName": "브루트포스 알고리즘",
+                "tagAliases": [
+                  {
+                    "alias": "완전탐색"
+                  },
+                  {
+                    "alias": "완전 탐색"
+                  },
+                  {
+                    "alias": "브루트포스"
+                  },
+                  {
+                    "alias": "bruteforce"
+                  },
+                  {
+                    "alias": "brute force"
+                  },
+                  {
+                    "alias": "완탐"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": null
+          }
+        ],
+        "willSolveProblems": [
+          {
+            "problemId": 4210,
+            "problemTitle": "로봇 청소기",
+            "problemTierLevel": 25,
+            "problemTierName": "D1",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 2,
+                "tagCode": "implementation",
+                "tagDisplayName": "구현",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 3,
+                "tagCode": "dp",
+                "tagDisplayName": "다이나믹 프로그래밍",
+                "tagAliases": [
+                  {
+                    "alias": "동적계획법"
+                  },
+                  {
+                    "alias": "동적 계획법"
+                  },
+                  {
+                    "alias": "다이나믹프로그래밍"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  }
+                ]
+              },
+              {
+                "tagId": 12,
+                "tagCode": "geometry",
+                "tagDisplayName": "기하학",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 20,
+                "tagCode": "simulation",
+                "tagDisplayName": "시뮬레이션",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 74,
+                "tagCode": "line_intersection",
+                "tagDisplayName": "선분 교차 판정",
+                "tagAliases": [],
+                "tagTargets": []
+              }
+            ],
+            "representativeTag": null
+          },
+          {
+            "problemId": 6020,
+            "problemTitle": "Cheese Towers",
+            "problemTierLevel": 12,
+            "problemTierName": "G4",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 3,
+                "tagCode": "dp",
+                "tagDisplayName": "다이나믹 프로그래밍",
+                "tagAliases": [
+                  {
+                    "alias": "동적계획법"
+                  },
+                  {
+                    "alias": "동적 계획법"
+                  },
+                  {
+                    "alias": "다이나믹프로그래밍"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  }
+                ]
+              },
+              {
+                "tagId": 6,
+                "tagCode": "greedy",
+                "tagDisplayName": "그리디 알고리즘",
+                "tagAliases": [
+                  {
+                    "alias": "탐욕법"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "representativeTag": null
+          }
+        ]
+      },
+      {
+        "targetDate": "2025-12-19",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 31403,
+            "problemTitle": "$A + B - C$",
+            "problemTierLevel": 2,
+            "problemTierName": "B4",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 1,
+                "tagCode": "math",
+                "tagDisplayName": "수학",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 7,
+                "tagCode": "string",
+                "tagDisplayName": "문자열",
+                "tagAliases": [
+                  {
+                    "alias": "스트링"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 19,
+                "tagCode": "arithmetic",
+                "tagDisplayName": "사칙연산",
+                "tagAliases": [
+                  {
+                    "alias": "덧셈"
+                  },
+                  {
+                    "alias": "뺄셈"
+                  },
+                  {
+                    "alias": "곱셈"
+                  },
+                  {
+                    "alias": "나눗셈"
+                  },
+                  {
+                    "alias": "더하기"
+                  },
+                  {
+                    "alias": "빼기"
+                  },
+                  {
+                    "alias": "곱하기"
+                  },
+                  {
+                    "alias": "나누기"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": null
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-20",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 2675,
+            "problemTitle": "문자열 반복",
+            "problemTierLevel": 4,
+            "problemTierName": "B2",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 2,
+                "tagCode": "implementation",
+                "tagDisplayName": "구현",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 7,
+                "tagCode": "string",
+                "tagDisplayName": "문자열",
+                "tagAliases": [
+                  {
+                    "alias": "스트링"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": null
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-21",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 3052,
+            "problemTitle": "나머지",
+            "problemTierLevel": 4,
+            "problemTierName": "B2",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 1,
+                "tagCode": "math",
+                "tagDisplayName": "수학",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 17,
+                "tagCode": "set",
+                "tagDisplayName": "집합과 맵",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 19,
+                "tagCode": "arithmetic",
+                "tagDisplayName": "사칙연산",
+                "tagAliases": [
+                  {
+                    "alias": "덧셈"
+                  },
+                  {
+                    "alias": "뺄셈"
+                  },
+                  {
+                    "alias": "곱셈"
+                  },
+                  {
+                    "alias": "나눗셈"
+                  },
+                  {
+                    "alias": "더하기"
+                  },
+                  {
+                    "alias": "빼기"
+                  },
+                  {
+                    "alias": "곱하기"
+                  },
+                  {
+                    "alias": "나누기"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": {
+              "tagId": 17,
+              "tagCode": "set",
+              "tagDisplayName": "집합과 맵"
+            }
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-22",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 1033,
+            "problemTitle": "칵테일",
+            "problemTierLevel": 14,
+            "problemTierName": "G2",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 1,
+                "tagCode": "math",
+                "tagDisplayName": "수학",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 5,
+                "tagCode": "graphs",
+                "tagDisplayName": "그래프 이론",
+                "tagAliases": [
+                  {
+                    "alias": "그래프이론"
+                  },
+                  {
+                    "alias": "그래프"
+                  }
+                ],
+                "tagTargets": []
+              },
+              {
+                "tagId": 9,
+                "tagCode": "graph_traversal",
+                "tagDisplayName": "그래프 탐색",
+                "tagAliases": [
+                  {
+                    "alias": "bfs"
+                  },
+                  {
+                    "alias": "dfs"
+                  }
+                ],
+                "tagTargets": []
+              },
+              {
+                "tagId": 14,
+                "tagCode": "number_theory",
+                "tagDisplayName": "정수론",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 54,
+                "tagCode": "euclidean",
+                "tagDisplayName": "유클리드 호제법",
+                "tagAliases": [
+                  {
+                    "alias": "유클리드알고리즘"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": {
+              "tagId": 54,
+              "tagCode": "euclidean",
+              "tagDisplayName": "유클리드 호제법"
+            }
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-23",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-24",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-25",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-26",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 8958,
+            "problemTitle": "OX퀴즈",
+            "problemTierLevel": 4,
+            "problemTierName": "B2",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 2,
+                "tagCode": "implementation",
+                "tagDisplayName": "구현",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 7,
+                "tagCode": "string",
+                "tagDisplayName": "문자열",
+                "tagAliases": [
+                  {
+                    "alias": "스트링"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": null
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-27",
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [
+          {
+            "problemId": 2609,
+            "problemTitle": "최대공약수와 최소공배수",
+            "problemTierLevel": 5,
+            "problemTierName": "B1",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 1,
+                "tagCode": "math",
+                "tagDisplayName": "수학",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 14,
+                "tagCode": "number_theory",
+                "tagDisplayName": "정수론",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 54,
+                "tagCode": "euclidean",
+                "tagDisplayName": "유클리드 호제법",
+                "tagAliases": [
+                  {
+                    "alias": "유클리드알고리즘"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": false,
+            "representativeTag": {
+              "tagId": 14,
+              "tagCode": "number_theory",
+              "tagDisplayName": "정수론"
+            }
+          }
+        ],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-28",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-29",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-30",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2025-12-31",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      }
+    ]
+  },
+  "error": {}
+}

@@ -1,0 +1,608 @@
+{
+  "status": 200,
+  "message": "ok",
+  "data": {
+    "userAccount": {
+      "userAccountId": 2,
+      "profileImageUrl": null,
+      "target": {
+        "targetId": 3,
+        "targetCode": "BEGINNER",
+        "targetDisplayName": "초심자"
+      },
+      "registeredAt": "2026-01-04T16:31:07"
+    },
+    "bjAccount": {
+      "bjAccountId": "happynj2697",
+      "stat": {
+        "tierId": 17,
+        "tierName": "P4",
+        "longestStreak": 57,
+        "rating": 1867,
+        "class": 6,
+        "tierStartDate": "2026-01-05"
+      },
+      "streaks": [
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-09-11",
+          "solvedCount": 3,
+          "solvedLevel": 3
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-09-12",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-09-14",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-09-16",
+          "solvedCount": 4,
+          "solvedLevel": 3
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-09-17",
+          "solvedCount": 12,
+          "solvedLevel": 4
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-09-18",
+          "solvedCount": 13,
+          "solvedLevel": 4
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-09-19",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-09-20",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-09-21",
+          "solvedCount": 4,
+          "solvedLevel": 3
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-09-22",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-09-23",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-09-24",
+          "solvedCount": 10,
+          "solvedLevel": 4
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-09-25",
+          "solvedCount": 5,
+          "solvedLevel": 4
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-09-26",
+          "solvedCount": 8,
+          "solvedLevel": 4
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-09-29",
+          "solvedCount": 7,
+          "solvedLevel": 4
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-09-30",
+          "solvedCount": 7,
+          "solvedLevel": 4
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-01",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-02",
+          "solvedCount": 8,
+          "solvedLevel": 4
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-03",
+          "solvedCount": 5,
+          "solvedLevel": 4
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-04",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-09",
+          "solvedCount": 3,
+          "solvedLevel": 3
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-10",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-12",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-13",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-14",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-15",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-16",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-21",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-22",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-23",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-25",
+          "solvedCount": 5,
+          "solvedLevel": 4
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-27",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-28",
+          "solvedCount": 3,
+          "solvedLevel": 3
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-29",
+          "solvedCount": 3,
+          "solvedLevel": 3
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-30",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-10-31",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-01",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-02",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-03",
+          "solvedCount": 3,
+          "solvedLevel": 3
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-04",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-05",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-06",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-07",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-08",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-09",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-10",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-11",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-12",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-13",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-14",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-15",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-16",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-17",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-18",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-19",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-20",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-21",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-22",
+          "solvedCount": 4,
+          "solvedLevel": 3
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-23",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-24",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-25",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-26",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-27",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-28",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-29",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-11-30",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-01",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-02",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-03",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-04",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-05",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-06",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-07",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-08",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-09",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-10",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-11",
+          "solvedCount": 5,
+          "solvedLevel": 4
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-12",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-13",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-14",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-15",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-16",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-17",
+          "solvedCount": 3,
+          "solvedLevel": 3
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-18",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-19",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-20",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-21",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-22",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-26",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2025-12-27",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2026-01-06",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2026-01-08",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2026-01-13",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2026-01-15",
+          "solvedCount": 2,
+          "solvedLevel": 2
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2026-01-20",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        },
+        {
+          "problemHistoryId": null,
+          "streakDate": "2026-01-21",
+          "solvedCount": 1,
+          "solvedLevel": 1
+        }
+      ],
+      "registeredAt": "2026-01-05T17:33:05"
+    },
+    "linkedAt": "2026-01-13T13:52:25"
+  },
+  "error": {}
+}

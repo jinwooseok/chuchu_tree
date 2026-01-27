@@ -1,0 +1,267 @@
+{
+  "status": 200,
+  "message": "ok",
+  "data": {
+    "totalProblemCount": 1,
+    "monthlyData": [
+      {
+        "targetDate": "2026-02-01",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-02",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-03",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-04",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-05",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-06",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-07",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-08",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-09",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-10",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-11",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-12",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-13",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-14",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-15",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-16",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-17",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 1,
+        "solvedProblems": [],
+        "willSolveProblems": [
+          {
+            "problemId": 1100,
+            "problemTitle": "하얀 칸",
+            "problemTierLevel": 4,
+            "problemTierName": "B2",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 2,
+                "tagCode": "implementation",
+                "tagDisplayName": "구현",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 7,
+                "tagCode": "string",
+                "tagDisplayName": "문자열",
+                "tagAliases": [
+                  {
+                    "alias": "스트링"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "representativeTag": null
+          }
+        ]
+      },
+      {
+        "targetDate": "2026-02-18",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-19",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-20",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-21",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-22",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-23",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-24",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-25",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-26",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-27",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      },
+      {
+        "targetDate": "2026-02-28",
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
+      }
+    ]
+  },
+  "error": {}
+}

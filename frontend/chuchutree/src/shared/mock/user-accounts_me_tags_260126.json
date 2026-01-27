@@ -1,0 +1,3281 @@
+{
+  "status": 200,
+  "message": "ok",
+  "data": {
+    "categories": [
+      {
+        "categoryName": "EXCLUDED",
+        "tags": [
+          {
+            "tagId": 1,
+            "tagCode": "math",
+            "tagDisplayName": "수학"
+          },
+          {
+            "tagId": 8,
+            "tagCode": "bruteforcing",
+            "tagDisplayName": "브루트포스 알고리즘"
+          },
+          {
+            "tagId": 20,
+            "tagCode": "simulation",
+            "tagDisplayName": "시뮬레이션"
+          }
+        ]
+      },
+      {
+        "categoryName": "LOCKED",
+        "tags": []
+      },
+      {
+        "categoryName": "MASTER",
+        "tags": [
+          {
+            "tagId": 2,
+            "tagCode": "implementation",
+            "tagDisplayName": "구현"
+          },
+          {
+            "tagId": 3,
+            "tagCode": "dp",
+            "tagDisplayName": "다이나믹 프로그래밍"
+          },
+          {
+            "tagId": 6,
+            "tagCode": "greedy",
+            "tagDisplayName": "그리디 알고리즘"
+          },
+          {
+            "tagId": 7,
+            "tagCode": "string",
+            "tagDisplayName": "문자열"
+          },
+          {
+            "tagId": 10,
+            "tagCode": "sorting",
+            "tagDisplayName": "정렬"
+          },
+          {
+            "tagId": 17,
+            "tagCode": "set",
+            "tagDisplayName": "집합과 맵"
+          },
+          {
+            "tagId": 23,
+            "tagCode": "bfs",
+            "tagDisplayName": "너비 우선 탐색"
+          },
+          {
+            "tagId": 27,
+            "tagCode": "dfs",
+            "tagDisplayName": "깊이 우선 탐색"
+          },
+          {
+            "tagId": 28,
+            "tagCode": "hash_set",
+            "tagDisplayName": "해시를 사용한 집합과 맵"
+          },
+          {
+            "tagId": 31,
+            "tagCode": "backtracking",
+            "tagDisplayName": "백트래킹"
+          }
+        ]
+      },
+      {
+        "categoryName": "INTERMEDIATE",
+        "tags": [
+          {
+            "tagId": 11,
+            "tagCode": "ad_hoc",
+            "tagDisplayName": "애드 혹"
+          },
+          {
+            "tagId": 12,
+            "tagCode": "geometry",
+            "tagDisplayName": "기하학"
+          },
+          {
+            "tagId": 14,
+            "tagCode": "number_theory",
+            "tagDisplayName": "정수론"
+          },
+          {
+            "tagId": 15,
+            "tagCode": "segtree",
+            "tagDisplayName": "세그먼트 트리"
+          },
+          {
+            "tagId": 19,
+            "tagCode": "arithmetic",
+            "tagDisplayName": "사칙연산"
+          },
+          {
+            "tagId": 21,
+            "tagCode": "prefix_sum",
+            "tagDisplayName": "누적 합"
+          },
+          {
+            "tagId": 22,
+            "tagCode": "combinatorics",
+            "tagDisplayName": "조합론"
+          },
+          {
+            "tagId": 29,
+            "tagCode": "dijkstra",
+            "tagDisplayName": "데이크스트라"
+          },
+          {
+            "tagId": 33,
+            "tagCode": "dp_tree",
+            "tagDisplayName": "트리에서의 다이나믹 프로그래밍"
+          },
+          {
+            "tagId": 34,
+            "tagCode": "tree_set",
+            "tagDisplayName": "트리를 사용한 집합과 맵"
+          },
+          {
+            "tagId": 39,
+            "tagCode": "divide_and_conquer",
+            "tagDisplayName": "분할 정복"
+          },
+          {
+            "tagId": 40,
+            "tagCode": "two_pointer",
+            "tagDisplayName": "두 포인터"
+          },
+          {
+            "tagId": 43,
+            "tagCode": "lazyprop",
+            "tagDisplayName": "느리게 갱신되는 세그먼트 트리"
+          },
+          {
+            "tagId": 44,
+            "tagCode": "primality_test",
+            "tagDisplayName": "소수 판정"
+          },
+          {
+            "tagId": 45,
+            "tagCode": "flow",
+            "tagDisplayName": "최대 유량"
+          },
+          {
+            "tagId": 46,
+            "tagCode": "dp_bitfield",
+            "tagDisplayName": "비트필드를 이용한 다이나믹 프로그래밍"
+          },
+          {
+            "tagId": 49,
+            "tagCode": "knapsack",
+            "tagDisplayName": "배낭 문제"
+          },
+          {
+            "tagId": 52,
+            "tagCode": "recursion",
+            "tagDisplayName": "재귀"
+          },
+          {
+            "tagId": 53,
+            "tagCode": "arbitrary_precision",
+            "tagDisplayName": "임의 정밀도 / 큰 수 연산"
+          },
+          {
+            "tagId": 54,
+            "tagCode": "euclidean",
+            "tagDisplayName": "유클리드 호제법"
+          },
+          {
+            "tagId": 55,
+            "tagCode": "mst",
+            "tagDisplayName": "최소 스패닝 트리"
+          },
+          {
+            "tagId": 56,
+            "tagCode": "convex_hull",
+            "tagDisplayName": "볼록 껍질"
+          },
+          {
+            "tagId": 58,
+            "tagCode": "topological_sorting",
+            "tagDisplayName": "위상 정렬"
+          },
+          {
+            "tagId": 60,
+            "tagCode": "sieve",
+            "tagDisplayName": "에라토스테네스의 체"
+          },
+          {
+            "tagId": 61,
+            "tagCode": "bipartite_matching",
+            "tagDisplayName": "이분 매칭"
+          },
+          {
+            "tagId": 64,
+            "tagCode": "lca",
+            "tagDisplayName": "최소 공통 조상"
+          },
+          {
+            "tagId": 68,
+            "tagCode": "floyd_warshall",
+            "tagDisplayName": "플로이드–워셜"
+          },
+          {
+            "tagId": 70,
+            "tagCode": "scc",
+            "tagDisplayName": "강한 연결 요소"
+          },
+          {
+            "tagId": 71,
+            "tagCode": "traceback",
+            "tagDisplayName": "역추적"
+          },
+          {
+            "tagId": 78,
+            "tagCode": "trie",
+            "tagDisplayName": "트라이"
+          },
+          {
+            "tagId": 79,
+            "tagCode": "deque",
+            "tagDisplayName": "덱"
+          },
+          {
+            "tagId": 86,
+            "tagCode": "sliding_window",
+            "tagDisplayName": "슬라이딩 윈도우"
+          },
+          {
+            "tagId": 87,
+            "tagCode": "mcmf",
+            "tagDisplayName": "최소 비용 최대 유량"
+          },
+          {
+            "tagId": 94,
+            "tagCode": "lis",
+            "tagDisplayName": "가장 긴 증가하는 부분 수열 문제"
+          },
+          {
+            "tagId": 111,
+            "tagCode": "queue",
+            "tagDisplayName": "큐"
+          },
+          {
+            "tagId": 113,
+            "tagCode": "tsp",
+            "tagDisplayName": "외판원 순회 문제"
+          }
+        ]
+      },
+      {
+        "categoryName": "ADVANCED",
+        "tags": [
+          {
+            "tagId": 13,
+            "tagCode": "trees",
+            "tagDisplayName": "트리"
+          },
+          {
+            "tagId": 16,
+            "tagCode": "binary_search",
+            "tagDisplayName": "이분 탐색"
+          },
+          {
+            "tagId": 25,
+            "tagCode": "shortest_path",
+            "tagDisplayName": "최단 경로"
+          },
+          {
+            "tagId": 26,
+            "tagCode": "bitmask",
+            "tagDisplayName": "비트마스킹"
+          },
+          {
+            "tagId": 32,
+            "tagCode": "disjoint_set",
+            "tagDisplayName": "분리 집합"
+          },
+          {
+            "tagId": 35,
+            "tagCode": "priority_queue",
+            "tagDisplayName": "우선순위 큐"
+          },
+          {
+            "tagId": 41,
+            "tagCode": "stack",
+            "tagDisplayName": "스택"
+          },
+          {
+            "tagId": 62,
+            "tagCode": "grid_graph",
+            "tagDisplayName": "격자 그래프"
+          },
+          {
+            "tagId": 96,
+            "tagCode": "kmp",
+            "tagDisplayName": "KMP"
+          }
+        ]
+      }
+    ],
+    "tags": [
+      {
+        "tagId": 1,
+        "tagCode": "math",
+        "tagDisplayName": "수학",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 18,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 15,
+          "requiredMinTier": 10,
+          "higherProblemTier": 13
+        },
+        "accountStat": {
+          "currentLevel": "MASTER",
+          "solvedProblemCount": 54,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": "2026-01-08",
+          "recommendation_period": 14
+        },
+        "lockedYn": false,
+        "excludedYn": true,
+        "recommendationYn": false
+      },
+      {
+        "tagId": 2,
+        "tagCode": "implementation",
+        "tagDisplayName": "구현",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 12,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 15,
+          "requiredMinTier": 10,
+          "higherProblemTier": 13
+        },
+        "accountStat": {
+          "currentLevel": "MASTER",
+          "solvedProblemCount": 94,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": "2026-01-15",
+          "recommendation_period": 14
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 3,
+        "tagCode": "dp",
+        "tagDisplayName": "다이나믹 프로그래밍",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "동적계획법"
+          },
+          {
+            "alias": "동적 계획법"
+          },
+          {
+            "alias": "다이나믹프로그래밍"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 20,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 13,
+          "higherProblemTier": 17
+        },
+        "accountStat": {
+          "currentLevel": "MASTER",
+          "solvedProblemCount": 38,
+          "requiredMinTier": 17,
+          "higherProblemTier": 19,
+          "lastSolvedDate": "2026-01-15",
+          "recommendation_period": 14
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 6,
+        "tagCode": "greedy",
+        "tagDisplayName": "그리디 알고리즘",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "탐욕법"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 18,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 15,
+          "requiredMinTier": 10,
+          "higherProblemTier": 13
+        },
+        "accountStat": {
+          "currentLevel": "MASTER",
+          "solvedProblemCount": 17,
+          "requiredMinTier": 17,
+          "higherProblemTier": 18,
+          "lastSolvedDate": null,
+          "recommendation_period": 14
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 7,
+        "tagCode": "string",
+        "tagDisplayName": "문자열",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "스트링"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 14,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 15,
+          "requiredMinTier": 10,
+          "higherProblemTier": 13
+        },
+        "accountStat": {
+          "currentLevel": "MASTER",
+          "solvedProblemCount": 34,
+          "requiredMinTier": 17,
+          "higherProblemTier": 19,
+          "lastSolvedDate": "2026-01-20",
+          "recommendation_period": 14
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 8,
+        "tagCode": "bruteforcing",
+        "tagDisplayName": "브루트포스 알고리즘",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "완전탐색"
+          },
+          {
+            "alias": "완전 탐색"
+          },
+          {
+            "alias": "브루트포스"
+          },
+          {
+            "alias": "bruteforce"
+          },
+          {
+            "alias": "brute force"
+          },
+          {
+            "alias": "완탐"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 13,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 15,
+          "requiredMinTier": 10,
+          "higherProblemTier": 13
+        },
+        "accountStat": {
+          "currentLevel": "MASTER",
+          "solvedProblemCount": 22,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": "2026-01-21",
+          "recommendation_period": 14
+        },
+        "lockedYn": false,
+        "excludedYn": true,
+        "recommendationYn": false
+      },
+      {
+        "tagId": 10,
+        "tagCode": "sorting",
+        "tagDisplayName": "정렬",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 16,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 15,
+          "requiredMinTier": 10,
+          "higherProblemTier": 13
+        },
+        "accountStat": {
+          "currentLevel": "MASTER",
+          "solvedProblemCount": 27,
+          "requiredMinTier": 17,
+          "higherProblemTier": 18,
+          "lastSolvedDate": "2026-01-13",
+          "recommendation_period": 14
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 11,
+        "tagCode": "ad_hoc",
+        "tagDisplayName": "애드 혹",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 20,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 7,
+          "requiredMinTier": 10,
+          "higherProblemTier": 14
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 1,
+          "requiredMinTier": 17,
+          "higherProblemTier": 11,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 12,
+        "tagCode": "geometry",
+        "tagDisplayName": "기하학",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 21,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 8,
+          "higherProblemTier": 10
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 4,
+          "requiredMinTier": 17,
+          "higherProblemTier": 17,
+          "lastSolvedDate": "2026-01-08",
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 13,
+        "tagCode": "trees",
+        "tagDisplayName": "트리",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "trees"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 22,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 15,
+          "requiredMinTier": 10,
+          "higherProblemTier": 13
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 12,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": "2026-01-20",
+          "recommendation_period": 7
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 14,
+        "tagCode": "number_theory",
+        "tagDisplayName": "정수론",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 19,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 8,
+          "higherProblemTier": 10
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 7,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 15,
+        "tagCode": "segtree",
+        "tagDisplayName": "세그먼트 트리",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "구간트리"
+          },
+          {
+            "alias": "세그트리"
+          },
+          {
+            "alias": "fenwick"
+          },
+          {
+            "alias": "펜윅"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 22,
+          "prevTags": [
+            {
+              "tagId": 13,
+              "tagCode": "trees",
+              "tagDisplayName": "트리",
+              "satisfiedYn": true
+            },
+            {
+              "tagId": 41,
+              "tagCode": "stack",
+              "tagDisplayName": "스택",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 18,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 13,
+          "requiredMinTier": 17,
+          "higherProblemTier": 18,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 16,
+        "tagCode": "binary_search",
+        "tagDisplayName": "이분 탐색",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "이분탐색"
+          },
+          {
+            "alias": "이진탐색"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 20,
+          "prevTags": [
+            {
+              "tagId": 17,
+              "tagCode": "set",
+              "tagDisplayName": "집합과 맵",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 13,
+          "higherProblemTier": 17
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 13,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": null,
+          "recommendation_period": 7
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 17,
+        "tagCode": "set",
+        "tagDisplayName": "집합과 맵",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 18,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 15,
+          "requiredMinTier": 10,
+          "higherProblemTier": 13
+        },
+        "accountStat": {
+          "currentLevel": "MASTER",
+          "solvedProblemCount": 24,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": "2026-01-20",
+          "recommendation_period": 14
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 19,
+        "tagCode": "arithmetic",
+        "tagDisplayName": "사칙연산",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "덧셈"
+          },
+          {
+            "alias": "뺄셈"
+          },
+          {
+            "alias": "곱셈"
+          },
+          {
+            "alias": "나눗셈"
+          },
+          {
+            "alias": "더하기"
+          },
+          {
+            "alias": "빼기"
+          },
+          {
+            "alias": "곱하기"
+          },
+          {
+            "alias": "나누기"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 5,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 8,
+          "higherProblemTier": 10
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 23,
+          "requiredMinTier": 17,
+          "higherProblemTier": 5,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 20,
+        "tagCode": "simulation",
+        "tagDisplayName": "시뮬레이션",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 13,
+          "prevTags": [
+            {
+              "tagId": 2,
+              "tagCode": "implementation",
+              "tagDisplayName": "구현",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 15,
+          "requiredMinTier": 10,
+          "higherProblemTier": 13
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 14,
+          "requiredMinTier": 17,
+          "higherProblemTier": 15,
+          "lastSolvedDate": null,
+          "recommendation_period": 7
+        },
+        "lockedYn": false,
+        "excludedYn": true,
+        "recommendationYn": false
+      },
+      {
+        "tagId": 21,
+        "tagCode": "prefix_sum",
+        "tagDisplayName": "누적 합",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "구간합"
+          },
+          {
+            "alias": "부분합"
+          },
+          {
+            "alias": "rangesum"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 18,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 8,
+          "higherProblemTier": 10
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 7,
+          "requiredMinTier": 17,
+          "higherProblemTier": 14,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 22,
+        "tagCode": "combinatorics",
+        "tagDisplayName": "조합론",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "combination"
+          },
+          {
+            "alias": "permutation"
+          },
+          {
+            "alias": "probability"
+          },
+          {
+            "alias": "확률"
+          },
+          {
+            "alias": "순열"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 20,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 8,
+          "higherProblemTier": 10
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 4,
+          "requiredMinTier": 17,
+          "higherProblemTier": 14,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 23,
+        "tagCode": "bfs",
+        "tagDisplayName": "너비 우선 탐색",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "breadthfirst"
+          },
+          {
+            "alias": "breadth first"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 16,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 15,
+          "requiredMinTier": 10,
+          "higherProblemTier": 13
+        },
+        "accountStat": {
+          "currentLevel": "MASTER",
+          "solvedProblemCount": 25,
+          "requiredMinTier": 17,
+          "higherProblemTier": 15,
+          "lastSolvedDate": "2026-01-21",
+          "recommendation_period": 14
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 25,
+        "tagCode": "shortest_path",
+        "tagDisplayName": "최단 경로",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 19,
+          "prevTags": [
+            {
+              "tagId": 27,
+              "tagCode": "dfs",
+              "tagDisplayName": "깊이 우선 탐색",
+              "satisfiedYn": true
+            },
+            {
+              "tagId": 23,
+              "tagCode": "bfs",
+              "tagDisplayName": "너비 우선 탐색",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 13,
+          "higherProblemTier": 17
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 19,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": null,
+          "recommendation_period": 7
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 26,
+        "tagCode": "bitmask",
+        "tagDisplayName": "비트마스킹",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "비트필드"
+          },
+          {
+            "alias": "비트마스크"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 20,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 13,
+          "higherProblemTier": 17
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 8,
+          "requiredMinTier": 17,
+          "higherProblemTier": 15,
+          "lastSolvedDate": "2026-01-21",
+          "recommendation_period": 7
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 27,
+        "tagCode": "dfs",
+        "tagDisplayName": "깊이 우선 탐색",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "depth first"
+          },
+          {
+            "alias": "depthfirst"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 19,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 15,
+          "requiredMinTier": 10,
+          "higherProblemTier": 13
+        },
+        "accountStat": {
+          "currentLevel": "MASTER",
+          "solvedProblemCount": 21,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": "2026-01-20",
+          "recommendation_period": 14
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 28,
+        "tagCode": "hash_set",
+        "tagDisplayName": "해시를 사용한 집합과 맵",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "집합"
+          },
+          {
+            "alias": "맵"
+          },
+          {
+            "alias": "셋"
+          },
+          {
+            "alias": "딕셔너리"
+          },
+          {
+            "alias": "dictionary"
+          },
+          {
+            "alias": "map"
+          },
+          {
+            "alias": "set"
+          },
+          {
+            "alias": "해싱"
+          },
+          {
+            "alias": "hashing"
+          },
+          {
+            "alias": "dict"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 14,
+          "prevTags": [
+            {
+              "tagId": 17,
+              "tagCode": "set",
+              "tagDisplayName": "집합과 맵",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 15,
+          "requiredMinTier": 10,
+          "higherProblemTier": 13
+        },
+        "accountStat": {
+          "currentLevel": "MASTER",
+          "solvedProblemCount": 18,
+          "requiredMinTier": 17,
+          "higherProblemTier": 15,
+          "lastSolvedDate": "2026-01-13",
+          "recommendation_period": 14
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 29,
+        "tagCode": "dijkstra",
+        "tagDisplayName": "데이크스트라",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "다익"
+          },
+          {
+            "alias": "다익스트라"
+          },
+          {
+            "alias": "데이크스트라"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 19,
+          "prevTags": [
+            {
+              "tagId": 25,
+              "tagCode": "shortest_path",
+              "tagDisplayName": "최단 경로",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 18,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 8,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 31,
+        "tagCode": "backtracking",
+        "tagDisplayName": "백트래킹",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "백트래킹"
+          },
+          {
+            "alias": "퇴각검색"
+          },
+          {
+            "alias": "퇴각 검색"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 16,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 15,
+          "requiredMinTier": 10,
+          "higherProblemTier": 13
+        },
+        "accountStat": {
+          "currentLevel": "MASTER",
+          "solvedProblemCount": 19,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": "2026-01-20",
+          "recommendation_period": 14
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 32,
+        "tagCode": "disjoint_set",
+        "tagDisplayName": "분리 집합",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "union"
+          },
+          {
+            "alias": "find"
+          },
+          {
+            "alias": "유니온"
+          },
+          {
+            "alias": "파인드"
+          },
+          {
+            "alias": "dsu"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 21,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 13,
+          "higherProblemTier": 17
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 9,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": null,
+          "recommendation_period": 7
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 33,
+        "tagCode": "dp_tree",
+        "tagDisplayName": "트리에서의 다이나믹 프로그래밍",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "트리dp"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 22,
+          "prevTags": [
+            {
+              "tagId": 3,
+              "tagCode": "dp",
+              "tagDisplayName": "다이나믹 프로그래밍",
+              "satisfiedYn": true
+            },
+            {
+              "tagId": 13,
+              "tagCode": "trees",
+              "tagDisplayName": "트리",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 18,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 3,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 34,
+        "tagCode": "tree_set",
+        "tagDisplayName": "트리를 사용한 집합과 맵",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "집합"
+          },
+          {
+            "alias": "맵"
+          },
+          {
+            "alias": "셋"
+          },
+          {
+            "alias": "딕셔너리"
+          },
+          {
+            "alias": "dictionary"
+          },
+          {
+            "alias": "map"
+          },
+          {
+            "alias": "set"
+          },
+          {
+            "alias": "bbst"
+          },
+          {
+            "alias": "트리"
+          },
+          {
+            "alias": "tree"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 21,
+          "prevTags": [
+            {
+              "tagId": 17,
+              "tagCode": "set",
+              "tagDisplayName": "집합과 맵",
+              "satisfiedYn": true
+            },
+            {
+              "tagId": 13,
+              "tagCode": "trees",
+              "tagDisplayName": "트리",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 7,
+          "requiredMinTier": 10,
+          "higherProblemTier": 14
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 3,
+          "requiredMinTier": 17,
+          "higherProblemTier": 12,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 35,
+        "tagCode": "priority_queue",
+        "tagDisplayName": "우선순위 큐",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "heap"
+          },
+          {
+            "alias": "힙"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 20,
+          "prevTags": [
+            {
+              "tagId": 41,
+              "tagCode": "stack",
+              "tagDisplayName": "스택",
+              "satisfiedYn": true
+            },
+            {
+              "tagId": 111,
+              "tagCode": "queue",
+              "tagDisplayName": "큐",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 13,
+          "higherProblemTier": 17
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 8,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": null,
+          "recommendation_period": 7
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 39,
+        "tagCode": "divide_and_conquer",
+        "tagDisplayName": "분할 정복",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "dnc"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 24,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 7,
+          "requiredMinTier": 10,
+          "higherProblemTier": 14
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 40,
+        "tagCode": "two_pointer",
+        "tagDisplayName": "두 포인터",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "투포인터"
+          },
+          {
+            "alias": "인치웜"
+          },
+          {
+            "alias": "inchworm"
+          },
+          {
+            "alias": "twopointer"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 19,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 1,
+          "higherProblemTier": 1
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 9,
+          "requiredMinTier": 17,
+          "higherProblemTier": 14,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 41,
+        "tagCode": "stack",
+        "tagDisplayName": "스택",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 18,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 15,
+          "requiredMinTier": 10,
+          "higherProblemTier": 13
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 13,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": null,
+          "recommendation_period": 7
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 43,
+        "tagCode": "lazyprop",
+        "tagDisplayName": "느리게 갱신되는 세그먼트 트리",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "레이지"
+          },
+          {
+            "alias": "레이지프로퍼게이션"
+          },
+          {
+            "alias": "레이지프로파게이션"
+          },
+          {
+            "alias": "구간트리"
+          },
+          {
+            "alias": "fenwick"
+          },
+          {
+            "alias": "펜윅"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 23,
+          "prevTags": [
+            {
+              "tagId": 15,
+              "tagCode": "segtree",
+              "tagDisplayName": "세그먼트 트리",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 18,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 2,
+          "requiredMinTier": 17,
+          "higherProblemTier": 17,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 44,
+        "tagCode": "primality_test",
+        "tagDisplayName": "소수 판정",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "소수"
+          },
+          {
+            "alias": "소수판별"
+          },
+          {
+            "alias": "소수판정"
+          },
+          {
+            "alias": "prime"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 17,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 8,
+          "higherProblemTier": 10
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 2,
+          "requiredMinTier": 17,
+          "higherProblemTier": 15,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 45,
+        "tagCode": "flow",
+        "tagDisplayName": "최대 유량",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "dinic"
+          },
+          {
+            "alias": "dinitz"
+          },
+          {
+            "alias": "ford"
+          },
+          {
+            "alias": "fulkerson"
+          },
+          {
+            "alias": "fordfulkerson"
+          },
+          {
+            "alias": "디닉"
+          },
+          {
+            "alias": "디니츠"
+          },
+          {
+            "alias": "포드풀커슨"
+          },
+          {
+            "alias": "플로우"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 22,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 18,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 17,
+          "higherProblemTier": 18,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 46,
+        "tagCode": "dp_bitfield",
+        "tagDisplayName": "비트필드를 이용한 다이나믹 프로그래밍",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "동적계획법"
+          },
+          {
+            "alias": "비트마스크"
+          },
+          {
+            "alias": "비트dp"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 20,
+          "prevTags": [
+            {
+              "tagId": 3,
+              "tagCode": "dp",
+              "tagDisplayName": "다이나믹 프로그래밍",
+              "satisfiedYn": true
+            },
+            {
+              "tagId": 26,
+              "tagCode": "bitmask",
+              "tagDisplayName": "비트마스킹",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 18,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 2,
+          "requiredMinTier": 17,
+          "higherProblemTier": 15,
+          "lastSolvedDate": "2026-01-15",
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 49,
+        "tagCode": "knapsack",
+        "tagDisplayName": "배낭 문제",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "냅색"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 18,
+          "prevTags": [
+            {
+              "tagId": 3,
+              "tagCode": "dp",
+              "tagDisplayName": "다이나믹 프로그래밍",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 18,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 8,
+          "requiredMinTier": 17,
+          "higherProblemTier": 18,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 52,
+        "tagCode": "recursion",
+        "tagDisplayName": "재귀",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 17,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 8,
+          "higherProblemTier": 10
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 6,
+          "requiredMinTier": 17,
+          "higherProblemTier": 15,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 53,
+        "tagCode": "arbitrary_precision",
+        "tagDisplayName": "임의 정밀도 / 큰 수 연산",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "빅인티저"
+          },
+          {
+            "alias": "빅데시멀"
+          },
+          {
+            "alias": "biginteger"
+          },
+          {
+            "alias": "bigdecimal"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 18,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 8,
+          "higherProblemTier": 10
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 2,
+          "requiredMinTier": 17,
+          "higherProblemTier": 9,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 54,
+        "tagCode": "euclidean",
+        "tagDisplayName": "유클리드 호제법",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "유클리드알고리즘"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 15,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 7,
+          "requiredMinTier": 10,
+          "higherProblemTier": 14
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 3,
+          "requiredMinTier": 17,
+          "higherProblemTier": 14,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 55,
+        "tagCode": "mst",
+        "tagDisplayName": "최소 스패닝 트리",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 20,
+          "prevTags": [
+            {
+              "tagId": 35,
+              "tagCode": "priority_queue",
+              "tagDisplayName": "우선순위 큐",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 18,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 17,
+          "higherProblemTier": 14,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 56,
+        "tagCode": "convex_hull",
+        "tagDisplayName": "볼록 껍질",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "컨벡스헐"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 23,
+          "prevTags": [
+            {
+              "tagId": 12,
+              "tagCode": "geometry",
+              "tagDisplayName": "기하학",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 17,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 1,
+          "requiredMinTier": 17,
+          "higherProblemTier": 17,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 58,
+        "tagCode": "topological_sorting",
+        "tagDisplayName": "위상 정렬",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 19,
+          "prevTags": [
+            {
+              "tagId": 13,
+              "tagCode": "trees",
+              "tagDisplayName": "트리",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 18,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 7,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": "2026-01-13",
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 60,
+        "tagCode": "sieve",
+        "tagDisplayName": "에라토스테네스의 체",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "sieve"
+          },
+          {
+            "alias": "에라체"
+          },
+          {
+            "alias": "소수"
+          },
+          {
+            "alias": "prime"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 17,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 8,
+          "higherProblemTier": 10
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 2,
+          "requiredMinTier": 17,
+          "higherProblemTier": 15,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 61,
+        "tagCode": "bipartite_matching",
+        "tagDisplayName": "이분 매칭",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 21,
+          "prevTags": [
+            {
+              "tagId": 45,
+              "tagCode": "flow",
+              "tagDisplayName": "최대 유량",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 17,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 4,
+          "requiredMinTier": 17,
+          "higherProblemTier": 18,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 62,
+        "tagCode": "grid_graph",
+        "tagDisplayName": "격자 그래프",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 15,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 13,
+          "higherProblemTier": 17
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 15,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": "2026-01-20",
+          "recommendation_period": 7
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 64,
+        "tagCode": "lca",
+        "tagDisplayName": "최소 공통 조상",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 22,
+          "prevTags": [
+            {
+              "tagId": 13,
+              "tagCode": "trees",
+              "tagDisplayName": "트리",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 18,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 2,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 68,
+        "tagCode": "floyd_warshall",
+        "tagDisplayName": "플로이드–워셜",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "플로이드"
+          },
+          {
+            "alias": "플로이드와셜"
+          },
+          {
+            "alias": "플로이드와샬"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 18,
+          "prevTags": [
+            {
+              "tagId": 25,
+              "tagCode": "shortest_path",
+              "tagDisplayName": "최단 경로",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 18,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 70,
+        "tagCode": "scc",
+        "tagDisplayName": "강한 연결 요소",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 22,
+          "prevTags": [
+            {
+              "tagId": 27,
+              "tagCode": "dfs",
+              "tagDisplayName": "깊이 우선 탐색",
+              "satisfiedYn": true
+            },
+            {
+              "tagId": 41,
+              "tagCode": "stack",
+              "tagDisplayName": "스택",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 17,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 0,
+          "requiredMinTier": null,
+          "higherProblemTier": null,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 71,
+        "tagCode": "traceback",
+        "tagDisplayName": "역추적",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 18,
+          "prevTags": [
+            {
+              "tagId": 3,
+              "tagCode": "dp",
+              "tagDisplayName": "다이나믹 프로그래밍",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 18,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 17,
+          "higherProblemTier": 17,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 78,
+        "tagCode": "trie",
+        "tagDisplayName": "트라이",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 21,
+          "prevTags": [
+            {
+              "tagId": 7,
+              "tagCode": "string",
+              "tagDisplayName": "문자열",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 18,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 1,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": "2026-01-20",
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 79,
+        "tagCode": "deque",
+        "tagDisplayName": "덱",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 19,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 8,
+          "higherProblemTier": 10
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 86,
+        "tagCode": "sliding_window",
+        "tagDisplayName": "슬라이딩 윈도우",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "슬라이딩윈도"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 17,
+          "prevTags": [
+            {
+              "tagId": 40,
+              "tagCode": "two_pointer",
+              "tagDisplayName": "두 포인터",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 7,
+          "requiredMinTier": 10,
+          "higherProblemTier": 14
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 1,
+          "requiredMinTier": 17,
+          "higherProblemTier": 8,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 87,
+        "tagCode": "mcmf",
+        "tagDisplayName": "최소 비용 최대 유량",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "dinic"
+          },
+          {
+            "alias": "dinitz"
+          },
+          {
+            "alias": "ford"
+          },
+          {
+            "alias": "fulkerson"
+          },
+          {
+            "alias": "fordfulkerson"
+          },
+          {
+            "alias": "디닉"
+          },
+          {
+            "alias": "디니츠"
+          },
+          {
+            "alias": "포드풀커슨"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 22,
+          "prevTags": [
+            {
+              "tagId": 45,
+              "tagCode": "flow",
+              "tagDisplayName": "최대 유량",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 5,
+          "requiredMinTier": 17,
+          "higherProblemTier": 19
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 0,
+          "requiredMinTier": null,
+          "higherProblemTier": null,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 94,
+        "tagCode": "lis",
+        "tagDisplayName": "가장 긴 증가하는 부분 수열 문제",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 20,
+          "prevTags": [
+            {
+              "tagId": 3,
+              "tagCode": "dp",
+              "tagDisplayName": "다이나믹 프로그래밍",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 1,
+          "higherProblemTier": 1
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 1,
+          "requiredMinTier": 17,
+          "higherProblemTier": 16,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 96,
+        "tagCode": "kmp",
+        "tagDisplayName": "KMP",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 21,
+          "prevTags": [
+            {
+              "tagId": 7,
+              "tagCode": "string",
+              "tagDisplayName": "문자열",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "MASTER",
+          "solvedProblemCount": 7,
+          "requiredMinTier": 19,
+          "higherProblemTier": 21
+        },
+        "accountStat": {
+          "currentLevel": "ADVANCED",
+          "solvedProblemCount": 6,
+          "requiredMinTier": 17,
+          "higherProblemTier": 19,
+          "lastSolvedDate": null,
+          "recommendation_period": 7
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 111,
+        "tagCode": "queue",
+        "tagDisplayName": "큐",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          },
+          {
+            "targetId": 2,
+            "targetCode": "CT",
+            "targetDisplayName": "코딩테스트"
+          },
+          {
+            "targetId": 3,
+            "targetCode": "BEGINNER",
+            "targetDisplayName": "초심자"
+          }
+        ],
+        "tagAliases": [],
+        "requiredStat": {
+          "requiredMinTier": 13,
+          "prevTags": []
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 8,
+          "higherProblemTier": 10
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 7,
+          "requiredMinTier": 17,
+          "higherProblemTier": 12,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      },
+      {
+        "tagId": 113,
+        "tagCode": "tsp",
+        "tagDisplayName": "외판원 순회 문제",
+        "tagTargets": [
+          {
+            "targetId": 1,
+            "targetCode": "DAILY",
+            "targetDisplayName": "일상"
+          }
+        ],
+        "tagAliases": [
+          {
+            "alias": "외판원순회"
+          }
+        ],
+        "requiredStat": {
+          "requiredMinTier": 18,
+          "prevTags": [
+            {
+              "tagId": 46,
+              "tagCode": "dp_bitfield",
+              "tagDisplayName": "비트필드를 이용한 다이나믹 프로그래밍",
+              "satisfiedYn": true
+            }
+          ]
+        },
+        "nextLevelStat": {
+          "nextLevel": "ADVANCED",
+          "solvedProblemCount": 10,
+          "requiredMinTier": 1,
+          "higherProblemTier": 1
+        },
+        "accountStat": {
+          "currentLevel": "INTERMEDIATE",
+          "solvedProblemCount": 1,
+          "requiredMinTier": 17,
+          "higherProblemTier": 15,
+          "lastSolvedDate": null,
+          "recommendation_period": 3
+        },
+        "lockedYn": false,
+        "excludedYn": false,
+        "recommendationYn": true
+      }
+    ]
+  },
+  "error": {}
+}
