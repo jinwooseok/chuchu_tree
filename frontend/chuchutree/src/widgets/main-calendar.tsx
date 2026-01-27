@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 
 // 클라이언트 전용 렌더링 (hydration mismatch 방지)
-const BigCalendar = dynamic(() => import('@/features/calendar/ui/BigCalendar'), {
+const BigCalendar = dynamic(() => import('@/features/calendar').then((mod) => mod.BigCalendar), {
   ssr: false,
   loading: () => (
     <div className="flex h-full w-full items-center justify-center">
@@ -17,7 +17,7 @@ const BigCalendar = dynamic(() => import('@/features/calendar/ui/BigCalendar'), 
 });
 
 export default function MainCalendar() {
-  const {  bigCalendarDate, actions } = useCalendarStore();
+  const { bigCalendarDate, actions } = useCalendarStore();
   const { setBigCalendarDate } = actions;
   const [initialDate] = useState(new Date());
 

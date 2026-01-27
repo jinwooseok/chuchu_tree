@@ -22,7 +22,7 @@ interface SmallCalendarProps {
   onActiveStartDateChange?: (date: Date) => void;
 }
 
-export default function SmallCalendar({ calendarData, activeStartDate: externalActiveStartDate, onActiveStartDateChange }: SmallCalendarProps) {
+export function SmallCalendar({ calendarData, activeStartDate: externalActiveStartDate, onActiveStartDateChange }: SmallCalendarProps) {
   const { selectedDate, actions } = useCalendarStore();
   const { setSelectedDate } = actions;
 

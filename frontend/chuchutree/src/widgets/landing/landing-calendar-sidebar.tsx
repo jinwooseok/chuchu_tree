@@ -1,12 +1,12 @@
-import { CalendarSidebarInset } from '@/features/calendar-sidebar';
 import { useLandingCalendar } from '@/features/landing';
 import dynamic from 'next/dynamic';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { useState, useEffect } from 'react';
 import { isSameMonth } from 'date-fns';
+import { CalendarSidebarInset } from '@/features/calendar';
 
 // 클라이언트 전용 렌더링 (hydration mismatch 방지)
-const SmallCalendar = dynamic(() => import('@/features/calendar/ui/SmallCalendar'), {
+const SmallCalendar = dynamic(() => import('@/features/calendar').then(mod => mod.SmallCalendar), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center" style={{ minHeight: '300px' }}>
