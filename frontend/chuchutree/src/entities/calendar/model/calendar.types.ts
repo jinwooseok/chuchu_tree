@@ -30,7 +30,7 @@ export interface SolvedProblems {
   problemTitle: string;
   problemTierLevel: TierNumKey;
   problemTierName: TierKey;
-  problemClassLevel: number;
+  problemClassLevel: number | null;
   tags: Tags[];
   representativeTag: { tagId: number; tagCode: TagKey; tagDisplayName: string };
 }
@@ -40,7 +40,7 @@ export interface WillSolveProblems {
   problemTitle: string;
   problemTierLevel: TierNumKey;
   problemTierName: TierKey;
-  problemClassLevel: number;
+  problemClassLevel: number | null;
   tags: Tags[];
   representativeTag: { tagId: number; tagCode: TagKey; tagDisplayName: string };
 }

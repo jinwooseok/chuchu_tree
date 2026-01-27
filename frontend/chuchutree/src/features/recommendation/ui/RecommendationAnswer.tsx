@@ -4,23 +4,19 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import { useRecommendationStore } from '@/lib/store/recommendation';
 import { useCalendarStore } from '@/lib/store/calendar';
-import { useCalendar, useUpdateWillSolveProblems, useUpdateRepresentativeTag } from '@/entities/calendar';
+import { useUpdateWillSolveProblems, useUpdateRepresentativeTag, Calendar } from '@/entities/calendar';
 import { toast } from '@/lib/utils/toast';
 import { Trash2, CheckCircle, Ban } from 'lucide-react';
-import { useBanProblem, useUnbanProblem, useGetBannedProblems } from '@/entities/recommendation';
+import { useBanProblem, useUnbanProblem, BannedProblems } from '@/entities/recommendation';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { useMemo } from 'react';
 import { formatDateString } from '@/lib/utils/date';
 import { getErrorCode, getErrorMessage } from '@/lib/utils/error';
 
-export function RecommendationAnswer() {
+export function RecommendationAnswer({ calendarData, bannedListData, isLanding = false }: { calendarData?: Calendar; bannedListData?: BannedProblems; isLanding?: boolean }) {
   const { problems, isLoading, showFilters } = useRecommendationStore();
   const { selectedDate } = useCalendarStore();
-  // 현재 선택된 날짜의 년/월로 calendar 데이터 fetch
-  const year = selectedDate?.getFullYear() || new Date().getFullYear();
-  const month = (selectedDate?.getMonth() || new Date().getMonth()) + 1;
-  const { data: calendarData } = useCalendar(year, month);
-  const { data: bannedProblemsData } = useGetBannedProblems();
+
   const { mutate: banProblem, isPending: isBanPending } = useBanProblem();
   const { mutate: unbanProblem, isPending: isUnbanPending } = useUnbanProblem();
 
@@ -49,12 +45,16 @@ export function RecommendationAnswer() {
 
   // Check if problem is banned
   const isProblemBanned = (problemId: number): boolean => {
-    if (!bannedProblemsData) return false;
-    return bannedProblemsData.bannedProblems.some((p) => p.problemId === problemId);
+    if (!bannedListData) return false;
+    return bannedListData.bannedProblems.some((p) => p.problemId === problemId);
   };
 
   // Toggle problem registration (add or remove)
   const handleToggleProblem = (problemId: number) => {
+    if (isLanding) {
+      toast.info('로그인 후 이용해보세요');
+      return;
+    }
     if (!selectedDate) {
       toast.error('날짜를 먼저 선택해주세요.');
       return;
@@ -101,6 +101,10 @@ export function RecommendationAnswer() {
   };
 
   const handleToggleBanProblem = (problemId: number, problemTitle: string) => {
+    if (isLanding) {
+      toast.info('로그인 후 이용해보세요');
+      return;
+    }
     const isBanned = isProblemBanned(problemId);
 
     if (isBanned) {
@@ -140,7 +144,6 @@ export function RecommendationAnswer() {
     );
   }
 
-  // 테스트시 주석처리
   if (problems.length === 0) {
     return (
       <div

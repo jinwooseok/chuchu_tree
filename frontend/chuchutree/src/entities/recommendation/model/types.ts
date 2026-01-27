@@ -56,7 +56,7 @@ interface BannedProblem {
   problemTitle: string;
   problemTierLevel: TierNumKey;
   problemTierName: TierKey;
-  problemClassLevel: number;
+  problemClassLevel: number | null;
   tags: ShortTag[];
 }
 

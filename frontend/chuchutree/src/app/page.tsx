@@ -133,7 +133,7 @@ export default function LandingPage() {
 
             {/* <div className="flex-1 overflow-hidden transition-all duration-300 ease-in-out">{centerSection === 'calendar' ? <LandingMainCalendar /> : <LandingMainTagDashboard />}</div> */}
 
-            {/* <div
+            <div
               className={cn('hide-scrollbar relative overflow-scroll', !isResizing && 'transition-all duration-300 ease-in-out')}
               style={bottomSection ? { height: `${bottomHeight}px`, marginTop: '0.5rem' } : { height: 0 }}
             >
@@ -141,7 +141,7 @@ export default function LandingPage() {
                 {displayBottomSection === 'recommend' && <LandingBottomRecommend />}
               </div>
               {bottomSection && <ResizeHandle direction="vertical" onMouseDown={handleBottomResize} className="absolute top-0 left-0 w-full" />}
-            </div> */}
+            </div>
           </main>
         </div>
       </SidebarInset>
