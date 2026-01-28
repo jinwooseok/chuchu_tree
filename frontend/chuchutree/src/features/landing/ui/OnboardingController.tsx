@@ -71,6 +71,11 @@ export function OnboardingController() {
         setTopSection('streak');
       }
 
+      // Step 6의 Top Section 닫기 (사용자가 dashboard 버튼 클릭할 예정)
+      if (currentStep === 6 && currentSequence === 1) {
+        setTopSection(null);
+      }
+
       // systemAction이 있으면 실행
       if (sequenceData.systemAction) {
         sequenceData.systemAction();

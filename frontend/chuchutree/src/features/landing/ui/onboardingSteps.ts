@@ -218,5 +218,43 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
       },
     ],
   },
-  // Step 6-9는 향후 구현
+  // Step 6: Tag Dashboard (유형별 숙련도)
+  {
+    stepNumber: 6,
+    title: 'Tag Dashboard',
+    sequences: [
+      {
+        type: 'd',
+        dialogMessages: ['이제 유형별 숙련도 대시보드를 확인해보겠습니다.'],
+        dialogButtons: [{ text: '다음', action: 'next' }],
+      },
+      {
+        type: 's',
+        duration: 300,
+        systemAction: () => {
+          console.log('Top Section 닫기');
+        },
+      },
+      {
+        type: 'u',
+        waitForEvent: 'click',
+        eventTarget: '[data-onboarding-id="dashboard-button"]',
+        targetSelector: '[data-onboarding-id="dashboard-button"]',
+        message: '유형별 숙련도 버튼을 클릭하면 알고리즘 유형별 실력을 확인할 수 있습니다.',
+        tooltipPosition: 'right',
+        buttonText: '클릭해보세요',
+        highlightAnimation: 'pulse',
+        duration: 300,
+      },
+      {
+        type: 'f',
+        targetSelector: '[data-onboarding-id="first-tag-card"]',
+        message: '각 유형별로 풀이 현황과 진행도를 확인할 수 있습니다.',
+        tooltipPosition: 'right',
+        buttonText: '완료',
+        duration: 300,
+      },
+    ],
+  },
+  // Step 7-9는 향후 구현
 ];

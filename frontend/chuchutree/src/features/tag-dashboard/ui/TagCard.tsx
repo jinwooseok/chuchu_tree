@@ -14,7 +14,7 @@ import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { TIER_INFO } from '@/shared/constants/tierSystem';
 
 const TagCard = memo(
-  function TagCard({ tag, progress, isLanding = false }: { tag: CategoryTags; progress: number; isLanding: boolean }) {
+  function TagCard({ tag, progress, isLanding = false, onboardingId }: { tag: CategoryTags; progress: number; isLanding: boolean; onboardingId?: string }) {
     const { tagCode, tagDisplayName, accountStat, nextLevelStat, excludedYn, recommendationYn } = tag;
     const { openModal, closeModal } = useModal();
 
@@ -76,6 +76,7 @@ const TagCard = memo(
     return (
       <div
         className={`bg-innerground-white flex flex-col gap-2 rounded-lg border-3 ${!excludedYn ? currentLevelColors.border : 'border-excluded-bg'} group relative w-80 cursor-default p-4 text-xs transition-all duration-100 ease-in-out hover:shadow-md`}
+        {...(onboardingId ? { 'data-onboarding-id': onboardingId } : {})}
       >
         {/* 우상단 */}
         <div className="absolute top-0 right-0 overflow-hidden">
