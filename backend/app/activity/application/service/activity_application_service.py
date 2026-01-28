@@ -305,7 +305,6 @@ class ActivityApplicationService:
                 await self.user_activity_repository.save_all_will_solve_problems(existing_will_solves)
 
         # 4. 해당 날짜의 모든 데이터(삭제된 것 포함)를 가져옵니다.
-        # (나중에 복구를 위해 deleted_at 포함 조회를 권장)
         existing_problems = await self.user_activity_repository.find_problem_records_by_date(
             user_id, command.solved_date
         )

@@ -97,7 +97,10 @@ class UserActivityRepositoryImpl(UserActivityRepository):
                     ProblemDateRecordModel.deleted_at.is_(None)
                 )
             )
-            .order_by(ProblemDateRecordModel.marked_date.asc())
+            .order_by(
+                ProblemDateRecordModel.marked_date.asc(),
+                ProblemDateRecordModel.display_order.asc()
+            )
         )
 
         result = await self.session.execute(stmt)
