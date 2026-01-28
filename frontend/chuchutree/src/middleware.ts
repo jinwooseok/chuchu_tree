@@ -13,7 +13,7 @@ export async function middleware(request: NextRequest) {
   if (protectedPaths.includes(pathname)) {
     if (!accessToken) {
       console.log('[Middleware] access토큰 없음');
-      return NextResponse.redirect(new URL('/', request.url));
+      return NextResponse.redirect(new URL('/sign-in', request.url));
     }
     // access_token이 있는 경우, 유효성 검증
     // local환경: rewrites에 의해 https://chuchu-tree-dev.duckdns.org/api/v1/auth/me로 프록시

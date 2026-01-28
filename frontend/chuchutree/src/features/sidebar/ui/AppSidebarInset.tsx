@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, ChevronUp, Dices, Gem, Leaf, LibraryBig, PanelLeft, User2, Settings, LogOut, BookX, BookOpen, RefreshCw, PackageOpen } from 'lucide-react';
+import { Calendar, ChevronUp, Dices, Gem, Leaf, LibraryBig, PanelLeft, User2, Settings, LogOut, BookX, BookOpen, RefreshCw, PackageOpen, House, LogIn, Lightbulb } from 'lucide-react';
 import { useLayoutStore } from '@/lib/store/layout';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -78,7 +78,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
   // 로그아웃 핸들러
   const handleLogout = () => {
     if (isLanding) {
-      router.push('/sign-in');
+      router.push('/chu');
     } else {
       logout();
     }
@@ -262,7 +262,10 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                 <div className="absolute top-2 left-3">
                   <Image src="/logo/logo.svg" alt="logo" width={24} height={32} />
                 </div>
-                <h1 className={`text-md ml-9 font-bold ${sidebarOpenState !== 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>ChuChuTree</h1>
+                <div className={`text-md ml-9 flex flex-col font-bold ${sidebarOpenState !== 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>
+                  <span>ChuChuTree</span>
+                  <span className="text-muted-foreground text-end text-sm font-medium">{isLanding ? '튜토리얼' : 'ver1.0'}</span>
+                </div>
               </div>
               {/* 사이드 바 토글 (header) */}
               <AppTooltip content="사이드바 닫기" side="right" shortCut1="Shift" shortCut2="B">
@@ -353,6 +356,49 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
         </SidebarContent>
         {/* footer */}
         <SidebarFooter>
+          <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {/* 랜딩 전용 입장하기 */}
+                {isLanding && (
+                  <SidebarMenuItem key="enter-main-page" aria-label={'입장하기'}>
+                    <AppTooltip content="시작해보자!" side="right">
+                      <SidebarMenuButton asChild>
+                        <div
+                          onClick={() => {
+                            router.push('/chu');
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <House size={ICON_SIZE} />
+                          <span>입장하기</span>
+                        </div>
+                      </SidebarMenuButton>
+                    </AppTooltip>
+                  </SidebarMenuItem>
+                )}
+                {/* 실 서비스 전용 랜딩페이지로 가기*/}
+                {!isLanding && (
+                  <SidebarMenuItem key="enter-landing-page" aria-label={'랜딩페이지로이동하기'}>
+                    <AppTooltip content="튜토리얼 이동하기" side="right">
+                      <SidebarMenuButton asChild>
+                        <div
+                          onClick={() => {
+                            router.push('/');
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Lightbulb size={ICON_SIZE} />
+                          <span>튜토리얼</span>
+                        </div>
+                      </SidebarMenuButton>
+                    </AppTooltip>
+                  </SidebarMenuItem>
+                )}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+          {/* 드롭다운 */}
           <SidebarMenu>
             <SidebarMenuItem>
               <DropdownMenu>
@@ -381,7 +427,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                     }}
                   >
                     <LogOut className="mr-2 h-4 w-4" />
-                    <span>{isLanding ? '로그인' : '로그아웃'}</span>
+                    <span>{isLanding ? '입장하기' : '로그아웃'}</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
