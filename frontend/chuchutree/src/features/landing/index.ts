@@ -4,4 +4,4 @@ export { useLandingStreak } from './hooks/useLandingStreak';
 export { useLandingCalendar } from './hooks/useLandingCalendar';
 export { useLandingBannedList } from './hooks/useLandingBannedList';
 export { useLandingTagDashboard } from './hooks/useLandingTagDashboard';
-export { OnboardingOverlay } from './ui/OnboardingOverlay';
+export { OnboardingController } from './ui/OnboardingController';

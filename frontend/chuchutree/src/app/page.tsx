@@ -15,7 +15,7 @@ import LandingTopStreakbar from '@/widgets/landing/landing-top-streakbar';
 import LandingMainCalendar from '@/widgets/landing/landing-main-calendar';
 import LandingMainTagDashboard from '@/widgets/landing/landing-main-tag-dashboard';
 import LandingBottomRecommend from '@/widgets/landing/landing-bottom-recommend';
-import { OnboardingOverlay } from '@/features/landing';
+import { OnboardingController } from '@/features/landing';
 import { useOnboardingStore } from '@/lib/store/onboarding';
 
 function LandingPageContent() {
@@ -152,7 +152,6 @@ export default function LandingPage() {
   // 최초 진입자 감지 및 자동 실행 (hydration 완료 후에만 실행)
   useEffect(() => {
     if (_hasHydrated && !hasCompletedOnboarding && !isActive) {
-      console.log('온보딩 시작:', hasCompletedOnboarding, isActive);
       startOnboarding();
     }
   }, [_hasHydrated, hasCompletedOnboarding, isActive, startOnboarding]);
@@ -163,8 +162,8 @@ export default function LandingPage() {
       <SidebarInset>
         <LandingPageContent />
       </SidebarInset>
-      {/* 온보딩 오버레이 */}
-      {isActive && <OnboardingOverlay />}
+      {/* 온보딩 컨트롤러 */}
+      {isActive && <OnboardingController />}
     </SidebarProvider>
   );
 }
