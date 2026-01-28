@@ -8,7 +8,7 @@ export default function LandingTopTierbar() {
   if (!user) return null;
 
   return (
-    <div className="bg-innerground-white flex h-full w-full flex-col gap-4 p-6">
+    <div className="bg-innerground-white flex h-full w-full flex-col gap-4 p-6" data-onboarding-id="top-tierbar">
       <Tierbar user={user} />
       {/* <NextTier user={user} /> */}
     </div>

@@ -134,7 +134,7 @@ export default function LandingTopStreakbar() {
   } satisfies CalendarProps['labels'];
 
   return (
-    <div className="bg-innerground-white flex h-full cursor-default items-center justify-center p-4">
+    <div className="bg-innerground-white flex h-full cursor-default items-center justify-center p-4" data-onboarding-id="top-streakbar">
       <div className="max-w-full min-w-0">
         <div className="mb-2 flex items-center justify-between">
           <div className="text-muted-foreground flex items-center gap-2 text-sm">

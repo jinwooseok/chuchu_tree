@@ -153,5 +153,70 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
       },
     ],
   },
-  // Step 4-9는 향후 구현
+  // Step 4: Top Tierbar (티어 정보)
+  {
+    stepNumber: 4,
+    title: 'Top Tierbar',
+    sequences: [
+      {
+        type: 'd',
+        dialogMessages: ['이번에는 티어 정보를 확인해보겠습니다.'],
+        dialogButtons: [{ text: '다음', action: 'next' }],
+      },
+      {
+        type: 's',
+        duration: 300,
+        systemAction: () => {
+          console.log('Bottom Section 닫기');
+        },
+      },
+      {
+        type: 'u',
+        waitForEvent: 'click',
+        eventTarget: '[data-onboarding-id="tierbar-button"]',
+        targetSelector: '[data-onboarding-id="tierbar-button"]',
+        message: '티어 버튼을 클릭하면 현재 티어와 진행 상황을 확인할 수 있습니다.',
+        tooltipPosition: 'right',
+        buttonText: '클릭해보세요',
+        highlightAnimation: 'pulse',
+        duration: 300,
+      },
+      {
+        type: 'f',
+        targetSelector: '[data-onboarding-id="top-tierbar"]',
+        message: '현재 티어와 다음 티어까지의 진행도를 확인할 수 있습니다.',
+        tooltipPosition: 'bottom',
+        buttonText: '다음',
+        duration: 300,
+      },
+    ],
+  },
+  // Step 5: Top Streakbar (스트릭 정보)
+  {
+    stepNumber: 5,
+    title: 'Top Streakbar',
+    sequences: [
+      {
+        type: 'd',
+        dialogMessages: ['이번에는 스트릭 정보를 확인해보겠습니다.'],
+        dialogButtons: [{ text: '다음', action: 'next' }],
+      },
+      {
+        type: 's',
+        duration: 300,
+        systemAction: () => {
+          console.log('Top Section을 Streak으로 변경');
+        },
+      },
+      {
+        type: 'f',
+        targetSelector: '[data-onboarding-id="top-streakbar"]',
+        message: ['지난 1년간의 문제 풀이 기록을 한눈에 확인할 수 있습니다.', '꾸준히 문제를 풀어 스트릭을 이어가보세요!'],
+        tooltipPosition: 'bottom',
+        buttonText: '완료',
+        duration: 300,
+      },
+    ],
+  },
+  // Step 6-9는 향후 구현
 ];

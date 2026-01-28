@@ -59,6 +59,18 @@ export function OnboardingController() {
         }
       }
 
+      // Step 4의 Bottom Section 닫기
+      if (currentStep === 4 && currentSequence === 1) {
+        if (bottomSection === 'recommend') {
+          toggleBottomSection();
+        }
+      }
+
+      // Step 5의 Top Section을 Streak으로 변경
+      if (currentStep === 5 && currentSequence === 1) {
+        setTopSection('streak');
+      }
+
       // systemAction이 있으면 실행
       if (sequenceData.systemAction) {
         sequenceData.systemAction();

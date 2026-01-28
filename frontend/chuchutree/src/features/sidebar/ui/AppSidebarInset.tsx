@@ -217,6 +217,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       icon: Gem,
       isActive: topSection === 'tierbar',
       tooltipText: '내 티어',
+      onboardingId: 'tierbar-button',
     },
     {
       title: '스트릭',
@@ -226,6 +227,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       icon: Leaf,
       isActive: topSection === 'streak',
       tooltipText: '1년간 문제 풀이 기록',
+      onboardingId: 'streakbar-button',
     },
     {
       title: '캘린더',
@@ -244,6 +246,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       icon: LibraryBig,
       isActive: centerSection === 'dashboard',
       tooltipText: '유형별 실력 현황',
+      onboardingId: 'dashboard-button',
     },
     {
       title: '오늘의 문제',
@@ -253,6 +256,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       icon: Dices,
       isActive: bottomSection === 'recommend',
       tooltipText: '사용자 맞춤 문제 추천',
+      onboardingId: 'recommend-button',
     },
   ];
 
@@ -300,7 +304,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                   <SidebarMenuItem key={item.title} aria-label={item.tooltipText}>
                     <AppTooltip content={item.tooltipText} side="right" shortCut1={item.short1} shortCut2={item.short2}>
                       <SidebarMenuButton asChild isActive={item.isActive}>
-                        <div onClick={item.action} className="cursor-pointer" {...(item.title === '오늘의 문제' ? { 'data-onboarding-id': 'recommend-button' } : {})}>
+                        <div onClick={item.action} className="cursor-pointer" {...(item.onboardingId ? { 'data-onboarding-id': item.onboardingId } : {})}>
                           <item.icon size={ICON_SIZE} />
                           <span>{item.title}</span>
                         </div>
