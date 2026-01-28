@@ -11,9 +11,10 @@ interface OnboardingSpotlightProps {
   buttonText?: string;
   onNext: () => void;
   highlightAnimation?: 'pulse' | 'arrow' | 'none';
+  onPositionChange?: (position: ElementPosition | null) => void; // 위치 변경 콜백
 }
 
-export function OnboardingSpotlight({ targetSelector, message, tooltipPosition, buttonText = '다음', onNext, highlightAnimation = 'pulse' }: OnboardingSpotlightProps) {
+export function OnboardingSpotlight({ targetSelector, message, tooltipPosition, buttonText = '다음', onNext, highlightAnimation = 'pulse', onPositionChange }: OnboardingSpotlightProps) {
   const [targetPos, setTargetPos] = useState<ElementPosition | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number; placement: 'top' | 'bottom' | 'left' | 'right' } | null>(null);
 
@@ -67,6 +68,13 @@ export function OnboardingSpotlight({ targetSelector, message, tooltipPosition, 
       window.removeEventListener('resize', handleResize);
     };
   }, [targetSelector, tooltipPosition]);
+
+  // targetPos가 변경될 때마다 부모에게 알림
+  useEffect(() => {
+    if (onPositionChange) {
+      onPositionChange(targetPos);
+    }
+  }, [targetPos, onPositionChange]);
 
   if (!targetPos || !tooltipPos) {
     return null;

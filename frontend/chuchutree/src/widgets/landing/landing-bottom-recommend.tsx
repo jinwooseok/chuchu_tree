@@ -9,7 +9,7 @@ export default function LandingBottomRecommend() {
   const calendarData = useLandingCalendar({ year: year, month: month });
   const bannedListData = useLandingBannedList();
   return (
-    <div className="bg-innerground-white flex h-full items-center justify-between p-4">
+    <div className="bg-innerground-white flex h-full items-center justify-between p-4" data-onboarding-id="bottom-recommend">
       <RecommendationButton isLanding={true} />
       <RecommendationAnswer isLanding={true} calendarData={calendarData} bannedListData={bannedListData} />
     </div>

@@ -158,7 +158,7 @@ export function RecommendationAnswer({ calendarData, bannedListData, isLanding =
   const emptySlots = problems.length < totalSlots ? totalSlots - problems.length : 0;
 
   return (
-    <div className="ml-1 h-full w-full flex-1 rounded-lg border-2 border-dashed p-2">
+    <div className="ml-1 h-full w-full flex-1 rounded-lg border-2 border-dashed p-2" data-onboarding-id="recommend-answer">
       <div className={`flex h-full flex-col gap-1 overflow-x-hidden ${problems.length <= 3 ? 'overflow-y-hidden' : 'overflow-y-scroll'}`}>
         {problems.map((problem) => {
           const isRegistered = isProblemRegistered(problem.problemId);

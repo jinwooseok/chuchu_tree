@@ -300,7 +300,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                   <SidebarMenuItem key={item.title} aria-label={item.tooltipText}>
                     <AppTooltip content={item.tooltipText} side="right" shortCut1={item.short1} shortCut2={item.short2}>
                       <SidebarMenuButton asChild isActive={item.isActive}>
-                        <div onClick={item.action} className="cursor-pointer">
+                        <div onClick={item.action} className="cursor-pointer" {...(item.title === '오늘의 문제' ? { 'data-onboarding-id': 'recommend-button' } : {})}>
                           <item.icon size={ICON_SIZE} />
                           <span>{item.title}</span>
                         </div>

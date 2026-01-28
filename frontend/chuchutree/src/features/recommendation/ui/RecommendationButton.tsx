@@ -153,7 +153,7 @@ export function RecommendationButton({ isLanding = false }: { isLanding?: boolea
         </div>
         {/* 추천받기 */}
         <AppTooltip content="추천 받기" side="top" shortCut1="Shift" shortCut2="E">
-          <Button aria-label="알고리즘 문제 추천받기" className="selcect-none flex flex-1 cursor-pointer flex-col" onClick={handleRecommend} disabled={isPending}>
+          <Button aria-label="알고리즘 문제 추천받기" className="selcect-none flex flex-1 cursor-pointer flex-col" onClick={handleRecommend} disabled={isPending} data-onboarding-id="recommend-receive-button">
             {isPending ? '추천 중...' : '추천 받기'}
             {isLanding && (
               <div className="text-excluded-text/40 flex flex-col text-xs">

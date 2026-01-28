@@ -103,5 +103,55 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
       },
     ],
   },
-  // Step 3-9는 향후 구현
+  // Step 3: 오늘의 문제 (Bottom Recommendation)
+  {
+    stepNumber: 3,
+    title: '오늘의 문제',
+    sequences: [
+      {
+        type: 'd',
+        dialogMessages: ['이제 맞춤형 문제 추천 기능을 체험해보겠습니다.', '사이드바의 "오늘의 문제" 버튼을 클릭해주세요.'],
+        dialogButtons: [{ text: '다음', action: 'next' }],
+      },
+      {
+        type: 'u',
+        waitForEvent: 'click',
+        eventTarget: '[data-onboarding-id="recommend-button"]',
+        targetSelector: '[data-onboarding-id="recommend-button"]',
+        message: '이 버튼을 클릭해보세요!',
+        tooltipPosition: 'right',
+        buttonText: '클릭해주세요',
+        highlightAnimation: 'pulse',
+        duration: 300,
+      },
+      {
+        type: 'f',
+        targetSelector: '[data-onboarding-id="bottom-recommend"]',
+        message: ['여기서 당신의 실력과 목표에 맞는 문제를 추천받을 수 있습니다.', '좌측의 "추천 받기" 버튼을 클릭해보세요.'],
+        tooltipPosition: 'top',
+        buttonText: '다음',
+        duration: 300,
+      },
+      {
+        type: 'u',
+        waitForEvent: 'click',
+        eventTarget: '[data-onboarding-id="recommend-receive-button"]',
+        targetSelector: '[data-onboarding-id="recommend-receive-button"]',
+        message: '이 버튼을 클릭하면 맞춤형 알고리즘 문제가 추천됩니다!',
+        tooltipPosition: 'right',
+        buttonText: '클릭해주세요',
+        highlightAnimation: 'pulse',
+        duration: 300,
+      },
+      {
+        type: 'f',
+        targetSelector: '[data-onboarding-id="recommend-answer"]',
+        message: ['추천된 문제들입니다!', '각 문제를 클릭하면 백준 사이트로 이동하며,', '"문제 등록" 버튼으로 캘린더에 일정을 추가할 수 있습니다.'],
+        tooltipPosition: 'top',
+        buttonText: '완료',
+        duration: 300,
+      },
+    ],
+  },
+  // Step 4-9는 향후 구현
 ];
