@@ -318,7 +318,7 @@ export function AddPrevProblemsDialog({ onClose, isLanding = false, user }: prop
               {/* 좌측: 버튼 및 설명 */}
               <div className="flex flex-col justify-between space-y-4">
                 {isLanding && <Input value={landingDemoUsername} onChange={(e) => setLandingDemoUsername(e.target.value)} placeholder="백준 아이디를 입력하세요 (비회원 전용)" />}
-                <Button variant="outline" onClick={() => window.open(baekjoonUrl, '_blank')} className="w-full flex-1" disabled={!bjAccountId}>
+                <Button variant="outline" onClick={() => window.open(baekjoonUrl, '_blank')} className="w-full flex-1" disabled={!bjAccountId} data-onboarding-id="open-baekjoon-button">
                   <ExternalLink className="mr-2 h-4 w-4" />
                   백준 채점현황 페이지 열기
                 </Button>
@@ -411,6 +411,7 @@ export function AddPrevProblemsDialog({ onClose, isLanding = false, user }: prop
                     const textarea = e.currentTarget.querySelector('textarea');
                     textarea?.focus();
                   }}
+                  data-onboarding-id="paste-area"
                 >
                   <textarea
                     placeholder="여기를 클릭하고 Ctrl+V로 붙여넣기"

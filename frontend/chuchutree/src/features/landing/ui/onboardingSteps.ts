@@ -47,10 +47,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
           '알고리즘 문제 풀이를 체계적으로 관리하고 맞춤형 추천을 받을 수 있는 서비스입니다.',
           '지금부터 주요 기능들을 살펴보겠습니다.',
         ],
-        dialogButtons: [
-          { text: '시작하기', action: 'start' },
-          { text: '건너뛰기', action: 'skip' },
-        ],
+        dialogButtons: [{ text: '시작하기', action: 'start' }],
       },
       {
         type: 's',
@@ -256,5 +253,71 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
       },
     ],
   },
-  // Step 7-9는 향후 구현
+  // Step 7: Refresh Button (프로필 갱신)
+  {
+    stepNumber: 7,
+    title: 'Refresh Button',
+    sequences: [
+      {
+        type: 'd',
+        dialogMessages: ['프로필 갱신 기능을 알아보겠습니다.'],
+        dialogButtons: [{ text: '다음', action: 'next' }],
+      },
+      {
+        type: 'f',
+        targetSelector: '[data-onboarding-id="refresh-button"]',
+        message: '백준에서 새로 푼 문제가 있다면, 이 버튼으로 프로필을 갱신할 수 있습니다.',
+        tooltipPosition: 'right',
+        buttonText: '완료',
+        duration: 300,
+      },
+    ],
+  },
+  // Step 8: 가입일 이전 문제 등록하기
+  {
+    stepNumber: 8,
+    title: '가입일 이전 문제 등록',
+    sequences: [
+      {
+        type: 'd',
+        dialogMessages: ['마지막으로, 가입 전에 풀었던 문제를 등록하는 방법을 알려드리겠습니다.'],
+        dialogButtons: [{ text: '다음', action: 'next' }],
+      },
+      {
+        type: 'u',
+        waitForEvent: 'click',
+        eventTarget: '[data-onboarding-id="add-prev-problems-button"]',
+        targetSelector: '[data-onboarding-id="add-prev-problems-button"]',
+        message: '이 버튼을 클릭하면 과거에 풀었던 문제를 등록할 수 있습니다.',
+        tooltipPosition: 'right',
+        buttonText: '클릭해보세요',
+        highlightAnimation: 'pulse',
+        duration: 200,
+      },
+      {
+        type: 'f',
+        targetSelector: '[data-onboarding-id="open-baekjoon-button"]',
+        message: ['이 버튼을 클릭하면 백준 채점현황 페이지가 열립니다.', '거기서 HTML을 복사하여 과거 풀이 기록을 등록할 수 있어요.'],
+        tooltipPosition: 'right',
+        buttonText: '다음',
+        duration: 300,
+      },
+      {
+        type: 'f',
+        targetSelector: '[data-onboarding-id="paste-area"]',
+        message: ['백준에서 복사한 HTML을 이곳에 붙여넣으면 자동으로 문제가 등록됩니다.', '최초 가입 후 가장 먼저 해야 할 작업입니다!'],
+        tooltipPosition: 'top',
+        buttonText: '완료',
+        duration: 300,
+      },
+      {
+        type: 's',
+        duration: 200,
+        systemAction: () => {
+          console.log('모달 닫기');
+        },
+      },
+    ],
+  },
+  // Step 9는 향후 구현
 ];

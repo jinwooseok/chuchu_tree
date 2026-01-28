@@ -323,7 +323,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                 <SidebarMenuItem key="addPrevProblems" aria-label={'가입일 이전 문제 등록하기'}>
                   <AppTooltip content="가입일 이전 문제 등록하기" side="right">
                     <SidebarMenuButton asChild>
-                      <div onClick={handleAddPrevProblems} className="cursor-pointer">
+                      <div onClick={handleAddPrevProblems} className="cursor-pointer" data-onboarding-id="add-prev-problems-button">
                         <BookOpen size={ICON_SIZE} />
                         <span>가입 전 풀이 등록하기</span>
                       </div>
@@ -343,7 +343,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                 <SidebarMenuItem key="refresh" aria-label={'프로필 갱신'}>
                   <AppTooltip content="프로필 갱신" side="right" shortCut1="Shift" shortCut2="R">
                     <SidebarMenuButton asChild>
-                      <div onClick={handleRefresh} className="cursor-pointer">
+                      <div onClick={handleRefresh} className="cursor-pointer" data-onboarding-id="refresh-button">
                         {isPending ? <Spinner /> : <RefreshCw className="text-foreground h-5 w-5" />}
                         <span>프로필 갱신</span>
                       </div>

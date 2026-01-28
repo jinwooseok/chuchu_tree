@@ -4,16 +4,21 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useOnboardingStore } from '@/lib/store/onboarding';
 import { useLayoutStore } from '@/lib/store/layout';
+import { useModal } from '@/lib/providers/modal-provider';
 import { ONBOARDING_STEPS } from './onboardingSteps';
 import { OnboardingBackdrop } from './OnboardingBackdrop';
 import { OnboardingDialog } from './OnboardingDialog';
 import { OnboardingSpotlight } from './OnboardingSpotlight';
+import { OnboardingHeader } from './OnboardingHeader';
 import { getElementPosition } from './onboardingHelpers';
+import { useSidebar } from '@/components/ui/sidebar';
 
 export function OnboardingController() {
   const router = useRouter();
-  const { currentStep, nextStep, skipOnboarding, completeOnboarding } = useOnboardingStore();
+  const { closeModal } = useModal();
+  const { currentStep, nextStep, completeOnboarding } = useOnboardingStore();
   const { setTopSection, setCenterSection, toggleBottomSection, bottomSection } = useLayoutStore();
+  const { state: sidebarOpenState, toggleSidebar: setSidebarOpenState } = useSidebar();
 
   const [currentSequence, setCurrentSequence] = useState(0);
   const [spotlightTarget, setSpotlightTarget] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
@@ -57,6 +62,9 @@ export function OnboardingController() {
         if (bottomSection === 'recommend') {
           toggleBottomSection();
         }
+        if (sidebarOpenState !== 'collapsed') {
+          setSidebarOpenState();
+        }
       }
 
       // Step 4의 Bottom Section 닫기
@@ -74,6 +82,11 @@ export function OnboardingController() {
       // Step 6의 Top Section 닫기 (사용자가 dashboard 버튼 클릭할 예정)
       if (currentStep === 6 && currentSequence === 1) {
         setTopSection(null);
+      }
+
+      // Step 8의 모달 닫기
+      if (currentStep === 8 && currentSequence === 4) {
+        closeModal('add-prev-problems');
       }
 
       // systemAction이 있으면 실행
@@ -130,9 +143,6 @@ export function OnboardingController() {
       case 'start':
         goToNextSequence();
         break;
-      case 'skip':
-        skipOnboarding();
-        break;
       case 'login':
         completeOnboarding();
         router.push('/sign-in');
@@ -147,6 +157,7 @@ export function OnboardingController() {
   // 렌더링
   return (
     <>
+      <OnboardingHeader />
       <OnboardingBackdrop spotlightTarget={spotlightTarget} allowInteraction={sequenceData.type === 'u'} />
 
       {sequenceData.type === 'd' && sequenceData.dialogMessages && sequenceData.dialogButtons && (
