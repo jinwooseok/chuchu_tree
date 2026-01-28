@@ -1,6 +1,6 @@
 'use client';
 
-import { Calendar, ChevronUp, Dices, Gem, Leaf, LibraryBig, PanelLeft, User2, Settings, LogOut, BookX, BookOpen, RefreshCw, PackageOpen, House, LogIn, Lightbulb } from 'lucide-react';
+import { Calendar, ChevronUp, Dices, Gem, Leaf, LibraryBig, PanelLeft, User2, Settings, LogOut, BookX, BookOpen, RefreshCw, PackageOpen, House, LogIn, Lightbulb, SquarePlay } from 'lucide-react';
 import { useLayoutStore } from '@/lib/store/layout';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -23,6 +23,7 @@ import { BannedProblemsDialog } from '@/features/sidebar/ui/group-second/BannedP
 import { User } from '@/entities/user';
 import { useState } from 'react';
 import { useLandingRecommend } from '@/features/landing';
+import { useOnboardingStore } from '@/lib/store/onboarding';
 
 const ICON_SIZE = 32;
 
@@ -120,6 +121,13 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
         onClose={() => closeModal('settings')}
       />,
     );
+  };
+
+  // 튜토리얼 다시보기
+  const { resetOnboarding, startOnboarding } = useOnboardingStore();
+  const handleTutorialStart = () => {
+    resetOnboarding(); // localStorage에서 완료 플래그 제거
+    startOnboarding(); // 온보딩 시작
   };
 
   // 전역 단축키 등록
@@ -361,21 +369,33 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
               <SidebarMenu>
                 {/* 랜딩 전용 입장하기 */}
                 {isLanding && (
-                  <SidebarMenuItem key="enter-main-page" aria-label={'입장하기'}>
-                    <AppTooltip content="시작해보자!" side="right">
-                      <SidebarMenuButton asChild>
-                        <div
-                          onClick={() => {
-                            router.push('/chu');
-                          }}
-                          className="cursor-pointer"
-                        >
-                          <House size={ICON_SIZE} />
-                          <span>입장하기</span>
-                        </div>
-                      </SidebarMenuButton>
-                    </AppTooltip>
-                  </SidebarMenuItem>
+                  <>
+                    <SidebarMenuItem key="start-onboarding" aria-label={'튜토리얼 다시보기'}>
+                      <AppTooltip content="튜토리얼 다시보기" side="right">
+                        <SidebarMenuButton asChild>
+                          <div onClick={handleTutorialStart} className="cursor-pointer">
+                            <SquarePlay size={ICON_SIZE} />
+                            <span>튜토리얼 다시보기</span>
+                          </div>
+                        </SidebarMenuButton>
+                      </AppTooltip>
+                    </SidebarMenuItem>
+                    <SidebarMenuItem key="enter-main-page" aria-label={'입장하기'}>
+                      <AppTooltip content="시작해보자!" side="right">
+                        <SidebarMenuButton asChild>
+                          <div
+                            onClick={() => {
+                              router.push('/chu');
+                            }}
+                            className="cursor-pointer"
+                          >
+                            <House size={ICON_SIZE} />
+                            <span>입장하기</span>
+                          </div>
+                        </SidebarMenuButton>
+                      </AppTooltip>
+                    </SidebarMenuItem>
+                  </>
                 )}
                 {/* 실 서비스 전용 랜딩페이지로 가기*/}
                 {!isLanding && (
