@@ -84,7 +84,7 @@ export function OnboardingSpotlight({ targetSelector, message, tooltipPosition, 
     <>
       {/* Spotlight 강조 효과 */}
       <div
-        className="pointer-events-none fixed z-[45] rounded-md border-2 border-primary"
+        className="border-primary pointer-events-none fixed z-45 rounded-md border-2"
         style={{
           left: `${targetPos.x - 4}px`,
           top: `${targetPos.y - 4}px`,

@@ -10,7 +10,6 @@ import { OnboardingBackdrop } from './OnboardingBackdrop';
 import { OnboardingDialog } from './OnboardingDialog';
 import { OnboardingSpotlight } from './OnboardingSpotlight';
 import { OnboardingHeader } from './OnboardingHeader';
-import { getElementPosition } from './onboardingHelpers';
 import { useSidebar } from '@/components/ui/sidebar';
 
 export function OnboardingController() {

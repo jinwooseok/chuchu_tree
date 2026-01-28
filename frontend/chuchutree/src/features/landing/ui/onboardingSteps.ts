@@ -319,5 +319,23 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
       },
     ],
   },
-  // Step 9는 향후 구현
+  // Step 9: 마무리
+  {
+    stepNumber: 9,
+    title: '마무리',
+    sequences: [
+      {
+        type: 'd',
+        dialogMessages: [
+          '튜토리얼이 완료되었습니다! 🎉',
+          '이제 ChuChuTree의 모든 기능을 자유롭게 사용할 수 있습니다.',
+          '계속 튜토리얼 화면에서 둘러보시거나, 로그인하고 실제 서비스를 시작해보세요!',
+        ],
+        dialogButtons: [
+          { text: '튜토리얼 화면에서 더 둘러보기', action: 'next' },
+          { text: '로그인하고 시작하기', action: 'login' },
+        ],
+      },
+    ],
+  },
 ];
