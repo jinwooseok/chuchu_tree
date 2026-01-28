@@ -79,7 +79,7 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
   const today = isToday(date);
 
   return (
-    <div className="flex h-full flex-col">
+    <div className="flex h-full flex-col" {...(today ? { 'data-onboarding-id': 'big-calendar-today' } : {})}>
       {/* 날짜 숫자 */}
       <div className="mt-1 text-right text-sm" suppressHydrationWarning>
         {today ? <span className="bg-primary inline-flex h-6 w-6 items-center justify-center rounded text-white">{label}</span> : label}

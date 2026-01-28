@@ -74,13 +74,33 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     sequences: [
       {
         type: 'd',
-        dialogMessages: [
-          '이곳은 캘린더 화면입니다.',
-          '문제 풀이 일정을 한눈에 확인하고 관리할 수 있습니다.',
-        ],
+        dialogMessages: ['이곳은 캘린더 화면입니다.', '문제 풀이 일정을 한눈에 확인하고 관리할 수 있습니다.'],
         dialogButtons: [{ text: '다음', action: 'next' }],
       },
-      // 나머지 sequence는 2단계에서 구현
+      {
+        type: 'f',
+        targetSelector: '[data-onboarding-id="big-calendar-today"]',
+        message: ['캘린더에서 날짜를 선택하면,', '그날 풀었던 문제와 풀기로 한 문제가 표시됩니다.'],
+        tooltipPosition: 'right',
+        buttonText: '다음',
+        duration: 300,
+      },
+      {
+        type: 'f',
+        targetSelector: '[data-onboarding-id="calendar-sidebar-solved"]',
+        message: '여기서는 선택한 날짜에 해결한 문제 목록을 확인할 수 있습니다.',
+        tooltipPosition: 'right',
+        buttonText: '다음',
+        duration: 300,
+      },
+      {
+        type: 'f',
+        targetSelector: '[data-onboarding-id="calendar-sidebar-scheduled"]',
+        message: '풀기로 한 문제를 추가, 수정, 삭제할 수 있습니다.',
+        tooltipPosition: 'right',
+        buttonText: '완료',
+        duration: 300,
+      },
     ],
   },
   // Step 3-9는 향후 구현

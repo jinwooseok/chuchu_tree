@@ -343,7 +343,7 @@ export function CalendarSidebarInset({ isLanding = false, calendarData }: { cale
   return (
     <div className="flex flex-col gap-8">
       {/* Solved 문제 목록 */}
-      <div className="flex cursor-default flex-col gap-2">
+      <div className="flex cursor-default flex-col gap-2" data-onboarding-id="calendar-sidebar-solved">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold">해결한 문제</h3>
           <span className="text-xs text-gray-500">{solvedProblems.length}개</span>
@@ -365,7 +365,7 @@ export function CalendarSidebarInset({ isLanding = false, calendarData }: { cale
       </div>
 
       {/* Will Solve 문제 목록 */}
-      <div className="flex cursor-default flex-col gap-2">
+      <div className="flex cursor-default flex-col gap-2" data-onboarding-id="calendar-sidebar-scheduled">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold">오늘의 일정</h3>
           <span className="text-xs text-gray-500">{willSolveProblems.length}개</span>

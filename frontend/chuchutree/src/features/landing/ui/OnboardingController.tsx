@@ -7,6 +7,8 @@ import { useLayoutStore } from '@/lib/store/layout';
 import { ONBOARDING_STEPS } from './onboardingSteps';
 import { OnboardingBackdrop } from './OnboardingBackdrop';
 import { OnboardingDialog } from './OnboardingDialog';
+import { OnboardingSpotlight } from './OnboardingSpotlight';
+import { getElementPosition } from './onboardingHelpers';
 
 export function OnboardingController() {
   const router = useRouter();
@@ -14,6 +16,7 @@ export function OnboardingController() {
   const { setTopSection, setCenterSection, toggleBottomSection, bottomSection } = useLayoutStore();
 
   const [currentSequence, setCurrentSequence] = useState(0);
+  const [spotlightTarget, setSpotlightTarget] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
 
   // 현재 step과 sequence 데이터
   const currentStepData = ONBOARDING_STEPS[currentStep - 1];
@@ -63,6 +66,22 @@ export function OnboardingController() {
 
       return () => clearTimeout(timer);
     }
+
+    // 'f' 타입: 포커싱 대상 위치 계산
+    if (sequenceData.type === 'f' && sequenceData.targetSelector) {
+      // 약간의 딜레이 후 위치 계산 (렌더링 대기)
+      const timer = setTimeout(() => {
+        const position = getElementPosition(sequenceData.targetSelector!);
+        setSpotlightTarget(position);
+      }, 100);
+
+      return () => clearTimeout(timer);
+    }
+
+    // 'd' 타입이면 spotlight 제거
+    if (sequenceData.type === 'd') {
+      setSpotlightTarget(null);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep, currentSequence, bottomSection]);
 
@@ -90,11 +109,24 @@ export function OnboardingController() {
   // 렌더링
   return (
     <>
-      <OnboardingBackdrop />
+      <OnboardingBackdrop spotlightTarget={spotlightTarget} />
+
       {sequenceData.type === 'd' && sequenceData.dialogMessages && sequenceData.dialogButtons && (
         <OnboardingDialog messages={sequenceData.dialogMessages} buttons={sequenceData.dialogButtons} onButtonClick={handleDialogButtonClick} />
       )}
-      {/* 향후 f, u 타입 추가 */}
+
+      {sequenceData.type === 'f' && sequenceData.targetSelector && sequenceData.message && (
+        <OnboardingSpotlight
+          targetSelector={sequenceData.targetSelector}
+          message={sequenceData.message}
+          tooltipPosition={sequenceData.tooltipPosition || 'right'}
+          buttonText={sequenceData.buttonText}
+          onNext={goToNextSequence}
+          highlightAnimation={sequenceData.highlightAnimation}
+        />
+      )}
+
+      {/* 향후 u 타입 추가 */}
     </>
   );
 }

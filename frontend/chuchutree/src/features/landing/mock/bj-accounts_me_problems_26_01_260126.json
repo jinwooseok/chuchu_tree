@@ -659,137 +659,10 @@
       },
       {
         "targetDate": "2026-01-08",
-        "solvedProblemCount": 1,
-        "willSolveProblemCount": 2,
-        "solvedProblems": [
-          {
-            "problemId": 1004,
-            "problemTitle": "어린 왕자",
-            "problemTierLevel": 8,
-            "problemTierName": "S3",
-            "problemClassLevel": null,
-            "tags": [
-              {
-                "tagId": 1,
-                "tagCode": "math",
-                "tagDisplayName": "수학",
-                "tagAliases": [],
-                "tagTargets": [
-                  {
-                    "targetId": 1,
-                    "targetCode": "DAILY",
-                    "targetDisplayName": "일상"
-                  },
-                  {
-                    "targetId": 3,
-                    "targetCode": "BEGINNER",
-                    "targetDisplayName": "초심자"
-                  }
-                ]
-              },
-              {
-                "tagId": 12,
-                "tagCode": "geometry",
-                "tagDisplayName": "기하학",
-                "tagAliases": [],
-                "tagTargets": [
-                  {
-                    "targetId": 1,
-                    "targetCode": "DAILY",
-                    "targetDisplayName": "일상"
-                  },
-                  {
-                    "targetId": 3,
-                    "targetCode": "BEGINNER",
-                    "targetDisplayName": "초심자"
-                  }
-                ]
-              }
-            ],
-            "realSolvedYn": true,
-            "representativeTag": null
-          }
-        ],
-        "willSolveProblems": [
-          {
-            "problemId": 6622,
-            "problemTitle": "Domino tiling",
-            "problemTierLevel": 13,
-            "problemTierName": "G3",
-            "problemClassLevel": null,
-            "tags": [
-              {
-                "tagId": 31,
-                "tagCode": "backtracking",
-                "tagDisplayName": "백트래킹",
-                "tagAliases": [
-                  {
-                    "alias": "백트래킹"
-                  },
-                  {
-                    "alias": "퇴각검색"
-                  },
-                  {
-                    "alias": "퇴각 검색"
-                  }
-                ],
-                "tagTargets": [
-                  {
-                    "targetId": 1,
-                    "targetCode": "DAILY",
-                    "targetDisplayName": "일상"
-                  },
-                  {
-                    "targetId": 2,
-                    "targetCode": "CT",
-                    "targetDisplayName": "코딩테스트"
-                  },
-                  {
-                    "targetId": 3,
-                    "targetCode": "BEGINNER",
-                    "targetDisplayName": "초심자"
-                  }
-                ]
-              }
-            ],
-            "representativeTag": null
-          },
-          {
-            "problemId": 13711,
-            "problemTitle": "LCS 4",
-            "problemTierLevel": 16,
-            "problemTierName": "P5",
-            "problemClassLevel": null,
-            "tags": [
-              {
-                "tagId": 94,
-                "tagCode": "lis",
-                "tagDisplayName": "가장 긴 증가하는 부분 수열 문제",
-                "tagAliases": [],
-                "tagTargets": [
-                  {
-                    "targetId": 1,
-                    "targetCode": "DAILY",
-                    "targetDisplayName": "일상"
-                  },
-                  {
-                    "targetId": 2,
-                    "targetCode": "CT",
-                    "targetDisplayName": "코딩테스트"
-                  }
-                ]
-              },
-              {
-                "tagId": 153,
-                "tagCode": "lcs",
-                "tagDisplayName": "최장 공통 부분 수열 문제",
-                "tagAliases": [],
-                "tagTargets": []
-              }
-            ],
-            "representativeTag": null
-          }
-        ]
+        "solvedProblemCount": 0,
+        "willSolveProblemCount": 0,
+        "solvedProblems": [],
+        "willSolveProblems": []
       },
       {
         "targetDate": "2026-01-09",
@@ -3676,10 +3549,137 @@
       },
       {
         "targetDate": "2026-01-28",
-        "solvedProblemCount": 0,
-        "willSolveProblemCount": 0,
-        "solvedProblems": [],
-        "willSolveProblems": []
+        "solvedProblemCount": 1,
+        "willSolveProblemCount": 2,
+        "solvedProblems": [
+          {
+            "problemId": 1004,
+            "problemTitle": "어린 왕자",
+            "problemTierLevel": 8,
+            "problemTierName": "S3",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 1,
+                "tagCode": "math",
+                "tagDisplayName": "수학",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              },
+              {
+                "tagId": 12,
+                "tagCode": "geometry",
+                "tagDisplayName": "기하학",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "realSolvedYn": true,
+            "representativeTag": null
+          }
+        ],
+        "willSolveProblems": [
+          {
+            "problemId": 6622,
+            "problemTitle": "Domino tiling",
+            "problemTierLevel": 13,
+            "problemTierName": "G3",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 31,
+                "tagCode": "backtracking",
+                "tagDisplayName": "백트래킹",
+                "tagAliases": [
+                  {
+                    "alias": "백트래킹"
+                  },
+                  {
+                    "alias": "퇴각검색"
+                  },
+                  {
+                    "alias": "퇴각 검색"
+                  }
+                ],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  },
+                  {
+                    "targetId": 3,
+                    "targetCode": "BEGINNER",
+                    "targetDisplayName": "초심자"
+                  }
+                ]
+              }
+            ],
+            "representativeTag": null
+          },
+          {
+            "problemId": 13711,
+            "problemTitle": "LCS 4",
+            "problemTierLevel": 16,
+            "problemTierName": "P5",
+            "problemClassLevel": null,
+            "tags": [
+              {
+                "tagId": 94,
+                "tagCode": "lis",
+                "tagDisplayName": "가장 긴 증가하는 부분 수열 문제",
+                "tagAliases": [],
+                "tagTargets": [
+                  {
+                    "targetId": 1,
+                    "targetCode": "DAILY",
+                    "targetDisplayName": "일상"
+                  },
+                  {
+                    "targetId": 2,
+                    "targetCode": "CT",
+                    "targetDisplayName": "코딩테스트"
+                  }
+                ]
+              },
+              {
+                "tagId": 153,
+                "tagCode": "lcs",
+                "tagDisplayName": "최장 공통 부분 수열 문제",
+                "tagAliases": [],
+                "tagTargets": []
+              }
+            ],
+            "representativeTag": null
+          }
+        ]
       },
       {
         "targetDate": "2026-01-29",
