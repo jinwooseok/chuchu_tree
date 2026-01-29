@@ -1,0 +1,253 @@
+{
+  "status": 200,
+  "message": "ok",
+  "data": {
+    "problems": [
+      {
+        "problemId": 11779,
+        "problemTitle": "최소비용 구하기 2",
+        "problemTierLevel": 13,
+        "problemTierName": "G3",
+        "problemClassLevel": 0,
+        "recommandReasons": [
+          {
+            "reason": "'데이크스트라' 2문제만 더 풀면 ADVANCED 달성!",
+            "additionalData": null
+          }
+        ],
+        "tags": [
+          {
+            "tagId": 29,
+            "tagCode": "dijkstra",
+            "tagDisplayName": "데이크스트라",
+            "tagTargets": [
+              {
+                "targetId": 1,
+                "targetCode": "DAILY",
+                "targetDisplayName": "일상"
+              },
+              {
+                "targetId": 2,
+                "targetCode": "CT",
+                "targetDisplayName": "코딩테스트"
+              }
+            ],
+            "tagAliases": [
+              {
+                "alias": "다익"
+              },
+              {
+                "alias": "다익스트라"
+              },
+              {
+                "alias": "데이크스트라"
+              }
+            ]
+          },
+          {
+            "tagId": 25,
+            "tagCode": "shortest_path",
+            "tagDisplayName": "최단 경로",
+            "tagTargets": [
+              {
+                "targetId": 1,
+                "targetCode": "DAILY",
+                "targetDisplayName": "일상"
+              },
+              {
+                "targetId": 2,
+                "targetCode": "CT",
+                "targetDisplayName": "코딩테스트"
+              }
+            ],
+            "tagAliases": []
+          },
+          {
+            "tagId": 71,
+            "tagCode": "traceback",
+            "tagDisplayName": "역추적",
+            "tagTargets": [
+              {
+                "targetId": 1,
+                "targetCode": "DAILY",
+                "targetDisplayName": "일상"
+              },
+              {
+                "targetId": 2,
+                "targetCode": "CT",
+                "targetDisplayName": "코딩테스트"
+              }
+            ],
+            "tagAliases": []
+          }
+        ]
+      },
+      {
+        "problemId": 2637,
+        "problemTitle": "장난감 조립",
+        "problemTierLevel": 14,
+        "problemTierName": "G2",
+        "problemClassLevel": 0,
+        "recommandReasons": [
+          {
+            "reason": "'위상 정렬' 태그를 안 푼 지 13일이 지났어요.",
+            "additionalData": null
+          },
+          {
+            "reason": "'위상 정렬' 3문제만 더 풀면 ADVANCED 달성!",
+            "additionalData": null
+          }
+        ],
+        "tags": [
+          {
+            "tagId": 58,
+            "tagCode": "topological_sorting",
+            "tagDisplayName": "위상 정렬",
+            "tagTargets": [
+              {
+                "targetId": 1,
+                "targetCode": "DAILY",
+                "targetDisplayName": "일상"
+              },
+              {
+                "targetId": 2,
+                "targetCode": "CT",
+                "targetDisplayName": "코딩테스트"
+              }
+            ],
+            "tagAliases": []
+          },
+          {
+            "tagId": 3,
+            "tagCode": "dp",
+            "tagDisplayName": "다이나믹 프로그래밍",
+            "tagTargets": [
+              {
+                "targetId": 1,
+                "targetCode": "DAILY",
+                "targetDisplayName": "일상"
+              },
+              {
+                "targetId": 2,
+                "targetCode": "CT",
+                "targetDisplayName": "코딩테스트"
+              }
+            ],
+            "tagAliases": [
+              {
+                "alias": "동적계획법"
+              },
+              {
+                "alias": "동적 계획법"
+              },
+              {
+                "alias": "다이나믹프로그래밍"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "problemId": 16973,
+        "problemTitle": "직사각형 탈출",
+        "problemTierLevel": 12,
+        "problemTierName": "G4",
+        "problemClassLevel": 0,
+        "recommandReasons": [
+          {
+            "reason": "'누적 합' 3문제만 더 풀면 ADVANCED 달성!",
+            "additionalData": null
+          },
+          {
+            "reason": "초심자 목표에 잘 어울리는 문제입니다.",
+            "additionalData": null
+          }
+        ],
+        "tags": [
+          {
+            "tagId": 21,
+            "tagCode": "prefix_sum",
+            "tagDisplayName": "누적 합",
+            "tagTargets": [
+              {
+                "targetId": 1,
+                "targetCode": "DAILY",
+                "targetDisplayName": "일상"
+              },
+              {
+                "targetId": 2,
+                "targetCode": "CT",
+                "targetDisplayName": "코딩테스트"
+              },
+              {
+                "targetId": 3,
+                "targetCode": "BEGINNER",
+                "targetDisplayName": "초심자"
+              }
+            ],
+            "tagAliases": [
+              {
+                "alias": "구간합"
+              },
+              {
+                "alias": "부분합"
+              },
+              {
+                "alias": "rangesum"
+              }
+            ]
+          },
+          {
+            "tagId": 23,
+            "tagCode": "bfs",
+            "tagDisplayName": "너비 우선 탐색",
+            "tagTargets": [
+              {
+                "targetId": 1,
+                "targetCode": "DAILY",
+                "targetDisplayName": "일상"
+              },
+              {
+                "targetId": 2,
+                "targetCode": "CT",
+                "targetDisplayName": "코딩테스트"
+              },
+              {
+                "targetId": 3,
+                "targetCode": "BEGINNER",
+                "targetDisplayName": "초심자"
+              }
+            ],
+            "tagAliases": [
+              {
+                "alias": "breadthfirst"
+              },
+              {
+                "alias": "breadth first"
+              }
+            ]
+          },
+          {
+            "tagId": 62,
+            "tagCode": "grid_graph",
+            "tagDisplayName": "격자 그래프",
+            "tagTargets": [
+              {
+                "targetId": 1,
+                "targetCode": "DAILY",
+                "targetDisplayName": "일상"
+              },
+              {
+                "targetId": 2,
+                "targetCode": "CT",
+                "targetDisplayName": "코딩테스트"
+              }
+            ],
+            "tagAliases": []
+          }
+        ]
+      }
+    ]
+  },
+  "error": {}
+}

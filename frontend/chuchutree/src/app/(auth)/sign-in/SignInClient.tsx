@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { useTheme } from 'next-themes';
 import { useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
+import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 
 type SocialWay = (typeof SocialWays)[number];
 
@@ -42,10 +43,12 @@ export default function SignInClient() {
   return (
     <div className="bg-innerground-white flex h-full w-full flex-col rounded-xl p-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Image src="/logo/logo.svg" alt="logo" width={16} height={16} />
-          <div>ChuChuTree</div>
-        </div>
+        <AppTooltip content="튜토리얼 하러가기" side="right" delayDuration={300}>
+          <div className="flex cursor-pointer items-center gap-2" onClick={() => router.push('/')}>
+            <Image src="/logo/logo.svg" alt="logo" width={16} height={16} />
+            <div>ChuChuTree</div>
+          </div>
+        </AppTooltip>
         <div className="min-w-22">
           <ThemeButton />
         </div>
@@ -53,7 +56,7 @@ export default function SignInClient() {
       <div className="flex flex-1 flex-col items-center justify-center">
         {!mounted ? (
           <div className="flex flex-col gap-2">
-            <div className="mb-4">
+            <div className="mb-4 cursor-default select-none">
               <div className="font-semibold">나만의 알고리즘 캘린더</div>
               <div className="text-muted-foreground">ChuChuTree 로그인</div>
             </div>
@@ -63,7 +66,7 @@ export default function SignInClient() {
           </div>
         ) : (
           <div className="flex flex-col gap-2">
-            <div className="mb-4">
+            <div className="mb-4 cursor-default select-none">
               <div className="font-semibold">나만의 알고리즘 캘린더</div>
               <div className="text-muted-foreground">ChuChuTree 로그인</div>
             </div>

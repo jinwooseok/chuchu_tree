@@ -1,0 +1,255 @@
+{
+  "status": 200,
+  "message": "ok",
+  "data": {
+    "bannedProblems": [
+      {
+        "problemId": 1124,
+        "problemTitle": "언더프라임",
+        "problemTierLevel": 10,
+        "problemTierName": "S1",
+        "problemClassLevel": null,
+        "tags": [
+          {
+            "tagId": 1,
+            "tagCode": "math",
+            "tagDisplayName": "수학"
+          },
+          {
+            "tagId": 14,
+            "tagCode": "number_theory",
+            "tagDisplayName": "정수론"
+          },
+          {
+            "tagId": 44,
+            "tagCode": "primality_test",
+            "tagDisplayName": "소수 판정"
+          },
+          {
+            "tagId": 60,
+            "tagCode": "sieve",
+            "tagDisplayName": "에라토스테네스의 체"
+          },
+          {
+            "tagId": 92,
+            "tagCode": "prime_factorization",
+            "tagDisplayName": "소인수분해"
+          }
+        ]
+      },
+      {
+        "problemId": 1725,
+        "problemTitle": "히스토그램",
+        "problemTierLevel": 16,
+        "problemTierName": "P5",
+        "problemClassLevel": null,
+        "tags": [
+          {
+            "tagId": 4,
+            "tagCode": "data_structures",
+            "tagDisplayName": "자료 구조"
+          },
+          {
+            "tagId": 15,
+            "tagCode": "segtree",
+            "tagDisplayName": "세그먼트 트리"
+          },
+          {
+            "tagId": 39,
+            "tagCode": "divide_and_conquer",
+            "tagDisplayName": "분할 정복"
+          },
+          {
+            "tagId": 41,
+            "tagCode": "stack",
+            "tagDisplayName": "스택"
+          }
+        ]
+      },
+      {
+        "problemId": 1949,
+        "problemTitle": "우수 마을",
+        "problemTierLevel": 14,
+        "problemTierName": "G2",
+        "problemClassLevel": null,
+        "tags": [
+          {
+            "tagId": 3,
+            "tagCode": "dp",
+            "tagDisplayName": "다이나믹 프로그래밍"
+          },
+          {
+            "tagId": 13,
+            "tagCode": "trees",
+            "tagDisplayName": "트리"
+          },
+          {
+            "tagId": 33,
+            "tagCode": "dp_tree",
+            "tagDisplayName": "트리에서의 다이나믹 프로그래밍"
+          }
+        ]
+      },
+      {
+        "problemId": 2800,
+        "problemTitle": "괄호 제거",
+        "problemTierLevel": 12,
+        "problemTierName": "G4",
+        "problemClassLevel": null,
+        "tags": [
+          {
+            "tagId": 4,
+            "tagCode": "data_structures",
+            "tagDisplayName": "자료 구조"
+          },
+          {
+            "tagId": 7,
+            "tagCode": "string",
+            "tagDisplayName": "문자열"
+          },
+          {
+            "tagId": 8,
+            "tagCode": "bruteforcing",
+            "tagDisplayName": "브루트포스 알고리즘"
+          },
+          {
+            "tagId": 26,
+            "tagCode": "bitmask",
+            "tagDisplayName": "비트마스킹"
+          },
+          {
+            "tagId": 41,
+            "tagCode": "stack",
+            "tagDisplayName": "스택"
+          }
+        ]
+      },
+      {
+        "problemId": 2820,
+        "problemTitle": "자동차 공장",
+        "problemTierLevel": 18,
+        "problemTierName": "P3",
+        "problemClassLevel": null,
+        "tags": [
+          {
+            "tagId": 4,
+            "tagCode": "data_structures",
+            "tagDisplayName": "자료 구조"
+          },
+          {
+            "tagId": 13,
+            "tagCode": "trees",
+            "tagDisplayName": "트리"
+          },
+          {
+            "tagId": 15,
+            "tagCode": "segtree",
+            "tagDisplayName": "세그먼트 트리"
+          },
+          {
+            "tagId": 43,
+            "tagCode": "lazyprop",
+            "tagDisplayName": "느리게 갱신되는 세그먼트 트리"
+          },
+          {
+            "tagId": 82,
+            "tagCode": "euler_tour_technique",
+            "tagDisplayName": "오일러 경로 테크닉"
+          }
+        ]
+      },
+      {
+        "problemId": 4354,
+        "problemTitle": "문자열 제곱",
+        "problemTierLevel": 16,
+        "problemTierName": "P5",
+        "problemClassLevel": null,
+        "tags": [
+          {
+            "tagId": 7,
+            "tagCode": "string",
+            "tagDisplayName": "문자열"
+          },
+          {
+            "tagId": 96,
+            "tagCode": "kmp",
+            "tagDisplayName": "KMP"
+          }
+        ]
+      },
+      {
+        "problemId": 7469,
+        "problemTitle": "K번째 수",
+        "problemTierLevel": 19,
+        "problemTierName": "P2",
+        "problemClassLevel": null,
+        "tags": [
+          {
+            "tagId": 4,
+            "tagCode": "data_structures",
+            "tagDisplayName": "자료 구조"
+          },
+          {
+            "tagId": 10,
+            "tagCode": "sorting",
+            "tagDisplayName": "정렬"
+          },
+          {
+            "tagId": 15,
+            "tagCode": "segtree",
+            "tagDisplayName": "세그먼트 트리"
+          },
+          {
+            "tagId": 16,
+            "tagCode": "binary_search",
+            "tagDisplayName": "이분 탐색"
+          },
+          {
+            "tagId": 154,
+            "tagCode": "merge_sort_tree",
+            "tagDisplayName": "머지 소트 트리"
+          }
+        ]
+      },
+      {
+        "problemId": 13116,
+        "problemTitle": "30번",
+        "problemTierLevel": 7,
+        "problemTierName": "S4",
+        "problemClassLevel": null,
+        "tags": [
+          {
+            "tagId": 1,
+            "tagCode": "math",
+            "tagDisplayName": "수학"
+          },
+          {
+            "tagId": 13,
+            "tagCode": "trees",
+            "tagDisplayName": "트리"
+          },
+          {
+            "tagId": 64,
+            "tagCode": "lca",
+            "tagDisplayName": "최소 공통 조상"
+          }
+        ]
+      },
+      {
+        "problemId": 18185,
+        "problemTitle": "라면 사기 (Small)",
+        "problemTierLevel": 21,
+        "problemTierName": "D5",
+        "problemClassLevel": null,
+        "tags": [
+          {
+            "tagId": 6,
+            "tagCode": "greedy",
+            "tagDisplayName": "그리디 알고리즘"
+          }
+        ]
+      }
+    ]
+  },
+  "error": {}
+}

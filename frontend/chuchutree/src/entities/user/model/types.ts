@@ -9,7 +9,7 @@ interface Target {
 
 interface UserAccount {
   userAccountId: number;
-  profileImageUrl: string;
+  profileImageUrl: string | null;
   target: Target;
   registeredAt: string;
 }

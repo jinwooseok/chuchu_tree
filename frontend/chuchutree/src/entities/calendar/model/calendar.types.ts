@@ -30,9 +30,9 @@ export interface SolvedProblems {
   problemTitle: string;
   problemTierLevel: TierNumKey;
   problemTierName: TierKey;
-  problemClassLevel: number;
+  problemClassLevel: number | null;
   tags: Tags[];
-  representativeTag: { tagId: number; tagCode: TagKey; tagDisplayName: string };
+  representativeTag: { tagId: number; tagCode: TagKey; tagDisplayName: string } | null;
 }
 
 export interface WillSolveProblems {
@@ -40,9 +40,9 @@ export interface WillSolveProblems {
   problemTitle: string;
   problemTierLevel: TierNumKey;
   problemTierName: TierKey;
-  problemClassLevel: number;
+  problemClassLevel: number | null;
   tags: Tags[];
-  representativeTag: { tagId: number; tagCode: TagKey; tagDisplayName: string };
+  representativeTag: { tagId: number; tagCode: TagKey; tagDisplayName: string } | null;
 }
 
 // Problem: SolvedProblems와 WillSolveProblems의 공통 타입

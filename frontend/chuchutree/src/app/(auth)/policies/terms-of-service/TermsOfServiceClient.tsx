@@ -13,7 +13,7 @@ export default function TermsOfServiceClient({ markdownContent }: TermsOfService
   const router = useRouter();
 
   const handleLogoClick = () => {
-    router.push('/');
+    router.push('/chu');
   };
 
   const handleNavigateToPrivacy = () => {

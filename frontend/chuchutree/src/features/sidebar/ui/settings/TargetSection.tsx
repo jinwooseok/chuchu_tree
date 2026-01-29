@@ -9,10 +9,11 @@ import { toast } from '@/lib/utils/toast';
 
 interface TargetSectionProps {
   currentTarget: TargetCode;
+  isLanding?: boolean;
   onClose: () => void;
 }
 
-export default function TargetSection({ currentTarget, onClose }: TargetSectionProps) {
+export default function TargetSection({ currentTarget, onClose, isLanding }: TargetSectionProps) {
   const [selectedTarget, setSelectedTarget] = useState<TargetCode>(currentTarget);
 
   // currentTarget이 변경되면 selectedTarget 초기화
@@ -69,7 +70,7 @@ export default function TargetSection({ currentTarget, onClose }: TargetSectionP
         ))}
 
         <div className="flex justify-end pt-2">
-          <Button onClick={handleTargetChange} disabled={isPending || selectedTarget === currentTarget}>
+          <Button onClick={handleTargetChange} disabled={isPending || selectedTarget === currentTarget || isLanding}>
             {isPending ? '변경 중...' : '저장'}
           </Button>
         </div>

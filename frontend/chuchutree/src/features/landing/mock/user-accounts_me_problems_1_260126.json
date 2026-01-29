@@ -1,0 +1,265 @@
+{
+  "status": 200,
+  "message": "ok",
+  "data": {
+    "problems": [
+      {
+        "problemId": 1036,
+        "problemTitle": "36진수",
+        "problemTierLevel": 14,
+        "problemTierName": "G2",
+        "problemClassLevel": 0,
+        "recommandReasons": [
+          {
+            "reason": "초심자 목표에 잘 어울리는 문제입니다.",
+            "additionalData": null
+          }
+        ],
+        "tags": [
+          {
+            "tagId": 53,
+            "tagCode": "arbitrary_precision",
+            "tagDisplayName": "임의 정밀도 / 큰 수 연산",
+            "tagTargets": [
+              {
+                "targetId": 1,
+                "targetCode": "DAILY",
+                "targetDisplayName": "일상"
+              },
+              {
+                "targetId": 2,
+                "targetCode": "CT",
+                "targetDisplayName": "코딩테스트"
+              },
+              {
+                "targetId": 3,
+                "targetCode": "BEGINNER",
+                "targetDisplayName": "초심자"
+              }
+            ],
+            "tagAliases": [
+              {
+                "alias": "빅인티저"
+              },
+              {
+                "alias": "빅데시멀"
+              },
+              {
+                "alias": "biginteger"
+              },
+              {
+                "alias": "bigdecimal"
+              }
+            ]
+          },
+          {
+            "tagId": 1,
+            "tagCode": "math",
+            "tagDisplayName": "수학",
+            "tagTargets": [
+              {
+                "targetId": 1,
+                "targetCode": "DAILY",
+                "targetDisplayName": "일상"
+              },
+              {
+                "targetId": 3,
+                "targetCode": "BEGINNER",
+                "targetDisplayName": "초심자"
+              }
+            ],
+            "tagAliases": []
+          },
+          {
+            "tagId": 2,
+            "tagCode": "implementation",
+            "tagDisplayName": "구현",
+            "tagTargets": [
+              {
+                "targetId": 1,
+                "targetCode": "DAILY",
+                "targetDisplayName": "일상"
+              },
+              {
+                "targetId": 2,
+                "targetCode": "CT",
+                "targetDisplayName": "코딩테스트"
+              },
+              {
+                "targetId": 3,
+                "targetCode": "BEGINNER",
+                "targetDisplayName": "초심자"
+              }
+            ],
+            "tagAliases": []
+          },
+          {
+            "tagId": 6,
+            "tagCode": "greedy",
+            "tagDisplayName": "그리디 알고리즘",
+            "tagTargets": [
+              {
+                "targetId": 1,
+                "targetCode": "DAILY",
+                "targetDisplayName": "일상"
+              },
+              {
+                "targetId": 2,
+                "targetCode": "CT",
+                "targetDisplayName": "코딩테스트"
+              },
+              {
+                "targetId": 3,
+                "targetCode": "BEGINNER",
+                "targetDisplayName": "초심자"
+              }
+            ],
+            "tagAliases": [
+              {
+                "alias": "탐욕법"
+              }
+            ]
+          },
+          {
+            "tagId": 7,
+            "tagCode": "string",
+            "tagDisplayName": "문자열",
+            "tagTargets": [
+              {
+                "targetId": 1,
+                "targetCode": "DAILY",
+                "targetDisplayName": "일상"
+              },
+              {
+                "targetId": 2,
+                "targetCode": "CT",
+                "targetDisplayName": "코딩테스트"
+              },
+              {
+                "targetId": 3,
+                "targetCode": "BEGINNER",
+                "targetDisplayName": "초심자"
+              }
+            ],
+            "tagAliases": [
+              {
+                "alias": "스트링"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "problemId": 2637,
+        "problemTitle": "장난감 조립",
+        "problemTierLevel": 14,
+        "problemTierName": "G2",
+        "problemClassLevel": 0,
+        "recommandReasons": [
+          {
+            "reason": "'위상 정렬' 태그를 안 푼 지 13일이 지났어요.",
+            "additionalData": null
+          },
+          {
+            "reason": "'위상 정렬' 3문제만 더 풀면 ADVANCED 달성!",
+            "additionalData": null
+          }
+        ],
+        "tags": [
+          {
+            "tagId": 58,
+            "tagCode": "topological_sorting",
+            "tagDisplayName": "위상 정렬",
+            "tagTargets": [
+              {
+                "targetId": 1,
+                "targetCode": "DAILY",
+                "targetDisplayName": "일상"
+              },
+              {
+                "targetId": 2,
+                "targetCode": "CT",
+                "targetDisplayName": "코딩테스트"
+              }
+            ],
+            "tagAliases": []
+          },
+          {
+            "tagId": 3,
+            "tagCode": "dp",
+            "tagDisplayName": "다이나믹 프로그래밍",
+            "tagTargets": [
+              {
+                "targetId": 1,
+                "targetCode": "DAILY",
+                "targetDisplayName": "일상"
+              },
+              {
+                "targetId": 2,
+                "targetCode": "CT",
+                "targetDisplayName": "코딩테스트"
+              }
+            ],
+            "tagAliases": [
+              {
+                "alias": "동적계획법"
+              },
+              {
+                "alias": "동적 계획법"
+              },
+              {
+                "alias": "다이나믹프로그래밍"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "problemId": 11266,
+        "problemTitle": "단절점",
+        "problemTierLevel": 17,
+        "problemTierName": "P4",
+        "problemClassLevel": 0,
+        "recommandReasons": [
+          {
+            "reason": "초심자 목표에 잘 어울리는 문제입니다.",
+            "additionalData": null
+          }
+        ],
+        "tags": [
+          {
+            "tagId": 27,
+            "tagCode": "dfs",
+            "tagDisplayName": "깊이 우선 탐색",
+            "tagTargets": [
+              {
+                "targetId": 1,
+                "targetCode": "DAILY",
+                "targetDisplayName": "일상"
+              },
+              {
+                "targetId": 2,
+                "targetCode": "CT",
+                "targetDisplayName": "코딩테스트"
+              },
+              {
+                "targetId": 3,
+                "targetCode": "BEGINNER",
+                "targetDisplayName": "초심자"
+              }
+            ],
+            "tagAliases": [
+              {
+                "alias": "depth first"
+              },
+              {
+                "alias": "depthfirst"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "error": {}
+}

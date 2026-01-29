@@ -2,7 +2,7 @@
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { useUser } from '@/entities/user/model/queries';
+// import { useUser } from '@/entities/user/model/queries';
 import { useBatchSolvedProblems } from '@/entities/calendar';
 import { useState, useMemo, useEffect } from 'react';
 import { toast } from '@/lib/utils/toast';
@@ -11,9 +11,13 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Image from 'next/image';
+import { User } from '@/entities/user';
+import { Input } from '@/components/ui/input';
 
 interface props {
   onClose: () => void;
+  isLanding?: boolean;
+  user?: User;
 }
 
 interface ProblemData {
@@ -28,8 +32,8 @@ interface PageInfo {
   problemIds: number[]; // 이 페이지에서 추가된 문제 ID들
 }
 
-export function AddPrevProblemsDialog({ onClose }: props) {
-  const { data: user } = useUser();
+export function AddPrevProblemsDialog({ onClose, isLanding = false, user }: props) {
+  const [landingDemoUsername, setLandingDemoUsername] = useState('');
   const [htmlContent, setHtmlContent] = useState('');
   const [accumulatedProblems, setAccumulatedProblems] = useState<ProblemData[]>([]); // 누적된 문제들
   const [pageInfos, setPageInfos] = useState<PageInfo[]>([]); // 페이지별 정보
@@ -205,10 +209,15 @@ export function AddPrevProblemsDialog({ onClose }: props) {
       problemIds,
     }));
 
-    batchSolvedProblems.mutate(batchData);
+    if (!isLanding) {
+      batchSolvedProblems.mutate(batchData);
+    } else {
+      toast.info('로그인 후 이용가능합니다.');
+      onClose();
+    }
   };
 
-  const bjAccountId = user?.bjAccount?.bjAccountId || '';
+  const bjAccountId = landingDemoUsername || user?.bjAccount?.bjAccountId || '';
   const baekjoonUrl = `https://www.acmicpc.net/status?problem_id=&user_id=${bjAccountId}&language_id=-1&result_id=4`;
 
   return (
@@ -308,11 +317,11 @@ export function AddPrevProblemsDialog({ onClose }: props) {
             <div className="mr-4 grid grid-cols-[35%_65%] gap-6">
               {/* 좌측: 버튼 및 설명 */}
               <div className="flex flex-col justify-between space-y-4">
-                <Button variant="outline" onClick={() => window.open(baekjoonUrl, '_blank')} className="w-full flex-1" disabled={!bjAccountId}>
+                {isLanding && <Input value={landingDemoUsername} onChange={(e) => setLandingDemoUsername(e.target.value)} placeholder="백준 아이디를 입력하세요 (비회원 전용)" />}
+                <Button variant="outline" onClick={() => window.open(baekjoonUrl, '_blank')} className="w-full flex-1" disabled={!bjAccountId} data-onboarding-id="open-baekjoon-button">
                   <ExternalLink className="mr-2 h-4 w-4" />
                   백준 채점현황 페이지 열기
                 </Button>
-
                 <div className="bg-innerground-hovergray/50 space-y-3 rounded-lg p-4">
                   <ol className="list-inside list-decimal space-y-2 text-sm">
                     <li className="flex flex-wrap items-center gap-2">
@@ -402,6 +411,7 @@ export function AddPrevProblemsDialog({ onClose }: props) {
                     const textarea = e.currentTarget.querySelector('textarea');
                     textarea?.focus();
                   }}
+                  data-onboarding-id="paste-area"
                 >
                   <textarea
                     placeholder="여기를 클릭하고 Ctrl+V로 붙여넣기"

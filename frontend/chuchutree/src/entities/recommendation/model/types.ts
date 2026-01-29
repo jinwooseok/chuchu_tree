@@ -21,7 +21,7 @@ interface Tags {
 
 interface RecommandReasons {
   reason: string;
-  additionalData: string;
+  additionalData: string | null;
 }
 
 interface RecommendedProblems {
@@ -56,7 +56,7 @@ interface BannedProblem {
   problemTitle: string;
   problemTierLevel: TierNumKey;
   problemTierName: TierKey;
-  problemClassLevel: number;
+  problemClassLevel: number | null;
   tags: ShortTag[];
 }
 
