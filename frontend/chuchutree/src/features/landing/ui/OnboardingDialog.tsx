@@ -18,7 +18,7 @@ export function OnboardingDialog({ messages, buttons, onButtonClick }: Onboardin
         {/* 메시지 */}
         <div className="mb-6 space-y-3 text-center">
           {messages.map((message, index) => (
-            <p key={index} className={index === 0 ? 'text-2xl font-bold' : 'text-muted-foreground'}>
+            <p key={index} className={index === 0 ? 'text-xl font-bold whitespace-pre-wrap' : 'text-muted-foreground whitespace-pre-wrap'}>
               {message}
             </p>
           ))}
@@ -27,12 +27,7 @@ export function OnboardingDialog({ messages, buttons, onButtonClick }: Onboardin
         {/* 버튼 */}
         <div className="flex justify-center gap-3">
           {buttons.map((button, index) => (
-            <Button
-              key={index}
-              variant={button.action === 'skip' ? 'outline' : 'default'}
-              onClick={() => onButtonClick(button.action)}
-              className="flex-1"
-            >
+            <Button key={index} variant={button.action === 'skip' ? 'outline' : 'default'} onClick={() => onButtonClick(button.action)} className="flex-1">
               {button.text}
             </Button>
           ))}

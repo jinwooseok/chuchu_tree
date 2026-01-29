@@ -42,7 +42,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     sequences: [
       {
         type: 'd',
-        dialogMessages: ['ChuChuTree에 오신 것을 환영합니다! 🎉', '알고리즘 문제 풀이를 체계적으로 관리하고 맞춤형 추천을 받을 수 있는 서비스입니다.', '지금부터 주요 기능들을 살펴보겠습니다.'],
+        dialogMessages: ['ChuChuTree에 오신 것을 환영합니다!', '알고리즘 문제 풀이를 체계적으로 관리하고, \n나만의 문제를 추천 받을 수 있습니다.', '지금부터 주요 기능들을 살펴보겠습니다.'],
         dialogButtons: [{ text: '시작하기', action: 'start' }],
       },
       {
@@ -52,11 +52,6 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
           // 레이아웃 초기화는 OnboardingController에서 처리
           // console.log('레이아웃 초기화');
         },
-      },
-      {
-        type: 'd',
-        dialogMessages: ['화면이 준비되었습니다. 캘린더 화면을 살펴볼까요?'],
-        dialogButtons: [{ text: '다음', action: 'next' }],
       },
     ],
   },
@@ -73,7 +68,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
       {
         type: 'f',
         targetSelector: '[data-onboarding-id="big-calendar-today"]',
-        message: ['캘린더에서 날짜를 선택하면,', '그날 풀었던 문제와 풀기로 한 문제가 표시됩니다.'],
+        message: ['캘린더에서는,', '풀었던 문제와 풀어야 할 문제가 표시됩니다.'],
         tooltipPosition: 'right',
         buttonText: '다음',
         duration: 300,
@@ -81,7 +76,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
       {
         type: 'f',
         targetSelector: '[data-onboarding-id="calendar-sidebar-solved"]',
-        message: '여기서는 선택한 날짜에 해결한 문제 목록을 확인할 수 있습니다.',
+        message: '해결한 문제들을 확인할 수 있습니다.',
         tooltipPosition: 'right',
         buttonText: '다음',
         duration: 300,
@@ -89,7 +84,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
       {
         type: 'f',
         targetSelector: '[data-onboarding-id="calendar-sidebar-scheduled"]',
-        message: '풀기로 한 문제를 추가, 수정, 삭제할 수 있습니다.',
+        message: '오늘 풀 문제를 기록 할 수 있습니다.',
         tooltipPosition: 'right',
         buttonText: '완료',
         duration: 300,

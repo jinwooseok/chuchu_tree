@@ -29,6 +29,8 @@ export function getElementPosition(selector: string): ElementPosition | null {
  * 요소가 렌더링될 때까지 대기 (최대 timeout ms)
  */
 export function waitForElement(selector: string, timeout = 5000): Promise<Element> {
+  console.log('렌더링 대기');
+
   return new Promise((resolve, reject) => {
     const element = document.querySelector(selector);
     if (element) {
@@ -36,10 +38,13 @@ export function waitForElement(selector: string, timeout = 5000): Promise<Elemen
       return;
     }
 
+    let timer: NodeJS.Timeout | null = null;
+
     const observer = new MutationObserver(() => {
       const element = document.querySelector(selector);
       if (element) {
         observer.disconnect();
+        if (timer) clearTimeout(timer);
         resolve(element);
       }
     });
@@ -49,7 +54,7 @@ export function waitForElement(selector: string, timeout = 5000): Promise<Elemen
       subtree: true,
     });
 
-    setTimeout(() => {
+    timer = setTimeout(() => {
       observer.disconnect();
       reject(new Error(`Element ${selector} not found within ${timeout}ms`));
     }, timeout);

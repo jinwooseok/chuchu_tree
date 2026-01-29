@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useOnboardingStore } from '@/lib/store/onboarding';
 import { useLayoutStore } from '@/lib/store/layout';
@@ -22,6 +22,9 @@ export function OnboardingController() {
   const [currentSequence, setCurrentSequence] = useState(0);
   const [spotlightTarget, setSpotlightTarget] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
 
+  // 이전 step을 추적하여 step 변경 감지
+  const prevStepRef = useRef(currentStep);
+
   // Spotlight 위치 업데이트 핸들러
   const handlePositionChange = (position: { x: number; y: number; width: number; height: number } | null) => {
     setSpotlightTarget(position);
@@ -29,8 +32,10 @@ export function OnboardingController() {
 
   // Step이 변경될 때마다 sequence를 0으로 리셋 (건너뛰기 대응)
   useEffect(() => {
-    setCurrentSequence(0);
-    console.log('skiped');
+    if (prevStepRef.current !== currentStep) {
+      setCurrentSequence(0);
+      prevStepRef.current = currentStep;
+    }
     if (currentStep < 6) {
       setTopSection(null);
       setCenterSection('calendar');
@@ -47,7 +52,11 @@ export function OnboardingController() {
 
   // 현재 step과 sequence 데이터
   const currentStepData = ONBOARDING_STEPS[currentStep - 1];
-  const sequenceData = currentStepData?.sequences[currentSequence];
+  // Step이 방금 변경되었는지 확인 (state 업데이트 전이라도 감지)
+  const isStepJustChanged = prevStepRef.current !== currentStep;
+  // Step 전환 직후에는 강제로 sequence 0 사용
+  const safeSequenceIndex = isStepJustChanged ? 0 : currentSequence;
+  const sequenceData = currentStepData?.sequences[safeSequenceIndex];
 
   // 다음 sequence로 이동
   const goToNextSequence = () => {
@@ -183,6 +192,7 @@ export function OnboardingController() {
 
       {sequenceData.type === 'f' && sequenceData.targetSelector && sequenceData.message && (
         <OnboardingSpotlight
+          key={`f-${currentStep}-${currentSequence}`}
           targetSelector={sequenceData.targetSelector}
           message={sequenceData.message}
           tooltipPosition={sequenceData.tooltipPosition || 'right'}
@@ -195,6 +205,7 @@ export function OnboardingController() {
 
       {sequenceData.type === 'u' && (sequenceData.targetSelector || sequenceData.eventTarget) && sequenceData.message && (
         <OnboardingSpotlight
+          key={`u-${currentStep}-${currentSequence}`}
           targetSelector={sequenceData.targetSelector || sequenceData.eventTarget!}
           message={sequenceData.message}
           tooltipPosition={sequenceData.tooltipPosition || 'right'}
