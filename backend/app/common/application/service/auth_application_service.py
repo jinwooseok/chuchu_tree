@@ -141,11 +141,10 @@ class AuthApplicationService:
         
         return frontend_redirect_url
     
-    @transactional
     async def logout(self, response: Response):
         self._clear_auth_cookies(response)
     
-    @transactional
+    @transactional(readonly=True)
     async def get_withdraw_url(self, user_account_id: int, frontend_redirect_url: str | None) -> str:
         """
         회원탈퇴용 OAuth 인증 URL 생성

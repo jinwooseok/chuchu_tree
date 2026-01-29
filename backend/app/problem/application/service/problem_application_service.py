@@ -40,13 +40,13 @@ class ProblemApplicationService:
         self.tier_repository = tier_repository
 
     @event_handler("GET_PROBLEM_INFOS_REQUESTED")
-    @transactional
+    @transactional(readonly=True)
     async def get_problems_info(self, payload: GetProblemsInfoPayload) -> ProblemsInfoQuery:
         """단일 진입점: 문제 ID 목록으로 상세 정보 조회"""
         problems = await self._get_base_data(payload.problem_ids)
         return await self._get_problems_info_logic(problems)
     
-    @transactional
+    @transactional(readonly=True)
     async def search_problem_by_keyword(self, keyword: str) -> list[list[ProblemInfoQuery]]:
         """검색 진입점: 키워드 검색 후 결과를 ID기준/제목기준으로 분리하여 반환"""
         # 1. 레포지토리 병렬 검색 (동일 세션 공유)

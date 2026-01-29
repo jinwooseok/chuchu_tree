@@ -40,7 +40,7 @@ class GetBaekjoonMeUsecase:
         self.tier_repository = tier_repository
         self.domain_event_bus = domain_event_bus
 
-    @transactional
+    @transactional(readonly=True)
     async def execute(self, command: GetBaekjoonMeCommand) -> BaekjoonMeQuery:
         """
         백준 내 정보 조회

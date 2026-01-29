@@ -55,7 +55,7 @@ class ActivityApplicationService:
         self.problem_history_repository = problem_history_repository
 
     @event_handler("GET_MONTHLY_ACTIVITY_DATA_REQUESTED")
-    @transactional
+    @transactional(readonly=True)
     async def get_monthly_activity_data(
         self,
         payload: GetMonthlyActivityDataPayload
@@ -576,7 +576,7 @@ class ActivityApplicationService:
         if len(problem_ids) != len(set(problem_ids)):
             raise APIException(ErrorCode.DUPLICATED_ORDER)
 
-    @transactional
+    @transactional(readonly=True)
     async def get_banned_problems(self, user_account_id: int):
         user_id = UserAccountId(user_account_id)
         activity: UserActivity = await self.user_activity_repository.find_only_banned_problem_by_user_account_id(user_id)
@@ -601,7 +601,7 @@ class ActivityApplicationService:
         banned_problem_list = list(problems_info.problems.values())
         return BannedProblemsQuery(banned_problem_list=banned_problem_list)
 
-    @transactional
+    @transactional(readonly=True)
     async def get_banned_tags(self, user_account_id: int):
         user_id = UserAccountId(user_account_id)
         activity: UserActivity = await self.user_activity_repository.find_only_tag_custom_by_user_account_id(user_id)
@@ -625,6 +625,7 @@ class ActivityApplicationService:
         return BannedTagsQuery(banned_tag_list=result.tags)
 
     @event_handler("USER_ACCOUNT_WITHDRAWAL_REQUESTED")
+    @transactional
     async def delete_user_activity(
         self,
         command: DeleteUserActivityCommand

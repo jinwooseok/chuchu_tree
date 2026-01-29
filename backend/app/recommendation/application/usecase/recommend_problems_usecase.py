@@ -61,7 +61,7 @@ class RecommendProblemsUsecase:
             "IM": "INTERMEDIATE"
         }
     
-    @transactional
+    @transactional(readonly=True)
     async def execute(
         self,
         user_account_id: UserAccountId,
