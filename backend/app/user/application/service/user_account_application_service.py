@@ -40,6 +40,7 @@ class UserAccountApplicationService:
         self.domain_event_bus = domain_event_bus
 
     @event_handler("SOCIAL_LOGIN_SUCCESSED")
+    @transactional
     async def create_or_find_user_account(
         self,
         command: CreateUserAccountCommand
@@ -84,6 +85,7 @@ class UserAccountApplicationService:
         )
     
     @event_handler("LINK_BAEKJOON_ACCOUNT_REQUESTED")
+    @transactional
     async def link_baekjoon_account(
         self,
         command: LinkBjAccountCommand
@@ -114,6 +116,7 @@ class UserAccountApplicationService:
         return True
 
     @event_handler("GET_USER_ACCOUNT_INFO_REQUESTED")
+    @transactional(readonly=True)
     async def get_user_account_info(
         self,
         command: GetUserAccountInfoCommand
@@ -140,7 +143,6 @@ class UserAccountApplicationService:
         else:
             target_info = None
             
-        print(target_info)
         return GetUserAccountInfoQuery(
             user_account_id=user_account.user_account_id.value,
             provider=user_account.provider.value,
@@ -149,7 +151,7 @@ class UserAccountApplicationService:
             registered_at=user_account.registered_at
         )
     
-    @transactional
+    @transactional(readonly=True)
     async def get_user_target(self, user_account_id: int):
         user_account = await self.user_account_repository.find_by_id(
             UserAccountId(user_account_id)
@@ -196,6 +198,7 @@ class UserAccountApplicationService:
         await self.user_account_repository.update(user_account)
 
     @event_handler("USER_ACCOUNT_WITHDRAWAL_REQUESTED")
+    @transactional
     async def delete_user_account(
         self,
         command: DeleteUserAccountCommand

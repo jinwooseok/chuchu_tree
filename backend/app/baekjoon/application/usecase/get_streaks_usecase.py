@@ -25,7 +25,7 @@ class GetStreaksUsecase:
         self.streak_repository = streak_repository
         self.baekjoon_account_repository = baekjoon_account_repository
 
-    @transactional
+    @transactional(readonly=True)
     async def execute(self, command: GetStreaksCommand) -> StreaksQuery:
         """
         스트릭 조회

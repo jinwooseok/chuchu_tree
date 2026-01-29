@@ -44,14 +44,11 @@ async def lifespan(app: AppWithContainer):
     injection_container = Container()
     app.container = injection_container
     await injection_container.init_resources_provider(injection_container)
-    db = injection_container.database()
-    database.database_instance = db
     try:
         yield
     finally:
-        # 정리 작업
-        if database.database_instance:
-            await database.database_instance.close()
+        # Shutdown: 정리 작업
+        db = injection_container.database()
         return
 
 app = AppWithContainer(
