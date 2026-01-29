@@ -405,12 +405,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                 <SidebarMenuItem key="enter-landing-page" aria-label={'랜딩페이지로이동하기'}>
                   <AppTooltip content="튜토리얼 이동하기" side="right">
                     <SidebarMenuButton asChild>
-                      <div
-                        onClick={() => {
-                          router.push('/');
-                        }}
-                        className="cursor-pointer"
-                      >
+                      <div onClick={handleTutorialStart} className="cursor-pointer">
                         <Lightbulb size={ICON_SIZE} />
                         <span>튜토리얼</span>
                       </div>

@@ -25,11 +25,7 @@ interface ActivityData {
  * streaks 데이터를 ActivityCalendar 형식으로 변환
  * 시작 날짜와 끝 날짜가 없으면 추가
  */
-const transformStreaksData = (
-  streaks: Array<{ streakDate: string; solvedCount: number; solvedLevel: number }>,
-  startDate: string,
-  endDate: string,
-): ActivityData[] => {
+const transformStreaksData = (streaks: Array<{ streakDate: string; solvedCount: number; solvedLevel: number }>, startDate: string, endDate: string): ActivityData[] => {
   // streaks를 Map으로 변환 (날짜를 key로)
   const dataMap = new Map<string, ActivityData>();
   streaks.forEach((streak) => {
@@ -137,7 +133,7 @@ export default function TopStreakbar() {
   } satisfies CalendarProps['labels'];
 
   return (
-    <div className="bg-innerground-white flex h-full cursor-default items-center justify-center p-4">
+    <div className="bg-innerground-white flex h-full cursor-default items-center justify-center p-4" data-onboarding-id="top-streakbar">
       <div className="max-w-full min-w-0">
         <div className="mb-2 flex items-center justify-between">
           <div className="text-muted-foreground flex items-center gap-2 text-sm">
