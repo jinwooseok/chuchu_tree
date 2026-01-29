@@ -27,7 +27,7 @@ class TagInfo(BaseModel):
     tag_id: int = Field(..., alias="tagId")
     tag_code: str = Field(..., alias="tagCode")
     tag_display_name: str = Field(..., alias="tagDisplayName")
-    tag_target: List[TagTarget] | None = Field(None, alias="tagTarget")
+    tag_targets: List[TagTarget] | None = Field(None, alias="tagTarget")
     tag_aliases: List[TagAlias] = Field(default_factory=list, alias="tagAliases")
 
     class Config:
@@ -39,7 +39,7 @@ class TagInfo(BaseModel):
             tagId=query.tag_id,
             tagCode=query.tag_code,
             tagDisplayName=query.tag_display_name,
-            tagTarget=[
+            tagTargets=[
                 TagTarget(
                     targetId=t.target_id,
                     targetCode=t.target_code,

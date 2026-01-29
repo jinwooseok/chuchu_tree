@@ -2,7 +2,7 @@
 
 from datetime import date, datetime
 from typing import override
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, func, select, case
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.baekjoon.domain.entity.baekjoon_account import BaekjoonAccount
@@ -19,6 +19,8 @@ from app.core.database import Database
 from app.problem.infra.model.problem import ProblemModel
 from app.problem.infra.model.problem_tag import ProblemTagModel
 from app.user.infra.model.account_link import AccountLinkModel
+from app.activity.infra.model.user_problem_status import UserProblemStatusModel
+from app.activity.infra.model.problem_date_record import ProblemDateRecordModel, RecordType
 
 
 class BaekjoonAccountRepositoryImpl(BaekjoonAccountRepository):
@@ -154,26 +156,79 @@ class BaekjoonAccountRepositoryImpl(BaekjoonAccountRepository):
         return [BaekjoonAccountMapper.to_entity(model) for model in models]
 
     @override
-    async def get_tag_stats(self, account_id: BaekjoonAccountId) -> list[TagAccountStat]:
-        """백준 계정의 모든 태그별 통계 조회 (영속성 없이 계산)"""
-        # 태그별로 풀이 통계 집계
-        stmt = (
-            select(
-                ProblemTagModel.tag_id,
-                func.count(func.distinct(ProblemHistoryModel.problem_id)).label('solved_problem_count'),
-                func.max(ProblemModel.problem_tier_level).label('highest_tier_level'),
-                func.max(StreakModel.streak_date).label('last_solved_streak_date')
+    async def get_tag_stats(
+        self,
+        account_id: BaekjoonAccountId,
+        user_account_id: UserAccountId | None = None
+    ) -> list[TagAccountStat]:
+        """백준 계정의 모든 태그별 통계 조회 (영속성 없이 계산)
+
+        Args:
+            account_id: 백준 계정 ID
+            user_account_id: 유저 계정 ID (streak이 없을 때 problem_record 날짜 사용을 위해)
+
+        Returns:
+            태그별 통계 목록. last_solved_date는 streak_date 우선, 없으면 problem_record의 marked_date 사용
+        """
+        if user_account_id:
+            # user_account_id가 제공되면 problem_record도 함께 고려
+            # streak_date 우선, 없으면 record_date 사용
+            stmt = (
+                select(
+                    ProblemTagModel.tag_id,
+                    func.count(func.distinct(ProblemHistoryModel.problem_id)).label('solved_problem_count'),
+                    func.max(ProblemModel.problem_tier_level).label('highest_tier_level'),
+                    func.max(
+                        func.coalesce(StreakModel.streak_date, ProblemDateRecordModel.marked_date)
+                    ).label('last_solved_date')
+                )
+                .select_from(ProblemHistoryModel)
+                # 태그 정보 조인
+                .join(ProblemTagModel, ProblemHistoryModel.problem_id == ProblemTagModel.problem_id)
+                # 문제 난이도 정보 조인
+                .join(ProblemModel, ProblemHistoryModel.problem_id == ProblemModel.problem_id)
+                # 스트릭 날짜 정보를 가져오기 위해 StreakModel 조인
+                .outerjoin(StreakModel, ProblemHistoryModel.streak_id == StreakModel.streak_id)
+                # streak이 없을 때 problem_record 날짜를 사용하기 위해 조인
+                .outerjoin(
+                    UserProblemStatusModel,
+                    and_(
+                        ProblemHistoryModel.problem_id == UserProblemStatusModel.problem_id,
+                        UserProblemStatusModel.user_account_id == user_account_id.value,
+                        UserProblemStatusModel.solved_yn == True,
+                        UserProblemStatusModel.deleted_at.is_(None)
+                    )
+                )
+                .outerjoin(
+                    ProblemDateRecordModel,
+                    and_(
+                        UserProblemStatusModel.user_problem_status_id == ProblemDateRecordModel.user_problem_status_id,
+                        ProblemDateRecordModel.record_type == RecordType.SOLVED,
+                        ProblemDateRecordModel.deleted_at.is_(None)
+                    )
+                )
+                .where(ProblemHistoryModel.bj_account_id == account_id.value)
+                .group_by(ProblemTagModel.tag_id)
             )
-            .select_from(ProblemHistoryModel)
-            # 태그 정보 조인
-            .join(ProblemTagModel, ProblemHistoryModel.problem_id == ProblemTagModel.problem_id)
-            # 문제 난이도 정보 조인
-            .join(ProblemModel, ProblemHistoryModel.problem_id == ProblemModel.problem_id)
-            # 스트릭 날짜 정보를 가져오기 위해 StreakModel 조인
-            .join(StreakModel, ProblemHistoryModel.streak_id == StreakModel.streak_id, isouter=True) 
-            .where(ProblemHistoryModel.bj_account_id == account_id.value)
-            .group_by(ProblemTagModel.tag_id)
-        )
+        else:
+            # 기존 로직: streak_date만 사용
+            stmt = (
+                select(
+                    ProblemTagModel.tag_id,
+                    func.count(func.distinct(ProblemHistoryModel.problem_id)).label('solved_problem_count'),
+                    func.max(ProblemModel.problem_tier_level).label('highest_tier_level'),
+                    func.max(StreakModel.streak_date).label('last_solved_date')
+                )
+                .select_from(ProblemHistoryModel)
+                # 태그 정보 조인
+                .join(ProblemTagModel, ProblemHistoryModel.problem_id == ProblemTagModel.problem_id)
+                # 문제 난이도 정보 조인
+                .join(ProblemModel, ProblemHistoryModel.problem_id == ProblemModel.problem_id)
+                # 스트릭 날짜 정보를 가져오기 위해 StreakModel 조인
+                .outerjoin(StreakModel, ProblemHistoryModel.streak_id == StreakModel.streak_id)
+                .where(ProblemHistoryModel.bj_account_id == account_id.value)
+                .group_by(ProblemTagModel.tag_id)
+            )
 
         result = await self.session.execute(stmt)
         rows = result.all()
@@ -185,7 +240,7 @@ class BaekjoonAccountRepositoryImpl(BaekjoonAccountRepository):
                 tag_id=TagId(row.tag_id),
                 solved_problem_count=row.solved_problem_count,
                 highest_tier_id=TierId(row.highest_tier_level) if row.highest_tier_level else None,
-                last_solved_date=row.last_solved_streak_date if row.last_solved_streak_date else None
+                last_solved_date=row.last_solved_date if row.last_solved_date else None
             ))
 
         return stats

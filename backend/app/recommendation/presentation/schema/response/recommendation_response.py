@@ -53,7 +53,7 @@ class TagInfo(BaseModel):
     tag_id: int = Field(..., alias="tagId")
     tag_code: str = Field(..., alias="tagCode")
     tag_display_name: str = Field(..., alias="tagDisplayName")
-    tag_target: List[TagTarget] | None = Field(None, alias="tagTarget")
+    tag_targets: List[TagTarget] | None = Field(None, alias="tagTargets")
     tag_aliases: List[TagAlias] = Field(default_factory=list, alias="tagAliases")
 
     model_config = ConfigDict(
@@ -68,7 +68,7 @@ class TagInfo(BaseModel):
             tag_id=query.tag_id,
             tag_code=query.tag_code,
             tag_display_name=query.tag_display_name,
-            tag_target=[TagTarget.from_query(t) for t in query.tag_target] if query.tag_target else None,
+            tag_targets=[TagTarget.from_query(t) for t in query.tag_targets] if query.tag_targets else None,
             tag_aliases=[TagAlias.from_query(a) for a in query.tag_aliases]
         )
 
