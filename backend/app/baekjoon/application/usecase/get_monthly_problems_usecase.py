@@ -57,7 +57,7 @@ class GetMonthlyProblemsUsecase:
         self.problem_history_repository = problem_history_repository
         self.domain_event_bus = domain_event_bus
 
-    @transactional
+    @transactional(readonly=True)
     async def execute(self, command: GetMonthlyProblemsCommand) -> MonthlyProblemsQuery:
         user_account_id = UserAccountId(command.user_account_id)
 

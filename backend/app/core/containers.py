@@ -12,7 +12,8 @@ from app.baekjoon.infra.repository.problem_history_repository_impl import Proble
 from app.baekjoon.infra.repository.streak_repository_impl import StreakRepositoryImpl
 from app.baekjoon.infra.scheduler.metric_scheduler import BjAccountUpdateScheduler
 from app.config.settings import get_settings
-from app.core.database import Database
+from app.core.database import Database, set_global_database
+from app.middlewares import DatabaseContextMiddleware
 from app.recommendation.application.usecase.recommend_problems_usecase import RecommendProblemsUsecase
 from app.recommendation.infra.repository.level_filter_repository_impl import LevelFilterRepositoryImpl
 from app.tag.application.service.tag_application_service import TagApplicationService
@@ -110,7 +111,12 @@ class Container(containers.DeclarativeContainer):
         Database,
         db_url=db_url,
     )
-
+    
+    database_middleware = providers.Factory(
+        DatabaseContextMiddleware,
+        db=database,
+    )
+    
     # ========================================================================
     # Infrastructure - Redis Client (Singleton)
     # ========================================================================
@@ -424,6 +430,8 @@ class Container(containers.DeclarativeContainer):
         """앱 시작 시점에 싱글톤 객체들을 미리 생성"""
         # 1. 인프라 클라이언트 (Redis, Storage 등)
         self.storage_client()
+        db = self.database()
+        set_global_database(db)
         redis = self.redis_client()
         await redis._initialize_client()
         # 2. 이벤트 핸들러가 등록되어야 하는 서비스들

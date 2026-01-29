@@ -1,0 +1,220 @@
+'use client';
+
+import { useState, useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
+import { useOnboardingStore } from '@/lib/store/onboarding';
+import { useLayoutStore } from '@/lib/store/layout';
+import { useModal } from '@/lib/providers/modal-provider';
+import { ONBOARDING_STEPS } from './onboardingSteps';
+import { OnboardingBackdrop } from './OnboardingBackdrop';
+import { OnboardingDialog } from './OnboardingDialog';
+import { OnboardingSpotlight } from './OnboardingSpotlight';
+import { OnboardingHeader } from './OnboardingHeader';
+import { useSidebar } from '@/components/ui/sidebar';
+
+export function OnboardingController() {
+  const router = useRouter();
+  const { closeModal } = useModal();
+  const { currentStep, nextStep, completeOnboarding } = useOnboardingStore();
+  const { setTopSection, setCenterSection, toggleBottomSection, bottomSection } = useLayoutStore();
+  const { state: sidebarOpenState, toggleSidebar: setSidebarOpenState } = useSidebar();
+
+  const [currentSequence, setCurrentSequence] = useState(0);
+  const [spotlightTarget, setSpotlightTarget] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
+
+  // 이전 step을 추적하여 step 변경 감지
+  const prevStepRef = useRef(currentStep);
+
+  // Spotlight 위치 업데이트 핸들러
+  const handlePositionChange = (position: { x: number; y: number; width: number; height: number } | null) => {
+    setSpotlightTarget(position);
+  };
+
+  // Step이 변경될 때마다 sequence를 0으로 리셋 (건너뛰기 대응)
+  useEffect(() => {
+    if (prevStepRef.current !== currentStep) {
+      setCurrentSequence(0);
+      prevStepRef.current = currentStep;
+    }
+    if (currentStep < 6) {
+      setTopSection(null);
+      setCenterSection('calendar');
+      // bottomSection이 열려있으면 닫기
+      if (bottomSection === 'recommend') {
+        toggleBottomSection();
+      }
+      if (sidebarOpenState !== 'collapsed') {
+        setSidebarOpenState();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep]);
+
+  // 현재 step과 sequence 데이터
+  const currentStepData = ONBOARDING_STEPS[currentStep - 1];
+  // Step이 방금 변경되었는지 확인 (state 업데이트 전이라도 감지)
+  const isStepJustChanged = prevStepRef.current !== currentStep;
+  // Step 전환 직후에는 강제로 sequence 0 사용
+  const safeSequenceIndex = isStepJustChanged ? 0 : currentSequence;
+  const sequenceData = currentStepData?.sequences[safeSequenceIndex];
+
+  // 다음 sequence로 이동
+  const goToNextSequence = () => {
+    if (currentSequence < currentStepData.sequences.length - 1) {
+      setCurrentSequence((prev) => prev + 1);
+    } else {
+      // 마지막 sequence면 다음 step으로
+      if (currentStep < ONBOARDING_STEPS.length) {
+        nextStep();
+        // sequence 리셋은 useEffect에서 자동 처리됨
+      } else {
+        // 마지막 step이면 온보딩 완료
+        completeOnboarding();
+      }
+    }
+  };
+
+  // sequence가 변경될 때 처리
+  useEffect(() => {
+    if (!sequenceData) return;
+
+    // 's' 타입: 시스템 동작 실행
+    if (sequenceData.type === 's') {
+      // Step 1의 레이아웃 초기화
+      // if (currentStep === 1 && currentSequence === 1) {
+      //   setTopSection(null);
+      //   setCenterSection('calendar');
+      //   // bottomSection이 열려있으면 닫기
+      //   if (bottomSection === 'recommend') {
+      //     toggleBottomSection();
+      //   }
+      //   if (sidebarOpenState !== 'collapsed') {
+      //     setSidebarOpenState();
+      //   }
+      // }
+
+      // Step 4의 Bottom Section 닫기
+      // if (currentStep === 4 && currentSequence === 1) {
+      //   if (bottomSection === 'recommend') {
+      //     toggleBottomSection();
+      //   }
+      // }
+
+      // Step 5의 Top Section을 Streak으로 변경
+      // if (currentStep === 5 && currentSequence === 1) {
+      //   setTopSection('streak');
+      // }
+
+      // Step 6의 Top Section 닫기 (사용자가 dashboard 버튼 클릭할 예정)
+      if (currentStep === 6 && currentSequence === 1) {
+        setTopSection(null);
+      }
+
+      // Step 8의 모달 닫기
+      if (currentStep === 8 && currentSequence === 4) {
+        closeModal('add-prev-problems');
+      }
+
+      // systemAction이 있으면 실행
+      if (sequenceData.systemAction) {
+        sequenceData.systemAction();
+      }
+
+      // duration 후 자동으로 다음 sequence로
+      const timer = setTimeout(() => {
+        goToNextSequence();
+      }, sequenceData.duration || 0);
+
+      return () => clearTimeout(timer);
+    }
+
+    // 'f' 타입: spotlight 위치는 OnboardingSpotlight에서 계산하여 전달받음
+    // 별도 처리 불필요
+
+    // 'u' 타입: 사용자 인터랙션 대기
+    if (sequenceData.type === 'u' && sequenceData.eventTarget) {
+      // spotlight 위치는 OnboardingSpotlight에서 계산하여 전달받음
+      // 클릭 이벤트 리스너만 부착
+      const handleClick = () => {
+        // 실제 버튼 기능이 동작하도록 preventDefault/stopPropagation 제거
+        // 클릭 후 약간의 딜레이를 두고 다음 sequence로 이동 (버튼 동작 완료 후)
+        setTimeout(() => {
+          goToNextSequence();
+        }, 100);
+      };
+
+      const targetElement = document.querySelector(sequenceData.eventTarget);
+      if (targetElement) {
+        targetElement.addEventListener('click', handleClick);
+      }
+
+      return () => {
+        if (targetElement) {
+          targetElement.removeEventListener('click', handleClick);
+        }
+      };
+    }
+
+    // 'd', 's' 타입이면 spotlight 제거
+    if (sequenceData.type === 'd') {
+      setSpotlightTarget(null);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep, currentSequence, bottomSection]);
+
+  // 다이얼로그 버튼 클릭 처리
+  const handleDialogButtonClick = (action: string) => {
+    switch (action) {
+      case 'next':
+      case 'start':
+        goToNextSequence();
+        break;
+      case 'login':
+        completeOnboarding();
+        router.push('/sign-in');
+        break;
+    }
+  };
+
+  if (!sequenceData) {
+    return null;
+  }
+
+  // 렌더링
+  return (
+    <>
+      <OnboardingHeader />
+      <OnboardingBackdrop spotlightTarget={spotlightTarget} allowInteraction={sequenceData.type === 'u'} />
+
+      {sequenceData.type === 'd' && sequenceData.dialogMessages && sequenceData.dialogButtons && (
+        <OnboardingDialog messages={sequenceData.dialogMessages} buttons={sequenceData.dialogButtons} onButtonClick={handleDialogButtonClick} />
+      )}
+
+      {sequenceData.type === 'f' && sequenceData.targetSelector && sequenceData.message && (
+        <OnboardingSpotlight
+          key={`f-${currentStep}-${currentSequence}`}
+          targetSelector={sequenceData.targetSelector}
+          message={sequenceData.message}
+          tooltipPosition={sequenceData.tooltipPosition || 'right'}
+          buttonText={sequenceData.buttonText}
+          onNext={goToNextSequence}
+          highlightAnimation={sequenceData.highlightAnimation}
+          onPositionChange={handlePositionChange}
+        />
+      )}
+
+      {sequenceData.type === 'u' && (sequenceData.targetSelector || sequenceData.eventTarget) && sequenceData.message && (
+        <OnboardingSpotlight
+          key={`u-${currentStep}-${currentSequence}`}
+          targetSelector={sequenceData.targetSelector || sequenceData.eventTarget!}
+          message={sequenceData.message}
+          tooltipPosition={sequenceData.tooltipPosition || 'right'}
+          buttonText={sequenceData.buttonText || '클릭해주세요'}
+          onNext={() => {}} // 버튼은 표시만 하고 실제 동작 없음
+          highlightAnimation={sequenceData.highlightAnimation || 'pulse'}
+          onPositionChange={handlePositionChange}
+        />
+      )}
+    </>
+  );
+}

@@ -61,7 +61,7 @@ class RecommendProblemsUsecase:
             "IM": "INTERMEDIATE"
         }
     
-    @transactional
+    @transactional(readonly=True)
     async def execute(
         self,
         user_account_id: UserAccountId,
@@ -72,7 +72,11 @@ class RecommendProblemsUsecase:
     ) -> RecommendProblemsQuery:
         # 1. 초기 데이터 로딩
         bj_account = await self.baekjoon_account_repository.find_by_user_id(user_account_id)
-        raw_tag_stats = await self.baekjoon_account_repository.get_tag_stats(bj_account.bj_account_id)
+        # user_account_id를 전달하여 streak이 없을 때 problem_record 날짜 사용
+        raw_tag_stats = await self.baekjoon_account_repository.get_tag_stats(
+            bj_account.bj_account_id,
+            user_account_id
+        )
         user_activity: UserActivity = await self.user_activity_repository.find_by_user_account_id(user_account_id)
         all_tags: list[Tag] = await self.tag_repository.find_active_tags_with_relations()
         all_tag_skills = await self.tag_skill_repository.find_all_active()
@@ -318,7 +322,7 @@ class RecommendProblemsUsecase:
                         tag_id=tag.tag_id.value,
                         tag_code=tag.code,
                         tag_display_name=tag.tag_display_name,
-                        tag_target=tag_targets if tag_targets else None,
+                        tag_targets=tag_targets if tag_targets else None,
                         tag_aliases=tag_aliases
                     )
 

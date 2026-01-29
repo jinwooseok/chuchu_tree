@@ -16,7 +16,7 @@ class TargetApplicationService:
         self.target_repository = target_repository
     
     @event_handler("GET_TARGET_INFOS_REQUESTED")
-    @transactional
+    @transactional(readonly=True)
     async def get_all_targets(self, target_ids: list[int] | None = None) -> list[TargetQuery]:
         if target_ids:
             targets = await self.target_repository.find_by_ids(target_ids=target_ids)
@@ -25,7 +25,7 @@ class TargetApplicationService:
         return [TargetQuery.from_entity(target) for target in targets]
     
     @event_handler("GET_TARGET_INFO_REQUESTED")
-    @transactional
+    @transactional(readonly=True)
     async def get_target_by_command(
         self,
         command: GetTargetInfoCommand

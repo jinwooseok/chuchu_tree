@@ -16,14 +16,14 @@ class TagApplicationService:
         self.tag_repository = tag_repository
     
     @event_handler("GET_TAG_INFOS_REQUESTED")
-    @transactional
+    @transactional(readonly=True)
     async def get_tags(self, command: GetTagInfosCommand) -> TagInfosQuery:
         tags = await self.tag_repository.find_by_ids(tag_ids=command.tag_ids)
         tag_queries = [TagSummaryQuery.from_entity(tag) for tag in tags]
         return TagInfosQuery(tags=tag_queries)
     
     @event_handler("GET_TAG_INFO_REQUESTED")
-    @transactional
+    @transactional(readonly=True)
     async def get_tag_by_command(
         self,
         command: GetTagInfoCommand

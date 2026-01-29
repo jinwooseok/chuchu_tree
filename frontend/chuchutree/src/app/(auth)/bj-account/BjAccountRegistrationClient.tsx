@@ -27,7 +27,7 @@ export default function BjAccountRegistrationClient() {
         {
           onSuccess: () => {
             toast.success('계정이 등록되었습니다.');
-            router.push('/');
+            router.push('/chu');
           },
           onError: () => {
             toast.warning('계정은 등록되었으나 목표 설정에 실패했습니다.');

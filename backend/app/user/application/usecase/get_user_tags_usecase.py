@@ -77,7 +77,11 @@ class GetUserTagsUsecase:
             raise APIException(ErrorCode.UNLINKED_USER)
 
         # 2. 모든 데이터 미리 조회
-        tag_stats = await self.baekjoon_account_repository.get_tag_stats(bj_account.bj_account_id)
+        # user_account_id를 전달하여 streak이 없을 때 problem_record 날짜 사용
+        tag_stats = await self.baekjoon_account_repository.get_tag_stats(
+            bj_account.bj_account_id,
+            user_account_id
+        )
         all_tags = await self.tag_repository.find_active_tags_with_relations()
         all_tag_skills = await self.tag_skill_repository.find_all_active()
         all_tiers = await self.tier_repository.find_all()

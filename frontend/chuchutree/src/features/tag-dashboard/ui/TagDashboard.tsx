@@ -3,13 +3,10 @@
 import { useMemo } from 'react';
 import TagCard from '@/features/tag-dashboard/ui/TagCard';
 import { useTagDashboardSidebarStore } from '@/lib/store/tagDashboard';
-import { useTagDashboard } from '@/entities/tag-dashboard';
+import { TagDashboard as TagDashboardType } from '@/entities/tag-dashboard';
 import { calculateProgress } from '@/features/tag-dashboard/lib/utils';
 
-export default function TagDashboard() {
-  // TanStack Query에서 태그 데이터 가져오기
-  const { data: tagDashboard } = useTagDashboard();
-
+export function TagDashboard({ tagDashboard, isLanding = false }: { tagDashboard?: TagDashboardType; isLanding?: boolean }) {
   // store에서 필터/정렬 상태 가져오기
   const { searchQuery, sortBy, sortDirection, selectedTagId, categoryVisibility } = useTagDashboardSidebarStore();
 
@@ -110,8 +107,8 @@ export default function TagDashboard() {
   return (
     <div className="hide-scrollbar flex h-full w-full overflow-y-auto">
       <div className="mx-auto grid w-fit grid-cols-1 content-start gap-x-4 gap-y-8 lg:grid-cols-2 xl:grid-cols-3">
-        {filteredAndSortedTags.map((tag) => (
-          <TagCard key={tag.tagId} tag={tag} progress={tag.progress} />
+        {filteredAndSortedTags.map((tag, index) => (
+          <TagCard key={tag.tagId} tag={tag} progress={tag.progress} isLanding={isLanding} onboardingId={index === 0 ? 'first-tag-card' : undefined} />
         ))}
       </div>
     </div>

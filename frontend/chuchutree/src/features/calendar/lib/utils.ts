@@ -11,15 +11,17 @@ export function transformToCalendarEvents(monthlyDataArray: MonthlyData[]): Cale
 
     // solved 문제들을 이벤트로 변환
     dayData.solvedProblems.forEach((problem: SolvedProblems) => {
+      const lastTagDisplayName = problem.tags.length > 0 ? problem.tags[problem.tags.length - 1].tagDisplayName : '';
+      const lastTagCode = problem.tags.length > 0 ? problem.tags[problem.tags.length - 1].tagCode : '';
       if (problem.tags.length > 0) {
         events.push({
-          title: problem.representativeTag?.tagDisplayName || problem.tags[0].tagDisplayName,
+          title: problem.representativeTag?.tagDisplayName || lastTagDisplayName,
           start: date,
           end: date,
           resource: {
             type: 'solved',
             problem,
-            tagCode: problem.representativeTag?.tagCode || problem.tags[0].tagCode,
+            tagCode: problem.representativeTag?.tagCode || lastTagCode,
           },
         });
       }
@@ -27,15 +29,17 @@ export function transformToCalendarEvents(monthlyDataArray: MonthlyData[]): Cale
 
     // will solve 문제들을 이벤트로 변환
     dayData.willSolveProblems.forEach((problem: WillSolveProblems) => {
+      const lastTagDisplayName = problem.tags.length > 0 ? problem.tags[problem.tags.length - 1].tagDisplayName : '';
+      const lastTagCode = problem.tags.length > 0 ? problem.tags[problem.tags.length - 1].tagCode : '';
       if (problem.tags.length > 0) {
         events.push({
-          title: problem.representativeTag?.tagDisplayName || problem.tags[0].tagDisplayName,
+          title: problem.representativeTag?.tagDisplayName || lastTagDisplayName,
           start: date,
           end: date,
           resource: {
             type: 'willSolve',
             problem,
-            tagCode: problem.representativeTag?.tagCode || problem.tags[0].tagCode,
+            tagCode: problem.representativeTag?.tagCode || lastTagCode,
           },
         });
       }

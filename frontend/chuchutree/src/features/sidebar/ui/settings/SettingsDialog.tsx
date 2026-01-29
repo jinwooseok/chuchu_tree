@@ -15,9 +15,10 @@ interface SettingsDialogProps {
   currentBjAccountId: string;
   currentTarget: TargetCode;
   linkedAt?: string;
+  isLanding?: boolean;
 }
 
-export function SettingsDialog({ onClose, currentBjAccountId, currentTarget, linkedAt }: SettingsDialogProps) {
+export function SettingsDialog({ onClose, currentBjAccountId, currentTarget, linkedAt, isLanding = false }: SettingsDialogProps) {
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-2xl">
@@ -31,11 +32,11 @@ export function SettingsDialog({ onClose, currentBjAccountId, currentTarget, lin
 
           <Separator />
 
-          <BjAccountSection currentBjAccountId={currentBjAccountId} linkedAt={linkedAt} onClose={onClose} />
+          <BjAccountSection currentBjAccountId={currentBjAccountId} linkedAt={linkedAt} onClose={onClose} isLanding={isLanding}/>
 
           <Separator />
 
-          <TargetSection currentTarget={currentTarget} onClose={onClose} />
+          <TargetSection currentTarget={currentTarget} onClose={onClose} isLanding={isLanding}/>
 
           <Separator />
 
@@ -43,7 +44,7 @@ export function SettingsDialog({ onClose, currentBjAccountId, currentTarget, lin
 
           <Separator className="border-destructive/20 mb-20" />
 
-          <AccountDeletionSection />
+          <AccountDeletionSection isLanding={isLanding}/>
         </div>
       </DialogContent>
     </Dialog>
