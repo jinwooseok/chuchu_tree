@@ -27,6 +27,24 @@ export function OnboardingController() {
     setSpotlightTarget(position);
   };
 
+  // Step이 변경될 때마다 sequence를 0으로 리셋 (건너뛰기 대응)
+  useEffect(() => {
+    setCurrentSequence(0);
+    console.log('skiped');
+    if (currentStep < 6) {
+      setTopSection(null);
+      setCenterSection('calendar');
+      // bottomSection이 열려있으면 닫기
+      if (bottomSection === 'recommend') {
+        toggleBottomSection();
+      }
+      if (sidebarOpenState !== 'collapsed') {
+        setSidebarOpenState();
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep]);
+
   // 현재 step과 sequence 데이터
   const currentStepData = ONBOARDING_STEPS[currentStep - 1];
   const sequenceData = currentStepData?.sequences[currentSequence];
@@ -39,7 +57,7 @@ export function OnboardingController() {
       // 마지막 sequence면 다음 step으로
       if (currentStep < ONBOARDING_STEPS.length) {
         nextStep();
-        setCurrentSequence(0);
+        // sequence 리셋은 useEffect에서 자동 처리됨
       } else {
         // 마지막 step이면 온보딩 완료
         completeOnboarding();
@@ -54,24 +72,24 @@ export function OnboardingController() {
     // 's' 타입: 시스템 동작 실행
     if (sequenceData.type === 's') {
       // Step 1의 레이아웃 초기화
-      if (currentStep === 1 && currentSequence === 1) {
-        setTopSection(null);
-        setCenterSection('calendar');
-        // bottomSection이 열려있으면 닫기
-        if (bottomSection === 'recommend') {
-          toggleBottomSection();
-        }
-        if (sidebarOpenState !== 'collapsed') {
-          setSidebarOpenState();
-        }
-      }
+      // if (currentStep === 1 && currentSequence === 1) {
+      //   setTopSection(null);
+      //   setCenterSection('calendar');
+      //   // bottomSection이 열려있으면 닫기
+      //   if (bottomSection === 'recommend') {
+      //     toggleBottomSection();
+      //   }
+      //   if (sidebarOpenState !== 'collapsed') {
+      //     setSidebarOpenState();
+      //   }
+      // }
 
       // Step 4의 Bottom Section 닫기
-      if (currentStep === 4 && currentSequence === 1) {
-        if (bottomSection === 'recommend') {
-          toggleBottomSection();
-        }
-      }
+      // if (currentStep === 4 && currentSequence === 1) {
+      //   if (bottomSection === 'recommend') {
+      //     toggleBottomSection();
+      //   }
+      // }
 
       // Step 5의 Top Section을 Streak으로 변경
       if (currentStep === 5 && currentSequence === 1) {

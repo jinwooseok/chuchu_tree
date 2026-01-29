@@ -7,7 +7,7 @@ interface OnboardingState {
   hasCompletedOnboarding: boolean;
   // 세션 상태 (현재 온보딩 진행 중 여부)
   isActive: boolean;
-  // 현재 단계 (1~9)
+  // 현재 단계
   currentStep: number;
   // hydration 완료 여부
   _hasHydrated: boolean;
@@ -53,7 +53,7 @@ export const useOnboardingStore = create<OnboardingState>()(
         // 현재 step만 건너뛰고 다음으로 (Step 9에서는 종료)
         skipCurrentStep: () =>
           set((state) => {
-            if (state.currentStep >= 9) {
+            if (state.currentStep >= 8) {
               // 마지막 step이면 온보딩 완료
               state.hasCompletedOnboarding = true;
               state.isActive = false;
