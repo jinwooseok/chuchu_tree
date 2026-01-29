@@ -368,60 +368,58 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
         </SidebarContent>
         {/* footer */}
         <SidebarFooter>
-          <SidebarGroup>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {/* 랜딩 전용 입장하기 */}
-                {isLanding && (
-                  <>
-                    <SidebarMenuItem key="start-onboarding" aria-label={'튜토리얼 다시보기'}>
-                      <AppTooltip content="튜토리얼 다시보기" side="right">
-                        <SidebarMenuButton asChild>
-                          <div onClick={handleTutorialStart} className="cursor-pointer">
-                            <SquarePlay size={ICON_SIZE} />
-                            <span>튜토리얼 다시보기</span>
-                          </div>
-                        </SidebarMenuButton>
-                      </AppTooltip>
-                    </SidebarMenuItem>
-                    <SidebarMenuItem key="enter-main-page" aria-label={'입장하기'}>
-                      <AppTooltip content="시작해보자!" side="right">
-                        <SidebarMenuButton asChild>
-                          <div
-                            onClick={() => {
-                              router.push('/chu');
-                            }}
-                            className="cursor-pointer"
-                          >
-                            <House size={ICON_SIZE} />
-                            <span>입장하기</span>
-                          </div>
-                        </SidebarMenuButton>
-                      </AppTooltip>
-                    </SidebarMenuItem>
-                  </>
-                )}
-                {/* 실 서비스 전용 랜딩페이지로 가기*/}
-                {!isLanding && (
-                  <SidebarMenuItem key="enter-landing-page" aria-label={'랜딩페이지로이동하기'}>
-                    <AppTooltip content="튜토리얼 이동하기" side="right">
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {/* 랜딩 전용 입장하기 */}
+              {isLanding && (
+                <>
+                  <SidebarMenuItem key="start-onboarding" aria-label={'튜토리얼 다시보기'}>
+                    <AppTooltip content="튜토리얼 다시보기" side="right">
                       <SidebarMenuButton asChild>
-                        <div
-                          onClick={() => {
-                            router.push('/');
-                          }}
-                          className="cursor-pointer"
-                        >
-                          <Lightbulb size={ICON_SIZE} />
-                          <span>튜토리얼</span>
+                        <div onClick={handleTutorialStart} className="cursor-pointer">
+                          <SquarePlay size={ICON_SIZE} />
+                          <span>튜토리얼 다시보기</span>
                         </div>
                       </SidebarMenuButton>
                     </AppTooltip>
                   </SidebarMenuItem>
-                )}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
+                  <SidebarMenuItem key="enter-main-page" aria-label={'입장하기'}>
+                    <AppTooltip content="시작해보자!" side="right">
+                      <SidebarMenuButton asChild>
+                        <div
+                          onClick={() => {
+                            router.push('/chu');
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <House size={ICON_SIZE} />
+                          <span>입장하기</span>
+                        </div>
+                      </SidebarMenuButton>
+                    </AppTooltip>
+                  </SidebarMenuItem>
+                </>
+              )}
+              {/* 실 서비스 전용 랜딩페이지로 가기*/}
+              {!isLanding && (
+                <SidebarMenuItem key="enter-landing-page" aria-label={'랜딩페이지로이동하기'}>
+                  <AppTooltip content="튜토리얼 이동하기" side="right">
+                    <SidebarMenuButton asChild>
+                      <div
+                        onClick={() => {
+                          router.push('/');
+                        }}
+                        className="cursor-pointer"
+                      >
+                        <Lightbulb size={ICON_SIZE} />
+                        <span>튜토리얼</span>
+                      </div>
+                    </SidebarMenuButton>
+                  </AppTooltip>
+                </SidebarMenuItem>
+              )}
+            </SidebarMenu>
+          </SidebarGroupContent>
           {/* 드롭다운 */}
           <SidebarMenu>
             <SidebarMenuItem>

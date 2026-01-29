@@ -101,9 +101,9 @@ export function OnboardingController() {
       // }
 
       // Step 5의 Top Section을 Streak으로 변경
-      if (currentStep === 5 && currentSequence === 1) {
-        setTopSection('streak');
-      }
+      // if (currentStep === 5 && currentSequence === 1) {
+      //   setTopSection('streak');
+      // }
 
       // Step 6의 Top Section 닫기 (사용자가 dashboard 버튼 클릭할 예정)
       if (currentStep === 6 && currentSequence === 1) {

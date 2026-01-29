@@ -68,7 +68,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
       {
         type: 'f',
         targetSelector: '[data-onboarding-id="big-calendar-today"]',
-        message: ['캘린더에서는,', '풀었던 문제와 풀어야 할 문제가 표시됩니다.'],
+        message: '해결한 문제와 풀어야 할 문제가 기록됩니다.',
         tooltipPosition: 'right',
         buttonText: '다음',
         duration: 300,
@@ -97,25 +97,20 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     title: '오늘의 문제',
     sequences: [
       {
-        type: 'd',
-        dialogMessages: ['이제 맞춤형 문제 추천 기능을 체험해보겠습니다.', '사이드바의 "오늘의 문제" 버튼을 클릭해주세요.'],
-        dialogButtons: [{ text: '다음', action: 'next' }],
-      },
-      {
         type: 'u',
         waitForEvent: 'click',
         eventTarget: '[data-onboarding-id="recommend-button"]',
         targetSelector: '[data-onboarding-id="recommend-button"]',
-        message: '이 버튼을 클릭해보세요!',
+        message: '나만의 문제를 추천 받을 수 있습니다',
         tooltipPosition: 'right',
-        buttonText: '클릭해주세요',
+        buttonText: '클릭해보세요!',
         highlightAnimation: 'pulse',
         duration: 300,
       },
       {
         type: 'f',
         targetSelector: '[data-onboarding-id="bottom-recommend"]',
-        message: ['여기서 당신의 실력과 목표에 맞는 문제를 추천받을 수 있습니다.', '좌측의 "추천 받기" 버튼을 클릭해보세요.'],
+        message: '나의 실력과 목표에 맞는 문제를 추천받을 수 있습니다.',
         tooltipPosition: 'top',
         buttonText: '다음',
         duration: 300,
@@ -125,16 +120,16 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
         waitForEvent: 'click',
         eventTarget: '[data-onboarding-id="recommend-receive-button"]',
         targetSelector: '[data-onboarding-id="recommend-receive-button"]',
-        message: '이 버튼을 클릭하면 맞춤형 알고리즘 문제가 추천됩니다!',
+        message: '맞춤형 알고리즘 문제가 추천됩니다!',
         tooltipPosition: 'right',
-        buttonText: '클릭해주세요',
+        buttonText: '클릭해보세요!',
         highlightAnimation: 'pulse',
         duration: 300,
       },
       {
         type: 'f',
         targetSelector: '[data-onboarding-id="recommend-answer"]',
-        message: ['추천된 문제들입니다!', '각 문제를 클릭하면 백준 사이트로 이동하며,', '"문제 등록" 버튼으로 캘린더에 일정을 추가할 수 있습니다.'],
+        message: ['추천된 문제들입니다!', '문제를 클릭하면 백준 사이트로 이동하며,', '"문제 등록"으로 캘린더에 일정을 추가할 수 있습니다.'],
         tooltipPosition: 'top',
         buttonText: '완료',
         duration: 300,
@@ -147,23 +142,11 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     title: 'Top Tierbar',
     sequences: [
       {
-        type: 'd',
-        dialogMessages: ['이번에는 티어 정보를 확인해보겠습니다.'],
-        dialogButtons: [{ text: '다음', action: 'next' }],
-      },
-      {
-        type: 's',
-        duration: 300,
-        systemAction: () => {
-          console.log('Bottom Section 닫기');
-        },
-      },
-      {
         type: 'u',
         waitForEvent: 'click',
         eventTarget: '[data-onboarding-id="tierbar-button"]',
         targetSelector: '[data-onboarding-id="tierbar-button"]',
-        message: '티어 버튼을 클릭하면 현재 티어와 진행 상황을 확인할 수 있습니다.',
+        message: '나의 티어와 진행 상황도 확인할 수 있습니다.',
         tooltipPosition: 'right',
         buttonText: '클릭해보세요',
         highlightAnimation: 'pulse',
@@ -185,17 +168,23 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     title: 'Top Streakbar',
     sequences: [
       {
-        type: 'd',
-        dialogMessages: ['이번에는 스트릭 정보를 확인해보겠습니다.'],
-        dialogButtons: [{ text: '다음', action: 'next' }],
-      },
-      {
-        type: 's',
+        type: 'u',
+        waitForEvent: 'click',
+        eventTarget: '[data-onboarding-id="streakbar-button"]',
+        targetSelector: '[data-onboarding-id="streakbar-button"]',
+        message: '나의 1년 기록도 확인할 수 있습니다.',
+        tooltipPosition: 'right',
+        buttonText: '클릭해보세요',
+        highlightAnimation: 'pulse',
         duration: 300,
-        systemAction: () => {
-          console.log('Top Section을 Streak으로 변경');
-        },
       },
+      // {
+      //   type: 's',
+      //   duration: 300,
+      //   systemAction: () => {
+      //     console.log('Top Section을 Streak으로 변경');
+      //   },
+      // },
       {
         type: 'f',
         targetSelector: '[data-onboarding-id="top-streakbar"]',
@@ -213,7 +202,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     sequences: [
       {
         type: 'd',
-        dialogMessages: ['이제 유형별 숙련도 대시보드를 확인해보겠습니다.'],
+        dialogMessages: ['이제 나만의 알고리즘을 확인해보겠습니다.'],
         dialogButtons: [{ text: '다음', action: 'next' }],
       },
       {
@@ -228,7 +217,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
         waitForEvent: 'click',
         eventTarget: '[data-onboarding-id="dashboard-button"]',
         targetSelector: '[data-onboarding-id="dashboard-button"]',
-        message: '유형별 숙련도 버튼을 클릭하면 알고리즘 유형별 실력을 확인할 수 있습니다.',
+        message: '나의 알고리즘 유형별 실력을 확인할 수 있습니다.',
         tooltipPosition: 'right',
         buttonText: '클릭해보세요',
         highlightAnimation: 'pulse',
@@ -237,7 +226,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
       {
         type: 'f',
         targetSelector: '[data-onboarding-id="first-tag-card"]',
-        message: '각 유형별로 풀이 현황과 진행도를 확인할 수 있습니다.',
+        message: ['유형별로 날짜, 풀이 수, 등급을 확인할 수 있습니다.', 'Locked ≫ Intermediate ≫ Advanced ≫ Master', '모든 유형에 Master를 달성해보세요!'],
         tooltipPosition: 'right',
         buttonText: '완료',
         duration: 300,
@@ -252,7 +241,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
       {
         type: 'f',
         targetSelector: '[data-onboarding-id="refresh-button"]',
-        message: '백준에서 새로 푼 문제가 있다면, 이 버튼으로 프로필을 갱신할 수 있습니다.',
+        message: '백준에서 새로 푼 문제가 있다면, 프로필을 갱신해야 합니다.',
         tooltipPosition: 'right',
         buttonText: '완료',
         duration: 300,
@@ -260,7 +249,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
       {
         type: 'f',
         targetSelector: '[data-onboarding-id="add-prev-problems-button"]',
-        message: '이 버튼을 클릭하면 과거에 풀었던 문제를 등록할 수 있습니다.',
+        message: ['첫 가입 후에는 꼭!', ' 가입 전에 풀었던 문제들을 등록할 수 있습니다.'],
         tooltipPosition: 'right',
         buttonText: '완료',
         duration: 300,
@@ -274,9 +263,9 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
     sequences: [
       {
         type: 'd',
-        dialogMessages: ['튜토리얼이 완료되었습니다! 🎉', '이제 ChuChuTree의 모든 기능을 자유롭게 사용할 수 있습니다.', '계속 튜토리얼 화면에서 둘러보시거나, 로그인하고 실제 서비스를 시작해보세요!'],
+        dialogMessages: ['튜토리얼이 완료되었습니다! 🎉', '이제 ChuChuTree의 모든 기능을 사용할 수 있습니다.', '계속 튜토리얼 화면에서 둘러보시거나, \n로그인하고 ChuChuTree를 시작해보세요!'],
         dialogButtons: [
-          { text: '튜토리얼 화면에서 더 둘러보기', action: 'next' },
+          { text: '더 둘러보기', action: 'next' },
           { text: '로그인하고 시작하기', action: 'login' },
         ],
       },

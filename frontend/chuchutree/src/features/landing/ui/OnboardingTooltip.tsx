@@ -36,7 +36,7 @@ export function OnboardingTooltip({ message, position, placement, buttonText, on
       {/* 메시지 */}
       <div className="space-y-2">
         {messages.map((msg, index) => (
-          <p key={index} className={cn('text-sm', index === 0 ? 'font-semibold' : 'text-muted-foreground')}>
+          <p key={index} className={cn('text-sm', index === 0 ? '' : 'text-muted-foreground')}>
             {msg}
           </p>
         ))}
@@ -45,7 +45,7 @@ export function OnboardingTooltip({ message, position, placement, buttonText, on
       {/* 버튼 */}
       {buttonText && onButtonClick && (
         <div className="mt-3">
-          <Button onClick={onButtonClick} size="sm" className="w-full">
+          <Button onClick={onButtonClick} size="sm" className="w-full cursor-pointer">
             {buttonText}
           </Button>
         </div>

@@ -1,6 +1,5 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
 import { useOnboardingStore } from '@/lib/store/onboarding';
 import { ONBOARDING_STEPS } from './onboardingSteps';
 import { X, ChevronRight } from 'lucide-react';
@@ -10,25 +9,25 @@ export function OnboardingHeader() {
   const totalSteps = ONBOARDING_STEPS.length;
 
   return (
-    <div className="fixed top-4 right-4 z-60 flex items-center gap-3">
+    <div className="fixed top-4 right-4 z-60 flex h-10 items-center gap-3">
       {/* 현재 단계 표시 */}
-      <div className="bg-background/95 flex items-center gap-2 rounded-lg border px-4 py-2 shadow-lg backdrop-blur-sm">
+      <div className="bg-background hover:bg-innerground-darkgray flex h-full cursor-pointer items-center gap-2 rounded-lg border px-4 select-none">
         <span className="text-sm font-medium">
           Step {currentStep} / {totalSteps}
         </span>
       </div>
 
       {/* 건너뛰기 버튼 */}
-      <Button variant="outline" size="sm" onClick={skipCurrentStep} className="gap-1">
+      <button onClick={skipCurrentStep} className="bg-background hover:bg-innerground-darkgray flex h-full cursor-pointer items-center gap-1 rounded-lg border pr-3 pl-4 select-none">
         <span>건너뛰기</span>
         <ChevronRight className="h-4 w-4" />
-      </Button>
+      </button>
 
       {/* 종료 버튼 */}
-      <Button variant="outline" size="sm" onClick={completeOnboarding} className="gap-1">
+      <button onClick={completeOnboarding} className="bg-background hover:bg-innerground-darkgray flex h-full cursor-pointer items-center gap-1 rounded-lg border px-4 select-none">
         <X className="h-4 w-4" />
         <span>종료</span>
-      </Button>
+      </button>
     </div>
   );
 }

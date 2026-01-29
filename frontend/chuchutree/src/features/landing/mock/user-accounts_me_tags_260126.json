@@ -492,7 +492,7 @@
           "solvedProblemCount": 17,
           "requiredMinTier": 17,
           "higherProblemTier": 18,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-11-24",
           "recommendation_period": 14
         },
         "lockedYn": false,
@@ -807,7 +807,7 @@
           "solvedProblemCount": 7,
           "requiredMinTier": 17,
           "higherProblemTier": 16,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-12-27",
           "recommendation_period": 3
         },
         "lockedYn": false,
@@ -872,7 +872,7 @@
           "solvedProblemCount": 13,
           "requiredMinTier": 17,
           "higherProblemTier": 18,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-12-17",
           "recommendation_period": 3
         },
         "lockedYn": false,
@@ -1033,7 +1033,7 @@
           "solvedProblemCount": 23,
           "requiredMinTier": 17,
           "higherProblemTier": 5,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-12-21",
           "recommendation_period": 3
         },
         "lockedYn": false,
@@ -1084,7 +1084,7 @@
           "solvedProblemCount": 14,
           "requiredMinTier": 17,
           "higherProblemTier": 15,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-12-13",
           "recommendation_period": 7
         },
         "lockedYn": false,
@@ -1296,7 +1296,7 @@
           "solvedProblemCount": 19,
           "requiredMinTier": 17,
           "higherProblemTier": 16,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-11-29",
           "recommendation_period": 7
         },
         "lockedYn": false,
@@ -1531,7 +1531,7 @@
           "solvedProblemCount": 8,
           "requiredMinTier": 17,
           "higherProblemTier": 16,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-11-29",
           "recommendation_period": 3
         },
         "lockedYn": false,
@@ -1640,7 +1640,7 @@
           "solvedProblemCount": 9,
           "requiredMinTier": 17,
           "higherProblemTier": 16,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-12-17",
           "recommendation_period": 7
         },
         "lockedYn": false,
@@ -1779,7 +1779,7 @@
           "solvedProblemCount": 3,
           "requiredMinTier": 17,
           "higherProblemTier": 12,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-11-28",
           "recommendation_period": 3
         },
         "lockedYn": false,
@@ -1838,7 +1838,7 @@
           "solvedProblemCount": 8,
           "requiredMinTier": 17,
           "higherProblemTier": 16,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-11-28",
           "recommendation_period": 7
         },
         "lockedYn": false,
@@ -1881,7 +1881,7 @@
           "solvedProblemCount": 5,
           "requiredMinTier": 17,
           "higherProblemTier": 16,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-11-22",
           "recommendation_period": 3
         },
         "lockedYn": false,
@@ -1933,7 +1933,7 @@
           "solvedProblemCount": 9,
           "requiredMinTier": 17,
           "higherProblemTier": 14,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-12-08",
           "recommendation_period": 3
         },
         "lockedYn": false,
@@ -2042,7 +2042,7 @@
           "solvedProblemCount": 2,
           "requiredMinTier": 17,
           "higherProblemTier": 17,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-12-17",
           "recommendation_period": 3
         },
         "lockedYn": false,
@@ -2161,7 +2161,7 @@
           "solvedProblemCount": 5,
           "requiredMinTier": 17,
           "higherProblemTier": 18,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-11-20",
           "recommendation_period": 3
         },
         "lockedYn": false,
@@ -2317,7 +2317,7 @@
           "solvedProblemCount": 6,
           "requiredMinTier": 17,
           "higherProblemTier": 15,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-12-01",
           "recommendation_period": 3
         },
         "lockedYn": false,
@@ -2374,7 +2374,7 @@
           "solvedProblemCount": 2,
           "requiredMinTier": 17,
           "higherProblemTier": 9,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-12-16",
           "recommendation_period": 3
         },
         "lockedYn": false,
@@ -2417,7 +2417,7 @@
           "solvedProblemCount": 3,
           "requiredMinTier": 17,
           "higherProblemTier": 14,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-12-27",
           "recommendation_period": 3
         },
         "lockedYn": false,
@@ -2652,7 +2652,7 @@
           "solvedProblemCount": 4,
           "requiredMinTier": 17,
           "higherProblemTier": 18,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-11-20",
           "recommendation_period": 3
         },
         "lockedYn": false,
@@ -2793,7 +2793,7 @@
           "solvedProblemCount": 10,
           "requiredMinTier": 17,
           "higherProblemTier": 16,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-11-29",
           "recommendation_period": 3
         },
         "lockedYn": false,
@@ -2976,7 +2976,7 @@
           "solvedProblemCount": 5,
           "requiredMinTier": 17,
           "higherProblemTier": 16,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-11-23",
           "recommendation_period": 3
         },
         "lockedYn": false,
@@ -3223,7 +3223,7 @@
           "solvedProblemCount": 7,
           "requiredMinTier": 17,
           "higherProblemTier": 12,
-          "lastSolvedDate": null,
+          "lastSolvedDate": "2025-12-14",
           "recommendation_period": 3
         },
         "lockedYn": false,

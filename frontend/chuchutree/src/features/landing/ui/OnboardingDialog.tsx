@@ -18,7 +18,7 @@ export function OnboardingDialog({ messages, buttons, onButtonClick }: Onboardin
         {/* 메시지 */}
         <div className="mb-6 space-y-3 text-center">
           {messages.map((message, index) => (
-            <p key={index} className={index === 0 ? 'text-xl font-bold whitespace-pre-wrap' : 'text-muted-foreground whitespace-pre-wrap'}>
+            <p key={index} className={index === 0 ? 'text-xl whitespace-pre-wrap' : 'text-muted-foreground whitespace-pre-wrap'}>
               {message}
             </p>
           ))}
