@@ -20,7 +20,7 @@ class TagInfoQuery(BaseModel):
     tag_id: int = Field(..., description="태그 ID")
     tag_code: str = Field(..., description="태그 코드")
     tag_display_name: str = Field(..., description="태그 표시 이름")
-    tag_target: list[TagTargetQuery] | None = Field(None, description="태그 목표 목록")
+    tag_targets: list[TagTargetQuery] | None = Field(None, description="태그 목표 목록")
     tag_aliases: list[TagAliasQuery] = Field(default_factory=list, description="태그 별칭 목록")
 
 

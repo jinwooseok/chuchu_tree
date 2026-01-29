@@ -36,7 +36,19 @@ class BaekjoonAccountRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_tag_stats(self, account_id: BaekjoonAccountId) -> list[TagAccountStat]:
-        """백준 계정의 모든 태그별 통계 조회 (영속성 없이 계산)"""
+    async def get_tag_stats(
+        self,
+        account_id: BaekjoonAccountId,
+        user_account_id: UserAccountId | None = None
+    ) -> list[TagAccountStat]:
+        """백준 계정의 모든 태그별 통계 조회 (영속성 없이 계산)
+
+        Args:
+            account_id: 백준 계정 ID
+            user_account_id: 유저 계정 ID (streak이 없을 때 problem_record 날짜 사용을 위해)
+
+        Returns:
+            태그별 통계 목록. last_solved_date는 streak_date 우선, 없으면 problem_record의 marked_date 사용
+        """
         pass
     
