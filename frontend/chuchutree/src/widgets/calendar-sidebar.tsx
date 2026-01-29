@@ -6,7 +6,7 @@ import { isSameMonth } from 'date-fns';
 import { CalendarSidebarInset } from '@/features/calendar';
 
 // 클라이언트 전용 렌더링 (hydration mismatch 방지)
-const SmallCalendar = dynamic(() => import('@/features/calendar').then(mod => mod.SmallCalendar), {
+const SmallCalendar = dynamic(() => import('@/features/calendar').then((mod) => mod.SmallCalendar), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center" style={{ minHeight: '300px' }}>
@@ -37,7 +37,7 @@ export default function CalendarSidebar() {
   return (
     <div className="hide-scrollbar flex h-full flex-col gap-8 overflow-y-auto p-4">
       <SmallCalendar calendarData={calendarData} activeStartDate={activeStartDate} onActiveStartDateChange={setActiveStartDate} />
-      <CalendarSidebarInset calendarData={calendarData} isLanding={true} />
+      <CalendarSidebarInset calendarData={calendarData} />
     </div>
   );
 }
