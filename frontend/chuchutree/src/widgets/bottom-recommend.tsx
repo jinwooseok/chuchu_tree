@@ -10,7 +10,7 @@ export default function BottomRecommend() {
   const { data: calendarData } = useCalendar(year, month);
   const { data: bannedListData } = useGetBannedProblems();
   return (
-    <div className="bg-innerground-white flex h-full items-center justify-between p-4">
+    <div className="bg-innerground-white flex h-full items-center justify-between p-4" data-onboarding-id="bottom-recommend">
       <RecommendationButton />
       <RecommendationAnswer calendarData={calendarData} bannedListData={bannedListData} />
     </div>
