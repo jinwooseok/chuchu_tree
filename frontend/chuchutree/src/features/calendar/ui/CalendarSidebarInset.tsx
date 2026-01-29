@@ -54,7 +54,8 @@ function DraggableProblemCard({
   };
 
   const firstTag = problem.tags[0];
-  const tagInfo = TAG_INFO[problem.representativeTag?.tagCode || firstTag?.tagCode];
+  const lastTag = problem.tags.length > 0 ? problem.tags[problem.tags.length - 1] : null;
+  const tagInfo = TAG_INFO[problem.representativeTag?.tagCode || lastTag?.tagCode || firstTag?.tagCode];
 
   return (
     <div
@@ -72,11 +73,11 @@ function DraggableProblemCard({
 
       {/* 문제 기본정보 */}
       <div className="mr-2 flex max-w-[calc(50%-10px)] flex-col gap-1 text-center">
-        {firstTag && (
+        {lastTag && (
           <Popover open={isTagOpen} onOpenChange={setIsTagOpen}>
             <PopoverTrigger asChild>
               <div className={`group relative flex items-center gap-1 rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-innerground-darkgray'}`} onClick={(e) => e.stopPropagation()}>
-                <span className="line-clamp-1">{problem.representativeTag?.tagDisplayName || firstTag.tagDisplayName}</span>
+                <span className="line-clamp-1">{problem.representativeTag?.tagDisplayName || lastTag.tagDisplayName}</span>
                 <PencilLine className="text-muted-foreground group-hover:text-primary h-2 w-2" />
               </div>
             </PopoverTrigger>
@@ -100,7 +101,7 @@ function DraggableProblemCard({
           </Popover>
         )}
 
-        {!firstTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300'}`}>Undefined</div>}
+        {!lastTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300'}`}>Undefined</div>}
         <div className="flex items-center gap-1">
           <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={12} height={12} />
           <span>{problem.problemId}</span>
@@ -132,14 +133,15 @@ function DraggableProblemCard({
 // 검색 결과 문제 카드 (클릭 가능)
 function SearchResultCard({ problem, onClick }: { problem: WillSolveProblems; onClick: () => void }) {
   const firstTag = problem.tags[0];
-  const tagInfo = TAG_INFO[problem.representativeTag?.tagCode || firstTag?.tagCode];
+  const lastTag = problem.tags.length > 0 ? problem.tags[problem.tags.length - 1] : null;
+  const tagInfo = TAG_INFO[problem.representativeTag?.tagCode || lastTag?.tagCode || firstTag?.tagCode];
 
   return (
     <button onClick={onClick} className="bg-background hover:bg-accent flex w-full items-center gap-2 rounded-md p-2 text-left text-xs transition-colors">
       {/* 문제 기본정보 */}
       <div className="flex shrink-0 flex-col gap-1 text-center">
-        {firstTag && <div className={`rounded px-2 py-0.5 ${tagInfo ? tagInfo.bgColor : 'bg-only-gray'}`}>{firstTag.tagDisplayName}</div>}
-        {!firstTag && <div className="bg-only-gray rounded px-2 py-0.5">Undefined</div>}
+        {lastTag && <div className={`rounded px-2 py-0.5 ${tagInfo ? tagInfo.bgColor : 'bg-only-gray'}`}>{lastTag.tagDisplayName}</div>}
+        {!lastTag && <div className="bg-only-gray rounded px-2 py-0.5">Undefined</div>}
         <div className="flex items-center gap-1">
           <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={12} height={12} />
           <span>{problem.problemId}</span>
