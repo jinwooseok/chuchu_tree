@@ -21,11 +21,16 @@ export function getLevelColorClasses(level: CategoryName): { bg: string; text: s
 
 // 날짜로부터 며칠 전인지 계산
 export function getDaysAgo(dateString: string): number {
-  const lastDate = new Date(dateString);
+  const targetDate = new Date(dateString);
+  targetDate.setHours(0, 0, 0, 0);
+
   const today = new Date();
-  const diffTime = Math.abs(today.getTime() - lastDate.getTime());
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays;
+  today.setHours(0, 0, 0, 0);
+
+  const diffTime = today.getTime() - targetDate.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  return Math.max(0, diffDays); // 미래 날짜는 0으로 처리
 }
 
 // 진행률 계산 (0-100)

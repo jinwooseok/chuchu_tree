@@ -73,40 +73,40 @@ describe('getLevelColorClasses', () => {
 });
 
 describe('getDaysAgo', () => {
-  it('오늘로부터 며칠 전인지 계산한다', () => {
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayString = yesterday.toISOString().split('T')[0];
-
-    const result = getDaysAgo(yesterdayString);
-    expect(result).toBeGreaterThanOrEqual(1);
-    expect(result).toBeLessThanOrEqual(2); // 시간에 따라 1 또는 2
+  beforeEach(() => {
+    // 시간 Mock 설정: 2024-01-15 00:00:00
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2024-01-15T00:00:00.000Z'));
   });
 
-  it('과거 날짜를 처리한다', () => {
-    const pastDate = '2024-01-01';
-    const result = getDaysAgo(pastDate);
-    expect(result).toBeGreaterThan(0);
+  afterEach(() => {
+    // Mock 해제
+    jest.useRealTimers();
   });
 
-  it('미래 날짜도 양수 일수를 반환한다', () => {
-    const today = new Date();
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const tomorrowString = tomorrow.toISOString().split('T')[0];
-
-    const result = getDaysAgo(tomorrowString);
-    expect(result).toBeGreaterThanOrEqual(0);
+  it('오늘 날짜는 0일을 반환한다', () => {
+    const result = getDaysAgo('2024-01-15');
+    expect(result).toBe(0);
   });
 
-  it('오늘 날짜는 1일로 계산된다', () => {
-    const today = new Date();
-    const todayString = today.toISOString().split('T')[0];
+  it('어제 날짜는 1일을 반환한다', () => {
+    const result = getDaysAgo('2024-01-14');
+    expect(result).toBe(1);
+  });
 
-    const result = getDaysAgo(todayString);
-    expect(result).toBeGreaterThanOrEqual(0);
-    expect(result).toBeLessThanOrEqual(2);
+  it('3일 전 날짜는 3일을 반환한다', () => {
+    const result = getDaysAgo('2024-01-12');
+    expect(result).toBe(3);
+  });
+
+  it('일주일 전 날짜는 7일을 반환한다', () => {
+    const result = getDaysAgo('2024-01-08');
+    expect(result).toBe(7);
+  });
+
+  it('미래 날짜는 0을 반환한다', () => {
+    const result = getDaysAgo('2024-01-20');
+    expect(result).toBe(0);
   });
 });
 
@@ -167,8 +167,6 @@ describe('calculateProgress', () => {
     const result = calculateProgress({
       solvedCnt: 0,
       requireSolveCnt: 10,
-      userTier: 1,
-      requireTier: 10,
       userTier: 10,
       requireTier: 13,
       highest: 10,

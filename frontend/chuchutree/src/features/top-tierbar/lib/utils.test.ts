@@ -22,7 +22,7 @@ describe('getTierDetail', () => {
         bjAccountId: 'testuser',
         stat: {
           tierId: 10, // Silver I
-          tierName: 'Silver',
+          tierName: 'S1',
           longestStreak: 10,
           rating: 650,
           class: 1,
@@ -58,7 +58,7 @@ describe('getTierDetail', () => {
         bjAccountId: 'testuser',
         stat: {
           tierId: 10, // Silver I
-          tierName: 'Silver',
+          tierName: 'S1',
           longestStreak: 10,
           rating: 650,
           class: 1,
@@ -93,7 +93,7 @@ describe('getTierDetail', () => {
         bjAccountId: 'testuser',
         stat: {
           tierId: 10, // Silver I (650)
-          tierName: 'Silver',
+          tierName: 'S1',
           longestStreak: 10,
           rating: 650,
           class: 1,
@@ -130,7 +130,7 @@ describe('getTierDetail', () => {
         bjAccountId: 'testuser',
         stat: {
           tierId: 10, // Silver I (650)
-          tierName: 'Silver',
+          tierName: 'S1',
           longestStreak: 10,
           rating: 725, // 중간 지점
           class: 1,
@@ -166,7 +166,7 @@ describe('getTierDetail', () => {
         bjAccountId: 'testuser',
         stat: {
           tierId: 31, // Master
-          tierName: 'Master',
+          tierName: 'M1',
           longestStreak: 10,
           rating: 3000,
           class: 1,
@@ -202,7 +202,7 @@ describe('getTierDetail', () => {
         bjAccountId: 'testuser',
         stat: {
           tierId: 3, // Bronze III
-          tierName: 'Bronze',
+          tierName: 'B3',
           longestStreak: 5,
           rating: 90,
           class: 0,
@@ -274,7 +274,7 @@ describe('getTierDetail', () => {
         bjAccountId: 'testuser',
         stat: {
           tierId: 15, // Gold I
-          tierName: 'Gold',
+          tierName: 'G1',
           longestStreak: 20,
           rating: 1500,
           class: 2,
@@ -318,7 +318,7 @@ describe('getTierDetail', () => {
         bjAccountId: 'testuser',
         stat: {
           tierId: 10, // Silver I
-          tierName: 'Silver',
+          tierName: 'S2',
           longestStreak: 15,
           rating: 799, // Gold V 직전 (800)
           class: 1,
