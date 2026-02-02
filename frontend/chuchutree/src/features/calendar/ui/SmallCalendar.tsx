@@ -23,8 +23,7 @@ interface SmallCalendarProps {
 }
 
 export function SmallCalendar({ calendarData, activeStartDate: externalActiveStartDate, onActiveStartDateChange }: SmallCalendarProps) {
-  const { selectedDate, actions } = useCalendarStore();
-  const { setSelectedDate } = actions;
+  const { selectedDate, setSelectedDate } = useCalendarStore();
 
   // activeStartDate가 props로 제공되면 사용, 아니면 내부 상태로 관리
   const [internalActiveStartDate, setInternalActiveStartDate] = useState<Date>(selectedDate || new Date());

@@ -21,7 +21,7 @@ export function useLandingRecommend() {
   const [isPending, setIsPending] = useState(false);
 
   const {
-    actions: { setProblems, setLoading, setError, addRecommendationHistory },
+    setProblems, setLoading, setError, addRecommendationHistory
   } = useRecommendationStore();
 
   const recommend = () => {

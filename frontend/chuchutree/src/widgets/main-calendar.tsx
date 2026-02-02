@@ -17,8 +17,7 @@ const BigCalendar = dynamic(() => import('@/features/calendar').then((mod) => mo
 });
 
 export default function MainCalendar() {
-  const { bigCalendarDate, actions } = useCalendarStore();
-  const { setBigCalendarDate } = actions;
+  const { bigCalendarDate, setBigCalendarDate } = useCalendarStore();
   const [initialDate] = useState(new Date());
 
   // 컴포넌트 마운트 시 bigCalendarDate가 null이면 초기 날짜로 설정 (한 번만 실행)

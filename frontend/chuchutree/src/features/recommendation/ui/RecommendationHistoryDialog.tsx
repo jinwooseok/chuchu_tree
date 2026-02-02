@@ -20,11 +20,7 @@ interface props {
 }
 
 export function RecommendationHistoryDialog({ onClose }: props) {
-  const {
-    recommendationHistory,
-    showFilters,
-    actions: { clearRecommendationHistory, toggleFilter, resetFilters },
-  } = useRecommendationStore();
+  const { recommendationHistory, showFilters, clearRecommendationHistory, toggleFilter, resetFilters } = useRecommendationStore();
   const { selectedDate } = useCalendarStore();
 
   // 현재 선택된 날짜의 년/월로 calendar 데이터 fetch

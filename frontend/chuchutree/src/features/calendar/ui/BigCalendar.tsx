@@ -113,8 +113,7 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
 
 export function BigCalendar({ calendarData }: { calendarData?: CalendarType }) {
   // Zustand에서 UI 상태만 가져오기
-  const { selectedDate, bigCalendarDate, actions } = useCalendarStore();
-  const { setSelectedDate, setBigCalendarDate } = actions;
+  const { selectedDate, bigCalendarDate, setSelectedDate, setBigCalendarDate } = useCalendarStore();
   const { setOpen: setCloseAppSidebar } = useSidebar();
   const { centerSection } = useLayoutStore();
 

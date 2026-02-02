@@ -10,13 +10,7 @@ import { toast } from '@/lib/utils/toast';
  */
 export function useRecommend() {
   const { mutate: getRecommendation, isPending } = useGetRecommendation();
-  const {
-    selectedLevels,
-    selectedTagsList,
-    selectedExclusionMode,
-    selectedCount,
-    actions: { setProblems, setLoading, setError, addRecommendationHistory },
-  } = useRecommendationStore();
+  const { selectedLevels, selectedTagsList, selectedExclusionMode, selectedCount, setProblems, setLoading, setError, addRecommendationHistory } = useRecommendationStore();
 
   const recommend = () => {
     setLoading(true);
