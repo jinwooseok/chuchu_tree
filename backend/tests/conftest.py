@@ -5,6 +5,9 @@ from httpx import ASGITransport, AsyncClient
 from asgi_lifespan import LifespanManager
 from datetime import timedelta
 
+from app.common.domain.service.token_service import TokenService
+from app.user.domain.entity.user_account import UserAccount
+
 # =============================================================================
 # pytest 설정 훅 (가장 먼저 실행)
 # =============================================================================
@@ -51,27 +54,35 @@ async def client(app_with_container):
 async def test_user(app_with_container):
     """테스트용 유저 생성 (세션 범위) - 실제 서비스를 통해 생성"""
     from app.main import app
+    from app.core.database import get_global_database, set_database_context, reset_database_context
     from app.user.application.command.user_account_command import CreateUserAccountCommand
 
     # app_with_container를 통해 lifespan이 실행되었음을 보장
     _ = app_with_container
 
-    container = app.container
-    user_service = container.user_account_application_service()
+    # database context 설정
+    db = get_global_database()
+    token = set_database_context(db)
 
-    command = CreateUserAccountCommand(
-        provider="KAKAO",
-        provider_id="test_provider_id_for_integration_test",
-        email="test@example.com"
-    )
+    try:
+        container = app.container
+        user_service = container.user_account_application_service()
 
-    result = await user_service.create_or_find_user_account(command)
+        command = CreateUserAccountCommand(
+            provider="KAKAO",
+            provider_id="test_provider_id_for_integration_test",
+            email="test@example.com"
+        )
 
-    yield result
+        result = await user_service.create_or_find_user_account(command)
+
+        yield result
+    finally:
+        reset_database_context(token)
 
 
 @pytest_asyncio.fixture(scope="function", loop_scope="session")
-async def test_user_id(test_user) -> int:
+async def test_user_id(test_user: "UserAccount") -> int:
     """테스트 유저 ID"""
     return test_user.user_account_id
 
@@ -89,7 +100,7 @@ async def token_service(app_with_container):
 
 
 @pytest_asyncio.fixture(scope="function", loop_scope="session")
-async def valid_access_token(token_service, test_user_id) -> str:
+async def valid_access_token(token_service: "TokenService", test_user_id: int) -> str:
     """유효한 액세스 토큰"""
     return token_service.create_token(
         payload={"user_account_id": test_user_id},
@@ -98,7 +109,7 @@ async def valid_access_token(token_service, test_user_id) -> str:
 
 
 @pytest_asyncio.fixture(scope="function", loop_scope="session")
-async def expired_access_token(token_service, test_user_id) -> str:
+async def expired_access_token(token_service: "TokenService", test_user_id: int) -> str:
     """만료된 액세스 토큰"""
     return token_service.create_token(
         payload={"user_account_id": test_user_id},
@@ -113,7 +124,7 @@ def invalid_access_token() -> str:
 
 
 @pytest_asyncio.fixture(loop_scope="session")
-async def authenticated_client(client, valid_access_token):
+async def authenticated_client(client: "AsyncClient", valid_access_token):
     """인증된 클라이언트 (쿠키에 토큰 설정)"""
     client.cookies.set("access_token", valid_access_token)
     return client
