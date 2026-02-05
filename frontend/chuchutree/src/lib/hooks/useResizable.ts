@@ -26,8 +26,11 @@ export interface UseResizableReturn {
 export function useResizable(options: UseResizableOptions): UseResizableReturn {
   const { direction, initialSize, minSize, maxSize, inverted = false, onResizeStart, onResize, onResizeEnd } = options;
 
+  // Clamp initialSize to min/max constraints
+  const clampedInitialSize = Math.max(minSize, Math.min(maxSize, initialSize));
+
   // Current size state
-  const [size, setSize] = useState(initialSize);
+  const [size, setSize] = useState(clampedInitialSize);
   const [isResizing, setIsResizing] = useState(false);
   const [prevInitialSize, setPrevInitialSize] = useState(initialSize);
 

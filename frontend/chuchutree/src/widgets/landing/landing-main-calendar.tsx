@@ -6,7 +6,7 @@ import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
 
 // 클라이언트 전용 렌더링 (hydration mismatch 방지)
-const BigCalendar = dynamic(() => import('@/features/calendar').then(mod => mod.BigCalendar), {
+const BigCalendar = dynamic(() => import('@/features/calendar').then((mod) => mod.BigCalendar), {
   ssr: false,
   loading: () => (
     <div className="flex h-full w-full items-center justify-center">
@@ -16,8 +16,7 @@ const BigCalendar = dynamic(() => import('@/features/calendar').then(mod => mod.
 });
 
 export default function LandingMainCalendar() {
-  const { bigCalendarDate, actions } = useCalendarStore();
-  const { setBigCalendarDate } = actions;
+  const { bigCalendarDate, setBigCalendarDate } = useCalendarStore();
   const [initialDate] = useState(new Date());
 
   // 컴포넌트 마운트 시 bigCalendarDate가 null이면 초기 날짜로 설정 (한 번만 실행)

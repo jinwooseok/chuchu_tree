@@ -3,6 +3,7 @@
  */
 
 /**
+ * Date 객체 원본 = "Fri Jan 05 2024 00:00:00 GMT+0900"
  * Date 객체를 YYYY-MM-DD 형식의 문자열로 변환
  * @param date - 변환할 Date 객체
  * @returns YYYY-MM-DD 형식의 문자열

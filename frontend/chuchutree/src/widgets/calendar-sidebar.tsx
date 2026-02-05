@@ -17,7 +17,7 @@ const SmallCalendar = dynamic(() => import('@/features/calendar').then((mod) => 
 
 export default function CalendarSidebar() {
   const { selectedDate, bigCalendarDate } = useCalendarStore();
-
+  
   // SmallCalendar의 현재 표시 월 관리
   const [activeStartDate, setActiveStartDate] = useState<Date>(bigCalendarDate || selectedDate || new Date());
 
