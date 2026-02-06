@@ -144,16 +144,6 @@ class ProblemRepositoryImpl(ProblemRepository):
             ProblemModel.solved_user_count >= min_solved_count,
         ]
 
-        if tier_range.min_tier_id is not None:
-            inner_conditions.append(
-                ProblemModel.problem_tier_level >= tier_range.min_tier_id.value
-            )
-
-        if tier_range.max_tier_id is not None:
-            inner_conditions.append(
-                ProblemModel.problem_tier_level <= tier_range.max_tier_id.value
-            )
-
         # 2. percentile 계산 서브쿼리
         inner_stmt = (
             select(
@@ -170,20 +160,30 @@ class ProblemRepositoryImpl(ProblemRepository):
             )
             .where(and_(*inner_conditions))
         ).subquery()
-
+        
         # 3. percentile 범위 + exclude 적용
-        base_stmt = (
-            select(inner_stmt)
-            .where(
-                and_(
-                    inner_stmt.c.top_percentile >= max_skill_rate / 100.0,
-                    inner_stmt.c.top_percentile <= min_skill_rate / 100.0,
-                    inner_stmt.c.problem_id.notin_(exclude_ids)
-                    if exclude_ids else True
-                )
-            )
-        )
+        base_conditions = [
+            inner_stmt.c.top_percentile >= min_skill_rate / 100.0,
+            inner_stmt.c.top_percentile <= max_skill_rate / 100.0,
+        ]
 
+        if tier_range.min_tier_id is not None:
+            base_conditions.append(
+                inner_stmt.c.problem_tier_level >= tier_range.min_tier_id.value
+            )
+
+        if tier_range.max_tier_id is not None:
+            base_conditions.append(
+                inner_stmt.c.problem_tier_level <= tier_range.max_tier_id.value
+            )
+
+        if exclude_ids:
+            base_conditions.append(
+                inner_stmt.c.problem_id.notin_(exclude_ids)
+            )
+
+        base_stmt = select(inner_stmt).where(and_(*base_conditions))
+        
         # 4. 우선순위 문제 먼저 시도
         if priority_ids:
             priority_stmt = (
