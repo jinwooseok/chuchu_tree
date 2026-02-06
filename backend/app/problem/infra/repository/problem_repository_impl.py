@@ -136,15 +136,10 @@ class ProblemRepositoryImpl(ProblemRepository):
         exclude_ids: set[int],
         priority_ids: set[int]
     ) -> Problem | None:
-
-        tier_stmt = (
+        tier_count = (
             select(
                 ProblemModel.problem_tier_level.label("tier"),
-                (
-                    1.0 - func.percent_rank().over(
-                        order_by=ProblemModel.problem_tier_level
-                    )
-                ).label("tier_percentile"),
+                func.count().label("problem_cnt"),
             )
             .join(
                 ProblemTagModel,
@@ -160,6 +155,21 @@ class ProblemRepositoryImpl(ProblemRepository):
             .group_by(ProblemModel.problem_tier_level)
         ).subquery()
 
+        tier_stmt = (
+            select(
+                tier_count.c.tier,
+                (
+                    1 - (
+                        func.sum(tier_count.c.problem_cnt)
+                        .over(
+                            order_by=tier_count.c.tier,
+                            rows=(None, 0),  # ROWS UNBOUNDED PRECEDING
+                        )
+                        / func.sum(tier_count.c.problem_cnt).over()
+                    )
+                ).label("tier_percentile"),
+            )
+        ).subquery()
         
         conditions = [
             ProblemTagModel.tag_id == tag_id.value,
