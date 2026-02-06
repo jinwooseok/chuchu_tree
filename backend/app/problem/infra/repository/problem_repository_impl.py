@@ -212,20 +212,9 @@ class ProblemRepositoryImpl(ProblemRepository):
                 problems = await self._attach_tags_and_map_to_entities([priority_problem])
                 return problems[0] if problems else None
 
-        # 5. 일반 랜덤 추천
         final_stmt = base_stmt.order_by(func.rand()).limit(1)
         result = await self.session.execute(final_stmt)
-        problem_row = result.fetchone()
-
-        if not problem_row:
-            return None
-
-        final_problem_stmt = (
-            select(ProblemModel)
-            .where(ProblemModel.problem_id == problem_row.problem_id)
-        )
-        final_result = await self.session.execute(final_problem_stmt)
-        problem_model = final_result.scalar_one_or_none()
+        problem_model = result.scalar_one_or_none()
 
         if not problem_model:
             return None
