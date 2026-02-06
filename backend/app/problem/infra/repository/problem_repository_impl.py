@@ -163,6 +163,7 @@ class ProblemRepositoryImpl(ProblemRepository):
         
         conditions = [
             ProblemTagModel.tag_id == tag_id.value,
+            ProblemModel.solved_user_count >= min_solved_count,
             tier_stmt.c.tier_percentile >= min_skill_rate / 100.0,
             tier_stmt.c.tier_percentile <= max_skill_rate / 100.0,
         ]
