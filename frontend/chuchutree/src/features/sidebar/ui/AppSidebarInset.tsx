@@ -384,7 +384,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                     </AppTooltip>
                   </SidebarMenuItem>
                   <SidebarMenuItem key="enter-main-page" aria-label={'입장하기'}>
-                    <AppTooltip content="시작해보자!" side="right">
+                    <AppTooltip content="로그인 하러가기" side="right">
                       <SidebarMenuButton asChild>
                         <div
                           onClick={() => {
@@ -393,7 +393,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                           className="cursor-pointer"
                         >
                           <House size={ICON_SIZE} />
-                          <span>입장하기</span>
+                          <span>로그인</span>
                         </div>
                       </SidebarMenuButton>
                     </AppTooltip>

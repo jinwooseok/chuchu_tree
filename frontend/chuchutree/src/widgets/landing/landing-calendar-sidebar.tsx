@@ -6,7 +6,7 @@ import { isSameMonth } from 'date-fns';
 import { CalendarSidebarInset } from '@/features/calendar';
 
 // 클라이언트 전용 렌더링 (hydration mismatch 방지)
-const SmallCalendar = dynamic(() => import('@/features/calendar').then(mod => mod.SmallCalendar), {
+const SmallCalendar = dynamic(() => import('@/features/calendar').then((mod) => mod.SmallCalendar), {
   ssr: false,
   loading: () => (
     <div className="flex items-center justify-center" style={{ minHeight: '300px' }}>
@@ -37,6 +37,7 @@ export default function LandingCalendarSidebar() {
   return (
     <div className="hide-scrollbar flex h-full flex-col gap-8 overflow-y-auto p-4">
       <div>
+        <div className="text-muted-foreground w-full pr-2 text-start text-sm font-medium">ChuchuTree 연습페이지</div>
         <SmallCalendar calendarData={calendarData} activeStartDate={activeStartDate} onActiveStartDateChange={setActiveStartDate} />
       </div>
       <CalendarSidebarInset calendarData={calendarData} isLanding={true} />
