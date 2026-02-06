@@ -154,30 +154,50 @@ class ProblemRepositoryImpl(ProblemRepository):
             )
             .group_by(ProblemModel.problem_tier_level)
         ).subquery()
+        total_cnt = func.sum(tier_count.c.problem_cnt).over()
 
-        tier_stmt = (
+        tier_range_stmt = (
             select(
                 tier_count.c.tier,
                 (
-                    1 - (
+                    1
+                    - (
                         func.sum(tier_count.c.problem_cnt)
                         .over(
                             order_by=tier_count.c.tier,
-                            rows=(None, 0),  # ROWS UNBOUNDED PRECEDING
+                            rows=(None, 0),  # UNBOUNDED PRECEDING ~ CURRENT
                         )
-                        / func.sum(tier_count.c.problem_cnt).over()
+                        / total_cnt
                     )
-                ).label("tier_percentile"),
+                ).label("percentile_end"),
+                (
+                    1
+                    - (
+                        func.sum(tier_count.c.problem_cnt)
+                        .over(
+                            order_by=tier_count.c.tier,
+                            rows=(None, -1),  # UNBOUNDED PRECEDING ~ 1 PRECEDING
+                        )
+                        / total_cnt
+                    )
+                ).label("percentile_start"),
             )
         ).subquery()
-        
+
+        result = await self.session.execute(select(
+            tier_range_stmt.c.tier,
+            tier_range_stmt.c.percentile_end,
+            tier_range_stmt.c.percentile_start,
+        ))
+        rows = result.mappings().all()
+        print(rows)
         conditions = [
             ProblemTagModel.tag_id == tag_id.value,
             ProblemModel.solved_user_count >= min_solved_count,
-            tier_stmt.c.tier_percentile >= max_skill_rate / 100.0,
-            tier_stmt.c.tier_percentile <= min_skill_rate / 100.0,
+            tier_range_stmt.c.percentile_start >= max_skill_rate / 100.0,
+            tier_range_stmt.c.percentile_end <= min_skill_rate / 100.0,
         ]
-
+        
         if tier_range.min_tier_id is not None:
             conditions.append(
                 ProblemModel.problem_tier_level >= tier_range.min_tier_id.value
@@ -196,8 +216,8 @@ class ProblemRepositoryImpl(ProblemRepository):
         base_stmt = (
             select(ProblemModel)
             .join(
-                tier_stmt,
-                ProblemModel.problem_tier_level == tier_stmt.c.tier,
+                tier_range_stmt,
+                ProblemModel.problem_tier_level == tier_range_stmt.c.tier,
             )
             .join(
                 ProblemTagModel,
