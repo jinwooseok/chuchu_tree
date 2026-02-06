@@ -137,73 +137,80 @@ class ProblemRepositoryImpl(ProblemRepository):
         priority_ids: set[int]
     ) -> Problem | None:
 
-        # 1. percentile 계산 대상이 될 조건들 (🔥 가장 중요)
-        inner_conditions = [
-            ProblemTagModel.tag_id == tag_id.value,
-            ProblemModel.deleted_at.is_(None),
-            ProblemModel.solved_user_count >= min_solved_count,
-        ]
-
-        # 2. percentile 계산 서브쿼리
-        inner_stmt = (
+        tier_stmt = (
             select(
-                ProblemModel.problem_id,
-                ProblemModel.problem_tier_level,
-                ProblemModel.solved_user_count,
-                (1.0 - func.percent_rank().over(
-                    order_by=ProblemModel.problem_tier_level
-                )).label("top_percentile")
+                ProblemModel.problem_tier_level.label("tier"),
+                (
+                    1.0 - func.percent_rank().over(
+                        order_by=ProblemModel.problem_tier_level
+                    )
+                ).label("tier_percentile"),
             )
             .join(
                 ProblemTagModel,
-                ProblemModel.problem_id == ProblemTagModel.problem_id
+                ProblemModel.problem_id == ProblemTagModel.problem_id,
             )
-            .where(and_(*inner_conditions))
+            .where(
+                and_(
+                    ProblemTagModel.tag_id == tag_id.value,
+                    ProblemModel.deleted_at.is_(None),
+                    ProblemModel.solved_user_count >= min_solved_count,
+                )
+            )
+            .group_by(ProblemModel.problem_tier_level)
         ).subquery()
+
         
-        # 3. percentile 범위 + exclude 적용
-        base_conditions = [
-            inner_stmt.c.top_percentile >= min_skill_rate / 100.0,
-            inner_stmt.c.top_percentile <= max_skill_rate / 100.0,
+        conditions = [
+            ProblemTagModel.tag_id == tag_id.value,
+            ProblemModel.solved_user_count >= min_solved_count,
+            tier_stmt.c.tier_percentile >= min_skill_rate / 100.0,
+            tier_stmt.c.tier_percentile <= max_skill_rate / 100.0,
         ]
 
         if tier_range.min_tier_id is not None:
-            base_conditions.append(
-                inner_stmt.c.problem_tier_level >= tier_range.min_tier_id.value
+            conditions.append(
+                ProblemModel.problem_tier_level >= tier_range.min_tier_id.value
             )
 
         if tier_range.max_tier_id is not None:
-            base_conditions.append(
-                inner_stmt.c.problem_tier_level <= tier_range.max_tier_id.value
+            conditions.append(
+                ProblemModel.problem_tier_level <= tier_range.max_tier_id.value
             )
 
         if exclude_ids:
-            base_conditions.append(
-                inner_stmt.c.problem_id.notin_(exclude_ids)
+            conditions.append(
+                ProblemModel.problem_id.notin_(exclude_ids)
             )
 
-        base_stmt = select(inner_stmt).where(and_(*base_conditions))
+        base_stmt = (
+            select(ProblemModel)
+            .join(
+                tier_stmt,
+                ProblemModel.problem_tier_level == tier_stmt.c.tier,
+            )
+            .join(
+                ProblemTagModel,
+                ProblemModel.problem_id == ProblemTagModel.problem_id,
+            )
+            .where(and_(*conditions))
+        )
+
         
         # 4. 우선순위 문제 먼저 시도
         if priority_ids:
             priority_stmt = (
                 base_stmt
-                .where(inner_stmt.c.problem_id.in_(priority_ids))
+                .where(ProblemModel.problem_id.in_(priority_ids))
                 .limit(1)
             )
-            priority_result = await self.session.execute(priority_stmt)
-            priority_row = priority_result.fetchone()
 
-            if priority_row:
-                final_problem_stmt = (
-                    select(ProblemModel)
-                    .where(ProblemModel.problem_id == priority_row.problem_id)
-                )
-                final_result = await self.session.execute(final_problem_stmt)
-                problem_model = final_result.scalar_one_or_none()
-                if problem_model:
-                    problems = await self._attach_tags_and_map_to_entities([problem_model])
-                    return problems[0] if problems else None
+            priority_result = await self.session.execute(priority_stmt)
+            priority_problem = priority_result.scalar_one_or_none()
+
+            if priority_problem:
+                problems = await self._attach_tags_and_map_to_entities([priority_problem])
+                return problems[0] if problems else None
 
         # 5. 일반 랜덤 추천
         final_stmt = base_stmt.order_by(func.rand()).limit(1)
