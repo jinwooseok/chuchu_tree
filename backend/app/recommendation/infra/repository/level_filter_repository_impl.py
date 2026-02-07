@@ -90,3 +90,22 @@ class LevelFilterRepositoryImpl(LevelFilterRepository):
         result = await self.session.execute(stmt)
         model = result.scalar_one_or_none()
         return LevelFilterMapper.to_entity(model)
+
+    @override
+    async def find_by_skill_and_codes(
+        self,
+        tag_skill_level: str,
+        filter_codes: list[str]
+    ) -> list[LevelFilter]:
+        """태그 스킬 레벨과 복수 필터 코드로 조회"""
+        stmt = select(ProblemRecommendationLevelFilterModel).where(
+            and_(
+                ProblemRecommendationLevelFilterModel.tag_skill_code == tag_skill_level,
+                ProblemRecommendationLevelFilterModel.filter_code.in_(filter_codes),
+                ProblemRecommendationLevelFilterModel.active_yn == True,
+                ProblemRecommendationLevelFilterModel.deleted_at.is_(None)
+            )
+        )
+        result = await self.session.execute(stmt)
+        models = result.scalars().all()
+        return [LevelFilterMapper.to_entity(model) for model in models]
