@@ -513,7 +513,7 @@ class DBMigrator:
                 SELECT p.problem_tier_level
                 FROM problem p
                 JOIN problem_tag pt ON p.problem_id = pt.problem_id
-                WHERE pt.tag_id = :tag_id
+                WHERE pt.tag_id = :tag_id AND p.solved_user_count >= 1000
                 ORDER BY p.problem_tier_level ASC
             """), {"tag_id": tag_id_val}).fetchall()
 
@@ -525,14 +525,7 @@ class DBMigrator:
 
             total_count = len(tier_list)
 
-            # 상위 20%, 하위 10% 절사
-            lower_trim_idx = int(total_count * 0.1)
-            upper_trim_idx = int(total_count * 0.8)
-
-            if upper_trim_idx <= lower_trim_idx:
-                trimmed_list = tier_list
-            else:
-                trimmed_list = tier_list[lower_trim_idx:upper_trim_idx]
+            trimmed_list = tier_list
 
             trimmed_count = len(trimmed_list)
 
@@ -666,15 +659,15 @@ class DBMigrator:
 
 
         filter_data = [
-            ("EASY", "쉬움", None, -5, "IM", 100, 0),
-            ("EASY", "쉬움", None, -5, "AD", 100, 0),
-            ("EASY", "쉬움", None, -5, "MAS", 100, 0),
+            ("EASY", "쉬움", None, -5, "IM", 100, 50),
+            ("EASY", "쉬움", None, -5, "AD", 100, 50),
+            ("EASY", "쉬움", None, -5, "MAS", 100, 50),
             ("NORMAL", "보통", -5, 0, "IM", 100, 50),
             ("NORMAL", "보통", -5, 0, "AD", 50, 20),
             ("NORMAL", "보통", -5, 0, "MAS", 20, 0),
-            ("HARD", "어려움", 0, 2, "IM", 50, 30),
-            ("HARD", "어려움", 0, 2, "AD", 20, 0),
-            ("HARD", "어려움", 0, 2, "MAS", 10, 0),
+            ("HARD", "어려움", -1, 2, "IM", 50, 30),
+            ("HARD", "어려움", -1, 2, "AD", 20, 0),
+            ("HARD", "어려움", -1, 2, "MAS", 10, 0),
             ("EXTREME", "매우 어려움", 2, None, "IM", 10, 0),
             ("EXTREME", "매우 어려움", 2, None, "AD", 10, 0),
             ("EXTREME", "매우 어려움", 2, None, "MAS", 10, 0)
