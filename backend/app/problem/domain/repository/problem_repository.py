@@ -1,8 +1,14 @@
+from __future__ import annotations
+
 from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
 
 from app.common.domain.vo.identifiers import ProblemId, TagId
 from app.common.domain.vo.primitives import TierRange
 from app.problem.domain.entity.problem import Problem, TierLevel
+
+if TYPE_CHECKING:
+    from app.recommendation.domain.vo.search_criteria import SearchCriteria
 
 class ProblemRepository(ABC):
     """Repository 인터페이스"""
@@ -46,9 +52,7 @@ class ProblemRepository(ABC):
     async def find_recommended_problem(
         self,
         tag_id: TagId,
-        tier_range: 'TierRange',
-        min_skill_rate: int,      # 예: 10 (상위 10%) -> 더 어려운 문제
-        max_skill_rate: int,      # 예: 30 (상위 30%) -> 더 쉬운 문제
+        criteria_list: list['SearchCriteria'],
         min_solved_count: int,
         exclude_ids: set[int],
         priority_ids: set[int]
@@ -57,8 +61,7 @@ class ProblemRepository(ABC):
 
         Args:
             tag_id: 태그 ID
-            tier_range: 티어 범위
-            skill_rate: 숙련도 비율 (해당 태그 내에서 상위 N% 문제)
+            criteria_list: 검색 조건 리스트 (각 레벨 필터별 독립적인 tier_range + skill_rate)
             min_solved_count: 최소 해결 수 (1000명 이상 푼 문제)
             exclude_ids: 제외할 문제 ID 집합 (이미 푼 문제 + ban한 문제)
             priority_ids: 우선순위 문제 ID 집합 (찜한 문제)

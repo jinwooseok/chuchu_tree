@@ -32,3 +32,11 @@ class LevelFilterRepository(ABC):
         filter_code: str
     ) -> LevelFilter | None:
         pass
+
+    @abstractmethod
+    async def find_by_skill_and_codes(
+        self,
+        tag_skill_level: str,
+        filter_codes: list[str]
+    ) -> list[LevelFilter]:
+        pass

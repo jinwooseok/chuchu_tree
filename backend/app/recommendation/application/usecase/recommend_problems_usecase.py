@@ -24,6 +24,7 @@ from app.recommendation.domain.entity.tag_skill import TagSkill
 from app.recommendation.domain.repository.level_filter_repository import LevelFilterRepository
 from app.recommendation.domain.repository.tag_skill_repository import TagSkillRepository
 from app.recommendation.domain.vo.recommendation_candidate import RecommendationCandidate
+from app.recommendation.domain.vo.search_criteria import SearchCriteria
 from app.recommendation.domain.vo.tag_candidate import TagCandidate, TagCandidates, TagStatsMap
 from app.tag.domain.entity.tag import Tag
 from app.tag.domain.repository.tag_repository import TagRepository
@@ -196,7 +197,8 @@ class RecommendProblemsUsecase:
         failed_attempts = 0
         max_failed_attempts = count * 10  # 무한 루프 방지
 
-        current_filter_code = level_filter_codes[0] if len(level_filter_codes) != 0 else FilterCode.NORMAL
+        effective_filter_codes = level_filter_codes if len(level_filter_codes) != 0 else [FilterCode.NORMAL]
+        display_filter_code = effective_filter_codes[0]  # 표시 목적용
 
         while len(recommended_results) < count and failed_attempts < max_failed_attempts:
             # 가중치 기반으로 태그 1개 랜덤 선택
@@ -206,18 +208,28 @@ class RecommendProblemsUsecase:
 
             tag_candidate = list(sampled)[0]
 
-            criteria = await self._get_search_criteria(
+            criteria_list = await self._get_search_criteria_list(
                 user_tier=bj_account.current_tier_id,
                 tag_stat=tag_candidate.stat,
-                filter_code=current_filter_code,
+                filter_codes=effective_filter_codes,
                 all_skills=all_tag_skills
             )
 
-            if not criteria:
+            if not criteria_list:
                 sampled_tags_log.append((tag_candidate.tag.tag_display_name, False))
                 failed_attempts += 1
                 continue
-            tier_range, min_skill_rate, max_skill_rate = criteria
+
+            # 태그 직접 지정 시 tier_range 무시 (skill rate만 사용)
+            if tag_filter_codes:
+                criteria_list = [
+                    SearchCriteria(
+                        tier_range=TierRange(min_tier_id=None, max_tier_id=None),
+                        min_skill_rate=c.min_skill_rate,
+                        max_skill_rate=c.max_skill_rate
+                    )
+                    for c in criteria_list
+                ]
 
             # Merge all exclusion sources (Requirement 2: including problem_history)
             excluded_problem_ids_vo = (
@@ -232,10 +244,8 @@ class RecommendProblemsUsecase:
 
             problem = await self.problem_repository.find_recommended_problem(
                 tag_id=tag_candidate.tag.tag_id,
-                tier_range=tier_range,
-                min_skill_rate=min_skill_rate,
-                max_skill_rate=max_skill_rate,
-                min_solved_count=tag.min_solved_person_count,
+                criteria_list=criteria_list,
+                min_solved_count=tag_candidate.tag.min_solved_person_count,
                 exclude_ids=excluded_problem_ids,
                 priority_ids=set()
             )
@@ -255,7 +265,7 @@ class RecommendProblemsUsecase:
                     tag_candidate.tag.tag_display_name,
                     all_tag_skills,
                     bj_account.current_tier_id,
-                    current_filter_code,
+                    display_filter_code,
                     target_tag_ids if isinstance(target_tag_ids, set) else set(),
                     active_target_name
                 )
@@ -353,37 +363,47 @@ class RecommendProblemsUsecase:
 
         return RecommendProblemsQuery(problems=problem_queries)
 
-    async def _get_search_criteria(
+    async def _get_search_criteria_list(
         self,
         user_tier: TierId,
         tag_stat: TagAccountStat,
-        filter_code: FilterCode,
+        filter_codes: list[FilterCode],
         all_skills: list[TagSkill]
-    ) -> tuple[TierRange, int] | None:
-        """숙련도 판별 및 필터 엔티티를 통한 검색 조건 도출"""
+    ) -> list[SearchCriteria]:
+        """숙련도 판별 및 필터 엔티티를 통한 검색 조건 도출 (복수 레벨 지원)"""
         # 1. 숙련도 매칭
         current_skill = self._match_tag_skill(tag_stat, user_tier, all_skills)
-        if not current_skill: return None
+        if not current_skill:
+            return []
 
-        # 2. 레벨 필터 엔티티 조회
-        level_filter: LevelFilter = await self.recommend_filter_repository.find_by_skill_and_code(
-            filter_code=filter_code.value,
-            tag_skill_level=current_skill.skill_code.value
+        # 2. 레벨 필터 엔티티 일괄 조회
+        filter_code_values = [fc.value for fc in filter_codes]
+        level_filters: list[LevelFilter] = await self.recommend_filter_repository.find_by_skill_and_codes(
+            tag_skill_level=current_skill.skill_code.value,
+            filter_codes=filter_code_values
         )
-        
-        # print("level_filter :", level_filter)
-        if not level_filter: return None
 
-        # 3. 도메인 로직 호출 (TierRange 계산)
-        tier_range = level_filter.calculate_tier_range(user_tier)
+        if not level_filters:
+            return []
 
-        # 4. Extreme 예외 보정 (H+2 조건)
-        if filter_code == FilterCode.EXTREME:
-            highest_val = tag_stat.highest_tier_id.value if tag_stat.highest_tier_id else 0
-            min_val = max(tier_range.min_tier_id.value if tier_range.min_tier_id else 0, highest_val + 2)
-            tier_range = TierRange(min_tier_id=TierId(min_val), max_tier_id=TierId(31))
-        
-        return tier_range, level_filter.min_tag_skill_rate, level_filter.max_tag_skill_rate
+        # 3. 각 필터별 독립적인 SearchCriteria 생성
+        criteria_list: list[SearchCriteria] = []
+        for level_filter in level_filters:
+            tier_range = level_filter.calculate_tier_range(user_tier)
+
+            # Extreme 예외 보정 (H+2 조건) - 해당 필터에만 적용
+            if level_filter.filter_code == FilterCode.EXTREME:
+                highest_val = tag_stat.highest_tier_id.value if tag_stat.highest_tier_id else 0
+                min_val = max(tier_range.min_tier_id.value if tier_range.min_tier_id else 0, highest_val + 2)
+                tier_range = TierRange(min_tier_id=TierId(min_val), max_tier_id=TierId(31))
+
+            criteria_list.append(SearchCriteria(
+                tier_range=tier_range,
+                min_skill_rate=level_filter.min_tag_skill_rate,
+                max_skill_rate=level_filter.max_tag_skill_rate
+            ))
+
+        return criteria_list
 
     def _match_tag_skill(self, tag_stat: TagAccountStat, user_tier: TierId, all_skills: list[TagSkill]) -> TagSkill | None:
         """요구사항 비교를 통한 숙련도 판별 (Entity 정책 활용)"""
