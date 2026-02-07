@@ -1,7 +1,7 @@
 """Problem Repository 구현"""
 from typing import override
 
-from sqlalchemy import String, and_, cast, func, select
+from sqlalchemy import String, and_, cast, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.domain.vo.identifiers import ProblemId, TagId
@@ -13,6 +13,7 @@ from app.problem.infra.mapper.problem_mapper import ProblemMapper
 from app.problem.infra.mapper.problem_tag_mapper import ProblemTagMapper
 from app.problem.infra.model.problem import ProblemModel
 from app.problem.infra.model.problem_tag import ProblemTagModel
+from app.recommendation.domain.vo.search_criteria import SearchCriteria
 
 
 class ProblemRepositoryImpl(ProblemRepository):
@@ -129,9 +130,7 @@ class ProblemRepositoryImpl(ProblemRepository):
     async def find_recommended_problem(
         self,
         tag_id: TagId,
-        tier_range: 'TierRange',
-        min_skill_rate: int,
-        max_skill_rate: int,
+        criteria_list: list[SearchCriteria],
         min_solved_count: int,
         exclude_ids: set[int],
         priority_ids: set[int]
@@ -191,27 +190,36 @@ class ProblemRepositoryImpl(ProblemRepository):
         ))
         rows = result.mappings().all()
         print(rows)
-        conditions = [
+
+        # 각 criteria를 OR 조건으로 결합
+        criteria_or_conditions = []
+        for criteria in criteria_list:
+            criteria_conditions = [
+                tier_range_stmt.c.percentile_start >= criteria.max_skill_rate / 100.0,
+                tier_range_stmt.c.percentile_end <= criteria.min_skill_rate / 100.0,
+            ]
+            if criteria.tier_range.min_tier_id is not None:
+                criteria_conditions.append(
+                    ProblemModel.problem_tier_level >= criteria.tier_range.min_tier_id.value
+                )
+            if criteria.tier_range.max_tier_id is not None:
+                criteria_conditions.append(
+                    ProblemModel.problem_tier_level <= criteria.tier_range.max_tier_id.value
+                )
+            criteria_or_conditions.append(and_(*criteria_conditions))
+
+        base_conditions = [
             ProblemTagModel.tag_id == tag_id.value,
             ProblemModel.solved_user_count >= min_solved_count,
-            tier_range_stmt.c.percentile_start >= max_skill_rate / 100.0,
-            tier_range_stmt.c.percentile_end <= min_skill_rate / 100.0,
         ]
-        
-        if tier_range.min_tier_id is not None:
-            conditions.append(
-                ProblemModel.problem_tier_level >= tier_range.min_tier_id.value
-            )
-
-        if tier_range.max_tier_id is not None:
-            conditions.append(
-                ProblemModel.problem_tier_level <= tier_range.max_tier_id.value
-            )
 
         if exclude_ids:
-            conditions.append(
+            base_conditions.append(
                 ProblemModel.problem_id.notin_(exclude_ids)
             )
+
+        # OR로 각 레벨 기준을 결합
+        base_conditions.append(or_(*criteria_or_conditions))
 
         base_stmt = (
             select(ProblemModel)
@@ -223,11 +231,10 @@ class ProblemRepositoryImpl(ProblemRepository):
                 ProblemTagModel,
                 ProblemModel.problem_id == ProblemTagModel.problem_id,
             )
-            .where(and_(*conditions))
+            .where(and_(*base_conditions))
         )
 
-        
-        # 4. 우선순위 문제 먼저 시도
+        # 우선순위 문제 먼저 시도
         if priority_ids:
             priority_stmt = (
                 base_stmt
@@ -251,6 +258,3 @@ class ProblemRepositoryImpl(ProblemRepository):
 
         problems = await self._attach_tags_and_map_to_entities([problem_model])
         return problems[0] if problems else None
-
-
-# problem, tag_skill, filter 변경됨. 관련 로직 수정들이 필요함
