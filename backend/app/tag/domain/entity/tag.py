@@ -19,7 +19,6 @@ class Tag:
     tag_display_name: str
     level: TagLevel
     exclusion: TagExclusion
-    applicable_tier_range: TierRange
     min_solved_person_count: int
     aliases: list[str]
     problem_count: int
@@ -44,7 +43,6 @@ class Tag:
             level=level,
             tag_display_name=None,
             exclusion=TagExclusion.is_not_excluded(),
-            applicable_tier_range=TierRange(min_tier_id, max_tier_id),
             min_solved_person_count=0,
             aliases=[],
             problem_count=0,
@@ -70,10 +68,6 @@ class Tag:
         
         self.parent_tag_relations.append(TagRelation.create(self.tag_id, sub_tag_id))
         self.updated_at = datetime.now()
-    
-    def is_applicable_for_tier(self, tier_id: TierId) -> bool:
-        """도메인 로직 - 특정 티어에 적용 가능한지 확인"""
-        return self.applicable_tier_range.contains(tier_id)
     
     def add_alias(self, alias: str) -> None:
         """도메인 로직 - 별칭 추가"""

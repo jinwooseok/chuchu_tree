@@ -49,11 +49,6 @@ class TagMapper:
         else:
             exclusion = TagExclusion.is_not_excluded()
 
-        # TierRange 처리
-        min_tier_id = TierId(model.min_problem_tier_id) if model.min_problem_tier_id else None
-        max_tier_id = TierId(model.max_problem_tier_id) if model.max_problem_tier_id else None
-        tier_range = TierRange(min_tier_id, max_tier_id)
-
         # Aliases 처리 (JSON -> list[str])
         aliases: list[str] = []
 
@@ -84,7 +79,6 @@ class TagMapper:
             tag_display_name=model.tag_display_name,
             level=TagLevel(model.tag_level),
             exclusion=exclusion,
-            applicable_tier_range=tier_range,
             min_solved_person_count=model.min_solved_person_count,
             aliases=aliases,
             problem_count=model.tag_problem_count,
@@ -107,8 +101,6 @@ class TagMapper:
             tag_level=entity.level.value,
             excluded_yn=entity.exclusion.is_excluded,
             excluded_reason=entity.exclusion.reason.value if entity.exclusion.reason else None,
-            min_problem_tier_id=entity.applicable_tier_range.min_tier_id.value if entity.applicable_tier_range.min_tier_id else None,
-            max_problem_tier_id=entity.applicable_tier_range.max_tier_id.value if entity.applicable_tier_range.max_tier_id else None,
             min_solved_person_count=entity.min_solved_person_count,
             aliases=aliases_json,
             tag_problem_count=entity.problem_count,
