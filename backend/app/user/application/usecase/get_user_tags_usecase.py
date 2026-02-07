@@ -7,7 +7,7 @@ from app.activity.domain.entity.user_activity import UserActivity
 from app.activity.domain.repository.user_activity_repository import UserActivityRepository
 from app.baekjoon.domain.repository.baekjoon_account_repository import BaekjoonAccountRepository
 from app.baekjoon.domain.vo.tag_account_stat import TagAccountStat
-from app.common.domain.enums import SkillCode, TagLevel
+from app.common.domain.enums import SkillCode
 from app.common.domain.vo.identifiers import UserAccountId
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
@@ -90,8 +90,8 @@ class GetUserTagsUsecase:
         # 3. 데이터 가공 및 매핑 생성
         tag_stats_dict: dict[int, TagAccountStat] = {stat.tag_id.value: stat for stat in tag_stats}
         all_tags_dict: dict[int, Tag] = {tag.tag_id.value: tag for tag in all_tags if tag.tag_id}
-        tag_skills_dict: dict[tuple[TagLevel, SkillCode], TagSkill] = {
-            (ts.tag_level, ts.skill_code): ts for ts in all_tag_skills
+        tag_skills_dict: dict[tuple[int, SkillCode], TagSkill] = {
+            (ts.tag_id.value, ts.skill_code): ts for ts in all_tag_skills if ts.tag_id
         }
         tiers_dict: dict[int, Tier] = {tier.tier_id.value: tier for tier in all_tiers if tier.tier_id}
 
@@ -130,14 +130,15 @@ class GetUserTagsUsecase:
                     )
             
             # required_stat 생성 (선수 태그 유무와 상관없이 항상 생성)
-            min_tier_name = None
-            if tag.applicable_tier_range and tag.applicable_tier_range.min_tier_id:
-                # Use tier_id.value as string as requested by the user
-                min_tier_name = str(tag.applicable_tier_range.min_tier_id.value)
-            
+            # tag_skill의 IM(INTERMEDIATE) 레벨에서 min_user_tier 기준을 가져옴
+            im_skill = tag_skills_dict.get((tag.tag_id.value, SkillCode.IM))
+            min_tier_value = None
+            if im_skill and im_skill.requirements.min_user_tier:
+                min_tier_value = im_skill.requirements.min_user_tier.value
+
             required_stat_query = RequiredStatQuery(
-                required_min_tier=min_tier_name,
-                prev_tags=prev_tags_queries,
+                required_min_tier=min_tier_value,
+                prev_tags=prev_tags_queries
             )
 
             # recommendation_yn 계산
@@ -188,22 +189,23 @@ class GetUserTagsUsecase:
         self,
         stat: TagAccountStat | None,
         tag: Tag,
-        tag_skills_dict: dict[tuple[TagLevel, SkillCode], TagSkill],
+        tag_skills_dict: dict[tuple[int, SkillCode], TagSkill],
     ) -> SkillCode:
         """현재 레벨 계산"""
         if not stat or stat.solved_problem_count == 0:
             return SkillCode.IM
 
+        tag_id_val = tag.tag_id.value
+
         # MASTER 체크
-        master_skill = tag_skills_dict.get((tag.level, SkillCode.MAS))
+        master_skill = tag_skills_dict.get((tag_id_val, SkillCode.MAS))
         if master_skill and self._meets_requirements(stat, master_skill):
             return SkillCode.MAS
 
         # ADVANCED 체크
-        advanced_skill = tag_skills_dict.get((tag.level, SkillCode.AD))
+        advanced_skill = tag_skills_dict.get((tag_id_val, SkillCode.AD))
         if advanced_skill and self._meets_requirements(stat, advanced_skill):
             return SkillCode.AD
-        
 
         return SkillCode.IM
 
@@ -250,7 +252,7 @@ class GetUserTagsUsecase:
         self,
         current_level: SkillCode,
         tag: Tag,
-        tag_skills_dict: dict[tuple[TagLevel, SkillCode], TagSkill],
+        tag_skills_dict: dict[tuple[int, SkillCode], TagSkill],
         tiers_dict: dict[int, Tier],
     ) -> NextLevelStatQuery | None:
         """다음 레벨 요구사항 생성"""
@@ -264,7 +266,7 @@ class GetUserTagsUsecase:
         else:
             return None # Should not happen unless SkillCode has more levels
 
-        next_skill = tag_skills_dict.get((tag.level, next_level_code))
+        next_skill = tag_skills_dict.get((tag.tag_id.value, next_level_code))
         if not next_skill:
             return None
         
