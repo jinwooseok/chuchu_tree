@@ -5,7 +5,7 @@ from app.activity.domain.repository.user_activity_repository import UserActivity
 from app.baekjoon.domain.repository.baekjoon_account_repository import BaekjoonAccountRepository
 from app.baekjoon.domain.repository.problem_history_repository import ProblemHistoryRepository
 from app.baekjoon.domain.vo.tag_account_stat import TagAccountStat
-from app.common.domain.enums import FilterCode, TagLevel, ExclusionMode
+from app.common.domain.enums import FilterCode, SkillCode, TagLevel, ExclusionMode
 from app.common.domain.vo.collections import ProblemIdSet, TagIdSet
 from app.common.domain.vo.identifiers import BaekjoonAccountId, TagId, TargetId, TierId, UserAccountId
 from app.common.domain.vo.primitives import TierRange
@@ -81,6 +81,9 @@ class RecommendProblemsUsecase:
         user_activity: UserActivity = await self.user_activity_repository.find_by_user_account_id(user_account_id)
         all_tags: list[Tag] = await self.tag_repository.find_active_tags_with_relations()
         all_tag_skills = await self.tag_skill_repository.find_all_active()
+        tag_skills_dict: dict[tuple[int, SkillCode], TagSkill] = {
+            (ts.tag_id.value, ts.skill_code): ts for ts in all_tag_skills if ts.tag_id
+        }
 
         # 1-1. Fetch user account to get active target (Requirement 4)
         user_account = await self.user_account_repository.find_by_id(user_account_id)
@@ -130,12 +133,12 @@ class RecommendProblemsUsecase:
             if tag_filter_codes and tag.code not in tag_filter_codes: continue
 
             # (2) 선수 태그 조건 검사
-            if not self._is_pre_requisite_satisfied(tag, stats_map, bj_account.current_tier_id, all_tag_skills):
+            if not self._is_pre_requisite_satisfied(tag, stats_map, bj_account.current_tier_id, tag_skills_dict):
                 continue
 
             # (3) 스코어 계산을 위한 Stat 보정 (기록 없는 태그 포함)
             stat = stats_map.get_or_empty(tag.tag_id)
-            score = self._calculate_tag_score(stat, user_activity, all_tag_skills, bj_account.current_tier_id, target_tag_ids)
+            score = self._calculate_tag_score(stat, user_activity, tag_skills_dict, bj_account.current_tier_id, target_tag_ids)
 
             # DEBUG: 타겟 가중치 확인
             if target_tag_ids and stat.tag_id.value in target_tag_ids:
@@ -165,7 +168,7 @@ class RecommendProblemsUsecase:
             review_score = 0.0
             if stat.last_solved_date:
                 days_diff = (datetime.now().date() - stat.last_solved_date).days
-                current_skill = self._match_tag_skill(stat, bj_account.current_tier_id, all_tag_skills)
+                current_skill = self._match_tag_skill(stat, bj_account.current_tier_id, tag_skills_dict)
                 if current_skill and days_diff >= current_skill.recommendation_period:
                     excess_days = days_diff - current_skill.recommendation_period
                     review_score = min(excess_days * 2 + 10, 50)
@@ -173,7 +176,7 @@ class RecommendProblemsUsecase:
                 review_score = 40 if stat.solved_problem_count == 0 else 20 # 풀었는데 기록이 없는 경우 20
 
             # 승급 임박
-            level_up_bonus = self._calculate_level_up_bonus(stat, bj_account.current_tier_id, all_tag_skills)
+            level_up_bonus = self._calculate_level_up_bonus(stat, bj_account.current_tier_id, tag_skills_dict)
 
             # 타겟
             target_score = 30 if (target_tag_ids and stat.tag_id.value in target_tag_ids) else 0
@@ -212,7 +215,7 @@ class RecommendProblemsUsecase:
                 user_tier=bj_account.current_tier_id,
                 tag_stat=tag_candidate.stat,
                 filter_codes=effective_filter_codes,
-                all_skills=all_tag_skills
+                tag_skills_dict=tag_skills_dict
             )
 
             if not criteria_list:
@@ -263,7 +266,7 @@ class RecommendProblemsUsecase:
                 reasons = self._generate_reasons(
                     tag_candidate.stat,
                     tag_candidate.tag.tag_display_name,
-                    all_tag_skills,
+                    tag_skills_dict,
                     bj_account.current_tier_id,
                     display_filter_code,
                     target_tag_ids if isinstance(target_tag_ids, set) else set(),
@@ -368,11 +371,11 @@ class RecommendProblemsUsecase:
         user_tier: TierId,
         tag_stat: TagAccountStat,
         filter_codes: list[FilterCode],
-        all_skills: list[TagSkill]
+        tag_skills_dict: dict[tuple[int, SkillCode], TagSkill]
     ) -> list[SearchCriteria]:
         """숙련도 판별 및 필터 엔티티를 통한 검색 조건 도출 (복수 레벨 지원)"""
         # 1. 숙련도 매칭
-        current_skill = self._match_tag_skill(tag_stat, user_tier, all_skills)
+        current_skill = self._match_tag_skill(tag_stat, user_tier, tag_skills_dict)
         if not current_skill:
             return []
 
@@ -405,25 +408,30 @@ class RecommendProblemsUsecase:
 
         return criteria_list
 
-    def _match_tag_skill(self, tag_stat: TagAccountStat, user_tier: TierId, all_skills: list[TagSkill]) -> TagSkill | None:
-        """요구사항 비교를 통한 숙련도 판별 (Entity 정책 활용)"""
-        # 높은 숙련도부터 검사
-        sorted_skills: list[TagSkill] = sorted(all_skills, key=lambda x: x.tag_skill_id.value, reverse=True)
+    def _match_tag_skill(self, tag_stat: TagAccountStat, user_tier: TierId, tag_skills_dict: dict[tuple[int, SkillCode], TagSkill]) -> TagSkill | None:
+        """요구사항 비교를 통한 숙련도 판별 (해당 태그의 skill만 검사)"""
+        tag_id_val = tag_stat.tag_id.value
+        highest_tier_val = tag_stat.highest_tier_id.value if tag_stat.highest_tier_id else 0
 
-        for skill in sorted_skills:
+        # 높은 숙련도부터 검사: MAS → AD → IM
+        for skill_code in [SkillCode.MAS, SkillCode.AD, SkillCode.IM]:
+            skill = tag_skills_dict.get((tag_id_val, skill_code))
+            if not skill:
+                continue
             req = skill.requirements
-            highest_tier_val = tag_stat.highest_tier_id.value if tag_stat.highest_tier_id else 0
             if (tag_stat.solved_problem_count >= req.min_solved_problem and
                 user_tier.value >= req.min_user_tier.value and
                 highest_tier_val >= req.min_solved_problem_tier.value):
                 return skill
-        return sorted_skills[-1] if sorted_skills else None
+
+        # 요구사항을 충족하지 못하면 IM 반환 (기본값)
+        return tag_skills_dict.get((tag_id_val, SkillCode.IM))
 
     def _generate_reasons(
         self,
         tag_stat: TagAccountStat,
         tag_name: str,
-        all_tag_skills: list[TagSkill],
+        tag_skills_dict: dict[tuple[int, SkillCode], TagSkill],
         user_tier: TierId,
         filter_code: FilterCode,
         target_tag_ids: set[int] = None,
@@ -452,7 +460,7 @@ class RecommendProblemsUsecase:
         # → 복습 주기 체크는 불가능하지만, 승급 임박은 확인 가능
         if not tag_stat.last_solved_date:
             # 승급 임박 체크만 수행
-            level_up_info = self._check_level_up_status(tag_stat, user_tier, all_tag_skills, tag_name)
+            level_up_info = self._check_level_up_status(tag_stat, user_tier, tag_skills_dict, tag_name)
             if level_up_info:
                 reasons.append(level_up_info)
 
@@ -468,12 +476,12 @@ class RecommendProblemsUsecase:
         days_diff = (datetime.now().date() - tag_stat.last_solved_date).days
 
         # 현재 숙련도를 찾아서 해당 숙련도의 추천 주기를 가져옴
-        current_skill = self._match_tag_skill(tag_stat, user_tier, all_tag_skills)
+        current_skill = self._match_tag_skill(tag_stat, user_tier, tag_skills_dict)
         if current_skill and days_diff >= current_skill.recommendation_period:
             reasons.append(f"'{tag_name}' 태그를 안 푼 지 {days_diff}일이 지났어요.")
 
         # 4. 승급 임박 체크
-        level_up_info = self._check_level_up_status(tag_stat, user_tier, all_tag_skills, tag_name)
+        level_up_info = self._check_level_up_status(tag_stat, user_tier, tag_skills_dict, tag_name)
         if level_up_info:
             reasons.append(level_up_info)
 
@@ -485,25 +493,29 @@ class RecommendProblemsUsecase:
             random.shuffle(reasons)
         return reasons
 
+    _SKILL_CODE_ORDER = {SkillCode.IM: SkillCode.AD, SkillCode.AD: SkillCode.MAS}
+
     def _check_level_up_status(
         self,
         tag_stat: TagAccountStat,
         user_tier: TierId,
-        all_tag_skills: list[TagSkill],
+        tag_skills_dict: dict[tuple[int, SkillCode], TagSkill],
         tag_name: str
     ) -> str | None:
         """승급 임박 상태 확인 및 메시지 생성"""
-        current_skill = self._match_tag_skill(tag_stat, user_tier, all_tag_skills)
+        current_skill = self._match_tag_skill(tag_stat, user_tier, tag_skills_dict)
         if not current_skill:
             return None
 
-        sorted_skills = sorted(all_tag_skills, key=lambda x: x.tag_skill_id.value)
-        current_index = next((i for i, s in enumerate(sorted_skills) if s.tag_skill_id == current_skill.tag_skill_id), -1)
-
-        if current_index == -1 or current_index >= len(sorted_skills) - 1:
+        # 같은 태그 내에서 다음 숙련도 결정 (IM→AD, AD→MAS)
+        next_skill_code = self._SKILL_CODE_ORDER.get(current_skill.skill_code)
+        if not next_skill_code:
             return None
 
-        next_skill = sorted_skills[current_index + 1]
+        next_skill = tag_skills_dict.get((tag_stat.tag_id.value, next_skill_code))
+        if not next_skill:
+            return None
+
         current_solved = tag_stat.solved_problem_count
         required_solved = next_skill.requirements.min_solved_problem
         problems_needed = required_solved - current_solved
@@ -519,7 +531,7 @@ class RecommendProblemsUsecase:
         tag: Tag,
         stats_map: TagStatsMap,
         user_tier: TierId,
-        all_tag_skills: list[TagSkill]
+        tag_skills_dict: dict[tuple[int, SkillCode], TagSkill]
     ) -> bool:
         """선수 태그 조건을 만족하는지 확인"""
         if not tag.parent_tag_relations:
@@ -530,7 +542,7 @@ class RecommendProblemsUsecase:
                 return False
 
         # 선수 태그의 숙련도를 계산
-        parent_skill = self._match_tag_skill(parent_stat, user_tier, all_tag_skills)
+        parent_skill = self._match_tag_skill(parent_stat, user_tier, tag_skills_dict)
 
         # 예: 선수 태그가 최소 'BEGINNER' 이상이어야 함
         return parent_skill and parent_skill.tag_level >= TagLevel.BEGINNER
@@ -539,7 +551,7 @@ class RecommendProblemsUsecase:
         self,
         tag_stat: TagAccountStat,
         user_activity: UserActivity,
-        all_tag_skills: list[TagSkill],
+        tag_skills_dict: dict[tuple[int, SkillCode], TagSkill],
         user_tier: TierId,
         target_tag_ids: set[int]
     ) -> float:
@@ -552,7 +564,7 @@ class RecommendProblemsUsecase:
             days_diff = (datetime.now().date() - tag_stat.last_solved_date).days
 
             # 현재 숙련도를 찾아서 해당 숙련도의 추천 주기를 기준으로 점수 계산
-            current_skill = self._match_tag_skill(tag_stat, user_tier, all_tag_skills)
+            current_skill = self._match_tag_skill(tag_stat, user_tier, tag_skills_dict)
             if current_skill:
                 # recommendation_period를 넘긴 시점부터 점수 급증
                 # 넘긴 일수에 비례하여 점수 추가 (최대 50점)
@@ -573,7 +585,7 @@ class RecommendProblemsUsecase:
         score += review_score
 
         # 2. 승급 임박 가중치 (다음 레벨까지 5문제 미만일 때, +30점)
-        level_up_bonus = self._calculate_level_up_bonus(tag_stat, user_tier, all_tag_skills)
+        level_up_bonus = self._calculate_level_up_bonus(tag_stat, user_tier, tag_skills_dict)
         score += level_up_bonus
 
         # 3. 타겟 정렬 가중치 (Requirement 4: 타겟 태그와 일치하면 +30점)
@@ -586,24 +598,23 @@ class RecommendProblemsUsecase:
         self,
         tag_stat: TagAccountStat,
         user_tier: TierId,
-        all_tag_skills: list[TagSkill]
+        tag_skills_dict: dict[tuple[int, SkillCode], TagSkill]
     ) -> float:
         """승급 임박 보너스 점수 계산"""
         # 현재 숙련도 찾기
-        current_skill = self._match_tag_skill(tag_stat, user_tier, all_tag_skills)
+        current_skill = self._match_tag_skill(tag_stat, user_tier, tag_skills_dict)
         if not current_skill:
             return 0.0
 
-        # 숙련도를 레벨 순으로 정렬 (낮은 레벨부터)
-        sorted_skills = sorted(all_tag_skills, key=lambda x: x.tag_skill_id.value)
-
-        # 다음 숙련도 찾기
-        current_index = next((i for i, s in enumerate(sorted_skills) if s.tag_skill_id == current_skill.tag_skill_id), -1)
-        if current_index == -1 or current_index >= len(sorted_skills) - 1:
-            # 마지막 숙련도(MASTER)이거나 찾을 수 없으면 보너스 없음
+        # 같은 태그 내에서 다음 숙련도 결정 (IM→AD, AD→MAS)
+        next_skill_code = self._SKILL_CODE_ORDER.get(current_skill.skill_code)
+        if not next_skill_code:
+            # 마지막 숙련도(MASTER)이면 보너스 없음
             return 0.0
 
-        next_skill = sorted_skills[current_index + 1]
+        next_skill = tag_skills_dict.get((tag_stat.tag_id.value, next_skill_code))
+        if not next_skill:
+            return 0.0
 
         # 다음 레벨까지 필요한 문제 수
         current_solved = tag_stat.solved_problem_count
