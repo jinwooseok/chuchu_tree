@@ -1,20 +1,37 @@
-from fastapi import FastAPI, Request
+import os
+from starlette.types import ASGIApp, Receive, Scope, Send
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.base import BaseHTTPMiddleware
 
 from app.core.database import get_global_database, reset_database_context, set_database_context
 
-class DatabaseContextMiddleware(BaseHTTPMiddleware):
-    """요청별로 Database 인스턴스를 ContextVar에 설정"""
-    
-    async def dispatch(self, request: Request, call_next):
-        # 전역 Database 사용
+class DatabaseContextMiddleware:
+    """요청별로 Database 인스턴스를 ContextVar에 설정 (Pure ASGI 미들웨어)
+
+    BaseHTTPMiddleware 대신 순수 ASGI 미들웨어로 구현.
+    BaseHTTPMiddleware의 call_next()는 별도 task에서 실행되어
+    ContextVar가 전파되지 않는 문제가 있음.
+    """
+
+    def __init__(self, app: ASGIApp) -> None:
+        self.app = app
+
+    async def __call__(self, scope: Scope, receive: Receive, send: Send) -> None:
+        if scope["type"] not in ("http", "websocket"):
+            await self.app(scope, receive, send)
+            return
+
+        # Unit 테스트: DB context 설정 불필요 (@transactional이 완전 우회됨)
+        db_session = os.getenv('DB_SESSION', '').lower()
+        if db_session == 'unit':
+            await self.app(scope, receive, send)
+            return
+
         db = get_global_database()
         token = set_database_context(db)
-        
+
         try:
-            response = await call_next(request)
-            return response
+            await self.app(scope, receive, send)
         finally:
             reset_database_context(token)
 

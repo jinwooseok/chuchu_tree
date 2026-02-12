@@ -30,7 +30,7 @@ services:
     networks:
       - chuchu-network
     volumes:
-      - /chuchu-db-data:/var/lib/mysql
+      - ./chuchu-db-data:/var/lib/mysql
     restart: always
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
@@ -54,29 +54,6 @@ services:
       - chuchu-network
     healthcheck:
       test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
-      timeout: 10s
-      retries: 5
-      start_period: 10s
-      interval: 30s
-
-  chuchu-minio:
-    image: minio/minio:latest
-    command: server /data --console-address ":9001"
-    container_name: chuchu-${LOCAL_STORAGE_PROVIDER}
-    restart: always
-    ports:
-      - "${LOCAL_STORAGE_API_PORT}:9000"
-      - "${LOCAL_STORAGE_CONSOLE_PORT}:9001"
-    volumes:
-      - ${LOCAL_STORAGE_PATH}:/data
-    environment:
-      - MINIO_ROOT_USER=${LOCAL_STORAGE_ACCESS_KEY}
-      - MINIO_ROOT_PASSWORD=${LOCAL_STORAGE_SECRET_KEY}
-      - TZ=Asia/Seoul
-    networks:
-      - chuchu-network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://${LOCAL_STORAGE_ENDPOINT}/minio/health/live"]
       timeout: 10s
       retries: 5
       start_period: 10s

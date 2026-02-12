@@ -3,32 +3,19 @@
 테스트 실행 + 체크리스트 업데이트를 한 번에 수행하는 스크립트
 
 사용법:
-    poetry run python scripts/run_tests.py              # 전체 테스트 실행
-    poetry run python scripts/run_tests.py auth         # auth 도메인만 테스트
-    poetry run python scripts/run_tests.py --checklist  # 체크리스트만 업데이트 (테스트 실행 없이)
+    poetry run python tests/scripts/run_tests.py              # 전체 테스트 실행
+    poetry run python tests/scripts/run_tests.py auth         # auth 도메인만 테스트
+    poetry run python tests/scripts/run_tests.py --checklist  # 체크리스트만 업데이트 (테스트 실행 없이)
 """
 
 import subprocess
 import sys
-import os
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).parent.parent
-
-
-def is_in_virtualenv() -> bool:
-    """가상환경 내부인지 확인"""
-    return hasattr(sys, 'real_prefix') or (hasattr(sys, 'base_prefix') and sys.base_prefix != sys.prefix)
-
+PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 def run_pytest(target: str | None = None) -> int:
     """pytest 실행"""
-    # 가상환경 확인
-    if not is_in_virtualenv():
-        print("⚠️  가상환경이 활성화되지 않았습니다.")
-        print("   다음 명령어로 실행하세요:")
-        print("   poetry run python scripts/run_tests.py")
-        return 1
 
     cmd = [sys.executable, "-m", "pytest"]
 
@@ -61,7 +48,7 @@ def run_pytest(target: str | None = None) -> int:
 
 def run_checklist_update() -> int:
     """체크리스트 업데이트 스크립트 실행"""
-    script_path = PROJECT_ROOT / "scripts" / "update_test_checklist.py"
+    script_path = PROJECT_ROOT / "tests" / "scripts" / "update_test_checklist.py"
     cmd = [sys.executable, str(script_path)]
 
     print()

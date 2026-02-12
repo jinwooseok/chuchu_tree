@@ -1,5 +1,8 @@
 # 환경 설정
 .env
+chuchu-db-data/
+coverage_report.json
+test_report.json
 
 # 로그 파일
 logs/
