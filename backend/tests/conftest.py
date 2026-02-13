@@ -263,3 +263,106 @@ async def authenticated_client(client: "AsyncClient", valid_access_token):
     """인증된 클라이언트 (쿠키에 토큰 설정)"""
     client.cookies.set("access_token", valid_access_token)
     return client
+
+
+# =============================================================================
+# 백준 관련 Fixtures
+# =============================================================================
+
+@pytest.fixture
+def mock_solvedac_gateway():
+    """단위 테스트용 solved.ac 게이트웨이 모킹
+
+    백준 계정 연동 및 업데이트 단위 테스트에서 사용.
+    AsyncMock을 반환하여 테스트에서 필요에 따라 설정 가능.
+    """
+    from unittest.mock import AsyncMock
+    from app.baekjoon.infra.gateway.solvedac_gateway_impl import SolvedacGatewayImpl
+
+    gateway = AsyncMock(spec=SolvedacGatewayImpl)
+    return gateway
+
+
+@pytest_asyncio.fixture(scope="function", loop_scope="session")
+async def baekjoon_test_user(integration_session) -> UserAccount:
+    """백준 통합 테스트용 테스트 유저
+
+    integration_session과 같은 커넥션을 공유하여
+    백준 계정 연동 테스트에서 사용.
+    """
+    from app.user.infra.model.user_account import UserAccountModel
+
+    session = integration_session
+
+    now = datetime.now()
+    model = UserAccountModel(
+        provider=Provider.GOOGLE,
+        provider_id="baekjoon_test_provider_123",
+        email="baekjoon_test@example.com",
+        profile_image=None,
+        registered_at=now,
+        created_at=now,
+        updated_at=now,
+    )
+    session.add(model)
+    await session.flush()
+
+    yield UserAccount(
+        user_account_id=model.user_account_id,
+        provider=Provider.GOOGLE,
+        provider_id="baekjoon_test_provider_123",
+        email="baekjoon_test@example.com",
+        profile_image=None,
+        registered_at=now,
+        created_at=now,
+        updated_at=now,
+    )
+
+
+@pytest_asyncio.fixture(scope="function", loop_scope="session")
+async def linked_baekjoon_account(integration_session, baekjoon_test_user):
+    """100개의 문제 히스토리가 있는 연동된 백준 계정
+
+    츄츄트리 업데이트 테스트에서 기존 계정 상태를 테스트할 때 사용.
+    """
+    from app.baekjoon.infra.model.bj_account import BjAccountModel
+    from app.baekjoon.infra.model.problem_history import ProblemHistoryModel
+    from app.user.infra.model.account_link import AccountLinkModel
+
+    session = integration_session
+
+    # 백준 계정 생성
+    now = datetime.now()
+    account_model = BjAccountModel(
+        bj_account_id="test_bj_user",
+        tier_id=11,  # Gold V
+        rating=1500,
+        class_=3,
+        longest_streak=30,
+        created_at=now,
+        updated_at=now,
+    )
+    session.add(account_model)
+    await session.flush()
+
+    # 계정 링크 생성 (user_account와 bj_account 연결)
+    account_link = AccountLinkModel(
+        user_account_id=baekjoon_test_user.user_account_id,
+        bj_account_id="test_bj_user",
+        created_at=now
+    )
+    session.add(account_link)
+    await session.flush()
+
+    # 100개의 문제 히스토리 생성
+    for i in range(100):
+        problem_history_model = ProblemHistoryModel(
+            bj_account_id=account_model.bj_account_id,
+            problem_id=1000 + i,
+            created_at=now,
+        )
+        session.add(problem_history_model)
+
+    await session.flush()
+
+    yield account_model
