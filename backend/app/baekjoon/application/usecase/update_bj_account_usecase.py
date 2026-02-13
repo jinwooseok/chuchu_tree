@@ -38,6 +38,11 @@ class UpdateBjAccountUsecase:
     async def execute(self, user_account_id: int) -> None:
         # 1. 기존 데이터 로드
         existing_account = await self.baekjoon_account_repository.find_by_user_id(UserAccountId(user_account_id))
+
+        # 백준 계정이 연동되지 않은 경우
+        if existing_account is None:
+            raise APIException(ErrorCode.UNLINKED_USER)
+
         return await self._sync_solved_ac(existing_account)
         
     @transactional
@@ -88,16 +93,15 @@ class UpdateBjAccountUsecase:
         # 6. 신규 문제 매칭
         if new_problems:
             # 어떤 날짜의 스트릭에 매칭할지 결정 (휴리스틱: API의 최신 날짜)
-            for p, s in zip(new_problems, date_to_streak_id):
-                # record_problem_solved는 streak_id 없이 문제 정보만 history에 추가
-                # 단, 필요하다면 history 엔티티 내부에 solved_date 필드를 두어 나중에 매칭 포인트로 활용
-                new_history_entities = [
-                    ProblemHistory.create(
-                        bj_account_id=bj_account.bj_account_id,
-                        problem_id=ProblemId(p.problem_id),
-                        streak_id=StreakId(s)
-                    ) for p in new_problems
-                ]
+            # record_problem_solved는 streak_id 없이 문제 정보만 history에 추가
+            # 단, 필요하다면 history 엔티티 내부에 solved_date 필드를 두어 나중에 매칭 포인트로 활용
+            new_history_entities = [
+                ProblemHistory.create(
+                    bj_account_id=bj_account.bj_account_id,
+                    problem_id=ProblemId(p.problem_id),
+                    streak_id=StreakId(s) if s and isinstance(s, int) else None
+                ) for p, s in zip(new_problems, date_to_streak_id)
+            ]
             await self.problem_history_repository.save_all(new_history_entities)
 
         await self.baekjoon_account_repository.update_stat(bj_account)
