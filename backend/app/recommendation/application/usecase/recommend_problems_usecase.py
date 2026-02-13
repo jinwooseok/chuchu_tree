@@ -73,6 +73,10 @@ class RecommendProblemsUsecase:
     ) -> RecommendProblemsQuery:
         # 1. 초기 데이터 로딩
         bj_account = await self.baekjoon_account_repository.find_by_user_id(user_account_id)
+        if bj_account is None:
+            from app.core.error_codes import ErrorCode
+            from app.core.exception import APIException
+            raise APIException(ErrorCode.BAEKJOON_USER_NOT_FOUND)
         # user_account_id를 전달하여 streak이 없을 때 problem_record 날짜 사용
         raw_tag_stats = await self.baekjoon_account_repository.get_tag_stats(
             bj_account.bj_account_id,

@@ -36,6 +36,8 @@ class Database:
     """
     
     def __init__(self, db_url: str, echo: bool = False) -> None:
+        self._is_test_mode = os.getenv('TEST_MODE', 'false') == 'true'
+
         self._engine = create_async_engine(
             db_url,
             pool_pre_ping=True,         # 연결 유효성 검사
@@ -53,7 +55,6 @@ class Database:
             autoflush=False,            # 명시적 flush 필요
             expire_on_commit=False,     # commit 후에도 객체 사용 가능
         )
-        self._is_test_mode = os.getenv('TEST_MODE', 'false') == 'true'
 
     @asynccontextmanager
     async def session(self) -> AsyncGenerator[AsyncSession, None]:
@@ -208,26 +209,31 @@ def transactional(
 ):
     """
     트랜잭션 데코레이터
-    
+
+    DB_SESSION 환경변수로 3가지 모드 지원:
+    - 'unit': 데코레이터 완전 우회 (단위 테스트용, mock repository 사용)
+    - 'test': 기존 세션 사용 + flush만 (통합 테스트용, 롤백 기반)
+    - 'local'/'production' 등: 기존 로직 (운영 환경)
+
     특징:
     1. 중첩 트랜잭션 지원 (같은 세션 재사용)
-    2. 테스트 모드 자동 감지
+    2. 환경별 자동 분기
     3. 격리 레벨 설정 가능
     4. readonly 모드 지원
-    
+
     Args:
         isolation_level: 트랜잭션 격리 레벨
         readonly: 읽기 전용 모드 (최적화)
-    
+
     Usage:
         @transactional()
         async def create_user(user_data: dict):
             ...
-        
+
         @transactional(isolation_level="SERIALIZABLE")
         async def transfer_points(from_id: int, to_id: int, points: int):
             ...
-        
+
         @transactional(readonly=True)
         async def get_user_stats(user_id: int):
             ...
@@ -235,51 +241,70 @@ def transactional(
     def decorator(func: Callable[..., Awaitable]) -> Callable[..., Awaitable]:
         @functools.wraps(func)
         async def _wrapper(*args, **kwargs) -> Any:
+            environment = os.getenv('DB_SESSION', 'local').lower()
+
+            # 1) Unit test: 데코레이터 완전 우회 (mock repository 사용)
+            if environment == 'unit':
+                return await func(*args, **kwargs)
+
+            # 2) Integration test: 기존 세션 사용 + flush만
+            #    get_global_database() 사용 (ContextVar가 아닌 전역 변수)
+            #    → asyncio task 경계를 넘어도 안전하게 DB 접근 가능
+            if environment == 'test':
+                db = get_global_database()
+                existing = _session_context.get()
+                if existing is not None:
+                    result = await func(*args, **kwargs)
+                    await existing.flush()
+                    return result
+                # 세션 없으면 test_session()으로 생성 (override된 것 사용)
+                async with db.test_session() as session:
+                    result = await func(*args, **kwargs)
+                    await session.flush()
+                    return result
+
+            # 3) Production/Local: 기존 로직 유지
             db = get_database_instance()
-            
-            # 현재 트랜잭션 깊이 확인
             depth = _transaction_depth.get()
-            
+
             # 이미 세션이 있는지 확인 (중첩 트랜잭션)
             existing_session = _session_context.get()
-            
+
             if existing_session is not None:
-                # 중첩 트랜잭션: 기존 세션 재사용
-                logger.debug(f"Reusing existing session (depth: {depth})")
+                # 중첩 트랜잭션: SAVEPOINT로 기존 세션 재사용
+                logger.debug(f"Reusing existing session with savepoint (depth: {depth})")
                 _transaction_depth.set(depth + 1)
-                
+
                 try:
-                    result = await func(*args, **kwargs)
+                    async with existing_session.begin_nested():
+                        result = await func(*args, **kwargs)
                     return result
                 finally:
                     _transaction_depth.set(depth)
-            
+
             else:
                 # 새 트랜잭션 시작
                 logger.debug(f"Starting new transaction (isolation: {isolation_level}, readonly: {readonly})")
                 _transaction_depth.set(depth + 1)
-                
-                # 테스트 모드면 test_session, 아니면 일반 session
-                session_context = db.test_session() if db._is_test_mode else db.session()
-                
+
                 try:
-                    async with session_context as session:
+                    async with db.session() as session:
                         # 격리 레벨 설정
                         if isolation_level:
                             await session.execute(text(f"SET TRANSACTION ISOLATION LEVEL {isolation_level}"))
-                        
+
                         # readonly 최적화
                         if readonly:
                             await session.execute(text("SET TRANSACTION READ ONLY"))
-                        
+
                         result = await func(*args, **kwargs)
                         return result
-                        
+
                 except APIException:
                     # 비즈니스 로직 예외는 그대로 전파
                     logger.warning(f"Business logic exception in transaction")
                     raise
-                    
+
                 except Exception as ex:
                     # 예상치 못한 예외는 DATABASE_ERROR로 래핑
                     logger.exception(f"Unexpected error in transaction: {ex}")
@@ -287,18 +312,18 @@ def transactional(
                         ErrorCode.DATABASE_ERROR,
                         f"Database transaction failed: {str(ex)}"
                     )
-                    
+
                 finally:
                     _transaction_depth.set(depth)
-        
+
         return _wrapper
-    
+
     # 파라미터 없이 @transactional 사용 시 대응
     if callable(isolation_level):
         func = isolation_level
         isolation_level = None
         return decorator(func)
-    
+
     return decorator
 
 

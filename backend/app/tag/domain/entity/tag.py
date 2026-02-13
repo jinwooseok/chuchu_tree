@@ -53,7 +53,7 @@ class Tag:
     
     def exclude(self, reason: ExcludedReason) -> None:
         """도메인 로직 - 태그 제외"""
-        self.exclusion = TagExclusion.excluded(reason)
+        self.exclusion = TagExclusion.is_excluded(reason)
         self.updated_at = datetime.now()
     
     def include(self) -> None:
