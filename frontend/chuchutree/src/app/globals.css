@@ -249,6 +249,19 @@
   }
 }
 
+/* SEO를 위한 스크린 리더 전용 콘텐츠 */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* ===== React Big Calendar 커스터마이징 ===== */
 
 /* 텍스트 크기 12px */

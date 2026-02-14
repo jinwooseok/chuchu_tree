@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import Providers from '@/lib/providers';
 import localFont from 'next/font/local';
+import Script from 'next/script';
 
 const paperlogy = localFont({
   src: [
@@ -22,9 +23,25 @@ const paperlogy = localFont({
 });
 
 export const metadata: Metadata = {
-  title: 'ChuChuTree | 알고리즘 캘린더',
-  description: 'ChuChuTree Algorithm Calendar',
-  keywords: ['ChuChuTree', 'Algorithm', '츄츄트리', '츄츄', '알고리즘 기록', '백준', 'solved.ac', '알고리즘 추천'],
+  title: '알고리즘 캘린더 ChuChuTree - 개인 맞춤형 백준 문제 추천',
+  description:
+    '백준과 solved.ac 데이터를 분석해 당신에게 딱 맞는 알고리즘 문제를 추천합니다. 알고리즘 유형별 분석, 학습 기록 캘린더를 한눈에 확인하세요. 코딩테스트 준비와 알고리즘 실력 향상을 위한 개인 맞춤형 학습 서비스입니다.',
+  keywords: [
+    'chuchu',
+    '츄츄트리',
+    '백준 문제 추천',
+    'solved.ac',
+    '알고리즘 추천',
+    '알고리즘 캘린더',
+    '알고리즘 기록',
+    '코딩테스트 준비',
+    'PS 공부',
+    '알고리즘 공부 순서',
+    '알고리즘 유형 추천',
+    '알고리즘 커리큘럼',
+    '프로그래밍 학습',
+    '알고리즘 대시보드',
+  ],
   metadataBase: new URL('https://chuchu-tree.duckdns.org'),
   alternates: {
     canonical: '/',
@@ -89,6 +106,43 @@ export default function RootLayout({
     <html lang="ko" suppressHydrationWarning>
       <body className={`${paperlogy.variable} antialiased`}>
         <Providers>{children}</Providers>
+
+        {/* JSON-LD 구조화된 데이터 */}
+        <Script
+          id="schema-website"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'WebSite',
+              name: 'ChuChuTree',
+              alternateName: '츄츄트리',
+              url: 'https://chuchu-tree.duckdns.org',
+              description: '백준과 solved.ac 데이터를 분석해 개인 맞춤형 알고리즘 문제를 추천하는 학습 캘린더 서비스',
+              inLanguage: 'ko-KR',
+            }),
+          }}
+        />
+
+        <Script
+          id="schema-software"
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              '@context': 'https://schema.org',
+              '@type': 'SoftwareApplication',
+              name: 'ChuChuTree',
+              applicationCategory: 'EducationalApplication',
+              offers: {
+                '@type': 'Offer',
+                price: '0',
+                priceCurrency: 'KRW',
+              },
+              operatingSystem: 'Web',
+              description: '알고리즘 유형별 분석, 학습 기록 캘린더, 개인 맞춤형 문제 추천 기능을 제공하는 백준 학습 도우미',
+            }),
+          }}
+        />
       </body>
     </html>
   );
