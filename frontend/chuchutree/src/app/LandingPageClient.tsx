@@ -149,7 +149,6 @@ function LandingPageContent() {
 export default function LandingPageClient() {
   const { hasCompletedOnboarding, isActive, _hasHydrated, startOnboarding } = useOnboardingStore();
 
-
   // 최초 진입자 감지 및 자동 실행 (hydration 완료 후에만 실행)
   useEffect(() => {
     if (_hasHydrated && !hasCompletedOnboarding && !isActive) {
@@ -158,13 +157,61 @@ export default function LandingPageClient() {
   }, [_hasHydrated, hasCompletedOnboarding, isActive, startOnboarding]);
 
   return (
-    <SidebarProvider defaultOpen={false}>
-      <LandingAppSidebar />
-      <SidebarInset>
-        <LandingPageContent />
-      </SidebarInset>
-      {/* 온보딩 컨트롤러 */}
-      {isActive && <OnboardingController />}
-    </SidebarProvider>
+    <>
+      {/* SEO 전용 콘텐츠 - 검색 엔진 최적화를 위한 구조화된 텍스트 */}
+      <header className="sr-only">
+        <h1>ChuChuTree - 백준 알고리즘 학습 캘린더</h1>
+
+        <section>
+          <h2>서비스 소개</h2>
+          <p>
+            ChuChuTree는 백준 온라인 저지와 solved.ac의 데이터를 분석하여 개인 맞춤형 알고리즘 문제를 추천하는 학습 캘린더 서비스입니다.
+            알고리즘 문제 풀이 기록을 시각화하고, 취약한 알고리즘 유형을 파악하여 효율적인 학습 경로를 제시합니다.
+            코딩테스트 준비생, PS 학습자, 알고리즘 공부를 시작하는 모든 분들을 위한 최적의 학습 도우미입니다.
+          </p>
+        </section>
+
+        <section>
+          <h2>주요 기능</h2>
+          <ul>
+            <li>개인 맞춤형 알고리즘 문제 추천 - 풀이 기록과 취약 유형을 분석하여 최적의 문제를 추천합니다</li>
+            <li>알고리즘 유형별 대시보드 - 60여 개의 알고리즘 유형별 실력을 한눈에 확인하고 관리할 수 있습니다</li>
+            <li>월별 학습 기록 캘린더 - Notion 스타일의 직관적인 캘린더로 학습 기록을 시각화합니다</li>
+            <li>백준 티어 진행도 관리 - solved.ac 티어 시스템 기반으로 목표를 설정하고 진행도를 추적합니다</li>
+            <li>학습 스트릭 히트맵 - 1년 단위의 학습 연속성을 히트맵으로 확인하며 동기부여를 얻습니다</li>
+            <li>문제 일정 관리 - 풀고 싶은 문제를 캘린더에 등록하고 체계적으로 관리할 수 있습니다</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>이런 분들께 추천합니다</h2>
+          <ul>
+            <li>코딩테스트를 준비하는 취업 준비생</li>
+            <li>알고리즘 실력을 체계적으로 키우고 싶은 학생</li>
+            <li>매일 꾸준히 PS 공부를 하고 싶은 개발자</li>
+            <li>백준 문제 중 어떤 유형을 공부해야 할지 모르는 초보자</li>
+            <li>solved.ac 티어를 효율적으로 올리고 싶은 학습자</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>주요 알고리즘 유형</h2>
+          <p>
+            ChuChuTree는 구현, 그리디, 문자열, 브루트포스, 다이나믹 프로그래밍, 그래프 이론, DFS, BFS, 백트래킹, 분할정복,
+            이분탐색, 정렬, 자료구조, 트리, 수학, 정수론, 조합론 등 다양한 알고리즘 유형을 체계적으로 관리합니다.
+            각 유형별로 초급, 중급, 고급, 마스터 레벨로 분류하여 단계적 학습을 지원합니다.
+          </p>
+        </section>
+      </header>
+
+      <SidebarProvider defaultOpen={false}>
+        <LandingAppSidebar />
+        <SidebarInset>
+          <LandingPageContent />
+        </SidebarInset>
+        {/* 온보딩 컨트롤러 */}
+        {isActive && <OnboardingController />}
+      </SidebarProvider>
+    </>
   );
 }
