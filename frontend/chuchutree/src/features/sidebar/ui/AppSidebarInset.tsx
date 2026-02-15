@@ -1,6 +1,26 @@
 'use client';
 
-import { Calendar, ChevronUp, Dices, Gem, Leaf, LibraryBig, PanelLeft, User2, Settings, LogOut, BookX, BookOpen, RefreshCw, PackageOpen, House, LogIn, Lightbulb, SquarePlay } from 'lucide-react';
+import {
+  Calendar,
+  ChevronUp,
+  Dices,
+  Gem,
+  Leaf,
+  LibraryBig,
+  PanelLeft,
+  User2,
+  Settings,
+  LogOut,
+  BookX,
+  BookOpen,
+  RefreshCw,
+  PackageOpen,
+  House,
+  LogIn,
+  Lightbulb,
+  SquarePlay,
+  Loader,
+} from 'lucide-react';
 import { useLayoutStore } from '@/lib/store/layout';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -12,7 +32,6 @@ import { useLogout } from '@/entities/auth';
 import { useModal } from '@/lib/providers/modal-provider';
 import { toast } from '@/lib/utils/toast';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
-import { Spinner } from '@/shared/ui';
 import { useGlobalShortcuts } from '@/lib/hooks/useGlobalShortcuts';
 import { useRefresh } from '@/entities/refresh';
 import { useRefreshButtonStore } from '@/lib/store/refreshButton';
@@ -344,7 +363,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                   <AppTooltip content="프로필 갱신" side="right" shortCut1="Shift" shortCut2="R">
                     <SidebarMenuButton asChild>
                       <div onClick={handleRefresh} className="cursor-pointer" data-onboarding-id="refresh-button">
-                        {isPending ? <Spinner /> : <RefreshCw className="text-foreground h-5 w-5" />}
+                        {isPending ? <Loader className="text-foreground h-5 w-5 animate-spin" style={{ animationDuration: '2s' }} /> : <RefreshCw className="text-foreground h-5 w-5" />}
                         <span>프로필 갱신</span>
                       </div>
                     </SidebarMenuButton>

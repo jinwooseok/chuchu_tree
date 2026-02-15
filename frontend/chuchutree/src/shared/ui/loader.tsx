@@ -56,13 +56,3 @@ export function SkeletonList({ count = 3 }: { count?: number }) {
   );
 }
 
-// 인라인 스피너 (버튼 내부 등에 사용)
-export function Spinner({ size = 'sm' }: { size?: 'sm' | 'md' | 'lg' }) {
-  const sizeClasses = {
-    sm: 'h-4 w-4 border-2',
-    md: 'h-6 w-6 border-2',
-    lg: 'h-8 w-8 border-3',
-  };
-
-  return <div className={`${sizeClasses[size]} inline-block animate-spin rounded-full border-current border-t-transparent`} role="status" aria-label="로딩 중" />;
-}
