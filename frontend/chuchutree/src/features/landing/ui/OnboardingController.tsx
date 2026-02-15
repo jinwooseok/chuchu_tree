@@ -11,6 +11,7 @@ import { OnboardingDialog } from './OnboardingDialog';
 import { OnboardingSpotlight } from './OnboardingSpotlight';
 import { OnboardingHeader } from './OnboardingHeader';
 import { useSidebar } from '@/components/ui/sidebar';
+import { OnboardingInitialDialog } from '@/features/landing/ui/OnboardingInitialDialog';
 
 export function OnboardingController() {
   const router = useRouter();
@@ -183,8 +184,10 @@ export function OnboardingController() {
   // 렌더링
   return (
     <>
-      <OnboardingHeader />
+      {sequenceData.type !== 'init' && <OnboardingHeader />}
       <OnboardingBackdrop spotlightTarget={spotlightTarget} allowInteraction={sequenceData.type === 'u'} />
+
+      {sequenceData.type === 'init' && <OnboardingInitialDialog onButtonClick={handleDialogButtonClick} />}
 
       {sequenceData.type === 'd' && sequenceData.dialogMessages && sequenceData.dialogButtons && (
         <OnboardingDialog messages={sequenceData.dialogMessages} buttons={sequenceData.dialogButtons} onButtonClick={handleDialogButtonClick} />

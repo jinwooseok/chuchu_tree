@@ -2,7 +2,7 @@
  * 온보딩 플로우 데이터 정의
  */
 
-export type SequenceType = 'f' | 'd' | 's' | 'u';
+export type SequenceType = 'f' | 'd' | 's' | 'u' | 'init';
 
 export interface OnboardingSequence {
   type: SequenceType;
@@ -35,23 +35,18 @@ export interface OnboardingStep {
 }
 
 export const ONBOARDING_STEPS: OnboardingStep[] = [
-  // Step 1: 환영 페이지
+  // Step 1: 시작 페이지
   {
     stepNumber: 1,
-    title: '환영 페이지',
+    title: '시작 페이지',
     sequences: [
       {
-        type: 'd',
-        dialogMessages: ['ChuChuTree에 오신 것을 환영합니다!', '알고리즘 문제 풀이를 체계적으로 관리하고, \n나만의 문제를 추천 받을 수 있습니다.', '지금부터 주요 기능들을 살펴보겠습니다.'],
-        dialogButtons: [{ text: '시작하기', action: 'start' }],
+        type: 'init',
       },
       {
-        type: 's',
-        duration: 500,
-        systemAction: () => {
-          // 레이아웃 초기화는 OnboardingController에서 처리
-          // console.log('레이아웃 초기화');
-        },
+        type: 'd',
+        dialogMessages: ['ChuChuTree에 오신 것을 환영합니다!', '지금부터 주요 기능들을 살펴보겠습니다.'],
+        dialogButtons: [{ text: '시작하기', action: 'start' }],
       },
     ],
   },
@@ -103,7 +98,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
         targetSelector: '[data-onboarding-id="recommend-button"]',
         message: '나만의 문제를 추천 받을 수 있습니다',
         tooltipPosition: 'right',
-        buttonText: '클릭해보세요!',
+        buttonText: '주사위를 클릭해보세요!',
         highlightAnimation: 'pulse',
         duration: 300,
       },
@@ -122,7 +117,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
         targetSelector: '[data-onboarding-id="recommend-receive-button"]',
         message: '맞춤형 알고리즘 문제가 추천됩니다!',
         tooltipPosition: 'right',
-        buttonText: '클릭해보세요!',
+        buttonText: '추천받기를 클릭해보세요!',
         highlightAnimation: 'pulse',
         duration: 300,
       },

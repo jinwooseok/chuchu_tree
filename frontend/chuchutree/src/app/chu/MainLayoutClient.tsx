@@ -10,8 +10,7 @@ interface MainLayoutClientProps {
 }
 
 export function MainLayoutClient({ children }: MainLayoutClientProps) {
-
-const { hasCompletedOnboarding, isActive, _hasHydrated, startOnboarding } = useOnboardingStore();
+  const { hasCompletedOnboarding, isActive, _hasHydrated, startOnboarding } = useOnboardingStore();
 
   // SSR prefetch 데이터는 HydrationBoundary가 자동으로 Query cache에 주입
   // Zustand 동기화 로직 제거 - 컴포넌트가 직접 Query hooks 사용
@@ -20,8 +19,8 @@ const { hasCompletedOnboarding, isActive, _hasHydrated, startOnboarding } = useO
     <SidebarProvider defaultOpen={false}>
       <AppSidebar />
       <SidebarInset>{children}</SidebarInset>
-            {/* 온보딩 컨트롤러 */}
-            {isActive && <OnboardingController />}
+      {/* 온보딩 컨트롤러 */}
+      {isActive && <OnboardingController />}
     </SidebarProvider>
   );
 }
