@@ -30,7 +30,7 @@ export default function LandingMainCalendar() {
   // 현재 표시 중인 월 (store에서 관리, fallback은 initialDate)
   const currentDate = bigCalendarDate || initialDate;
   const year = currentDate?.getFullYear() || new Date().getFullYear();
-  const month = (currentDate?.getMonth() || new Date().getMonth()) + 1;
+  const month = currentDate?.getMonth() + 1;
   const calendarData = useLandingCalendar({ year: year, month: month });
   return (
     <div className="bg-innerground-white relative h-full w-full p-4">
