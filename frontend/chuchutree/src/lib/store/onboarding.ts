@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { devtools, persist } from 'zustand/middleware';
+import { devtools, persist, StateStorage, createJSONStorage } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
 interface OnboardingState {
@@ -20,6 +20,42 @@ interface OnboardingState {
   resetOnboarding: () => void;
   setHasHydrated: (state: boolean) => void;
 }
+
+// 하루(24시간) 만료 시간 (밀리초)
+const EXPIRATION_TIME = 24 * 60 * 60 * 1000;
+
+// timestamp와 함께 저장하는 커스텀 storage
+const createExpiringStorage = (): StateStorage => {
+  return {
+    getItem: (name: string): string | null => {
+      const item = localStorage.getItem(name);
+      if (!item) return null;
+
+      try {
+        const { state, timestamp } = JSON.parse(item);
+        const now = Date.now();
+
+        // 24시간이 지났으면 null 반환 (데이터 만료)
+        if (now - timestamp > EXPIRATION_TIME) {
+          localStorage.removeItem(name);
+          return null;
+        }
+
+        return JSON.stringify(state);
+      } catch {
+        return null;
+      }
+    },
+    setItem: (name: string, value: string): void => {
+      const timestamp = Date.now();
+      const item = JSON.stringify({ state: JSON.parse(value), timestamp });
+      localStorage.setItem(name, item);
+    },
+    removeItem: (name: string): void => {
+      localStorage.removeItem(name);
+    },
+  };
+};
 
 export const useOnboardingStore = create<OnboardingState>()(
   devtools(
@@ -82,6 +118,8 @@ export const useOnboardingStore = create<OnboardingState>()(
       })),
       {
         name: 'onboarding-storage',
+        // 커스텀 storage 사용 (24시간 만료)
+        storage: createJSONStorage(() => createExpiringStorage()),
         // localStorage에는 완료 여부만 저장
         partialize: (state) => ({
           hasCompletedOnboarding: state.hasCompletedOnboarding,

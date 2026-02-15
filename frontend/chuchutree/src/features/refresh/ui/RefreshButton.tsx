@@ -1,6 +1,5 @@
 import { useRefresh } from '@/entities/refresh';
-import { Spinner } from '@/shared/ui';
-import { RefreshCw } from 'lucide-react';
+import { Loader, RefreshCw } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 
@@ -26,7 +25,7 @@ export default function RefreshButton() {
         <span className="text-only-black absolute left-4 translate-x-3.75 font-semibold transition-all duration-300 group-hover:opacity-0">Refresh</span>
         {/* Icon Container */}
         <div className="bg-logo absolute right-0 flex h-full w-10 items-center justify-center transition-all duration-300 group-hover:w-full">
-          {isRefreshPending ? <Spinner /> : <RefreshCw className="text-foreground h-5 w-5" />}
+          {isRefreshPending ? <Loader className="text-foreground h-5 w-5 animate-spin" style={{ animationDuration: '2s' }} /> : <RefreshCw className="text-foreground h-5 w-5" />}
         </div>
       </button>
     </AppTooltip>

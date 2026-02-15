@@ -49,8 +49,13 @@ export default function SignInClient() {
             <div>ChuChuTree</div>
           </div>
         </AppTooltip>
-        <div className="min-w-22">
-          <ThemeButton />
+        <div className="flex items-center gap-2">
+          <div className="min-w-22">
+            <ThemeButton />
+          </div>
+          <button className="hover:bg-muted cursor-pointer rounded-sm p-1 text-sm" onClick={() => router.push('/')}>
+            튜토리얼
+          </button>
         </div>
       </div>
       <div className="flex flex-1 flex-col items-center justify-center">
