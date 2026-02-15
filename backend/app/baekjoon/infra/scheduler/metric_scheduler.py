@@ -5,6 +5,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.cron import CronTrigger
 
 from app.baekjoon.application.usecase.update_bj_account_usecase import UpdateBjAccountUsecase
+from app.core.database import get_global_database, set_database_context, reset_database_context
 from app.core.exception import APIException
 
 logger = logging.getLogger(__name__)
@@ -45,19 +46,23 @@ class BjAccountUpdateScheduler:
     
     async def _collect_metrics_job(self):
         """메트릭 수집 작업"""
+        db = get_global_database()
+        token = set_database_context(db)
         try:
             logger.info("Starting daily metric collection...")
-            
+
             # 메트릭 수집 실행
             await self.update_bj_account_use_case.execute_bulk()
-            
-            
+
+
         except APIException as e:
             logger.error(f"API exception during metric collection: {e}")
-            
+
         except Exception as e:
             logger.error(f"Unexpected error during metric collection: {e}")
             # 필요시 알림 시스템에 에러 전송
+        finally:
+            reset_database_context(token)
     
     async def collect_metrics_now(self) -> None:
         """즉시 메트릭 수집 (테스트용)"""
