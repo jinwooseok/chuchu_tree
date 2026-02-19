@@ -1,6 +1,6 @@
 from datetime import datetime
 from typing import TYPE_CHECKING, Optional
-from sqlalchemy import String, DateTime, Integer, ForeignKey, UniqueConstraint, Index
+from sqlalchemy import Boolean, String, DateTime, Integer, ForeignKey, UniqueConstraint, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -16,6 +16,7 @@ class AccountLinkModel(Base):
     bj_account_id: Mapped[str] = mapped_column(String(50), ForeignKey('bj_account.bj_account_id'), nullable=False, index=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
     deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    is_synced: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default="0")
 
     __table_args__ = (
         Index('idx_user_account_id', 'user_account_id'),

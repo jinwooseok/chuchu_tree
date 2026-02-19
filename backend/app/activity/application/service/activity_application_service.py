@@ -31,6 +31,7 @@ from app.common.domain.entity.domain_event import DomainEvent
 from app.common.domain.enums import ExcludedReason
 from app.common.domain.service.event_publisher import DomainEventBus
 from app.common.domain.vo.identifiers import ProblemId, TagId, UserAccountId
+from app.user.application.command.mark_synced_command import MarkSyncedCommand
 from app.common.infra.event.decorators import event_handler, event_register_handlers
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
@@ -499,6 +500,14 @@ class ActivityApplicationService:
         # 6. 일괄 저장
         if all_new_records:
             await self.user_activity_repository.save_all_problem_records(all_new_records)
+
+        # 7. 배치 동기화 완료 이벤트 발행
+        sync_event = DomainEvent(
+            event_type="BATCH_SYNC_COMPLETED",
+            data=MarkSyncedCommand(user_account_id=command.user_account_id),
+            result_type=None
+        )
+        await self.domain_event_bus.publish(sync_event)
 
     @transactional
     async def ban_tag(self, command: TagCustomCommand):

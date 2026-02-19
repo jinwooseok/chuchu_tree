@@ -42,6 +42,7 @@ from app.common.infra.security.fastapi_cookie_service import FastAPICookieServic
 # ============================================================================
 from app.common.infra.gateway.storage_gateway_impl import StorageGatewayImpl
 from app.common.infra.gateway.csrf_token_gateway_impl import CsrfTokenGatewayImpl
+from app.common.infra.gateway.refresh_token_whitelist_gateway_impl import RefreshTokenWhitelistGatewayImpl
 from app.baekjoon.infra.gateway.solvedac_gateway_impl import SolvedacGatewayImpl
 
 # ============================================================================
@@ -159,6 +160,11 @@ class Container(containers.DeclarativeContainer):
     # ========================================================================
     csrf_token_gateway = providers.Singleton(
         CsrfTokenGatewayImpl,
+        redis_client=redis_client,
+    )
+
+    refresh_token_whitelist_gateway = providers.Singleton(
+        RefreshTokenWhitelistGatewayImpl,
         redis_client=redis_client,
     )
 
@@ -323,7 +329,8 @@ class Container(containers.DeclarativeContainer):
         kakao_oauth_client=kakao_oauth_client,
         naver_oauth_client=naver_oauth_client,
         google_oauth_client=google_oauth_client,
-        github_oauth_client=github_oauth_client
+        github_oauth_client=github_oauth_client,
+        refresh_token_whitelist=refresh_token_whitelist_gateway
     )
 
     # ========================================================================

@@ -43,3 +43,14 @@ class UserAccountRepository(ABC):
         연관 데이터(targets, account_links)도 함께 삭제
         """
         pass
+
+    @abstractmethod
+    async def delete_all_by_provider(self, provider: Provider) -> int:
+        """
+        특정 Provider의 모든 유저 삭제 (Hard Delete)
+        연관 데이터도 모두 CASCADE 삭제
+
+        Returns:
+            삭제된 유저 수
+        """
+        pass

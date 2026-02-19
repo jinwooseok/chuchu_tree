@@ -22,7 +22,13 @@ from app.core.exception import APIException
 from app.user.application.command.get_user_account_info_command import GetUserAccountInfoCommand
 from app.user.application.query.user_account_info_query import GetUserAccountInfoQuery
 
+from app.common.domain.gateway.refresh_token_whitelist_gateway import RefreshTokenWhitelistGateway
+
 logger = logging.getLogger()
+
+RT_TTL_SECONDS = 7 * 24 * 60 * 60  # 7일
+
+
 class AuthApplicationService:
     """인증 관련 Application Service"""
     def __init__(
@@ -33,7 +39,8 @@ class AuthApplicationService:
             naver_oauth_client: OAuthClient,
             google_oauth_client: OAuthClient,
             github_oauth_client: OAuthClient,
-            domain_event_bus: DomainEventBus
+            domain_event_bus: DomainEventBus,
+            refresh_token_whitelist: RefreshTokenWhitelistGateway
     ):
         self.token_service = token_service
         self.cookie_service = cookie_service
@@ -42,6 +49,7 @@ class AuthApplicationService:
         self.google_oauth_client = google_oauth_client
         self.github_oauth_client = github_oauth_client
         self.domain_event_bus = domain_event_bus
+        self.refresh_token_whitelist = refresh_token_whitelist
     
     def authenticate_user(self, token: Optional[str]) -> CurrentUser:
         """사용자 인증 - Application Layer 로직"""
@@ -133,15 +141,17 @@ class AuthApplicationService:
             await self.domain_event_bus.publish(withdrawal_event)
             logger.info(f"회원 탈퇴 처리 완료: user_id={user_account.user_account_id}")
 
-            # 쿠키 삭제
+            # RT 전체 폐기 + 쿠키 삭제
+            await self.refresh_token_whitelist.revoke_all_user_tokens(user_account.user_account_id)
             self._clear_auth_cookies(command.response)
         else:
             # JWT 토큰 생성 및 쿠키 설정
-            self._create_and_set_tokens(command.response, user_account.user_account_id)
+            await self._create_and_set_tokens(command.response, user_account.user_account_id)
         
         return frontend_redirect_url
     
-    async def logout(self, response: Response):
+    async def logout(self, response: Response, user_account_id: int):
+        await self.refresh_token_whitelist.revoke_all_user_tokens(user_account_id)
         self._clear_auth_cookies(response)
     
     @transactional(readonly=True)
@@ -170,21 +180,48 @@ class AuthApplicationService:
         oauth_client = self._get_oauth_client(provider_enum)
         return await oauth_client.get_social_login_url(frontend_redirect_url, action="withdraw")
 
-    @transactional
     async def refresh_access_token(self, response: Response, refresh_token: Optional[str]):
         if refresh_token is None:
             raise APIException(ErrorCode.INVALID_TOKEN)
-        
+
         payload = self.token_service.decode_token(refresh_token)
-        
+        user_account_id = payload.get("user_account_id")
+        jti = payload.get("jti")
+
+        if not user_account_id or not jti:
+            raise APIException(ErrorCode.INVALID_TOKEN)
+
+        # 1. 재사용 감지: 이미 사용된 RT인지 확인
+        used_by = await self.refresh_token_whitelist.is_token_used(jti)
+        if used_by is not None:
+            # 토큰 재사용 감지 → 해당 유저의 모든 RT 삭제
+            await self.refresh_token_whitelist.revoke_all_user_tokens(user_account_id)
+            raise APIException(ErrorCode.TOKEN_REUSE_DETECTED)
+
+        # 2. 화이트리스트 확인
+        is_valid = await self.refresh_token_whitelist.is_token_valid(user_account_id, jti)
+        if not is_valid:
+            raise APIException(ErrorCode.INVALID_TOKEN)
+
+        # 3. 기존 RT 폐기 + 사용 기록
+        await self.refresh_token_whitelist.revoke_token(user_account_id, jti)
+        await self.refresh_token_whitelist.mark_as_used(jti, user_account_id, RT_TTL_SECONDS)
+
+        # 4. 새 AT + RT 발급
         new_access_token = self.token_service.create_token(
-            payload={
-                "user_account_id": payload["user_account_id"],
-            },
+            payload={"user_account_id": user_account_id},
             expires_delta=timedelta(hours=6)
         )
-        
-        self._set_access_token_cookie(response, new_access_token)
+        new_refresh_token, new_jti = self.token_service.create_refresh_token(
+            payload={"user_account_id": user_account_id},
+            expires_delta=timedelta(days=7)
+        )
+
+        # 5. 새 RT를 화이트리스트에 저장
+        await self.refresh_token_whitelist.store_token(user_account_id, new_jti, RT_TTL_SECONDS)
+
+        # 6. 쿠키에 새 AT + RT 설정
+        self._set_auth_cookies(response, new_access_token, new_refresh_token)
 
     def _get_oauth_client(self, provider: Provider) -> OAuthClient:
         """Provider에 맞는 OAuth 클라이언트 반환"""
@@ -199,7 +236,7 @@ class AuthApplicationService:
         else:
             raise APIException(ErrorCode.INVALID_PROVIDER)
         
-    def _create_and_set_tokens(self, response: Response, user_account_id: int):
+    async def _create_and_set_tokens(self, response: Response, user_account_id: int):
         """JWT 토큰 생성 및 쿠키 설정"""
         access_token = self.token_service.create_token(
             payload={
@@ -208,12 +245,15 @@ class AuthApplicationService:
             expires_delta=timedelta(hours=6)
         )
 
-        refresh_token = self.token_service.create_token(
+        refresh_token, jti = self.token_service.create_refresh_token(
             payload={
                 "user_account_id": user_account_id
             },
             expires_delta=timedelta(days=7)
         )
+
+        # RT를 Redis 화이트리스트에 저장
+        await self.refresh_token_whitelist.store_token(user_account_id, jti, RT_TTL_SECONDS)
 
         self._set_auth_cookies(response, access_token, refresh_token)
 

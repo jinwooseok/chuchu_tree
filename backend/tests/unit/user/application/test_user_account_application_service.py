@@ -8,8 +8,10 @@ from app.core.exception import APIException
 from app.user.application.command.user_account_command import CreateUserAccountCommand, DeleteUserAccountCommand
 from app.user.application.command.link_bj_account_command import LinkBjAccountCommand
 from app.user.application.command.get_user_account_info_command import GetUserAccountInfoCommand
+from app.user.application.command.mark_synced_command import MarkSyncedCommand
 from app.user.application.command.update_user_target_command import UpdateUserTargetCommand
 from app.user.application.service.user_account_application_service import UserAccountApplicationService
+from app.user.domain.entity.account_link import AccountLink
 from app.user.domain.entity.user_account import UserAccount
 
 
@@ -218,3 +220,151 @@ class TestUpdateUserTarget:
             await service.update_user_target(command)
 
         assert exc_info.value.error_code == "INVALID_REQUEST"
+
+
+class TestLinkBaekjoonAccountWithProblemCount:
+    """link_baekjoon_account() - problem_count에 따른 is_synced 테스트"""
+
+    async def test_link_with_problems_sets_is_synced_false(self, mock_database_context):
+        existing = _make_existing_user()
+        service = _make_service(repo_return=existing)
+
+        command = LinkBjAccountCommand(
+            user_account_id=1,
+            bj_account_id="test_bj",
+            problem_count=100
+        )
+
+        result = await service.link_baekjoon_account(command)
+
+        assert result is True
+        # 연동된 link의 is_synced가 False인지 확인
+        updated_user = service.user_account_repository.update.call_args[0][0]
+        active_link = next(l for l in updated_user.account_links if l.deleted_at is None)
+        assert active_link.is_synced is False
+
+    async def test_link_without_problems_sets_is_synced_true(self, mock_database_context):
+        existing = _make_existing_user()
+        service = _make_service(repo_return=existing)
+
+        command = LinkBjAccountCommand(
+            user_account_id=1,
+            bj_account_id="test_bj",
+            problem_count=0
+        )
+
+        result = await service.link_baekjoon_account(command)
+
+        assert result is True
+        updated_user = service.user_account_repository.update.call_args[0][0]
+        active_link = next(l for l in updated_user.account_links if l.deleted_at is None)
+        assert active_link.is_synced is True
+
+
+class TestMarkAccountLinkSynced:
+    """mark_account_link_synced() - BATCH_SYNC_COMPLETED 이벤트 핸들러 테스트"""
+
+    async def test_mark_synced_success(self, mock_database_context):
+        existing = _make_existing_user()
+        # 활성 AccountLink 추가 (is_synced=False)
+        existing.account_links.append(
+            AccountLink(
+                account_link_id=None,
+                user_account_id=UserAccountId(1),
+                bj_account_id=BaekjoonAccountId("test_bj"),
+                created_at=datetime.now(),
+                deleted_at=None,
+                is_synced=False
+            )
+        )
+        service = _make_service(repo_return=existing)
+
+        command = MarkSyncedCommand(user_account_id=1)
+        await service.mark_account_link_synced(command)
+
+        service.user_account_repository.update.assert_called_once()
+        updated_user = service.user_account_repository.update.call_args[0][0]
+        active_link = next(l for l in updated_user.account_links if l.deleted_at is None)
+        assert active_link.is_synced is True
+
+    async def test_mark_synced_user_not_found_no_error(self, mock_database_context):
+        service = _make_service(repo_return=None)
+        service.user_account_repository.find_by_id.return_value = None
+
+        command = MarkSyncedCommand(user_account_id=999)
+
+        # user가 없어도 에러 없이 반환
+        await service.mark_account_link_synced(command)
+        service.user_account_repository.update.assert_not_called()
+
+    async def test_mark_synced_no_active_link(self, mock_database_context):
+        existing = _make_existing_user()
+        # 삭제된 링크만 있는 경우
+        existing.account_links.append(
+            AccountLink(
+                account_link_id=None,
+                user_account_id=UserAccountId(1),
+                bj_account_id=BaekjoonAccountId("test_bj"),
+                created_at=datetime.now(),
+                deleted_at=datetime.now(),
+                is_synced=False
+            )
+        )
+        service = _make_service(repo_return=existing)
+
+        command = MarkSyncedCommand(user_account_id=1)
+        await service.mark_account_link_synced(command)
+
+        # 활성 링크가 없으므로 is_synced 변경 없음
+        service.user_account_repository.update.assert_called_once()
+
+
+class TestGetUserAccountInfoIsSynced:
+    """get_user_account_info() - is_synced 필드 반환 테스트"""
+
+    async def test_info_includes_is_synced_true(self, mock_database_context):
+        existing = _make_existing_user()
+        existing.account_links.append(
+            AccountLink(
+                account_link_id=None,
+                user_account_id=UserAccountId(1),
+                bj_account_id=BaekjoonAccountId("test_bj"),
+                created_at=datetime.now(),
+                deleted_at=None,
+                is_synced=True
+            )
+        )
+        service = _make_service(repo_return=existing)
+
+        command = GetUserAccountInfoCommand(user_account_id=1)
+        result = await service.get_user_account_info(command)
+
+        assert result.is_synced is True
+
+    async def test_info_includes_is_synced_false(self, mock_database_context):
+        existing = _make_existing_user()
+        existing.account_links.append(
+            AccountLink(
+                account_link_id=None,
+                user_account_id=UserAccountId(1),
+                bj_account_id=BaekjoonAccountId("test_bj"),
+                created_at=datetime.now(),
+                deleted_at=None,
+                is_synced=False
+            )
+        )
+        service = _make_service(repo_return=existing)
+
+        command = GetUserAccountInfoCommand(user_account_id=1)
+        result = await service.get_user_account_info(command)
+
+        assert result.is_synced is False
+
+    async def test_info_no_link_returns_is_synced_false(self, mock_database_context):
+        existing = _make_existing_user()
+        service = _make_service(repo_return=existing)
+
+        command = GetUserAccountInfoCommand(user_account_id=1)
+        result = await service.get_user_account_info(command)
+
+        assert result.is_synced is False

@@ -10,6 +10,7 @@ from app.core.database import transactional
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
 from app.user.application.command.link_bj_account_command import LinkBjAccountCommand
+from app.user.application.command.mark_synced_command import MarkSyncedCommand
 from app.user.application.command.update_user_target_command import UpdateUserTargetCommand
 from app.user.application.command.user_account_command import CreateUserAccountCommand, DeleteUserAccountCommand
 from app.user.application.command.get_user_account_info_command import GetUserAccountInfoCommand
@@ -21,6 +22,7 @@ from app.user.domain.entity.user_target import UserTarget
 from app.user.domain.event.payloads import GetTargetInfoPayload, GetTargetInfoResultPayload
 from app.user.domain.repository.user_account_repository import UserAccountRepository
 from app.common.domain.enums import Provider
+from app.core.database import transactional
 
 logger = logging.getLogger(__name__)
 
@@ -108,12 +110,32 @@ class UserAccountApplicationService:
 
         # 3. UserAccount 엔티티에 연동 정보 기록
         bj_account_id = BaekjoonAccountId(command.bj_account_id)
-        user_account.link_baekjoon_account(bj_account_id)
+        user_account.link_baekjoon_account(bj_account_id, problem_count=command.problem_count)
 
         # 4. 저장
         await self.user_account_repository.update(user_account)
 
         return True
+
+    @event_handler("BATCH_SYNC_COMPLETED")
+    @transactional
+    async def mark_account_link_synced(
+        self,
+        command: MarkSyncedCommand
+    ) -> None:
+        """배치 동기화 완료 시 활성 AccountLink의 is_synced를 True로 설정"""
+        user_account = await self.user_account_repository.find_by_id(
+            UserAccountId(command.user_account_id)
+        )
+        if not user_account:
+            return
+
+        # 활성 AccountLink 찾아서 synced 처리
+        for link in user_account.account_links:
+            if link.deleted_at is None:
+                link.mark_as_synced()
+
+        await self.user_account_repository.update(user_account)
 
     @event_handler("GET_USER_ACCOUNT_INFO_REQUESTED")
     @transactional(readonly=True)
@@ -143,12 +165,20 @@ class UserAccountApplicationService:
         else:
             target_info = None
             
+        # 활성 AccountLink의 is_synced 값 조회
+        active_link = next(
+            (link for link in user_account.account_links if link.deleted_at is None),
+            None
+        )
+        is_synced = active_link.is_synced if active_link else False
+
         return GetUserAccountInfoQuery(
             user_account_id=user_account.user_account_id.value,
             provider=user_account.provider.value,
             targets=[target_info] if target_info else [],
             profile_image=user_account.profile_image,
-            registered_at=user_account.registered_at
+            registered_at=user_account.registered_at,
+            is_synced=is_synced
         )
     
     @transactional(readonly=True)
@@ -225,3 +255,24 @@ class UserAccountApplicationService:
         logger.info(f"UserAccount 삭제 완료: user_id={command.user_account_id}")
 
         return True
+
+    @event_handler("TEST_USERS_CLEANUP_REQUESTED")
+    @transactional
+    async def cleanup_test_users(self, command: dict) -> dict:
+        """
+        테스트 유저 일괄 삭제 (Provider.NONE인 모든 유저)
+
+        Args:
+            command: {"provider": "NONE"}
+
+        Returns:
+            {"deleted_count": int}
+        """
+        provider_str = command.get("provider")
+        provider = Provider(provider_str)
+
+        deleted_count = await self.user_account_repository.delete_all_by_provider(provider)
+
+        logger.info(f"테스트 유저 일괄 삭제 완료: provider={provider_str}, count={deleted_count}")
+
+        return {"deleted_count": deleted_count}
