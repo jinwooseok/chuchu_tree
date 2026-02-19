@@ -50,7 +50,6 @@ async def lifespan(app: AppWithContainer):
     finally:
         # Shutdown: 정리 작업
         db = injection_container.database()
-        return
 
 app = AppWithContainer(
     title="ChuChuTree API",
@@ -63,12 +62,12 @@ app = AppWithContainer(
     lifespan=lifespan
 )
 
-from prometheus_fastapi_instrumentator import Instrumentator
-Instrumentator().instrument(app).expose(app, endpoint="/metrics")
-
-
 # Register middlewares (CORS 등)
 create_middlewares(app)
+
+# Prometheus metrics (미들웨어 이후에 등록)
+from prometheus_fastapi_instrumentator import Instrumentator
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 # Register exception handlers
 app.add_exception_handler(APIException, custom_exception_handler)
