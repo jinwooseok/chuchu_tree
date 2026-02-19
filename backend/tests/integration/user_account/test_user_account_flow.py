@@ -1,4 +1,5 @@
 import pytest
+from datetime import timedelta
 from httpx import AsyncClient
 
 
@@ -35,9 +36,14 @@ class TestUserAccountAuthenticated:
     """
 
     async def test_get_user_tags(
-        self, integration_client: AsyncClient, valid_access_token: str
+        self, integration_client: AsyncClient,
+        linked_baekjoon_account, baekjoon_test_user, token_service
     ):
-        integration_client.cookies.set("access_token", valid_access_token)
+        access_token = token_service.create_token(
+            payload={"user_account_id": baekjoon_test_user.user_account_id},
+            expires_delta=timedelta(hours=6)
+        )
+        integration_client.cookies.set("access_token", access_token)
         resp = await integration_client.get("/api/v1/user-accounts/me/tags")
         assert resp.status_code == 200
 
