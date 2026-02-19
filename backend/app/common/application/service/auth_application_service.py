@@ -242,7 +242,7 @@ class AuthApplicationService:
             payload={
                 "user_account_id": user_account_id
             },
-            expires_delta=timedelta(hours=6)
+            expires_delta=timedelta(minutes=60)
         )
 
         refresh_token, jti = self.token_service.create_refresh_token(
@@ -269,7 +269,7 @@ class AuthApplicationService:
                                        max_age=7 * 24 * 60 * 60)
     
     def _set_access_token_cookie(self, response: Response, access_token: str):
-        self.cookie_service.set_cookie(response, 
+        self.cookie_service.set_cookie(response,
                                      "access_token", 
                                      access_token, 
                                      max_age=6 * 60 * 60)
