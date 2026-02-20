@@ -2,9 +2,7 @@ import pytest
 from datetime import date, datetime
 
 from app.activity.domain.entity.user_activity import UserActivity
-from app.activity.domain.entity.problem_banned_record import ProblemBannedRecord
-from app.activity.domain.entity.problem_record import ProblemRecord
-from app.activity.domain.entity.will_solve_problem import WillSolveProblem
+from app.activity.domain.entity.user_problem_status import UserProblemStatus
 from app.activity.domain.entity.tag_customization import TagCustomization
 from app.common.domain.enums import ExcludedReason
 from app.common.domain.vo.identifiers import ProblemId, TagId, UserAccountId
@@ -19,9 +17,7 @@ class TestUserActivityCreate:
 
         assert ua.user_activity_id is None
         assert ua.user_account_id == UserAccountId(1)
-        assert ua.will_solve_problems == []
-        assert ua.banned_problems == []
-        assert ua.solved_problems == []
+        assert ua.problem_statuses == []
         assert ua.tag_customizations == []
 
 
@@ -50,8 +46,7 @@ class TestUserActivityWillSolve:
         ua.mark_problem_to_solve(ProblemId(1000))
         ua.unmark_problem(ProblemId(1000))
 
-        active = [p for p in ua.will_solve_problems if p.deleted_at is None]
-        assert len(active) == 0
+        assert len(ua.will_solve_problems) == 0
 
     def test_mark_deleted_problem_restores(self):
         ua = self._make_activity()
@@ -59,8 +54,7 @@ class TestUserActivityWillSolve:
         ua.unmark_problem(ProblemId(1000))
         ua.mark_problem_to_solve(ProblemId(1000))
 
-        active = [p for p in ua.will_solve_problems if p.deleted_at is None]
-        assert len(active) == 1
+        assert len(ua.will_solve_problems) == 1
 
 
 class TestUserActivityBanProblem:
@@ -88,8 +82,7 @@ class TestUserActivityBanProblem:
         ua.ban_problem(ProblemId(1000))
         ua.remove_ban_problem(ProblemId(1000))
 
-        active = [p for p in ua.banned_problems if p.deleted_at is None]
-        assert len(active) == 0
+        assert len(ua.banned_problems) == 0
 
     def test_remove_nonexistent_ban_does_nothing(self):
         ua = self._make_activity()
@@ -123,10 +116,7 @@ class TestUserActivitySolvedProblem:
         ua.mark_problem_to_solve(ProblemId(1000))
         ua.record_problem_solved(ProblemId(1000))
 
-        active_will_solve = [
-            p for p in ua.will_solve_problems if p.deleted_at is None
-        ]
-        assert len(active_will_solve) == 0
+        assert len(ua.will_solve_problems) == 0
         assert len(ua.solved_problems) == 1
 
 

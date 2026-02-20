@@ -152,9 +152,7 @@ class UserAccountRepositoryImpl(UserAccountRepository):
         from app.baekjoon.infra.model.problem_history import ProblemHistoryModel
         from app.baekjoon.infra.model.streak import StreakModel
         from app.baekjoon.infra.model.tag_skill_history import TagSkillHistoryModel
-        from app.activity.infra.model.problem_record import ProblemRecordModel
-        from app.activity.infra.model.will_solve_problem import WillSolveProblemModel
-        from app.activity.infra.model.problem_banned_record import ProblemBannedRecordModel
+        from app.activity.infra.model.user_problem_status import UserProblemStatusModel
         from app.activity.infra.model.tag_custom import TagCustomModel
 
         # 1. Provider.NONE인 유저 ID 목록 조회
@@ -189,15 +187,9 @@ class UserAccountRepositoryImpl(UserAccountRepository):
                 delete(BjAccountModel).where(BjAccountModel.bj_account_id.in_(bj_account_ids))
             )
 
-        # 4. activity 관련 데이터 삭제
+        # 4. activity 관련 데이터 삭제 (UserProblemStatusModel 삭제 시 ProblemDateRecordModel CASCADE 삭제)
         await self.session.execute(
-            delete(ProblemRecordModel).where(ProblemRecordModel.user_account_id.in_(user_ids))
-        )
-        await self.session.execute(
-            delete(WillSolveProblemModel).where(WillSolveProblemModel.user_account_id.in_(user_ids))
-        )
-        await self.session.execute(
-            delete(ProblemBannedRecordModel).where(ProblemBannedRecordModel.user_account_id.in_(user_ids))
+            delete(UserProblemStatusModel).where(UserProblemStatusModel.user_account_id.in_(user_ids))
         )
         await self.session.execute(
             delete(TagCustomModel).where(TagCustomModel.user_account_id.in_(user_ids))
