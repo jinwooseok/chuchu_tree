@@ -86,6 +86,7 @@ class UserAccountResponse(BaseModel):
     profile_image_url: str | None = Field(None, description="프로필 이미지 URL")
     target: TargetResponse | None = Field(None, description="목표 정보")
     registered_at: str = Field(..., description="가입일")
+    is_synced: bool = Field(False, description="배치 동기화 완료 여부")
 
     model_config = ConfigDict(
         alias_generator=to_camel,
@@ -99,7 +100,8 @@ class UserAccountResponse(BaseModel):
             user_account_id=query.user_account_id,
             profile_image_url=query.profile_image_url,
             target=TargetResponse.from_query(query.targets[0]) if query.targets else TargetResponse(),
-            registered_at=query.registered_at.isoformat()
+            registered_at=query.registered_at.isoformat(),
+            is_synced=query.is_synced,
         )
 
 

@@ -95,7 +95,8 @@ class GetBaekjoonMeUsecase:
             user_account_id=user_account_info.user_account_id,
             profile_image_url=user_account_info.profile_image_url,
             registered_at=user_account_info.registered_at,
-            targets=user_account_info.targets
+            targets=user_account_info.targets,
+            is_synced=user_account_info.is_synced,
         )
 
         stat_query = BjAccountStatQuery(

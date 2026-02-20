@@ -91,7 +91,7 @@ async def logout(
         쿠키 삭제
     """
     response = ApiResponse({})
-    await auth_application_service.logout(response)
+    await auth_application_service.logout(response, current_user.user_account_id)
     return response
 
 @router.post("/token/refresh", response_model=ApiResponseSchema[dict])

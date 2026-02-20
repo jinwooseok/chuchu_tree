@@ -126,6 +126,31 @@ class TestUserAccountLinkBaekjoon:
         assert len(active_links) == 1
         assert active_links[0].bj_account_id == new_bj_id
 
+    def test_link_with_problems_sets_is_synced_false(self):
+        user = self._make_user()
+        bj_id = BaekjoonAccountId("test_bj")
+
+        user.link_baekjoon_account(bj_id, problem_count=10)
+
+        assert user.account_links[-1].is_synced is False
+
+    def test_link_without_problems_sets_is_synced_true(self):
+        user = self._make_user()
+        bj_id = BaekjoonAccountId("test_bj")
+
+        user.link_baekjoon_account(bj_id, problem_count=0)
+
+        assert user.account_links[-1].is_synced is True
+
+    def test_link_default_problem_count_sets_is_synced_true(self):
+        """problem_count 미전달 시 기본값 0이므로 is_synced=True"""
+        user = self._make_user()
+        bj_id = BaekjoonAccountId("test_bj")
+
+        user.link_baekjoon_account(bj_id)
+
+        assert user.account_links[-1].is_synced is True
+
     def test_link_deactivates_existing_active_link(self):
         user = self._make_user()
         old_bj_id = BaekjoonAccountId("old_bj")

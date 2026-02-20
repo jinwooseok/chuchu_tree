@@ -40,7 +40,7 @@ class UserAccount:
             targets=[]
         )
     
-    def link_baekjoon_account(self, bj_account_id: BaekjoonAccountId) -> None:
+    def link_baekjoon_account(self, bj_account_id: BaekjoonAccountId, problem_count: int = 0) -> None:
         """도메인 로직 - 백준 계정 연동"""
         now = datetime.now()
         
@@ -68,7 +68,7 @@ class UserAccount:
                 link.deleted_at = now
         
         # 4. 새로운 연동 정보 추가
-        new_link = AccountLink.create(self.user_account_id, bj_account_id)
+        new_link = AccountLink.create(self.user_account_id, bj_account_id, is_synced=(problem_count == 0))
         self.account_links.append(new_link)
         
         self.updated_at = datetime.now()
