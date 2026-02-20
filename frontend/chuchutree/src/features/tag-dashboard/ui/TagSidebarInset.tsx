@@ -172,8 +172,8 @@ export function TagSidebarInset({ tagDashboard, isLanding = false }: { tagDashbo
   return (
     <div className="hide-scrollbar flex h-full flex-col gap-4 overflow-y-auto p-4 text-sm">
       {/* 제목과 초기화 버튼 */}
-      {isLanding && <div className="text-muted-foreground w-full pr-2 text-start text-sm font-medium">ChuchuTree 연습페이지</div>}
-      <div className="flex items-center justify-between">
+      {isLanding && <div className="text-white cursor-default select-none bg-primary w-full px-2 py-2 rounded-sm text-sm font-medium">ChuchuTree 튜토리얼</div>}
+      <div className="flex items-center  justify-between">
         <div className="cursor-default text-lg font-semibold">알고리즘 Dashboard</div>
         <AppTooltip content="필터 초기화" side="right">
           <Button onClick={clearFilters} variant="ghost" size="icon" aria-label="필터 초기화">

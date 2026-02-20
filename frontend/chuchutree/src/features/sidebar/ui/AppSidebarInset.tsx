@@ -295,7 +295,11 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                 </div>
                 <div className={`text-md ml-9 flex flex-col font-bold ${sidebarOpenState !== 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>
                   <span>ChuChuTree</span>
-                  <span className="text-muted-foreground text-end text-sm font-medium">{isLanding ? '튜토리얼' : 'ver1.0'}</span>
+                  {isLanding ? (
+                    <span className="text-white bg-primary text-end text-sm font-medium rounded-sm px-2">튜토리얼</span>
+                  ) : (
+                    <span className="text-muted-foreground text-end text-sm font-medium">ver1.0</span>
+                  )}
                 </div>
               </div>
               {/* 사이드 바 토글 (header) */}
@@ -342,7 +346,11 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                 <SidebarMenuItem key="addPrevProblems" aria-label={'가입일 이전 문제 등록하기'}>
                   <AppTooltip content={user?.userAccount?.isSynced === false ? '첫 가입 후 꼭 해주세요!' : '가입일 이전 문제 등록하기'} side="right">
                     <SidebarMenuButton asChild>
-                      <div onClick={handleAddPrevProblems} className={`relative cursor-pointer ${user?.userAccount?.isSynced === false ? 'border-primary border-2' : ''}`} data-onboarding-id="add-prev-problems-button">
+                      <div
+                        onClick={handleAddPrevProblems}
+                        className={`relative cursor-pointer ${user?.userAccount?.isSynced === false ? 'border-primary border-2' : ''}`}
+                        data-onboarding-id="add-prev-problems-button"
+                      >
                         {user?.userAccount?.isSynced === false && (
                           <div className="pointer-events-none absolute inset-0 overflow-hidden">
                             <div className="star-border-active" />
