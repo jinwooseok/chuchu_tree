@@ -340,11 +340,16 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem key="addPrevProblems" aria-label={'가입일 이전 문제 등록하기'}>
-                  <AppTooltip content="가입일 이전 문제 등록하기" side="right">
+                  <AppTooltip content={user?.userAccount?.isSynced === false ? '첫 가입 후 꼭 해주세요!' : '가입일 이전 문제 등록하기'} side="right">
                     <SidebarMenuButton asChild>
-                      <div onClick={handleAddPrevProblems} className="cursor-pointer" data-onboarding-id="add-prev-problems-button">
-                        <BookOpen size={ICON_SIZE} />
-                        <span>가입 전 풀이 등록하기</span>
+                      <div onClick={handleAddPrevProblems} className={`relative cursor-pointer ${user?.userAccount?.isSynced === false ? 'border-primary border-2' : ''}`} data-onboarding-id="add-prev-problems-button">
+                        {user?.userAccount?.isSynced === false && (
+                          <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                            <div className="star-border-active" />
+                          </div>
+                        )}
+                        <BookOpen size={ICON_SIZE} className="relative z-10" />
+                        <span className="relative z-10">가입 전 풀이 등록하기</span>
                       </div>
                     </SidebarMenuButton>
                   </AppTooltip>
