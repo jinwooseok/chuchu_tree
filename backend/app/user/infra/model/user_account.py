@@ -10,10 +10,7 @@ from app.core.database import Base
 if TYPE_CHECKING:
     from app.user.infra.model.account_link import AccountLinkModel
     from app.user.infra.model.user_target import UserTargetModel
-    from app.activity.infra.model.problem_banned_record import ProblemBannedRecordModel
     from app.activity.infra.model.tag_custom import TagCustomModel
-    from app.activity.infra.model.will_solve_problem import WillSolveProblemModel
-    from app.activity.infra.model.problem_record import ProblemRecordModel
 
 class UserAccountModel(Base):
     __tablename__ = "user_account"
@@ -56,21 +53,3 @@ class UserAccountModel(Base):
         cascade="all, delete-orphan"
     )
     
-    problem_records: Mapped[list["ProblemRecordModel"]] = relationship(
-        "ProblemRecordModel", 
-        back_populates="user_account",
-        cascade="all, delete-orphan"
-    )
-    
-    banned_problems: Mapped[list["ProblemBannedRecordModel"]] = relationship(
-        "ProblemBannedRecordModel", 
-        back_populates="user_account",
-        cascade="all, delete-orphan"
-    )
-    
-    will_solve_problems: Mapped[list["WillSolveProblemModel"]] = relationship(
-        "WillSolveProblemModel", 
-        order_by="WillSolveProblemModel.order",
-        back_populates="user_account",
-        cascade="all, delete-orphan"
-    )

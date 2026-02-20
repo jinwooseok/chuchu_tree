@@ -1,20 +1,14 @@
 """ProblemDateRecord Model - 날짜별 기록 테이블 (1:N 관계의 N)"""
 from datetime import datetime, date
 from typing import TYPE_CHECKING, Optional
-from enum import Enum as PyEnum
 from sqlalchemy import DateTime, Integer, ForeignKey, Date, Index, Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from app.activity.domain.entity.problem_date_record import RecordType
 from app.core.database import Base
 
 if TYPE_CHECKING:
     from app.activity.infra.model.user_problem_status import UserProblemStatusModel
-
-
-class RecordType(PyEnum):
-    """기록 유형"""
-    WILL_SOLVE = "WILL_SOLVE"
-    SOLVED = "SOLVED"
 
 
 class ProblemDateRecordModel(Base):

@@ -7,14 +7,12 @@ from sqlalchemy import and_, delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.activity.domain.entity.problem_banned_record import ProblemBannedRecord
-from app.activity.domain.entity.problem_record import ProblemRecord
 from app.activity.domain.entity.user_activity import UserActivity
-from app.activity.domain.entity.will_solve_problem import WillSolveProblem
+from app.activity.domain.entity.user_problem_status import UserProblemStatus
 from app.activity.domain.repository.user_activity_repository import UserActivityRepository
-from app.activity.infra.mapper.problem_record_mapper import ProblemRecordMapper
 from app.activity.infra.mapper.tag_customization_mapper import TagCustomizationMapper
 from app.activity.infra.mapper.user_activity_mapper import UserActivityMapper
+from app.activity.infra.mapper.user_problem_status_mapper import UserProblemStatusMapper
 from app.activity.infra.model.user_problem_status import UserProblemStatusModel
 from app.activity.infra.model.problem_date_record import ProblemDateRecordModel, RecordType
 from app.activity.infra.model.tag_custom import TagCustomModel
@@ -29,11 +27,6 @@ class UserActivityRepositoryImpl(UserActivityRepository):
     정규화된 테이블 구조:
     - UserProblemStatusModel: 문제별 마스터 (1:N의 1)
     - ProblemDateRecordModel: 날짜별 디테일 (1:N의 N)
-
-    도메인 엔티티 매핑:
-    - SOLVED: solved_yn=true + record_type='SOLVED'
-    - WILL_SOLVE: solved_yn=false, banned_yn=false + record_type='WILL_SOLVE'
-    - BANNED: banned_yn=true (날짜 레코드 없음)
     """
 
     def __init__(self, db: Database):
@@ -76,7 +69,7 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         user_id: UserAccountId,
         year: int,
         month: int
-    ) -> list[ProblemRecord]:
+    ) -> list[UserProblemStatus]:
         """월간 푼 문제 기록 조회 (solved_yn=true, record_type='SOLVED')"""
         _, last_day = monthrange(year, month)
         start_date = date(year, month, 1)
@@ -104,17 +97,19 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         )
 
         result = await self.session.execute(stmt)
-        statuses = result.scalars().unique().all()
+        status_models = result.scalars().unique().all()
 
-        records = []
-        for status in statuses:
-            for date_record in status.date_records:
-                if (date_record.record_type == RecordType.SOLVED and
-                    date_record.deleted_at is None and
-                    start_date <= date_record.marked_date <= end_date):
-                    records.append(ProblemRecordMapper.to_entity(status, date_record))
+        statuses = []
+        for status_model in status_models:
+            for dr_model in status_model.date_records:
+                if (dr_model.record_type == RecordType.SOLVED and
+                        dr_model.deleted_at is None and
+                        start_date <= dr_model.marked_date <= end_date):
+                    statuses.append(UserProblemStatusMapper.status_to_entity(
+                        status_model, [dr_model]
+                    ))
 
-        return sorted(records, key=lambda r: r.marked_date)
+        return sorted(statuses, key=lambda s: s.marked_date)
 
     @override
     async def find_monthly_will_solve_problems(
@@ -122,7 +117,7 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         user_id: UserAccountId,
         year: int,
         month: int
-    ) -> list[WillSolveProblem]:
+    ) -> list[UserProblemStatus]:
         """월간 풀 예정 문제 조회 (solved_yn=false, banned_yn=false, record_type='WILL_SOLVE')"""
         _, last_day = monthrange(year, month)
         start_date = date(year, month, 1)
@@ -150,25 +145,27 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         )
 
         result = await self.session.execute(stmt)
-        statuses = result.scalars().unique().all()
+        status_models = result.scalars().unique().all()
 
-        records = []
-        for status in statuses:
-            for date_record in status.date_records:
-                if (date_record.record_type == RecordType.WILL_SOLVE and
-                    date_record.deleted_at is None and
-                    start_date <= date_record.marked_date <= end_date):
-                    records.append(ProblemRecordMapper.to_will_solve_entity(status, date_record))
+        statuses = []
+        for status_model in status_models:
+            for dr_model in status_model.date_records:
+                if (dr_model.record_type == RecordType.WILL_SOLVE and
+                        dr_model.deleted_at is None and
+                        start_date <= dr_model.marked_date <= end_date):
+                    statuses.append(UserProblemStatusMapper.status_to_entity(
+                        status_model, [dr_model]
+                    ))
 
-        return sorted(records, key=lambda r: (r.marked_date, r.order))
+        return sorted(statuses, key=lambda s: (s.marked_date, s.order))
 
     @override
     async def find_will_solve_problems_by_date(
         self,
         user_id: UserAccountId,
         target_date: date
-    ) -> list[WillSolveProblem]:
-        """날짜별 풀 예정 문제 조회 (solved_yn=false, banned_yn=false, record_type='WILL_SOLVE')"""
+    ) -> list[UserProblemStatus]:
+        """날짜별 풀 예정 문제 조회"""
         stmt = (
             select(UserProblemStatusModel)
             .join(ProblemDateRecordModel)
@@ -187,25 +184,27 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         )
 
         result = await self.session.execute(stmt)
-        statuses = result.scalars().unique().all()
+        status_models = result.scalars().unique().all()
 
-        records = []
-        for status in statuses:
-            for date_record in status.date_records:
-                if (date_record.record_type == RecordType.WILL_SOLVE and
-                    date_record.deleted_at is None and
-                    date_record.marked_date == target_date):
-                    records.append(ProblemRecordMapper.to_will_solve_entity(status, date_record))
+        statuses = []
+        for status_model in status_models:
+            for dr_model in status_model.date_records:
+                if (dr_model.record_type == RecordType.WILL_SOLVE and
+                        dr_model.deleted_at is None and
+                        dr_model.marked_date == target_date):
+                    statuses.append(UserProblemStatusMapper.status_to_entity(
+                        status_model, [dr_model]
+                    ))
 
-        return sorted(records, key=lambda r: r.order)
+        return sorted(statuses, key=lambda s: s.order)
 
     @override
     async def find_problem_records_by_date(
         self,
         user_id: UserAccountId,
         target_date: date
-    ) -> list[ProblemRecord]:
-        """날짜별 푼 문제 조회 (solved_yn=true, record_type='SOLVED')"""
+    ) -> list[UserProblemStatus]:
+        """날짜별 푼 문제 조회"""
         stmt = (
             select(UserProblemStatusModel)
             .join(ProblemDateRecordModel)
@@ -224,24 +223,26 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         )
 
         result = await self.session.execute(stmt)
-        statuses = result.scalars().unique().all()
+        status_models = result.scalars().unique().all()
 
-        records = []
-        for status in statuses:
-            for date_record in status.date_records:
-                if (date_record.record_type == RecordType.SOLVED and
-                    date_record.deleted_at is None and
-                    date_record.marked_date == target_date):
-                    records.append(ProblemRecordMapper.to_entity(status, date_record))
+        statuses = []
+        for status_model in status_models:
+            for dr_model in status_model.date_records:
+                if (dr_model.record_type == RecordType.SOLVED and
+                        dr_model.deleted_at is None and
+                        dr_model.marked_date == target_date):
+                    statuses.append(UserProblemStatusMapper.status_to_entity(
+                        status_model, [dr_model]
+                    ))
 
-        return sorted(records, key=lambda r: r.order)
+        return sorted(statuses, key=lambda s: s.order)
 
-    async def _get_or_create_status(
+    async def _get_existing_status(
         self,
         user_account_id: int,
         problem_id: int
-    ) -> UserProblemStatusModel:
-        """기존 status 조회 또는 새로 생성"""
+    ) -> UserProblemStatusModel | None:
+        """기존 status 조회"""
         stmt = select(UserProblemStatusModel).where(
             and_(
                 UserProblemStatusModel.user_account_id == user_account_id,
@@ -251,120 +252,68 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none()
 
+    async def _save_status_with_date_records(self, entity: UserProblemStatus) -> None:
+        """UserProblemStatus (+ date_records) 저장 - Upsert"""
+        existing_status = await self._get_existing_status(
+            entity.user_account_id.value,
+            entity.problem_id.value
+        )
+
+        status_model = UserProblemStatusMapper.entity_to_status_model(entity, existing_status)
+        if not existing_status:
+            self.session.add(status_model)
+            await self.session.flush()
+
+        for date_record in entity.date_records:
+            if date_record.problem_date_record_id:
+                dr_stmt = select(ProblemDateRecordModel).where(
+                    ProblemDateRecordModel.problem_date_record_id == date_record.problem_date_record_id
+                )
+                dr_result = await self.session.execute(dr_stmt)
+                existing_dr = dr_result.scalar_one_or_none()
+
+                dr_model = UserProblemStatusMapper.entity_to_date_record_model(
+                    date_record, status_model.user_problem_status_id, existing_dr
+                )
+                if not existing_dr:
+                    self.session.add(dr_model)
+            else:
+                dr_model = UserProblemStatusMapper.entity_to_date_record_model(
+                    date_record, status_model.user_problem_status_id
+                )
+                self.session.add(dr_model)
+
     @override
     async def save_all_will_solve_problems(
         self,
-        will_solve_problems: list[WillSolveProblem]
+        statuses: list[UserProblemStatus]
     ) -> None:
-        """일괄 저장 및 업데이트 (Upsert) - 2개 테이블 처리"""
-        if not will_solve_problems:
+        """풀 예정 문제 일괄 저장 (Upsert)"""
+        if not statuses:
             return
-
-        for entity in will_solve_problems:
-            # 1. Status 조회 또는 생성
-            existing_status = await self._get_or_create_status(
-                entity.user_account_id.value,
-                entity.problem_id.value
-            )
-
-            if existing_status:
-                # 기존 status 업데이트
-                status_model = ProblemRecordMapper.from_will_solve_to_status_model(
-                    entity, existing_status
-                )
-            else:
-                # 새 status 생성
-                status_model = ProblemRecordMapper.from_will_solve_to_status_model(entity)
-                self.session.add(status_model)
-                await self.session.flush()
-
-            # 2. Date record 처리
-            if entity.will_solve_problem_id:
-                # 기존 date record 조회
-                date_stmt = select(ProblemDateRecordModel).where(
-                    ProblemDateRecordModel.problem_date_record_id == entity.will_solve_problem_id
-                )
-                date_result = await self.session.execute(date_stmt)
-                existing_date_record = date_result.scalar_one_or_none()
-
-                date_record = ProblemRecordMapper.from_will_solve_to_date_record(
-                    entity, status_model.user_problem_status_id, existing_date_record
-                )
-                if not existing_date_record:
-                    self.session.add(date_record)
-            else:
-                date_record = ProblemRecordMapper.from_will_solve_to_date_record(
-                    entity, status_model.user_problem_status_id
-                )
-                self.session.add(date_record)
-
+        for entity in statuses:
+            await self._save_status_with_date_records(entity)
         await self.session.flush()
 
     @override
     async def save_all_problem_records(
         self,
-        problem_records: list[ProblemRecord]
+        statuses: list[UserProblemStatus]
     ) -> None:
-        """일괄 저장 및 업데이트 (Upsert) - 2개 테이블 처리"""
-        if not problem_records:
+        """푼 문제 일괄 저장 (Upsert)"""
+        if not statuses:
             return
-
-        for entity in problem_records:
-            # 1. Status 조회 또는 생성
-            existing_status = await self._get_or_create_status(
-                entity.user_account_id.value,
-                entity.problem_id.value
-            )
-
-            if existing_status:
-                status_model = ProblemRecordMapper.to_status_model(entity, existing_status)
-            else:
-                status_model = ProblemRecordMapper.to_status_model(entity)
-                self.session.add(status_model)
-                await self.session.flush()
-
-            # 2. Date record 처리
-            if entity.problem_record_id:
-                date_stmt = select(ProblemDateRecordModel).where(
-                    ProblemDateRecordModel.problem_date_record_id == entity.problem_record_id
-                )
-                date_result = await self.session.execute(date_stmt)
-                existing_date_record = date_result.scalar_one_or_none()
-
-                date_record = ProblemRecordMapper.to_date_record_model(
-                    entity, status_model.user_problem_status_id, existing_date_record
-                )
-                if not existing_date_record:
-                    self.session.add(date_record)
-            else:
-                date_record = ProblemRecordMapper.to_date_record_model(
-                    entity, status_model.user_problem_status_id
-                )
-                self.session.add(date_record)
-
+        for entity in statuses:
+            await self._save_status_with_date_records(entity)
         await self.session.flush()
 
     @override
-    async def save_problem_record(
-        self,
-        problem_record: ProblemRecord
-    ) -> None:
-        """저장 및 업데이트 (Upsert) - 2개 테이블 처리"""
-        if not problem_record:
+    async def save_problem_status(self, status: UserProblemStatus) -> None:
+        """단일 UserProblemStatus 저장"""
+        if not status:
             return
-
-        await self.save_all_problem_records([problem_record])
-
-    @override
-    async def save_will_solve_problem(
-        self,
-        will_solve_problem: WillSolveProblem
-    ) -> None:
-        """저장 및 업데이트 (Upsert) - 2개 테이블 처리"""
-        if not will_solve_problem:
-            return
-
-        await self.save_all_will_solve_problems([will_solve_problem])
+        await self._save_status_with_date_records(status)
+        await self.session.flush()
 
     @override
     async def find_only_tag_custom_by_user_account_id(
@@ -410,35 +359,32 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         result = await self.session.execute(stmt)
         status_models = result.scalars().all()
 
-        banned_problems = [ProblemRecordMapper.to_banned_entity(model) for model in status_models]
+        problem_statuses = [
+            UserProblemStatusMapper.status_to_entity(model, [])
+            for model in status_models
+        ]
 
         return UserActivity(
             user_activity_id=None,
             user_account_id=user_account_id,
-            will_solve_problems=[],
-            banned_problems=banned_problems,
-            solved_problems=[],
+            problem_statuses=problem_statuses,
             tag_customizations=[],
         )
 
     @override
-    async def save_problem_banned_record(self, activity: UserActivity):
+    async def save_problem_banned_record(self, activity: UserActivity) -> None:
         """밴된 문제 저장 (banned_yn=true로 저장, 날짜 레코드 없음)"""
-        if not activity.banned_problems:
-            return
+        for entity in activity.problem_statuses:
+            if not entity.banned_yn:
+                continue
 
-        for entity in activity.banned_problems:
-            existing_status = await self._get_or_create_status(
+            existing_status = await self._get_existing_status(
                 entity.user_account_id.value,
                 entity.problem_id.value
             )
 
-            if existing_status:
-                status_model = ProblemRecordMapper.from_banned_to_status_model(
-                    entity, existing_status
-                )
-            else:
-                status_model = ProblemRecordMapper.from_banned_to_status_model(entity)
+            status_model = UserProblemStatusMapper.entity_to_status_model(entity, existing_status)
+            if not existing_status:
                 self.session.add(status_model)
 
         await self.session.flush()
@@ -448,8 +394,8 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         self,
         user_id: UserAccountId,
         problem_ids: list[int]
-    ) -> list[ProblemRecord]:
-        """특정 문제 ID들의 problem_record 조회 (solved_yn=true, record_type='SOLVED')"""
+    ) -> list[UserProblemStatus]:
+        """특정 문제 ID들의 solved 상태 조회"""
         if not problem_ids:
             return []
 
@@ -467,24 +413,28 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         )
 
         result = await self.session.execute(stmt)
-        statuses = result.scalars().unique().all()
+        status_models = result.scalars().unique().all()
 
-        records = []
-        for status in statuses:
-            for date_record in status.date_records:
-                if (date_record.record_type == RecordType.SOLVED and
-                    date_record.deleted_at is None):
-                    records.append(ProblemRecordMapper.to_entity(status, date_record))
+        statuses = []
+        for status_model in status_models:
+            active_solved = [
+                dr for dr in status_model.date_records
+                if dr.record_type == RecordType.SOLVED and dr.deleted_at is None
+            ]
+            if active_solved:
+                statuses.append(UserProblemStatusMapper.status_to_entity(
+                    status_model, active_solved
+                ))
 
-        return records
+        return statuses
 
     @override
     async def find_will_solve_problems_by_problem_ids(
         self,
         user_id: UserAccountId,
         problem_ids: list[int]
-    ) -> list[WillSolveProblem]:
-        """특정 문제 ID들의 will_solve_problem 조회 (solved_yn=false=)"""
+    ) -> list[UserProblemStatus]:
+        """특정 문제 ID들의 will_solve 상태 조회"""
         if not problem_ids:
             return []
 
@@ -502,24 +452,28 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         )
 
         result = await self.session.execute(stmt)
-        statuses = result.scalars().unique().all()
+        status_models = result.scalars().unique().all()
 
-        records = []
-        for status in statuses:
-            for date_record in status.date_records:
-                if (date_record.record_type == RecordType.WILL_SOLVE and
-                    date_record.deleted_at is None):
-                    records.append(ProblemRecordMapper.to_will_solve_entity(status, date_record))
+        statuses = []
+        for status_model in status_models:
+            active_will_solve = [
+                dr for dr in status_model.date_records
+                if dr.record_type == RecordType.WILL_SOLVE and dr.deleted_at is None
+            ]
+            if active_will_solve:
+                statuses.append(UserProblemStatusMapper.status_to_entity(
+                    status_model, active_will_solve
+                ))
 
-        return records
+        return statuses
 
     @override
     async def find_problem_record_by_problem_id(
         self,
         user_id: UserAccountId,
         problem_id: int
-    ) -> ProblemRecord | None:
-        """특정 문제 ID의 problem_record 조회 (solved_yn=true)"""
+    ) -> UserProblemStatus | None:
+        """특정 문제 ID의 solved 상태 조회"""
         stmt = (
             select(UserProblemStatusModel)
             .options(selectinload(UserProblemStatusModel.date_records))
@@ -534,25 +488,27 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         )
 
         result = await self.session.execute(stmt)
-        status = result.scalar_one_or_none()
+        status_model = result.scalar_one_or_none()
 
-        if not status:
+        if not status_model:
             return None
 
-        for date_record in status.date_records:
-            if (date_record.record_type == RecordType.SOLVED and
-                date_record.deleted_at is None):
-                return ProblemRecordMapper.to_entity(status, date_record)
+        active_solved = [
+            dr for dr in status_model.date_records
+            if dr.record_type == RecordType.SOLVED and dr.deleted_at is None
+        ]
+        if not active_solved:
+            return None
 
-        return None
+        return UserProblemStatusMapper.status_to_entity(status_model, active_solved[:1])
 
     @override
     async def find_will_solve_problem_by_problem_id(
         self,
         user_id: UserAccountId,
         problem_id: int
-    ) -> WillSolveProblem | None:
-        """특정 문제 ID의 will_solve_problem 조회 (solved_yn=false, banned_yn=false)"""
+    ) -> UserProblemStatus | None:
+        """특정 문제 ID의 will_solve 상태 조회"""
         stmt = (
             select(UserProblemStatusModel)
             .options(selectinload(UserProblemStatusModel.date_records))
@@ -568,33 +524,30 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         )
 
         result = await self.session.execute(stmt)
-        status = result.scalar_one_or_none()
+        status_model = result.scalar_one_or_none()
 
-        if not status:
+        if not status_model:
             return None
 
-        for date_record in status.date_records:
-            if (date_record.record_type == RecordType.WILL_SOLVE and
-                date_record.deleted_at is None):
-                return ProblemRecordMapper.to_will_solve_entity(status, date_record)
+        active_will_solve = [
+            dr for dr in status_model.date_records
+            if dr.record_type == RecordType.WILL_SOLVE and dr.deleted_at is None
+        ]
+        if not active_will_solve:
+            return None
 
-        return None
+        return UserProblemStatusMapper.status_to_entity(status_model, active_will_solve[:1])
 
     @override
     async def delete_all_by_user_account_id(self, user_account_id: UserAccountId) -> None:
-        """
-        사용자와 연관된 모든 활동 데이터 삭제 (Hard Delete)
-        - tag_custom
-        - user_problem_status (CASCADE로 problem_date_record도 삭제)
-        """
+        """사용자와 연관된 모든 활동 데이터 삭제 (Hard Delete)"""
         user_id_value = user_account_id.value
 
-        # 1. tag_custom 삭제
         await self.session.execute(
             delete(TagCustomModel).where(TagCustomModel.user_account_id == user_id_value)
         )
 
-        # 2. user_problem_status 삭제 (CASCADE로 problem_date_record도 삭제됨)
+        # user_problem_status 삭제 (CASCADE로 problem_date_record도 삭제됨)
         await self.session.execute(
             delete(UserProblemStatusModel).where(
                 UserProblemStatusModel.user_account_id == user_id_value

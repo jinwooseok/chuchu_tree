@@ -7,7 +7,7 @@ from sqlalchemy import and_, extract, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.activity.infra.model.problem_record import ProblemRecordModel
+from app.activity.infra.model.user_problem_status import UserProblemStatusModel
 from app.baekjoon.domain.entity.problem_history import ProblemHistory
 from app.baekjoon.domain.repository.problem_history_repository import ProblemHistoryRepository
 from app.baekjoon.infra.mapper.problem_history_mapper import ProblemHistoryMapper
@@ -198,19 +198,20 @@ class ProblemHistoryRepositoryImpl(ProblemHistoryRepository):
             select(ProblemHistoryModel.problem_id)
             .select_from(ProblemHistoryModel)
             .outerjoin(
-                ProblemRecordModel,
+                UserProblemStatusModel,
                 and_(
-                    ProblemHistoryModel.problem_id == ProblemRecordModel.problem_id,
-                    ProblemRecordModel.user_account_id == user_account_id.value,
-                    ProblemRecordModel.banned_yn == False,  # banned 레코드 제외
-                    ProblemRecordModel.deleted_at.is_(None)
+                    ProblemHistoryModel.problem_id == UserProblemStatusModel.problem_id,
+                    UserProblemStatusModel.user_account_id == user_account_id.value,
+                    UserProblemStatusModel.banned_yn == False,
+                    UserProblemStatusModel.solved_yn == True,
+                    UserProblemStatusModel.deleted_at.is_(None)
                 )
             )
             .where(
                 and_(
                     ProblemHistoryModel.bj_account_id == bj_account_id.value,
                     ProblemHistoryModel.streak_id.is_(None),  # streak과 연동되지 않은 것만
-                    ProblemRecordModel.problem_record_id.is_(None)  # problem_record에 없는 것만
+                    UserProblemStatusModel.user_problem_status_id.is_(None)  # user_problem_status에 없는 것만
                 )
             )
         )
