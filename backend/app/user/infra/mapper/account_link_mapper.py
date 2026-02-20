@@ -25,6 +25,7 @@ class AccountLinkMapper:
         # 메타데이터
         model.created_at = entity.created_at
         model.deleted_at = entity.deleted_at
+        model.is_synced = entity.is_synced
 
         return model
 
@@ -36,5 +37,6 @@ class AccountLinkMapper:
             user_account_id=UserAccountId(model.user_account_id),
             bj_account_id=BaekjoonAccountId(model.bj_account_id),
             created_at=model.created_at,
-            deleted_at=model.deleted_at
+            deleted_at=model.deleted_at,
+            is_synced=model.is_synced
         )

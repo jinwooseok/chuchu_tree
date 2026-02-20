@@ -18,10 +18,9 @@ from app.activity.application.query.monthly_activity_data_query import (
     MonthlyActivityDataQuery,
     ProblemActivityInfo
 )
-from app.activity.domain.entity.problem_record import ProblemRecord
+from app.activity.domain.entity.user_problem_status import UserProblemStatus
 from app.problem.application.query.problems_info_query import ProblemsInfoQuery
 from app.activity.domain.entity.user_activity import UserActivity
-from app.activity.domain.entity.will_solve_problem import WillSolveProblem
 from app.activity.domain.event.payloads import GetProblemsInfoPayload, GetTagSummaryPayload, GetTagSummaryResultPayload, GetTagSummarysPayload, GetTagSummarysResultPayload
 from app.activity.domain.repository.user_activity_repository import UserActivityRepository
 from app.baekjoon.domain.event.get_monthly_activity_data_payload import GetMonthlyActivityDataPayload
@@ -31,6 +30,7 @@ from app.common.domain.entity.domain_event import DomainEvent
 from app.common.domain.enums import ExcludedReason
 from app.common.domain.service.event_publisher import DomainEventBus
 from app.common.domain.vo.identifiers import ProblemId, TagId, UserAccountId
+from app.user.application.command.mark_synced_command import MarkSyncedCommand
 from app.common.infra.event.decorators import event_handler, event_register_handlers
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
@@ -81,24 +81,24 @@ class ActivityApplicationService:
         seen_solved = defaultdict(set)  # 날짜별 중복 체크용
         seen_will_solve = defaultdict(set)
 
-        for record in problem_records:
-            if record.solved:
-                pid = record.problem_id.value
+        for status in problem_records:
+            if status.solved_yn:
+                pid = status.problem_id.value
                 # 중복 체크를 하며 리스트에 추가 (이미 정렬된 순서 유지)
-                if pid not in seen_solved[record.marked_date]:
-                    seen_solved[record.marked_date].add(pid)
-                    rep_tag_id = record.representative_tag_id.value if record.representative_tag_id else None
-                    daily_map[record.marked_date]["solved"].append(
+                if pid not in seen_solved[status.marked_date]:
+                    seen_solved[status.marked_date].add(pid)
+                    rep_tag_id = status.representative_tag_id.value if status.representative_tag_id else None
+                    daily_map[status.marked_date]["solved"].append(
                         ProblemActivityInfo(problem_id=pid, representative_tag_id=rep_tag_id)
                     )
 
-        for will_solve in will_solve_problems:
-            pid = will_solve.problem_id.value
+        for status in will_solve_problems:
+            pid = status.problem_id.value
             # 중복 체크를 하며 리스트에 추가 (이미 정렬된 순서 유지)
-            if pid not in seen_will_solve[will_solve.marked_date]:
-                seen_will_solve[will_solve.marked_date].add(pid)
-                rep_tag_id = will_solve.representative_tag_id.value if will_solve.representative_tag_id else None
-                daily_map[will_solve.marked_date]["will_solve"].append(
+            if pid not in seen_will_solve[status.marked_date]:
+                seen_will_solve[status.marked_date].add(pid)
+                rep_tag_id = status.representative_tag_id.value if status.representative_tag_id else None
+                daily_map[status.marked_date]["will_solve"].append(
                     ProblemActivityInfo(problem_id=pid, representative_tag_id=rep_tag_id)
                 )
 
@@ -191,7 +191,7 @@ class ActivityApplicationService:
                 processed_entities.append(target)
             else:
                 # 신규 생성
-                new_item: WillSolveProblem = WillSolveProblem.create(
+                new_item = UserProblemStatus.create_will_solve(
                     user_account_id=user_id,
                     problem_id=ProblemId(p_id),
                     marked_date=command.solved_date
@@ -199,11 +199,10 @@ class ActivityApplicationService:
                 new_item.change_order(index)
                 processed_entities.append(new_item)
 
-        # 6. 요청 리스트에 없는데 기존 DB에 살아있는(deleted_at is None) 데이터들은 삭제 처리
+        # 6. 요청 리스트에 없는데 기존 DB에 살아있는 데이터들은 삭제 처리
         for leftover in existing_map.values():
-            if leftover.deleted_at is None:
-                leftover.delete()
-                processed_entities.append(leftover)
+            leftover.delete()
+            processed_entities.append(leftover)
 
         # 7. Repository를 통해 일괄 저장
         await self.user_activity_repository.save_all_will_solve_problems(processed_entities)
@@ -283,9 +282,8 @@ class ActivityApplicationService:
                         )
 
                     # 케이스 C: 다른 날에 solved_problem만 존재 (streak 연동 없음) → 가능 (기존 삭제 후 새로 생성)
-                    if record.deleted_at is None:
-                        record.delete()
-                        records_to_delete.append(record)
+                    record.delete()
+                    records_to_delete.append(record)
 
                 # 케이스 C에 해당하는 기존 레코드 삭제 처리
                 if records_to_delete:
@@ -297,10 +295,8 @@ class ActivityApplicationService:
                 user_id,
                 command.problem_ids
             )
-            # 기존 will_solve 삭제 처리
             for will_solve in existing_will_solves:
-                if will_solve.deleted_at is None:
-                    will_solve.delete()
+                will_solve.delete()
             if existing_will_solves:
                 await self.user_activity_repository.save_all_will_solve_problems(existing_will_solves)
 
@@ -322,7 +318,7 @@ class ActivityApplicationService:
                 processed_entities.append(target)
             else:
                 # 신규 생성
-                new_item: ProblemRecord = ProblemRecord.create(
+                new_item = UserProblemStatus.create_solved(
                     user_account_id=user_id,
                     problem_id=ProblemId(p_id),
                     marked_date=command.solved_date
@@ -330,11 +326,10 @@ class ActivityApplicationService:
                 new_item.change_order(index)
                 processed_entities.append(new_item)
 
-        # 6. 요청 리스트에 없는데 기존 DB에 살아있는(deleted_at is None) 데이터들은 삭제 처리
+        # 6. 요청 리스트에 없는데 기존 DB에 살아있는 데이터들은 삭제 처리
         for leftover in existing_map.values():
-            if leftover.deleted_at is None:
-                leftover.delete()
-                processed_entities.append(leftover)
+            leftover.delete()
+            processed_entities.append(leftover)
 
         # 7. Repository를 통해 일괄 저장
         await self.user_activity_repository.save_all_problem_records(processed_entities)
@@ -415,12 +410,12 @@ class ActivityApplicationService:
 
         # 다른 날짜에 이미 등록된 문제 필터링
         records_on_different_date = [
-            record for record in existing_records
-            if record.marked_date != requested_date_map.get(record.problem_id.value)
+            status for status in existing_records
+            if status.marked_date != requested_date_map.get(status.problem_id.value)
         ]
 
         if records_on_different_date:
-            problem_ids_to_check = [r.problem_id.value for r in records_on_different_date]
+            problem_ids_to_check = [s.problem_id.value for s in records_on_different_date]
 
             # streak 확인
             streak_date_map: dict[int, date] = {}
@@ -436,21 +431,20 @@ class ActivityApplicationService:
                 }
 
             records_to_delete = []
-            for record in records_on_different_date:
-                pid = record.problem_id.value
+            for status in records_on_different_date:
+                pid = status.problem_id.value
                 streak_date = streak_date_map.get(pid)
 
                 # 케이스 D: 다른 날에 solved_problem 존재 + streak 날짜와 일치 → 불가능
-                if streak_date and record.marked_date == streak_date:
+                if streak_date and status.marked_date == streak_date:
                     raise APIException(
                         ErrorCode.PROBLEM_ALREADY_RECORDED_ON_DIFFERENT_DATE,
                         f"스트릭과 연동된 기록은 날짜를 변경할 수 없습니다."
                     )
 
                 # 케이스 C: 다른 날에 solved_problem만 존재 (streak 연동 없음) → 가능 (기존 삭제 후 새로 생성)
-                if record.deleted_at is None:
-                    record.delete()
-                    records_to_delete.append(record)
+                status.delete()
+                records_to_delete.append(status)
 
             if records_to_delete:
                 await self.user_activity_repository.save_all_problem_records(records_to_delete)
@@ -461,16 +455,15 @@ class ActivityApplicationService:
             all_problem_ids
         )
         for will_solve in existing_will_solves:
-            if will_solve.deleted_at is None:
-                will_solve.delete()
+            will_solve.delete()
         if existing_will_solves:
             await self.user_activity_repository.save_all_will_solve_problems(existing_will_solves)
 
         # 4. 이미 동일 날짜에 등록된 문제 ID 집합 생성 (중복 생성 방지)
         existing_same_date_pids: set[int] = set()
-        for record in existing_records:
-            if record.marked_date == requested_date_map.get(record.problem_id.value) and record.deleted_at is None:
-                existing_same_date_pids.add(record.problem_id.value)
+        for status in existing_records:
+            if status.marked_date == requested_date_map.get(status.problem_id.value):
+                existing_same_date_pids.add(status.problem_id.value)
 
         # 5. 날짜별로 새 레코드 생성 (기존 order 뒤에 추가)
         all_new_records = []
@@ -479,7 +472,7 @@ class ActivityApplicationService:
             existing_on_date = await self.user_activity_repository.find_problem_records_by_date(
                 user_id, solved_date
             )
-            max_order = max((r.order for r in existing_on_date if r.deleted_at is None), default=-1)
+            max_order = max((s.order for s in existing_on_date), default=-1)
 
             order_offset = 0
             for pid in problem_ids:
@@ -487,7 +480,7 @@ class ActivityApplicationService:
                 if pid in existing_same_date_pids:
                     continue
 
-                new_record = ProblemRecord.create(
+                new_record = UserProblemStatus.create_solved(
                     user_account_id=user_id,
                     problem_id=ProblemId(pid),
                     marked_date=solved_date
@@ -499,6 +492,14 @@ class ActivityApplicationService:
         # 6. 일괄 저장
         if all_new_records:
             await self.user_activity_repository.save_all_problem_records(all_new_records)
+
+        # 7. 배치 동기화 완료 이벤트 발행
+        sync_event = DomainEvent(
+            event_type="BATCH_SYNC_COMPLETED",
+            data=MarkSyncedCommand(user_account_id=command.user_account_id),
+            result_type=None
+        )
+        await self.domain_event_bus.publish(sync_event)
 
     @transactional
     async def ban_tag(self, command: TagCustomCommand):
@@ -692,12 +693,11 @@ class ActivityApplicationService:
                     )
 
                     if history_with_streak and history_with_streak.streak_date:
-                        # streak_date를 기준으로 새로운 problem_record 생성
-                        problem_record = ProblemRecord.create(
+                        # streak_date를 기준으로 새로운 solved 상태 생성
+                        problem_record = UserProblemStatus.create_solved(
                             user_account_id=user_id,
                             problem_id=ProblemId(command.problem_id),
-                            marked_date=history_with_streak.streak_date,
-                            solved=True
+                            marked_date=history_with_streak.streak_date
                         )
 
             # 여전히 없으면 에러
@@ -747,8 +747,8 @@ class ActivityApplicationService:
         # 4. 존재하는 엔티티에 대표 태그 설정 및 저장
         if problem_record:
             problem_record.set_representative_tag(tag_id)
-            await self.user_activity_repository.save_problem_record(problem_record)
+            await self.user_activity_repository.save_problem_status(problem_record)
 
         if will_solve_problem:
             will_solve_problem.set_representative_tag(tag_id)
-            await self.user_activity_repository.save_will_solve_problem(will_solve_problem)
+            await self.user_activity_repository.save_problem_status(will_solve_problem)

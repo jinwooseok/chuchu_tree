@@ -10,8 +10,7 @@ from app.activity.application.command.batch_create_solved_problems_command impor
 from app.activity.application.command.set_representative_tag_command import SetProblemRepresentativeTagCommand
 from app.activity.application.service.activity_application_service import ActivityApplicationService
 from app.activity.domain.entity.user_activity import UserActivity
-from app.activity.domain.entity.will_solve_problem import WillSolveProblem
-from app.activity.domain.entity.problem_record import ProblemRecord
+from app.activity.domain.entity.user_problem_status import UserProblemStatus
 from app.common.domain.vo.identifiers import ProblemId, TagId, UserAccountId
 from app.core.exception import APIException
 
@@ -70,7 +69,7 @@ class TestUpdateWillSolveProblems:
         service = _make_service()
 
         # Simulate existing problems on that date
-        existing = WillSolveProblem.create(
+        existing = UserProblemStatus.create_will_solve(
             user_account_id=UserAccountId(1),
             problem_id=ProblemId(1000),
             marked_date=date(2025, 1, 15)
@@ -87,7 +86,8 @@ class TestUpdateWillSolveProblems:
 
         service.user_activity_repository.save_all_will_solve_problems.assert_called_once()
         saved = service.user_activity_repository.save_all_will_solve_problems.call_args[0][0]
-        assert all(p.deleted_at is not None for p in saved)
+        # 삭제 처리된 경우 활성 date_record가 없어야 함
+        assert all(not p.is_will_solve() for p in saved)
 
 
 class TestUpdateSolvedProblems:
@@ -110,7 +110,7 @@ class TestUpdateSolvedProblems:
         service = _make_service()
 
         # Existing will_solve that should be deleted
-        will_solve = WillSolveProblem.create(
+        will_solve = UserProblemStatus.create_will_solve(
             user_account_id=UserAccountId(1),
             problem_id=ProblemId(1000),
             marked_date=date(2025, 1, 15)

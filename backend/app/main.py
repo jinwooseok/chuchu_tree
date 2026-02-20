@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
@@ -49,7 +50,6 @@ async def lifespan(app: AppWithContainer):
     finally:
         # Shutdown: 정리 작업
         db = injection_container.database()
-        return
 
 app = AppWithContainer(
     title="ChuChuTree API",
@@ -64,6 +64,10 @@ app = AppWithContainer(
 
 # Register middlewares (CORS 등)
 create_middlewares(app)
+
+# Prometheus metrics (미들웨어 이후에 등록)
+from prometheus_fastapi_instrumentator import Instrumentator
+Instrumentator().instrument(app).expose(app, endpoint="/metrics")
 
 # Register exception handlers
 app.add_exception_handler(APIException, custom_exception_handler)
@@ -98,6 +102,11 @@ app.include_router(tag_user_router, prefix=API_V1_PREFIX)
 
 # Recommendation router
 app.include_router(recommendation_router, prefix=API_V1_PREFIX)
+
+# Test auth router (local/dev 환경에서만 등록, prod에서는 비활성화)
+if os.getenv("environment", "local") != "prod":
+    from app.common.presentation.controller.test_auth_controller import router as test_auth_router
+    app.include_router(test_auth_router, prefix=API_V1_PREFIX)
 
 @app.get("/health")
 async def health_check():

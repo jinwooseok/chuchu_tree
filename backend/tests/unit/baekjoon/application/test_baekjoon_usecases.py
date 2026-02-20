@@ -276,6 +276,7 @@ class TestGetBaekjoonMeUsecase:
         user_info.profile_image_url = None
         user_info.registered_at = "2025-01-01"
         user_info.targets = []
+        user_info.is_synced = True
         usecase.domain_event_bus.publish.return_value = user_info
 
         # Mock bj account with link date
@@ -305,6 +306,7 @@ class TestGetBaekjoonMeUsecase:
 
         assert result.bj_account.bj_account_id == "test_bj"
         assert result.bj_account.stat.tier_name == "Gold V"
+        assert result.user_account.is_synced is True
 
     async def test_user_not_found_raises(self, mock_database_context):
         usecase = self._make_usecase()

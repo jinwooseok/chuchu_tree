@@ -133,3 +133,81 @@ class UserAccountRepositoryImpl(UserAccountRepository):
         await self.session.execute(
             delete(UserAccountModel).where(UserAccountModel.user_account_id == user_id_value)
         )
+
+    async def delete_all_by_provider(self, provider: Provider) -> int:
+        """
+        특정 Provider의 모든 유저 삭제 (Hard Delete)
+
+        CASCADE 삭제 순서:
+        1. bj_account 관련 (problem_history, tag_skill_history, streak)
+        2. activity 관련 (problem_record, will_solve_problem, problem_banned_record, tag_customization)
+        3. account_link
+        4. user_target
+        5. user_account
+        """
+        from sqlalchemy import delete, select
+        from app.user.infra.model.user_target import UserTargetModel
+        from app.user.infra.model.account_link import AccountLinkModel
+        from app.baekjoon.infra.model.bj_account import BjAccountModel
+        from app.baekjoon.infra.model.problem_history import ProblemHistoryModel
+        from app.baekjoon.infra.model.streak import StreakModel
+        from app.baekjoon.infra.model.tag_skill_history import TagSkillHistoryModel
+        from app.activity.infra.model.user_problem_status import UserProblemStatusModel
+        from app.activity.infra.model.tag_custom import TagCustomModel
+
+        # 1. Provider.NONE인 유저 ID 목록 조회
+        stmt = select(UserAccountModel.user_account_id).where(
+            UserAccountModel.provider == provider.value
+        )
+        result = await self.session.execute(stmt)
+        user_ids = [row[0] for row in result.all()]
+
+        if not user_ids:
+            return 0
+
+        # 2. account_link로 연결된 bj_account_id 목록 조회
+        stmt = select(AccountLinkModel.bj_account_id).where(
+            AccountLinkModel.user_account_id.in_(user_ids)
+        )
+        result = await self.session.execute(stmt)
+        bj_account_ids = [row[0] for row in result.all()]
+
+        # 3. bj_account 관련 데이터 삭제
+        if bj_account_ids:
+            await self.session.execute(
+                delete(ProblemHistoryModel).where(ProblemHistoryModel.bj_account_id.in_(bj_account_ids))
+            )
+            await self.session.execute(
+                delete(TagSkillHistoryModel).where(TagSkillHistoryModel.bj_account_id.in_(bj_account_ids))
+            )
+            await self.session.execute(
+                delete(StreakModel).where(StreakModel.bj_account_id.in_(bj_account_ids))
+            )
+            await self.session.execute(
+                delete(BjAccountModel).where(BjAccountModel.bj_account_id.in_(bj_account_ids))
+            )
+
+        # 4. activity 관련 데이터 삭제 (UserProblemStatusModel 삭제 시 ProblemDateRecordModel CASCADE 삭제)
+        await self.session.execute(
+            delete(UserProblemStatusModel).where(UserProblemStatusModel.user_account_id.in_(user_ids))
+        )
+        await self.session.execute(
+            delete(TagCustomModel).where(TagCustomModel.user_account_id.in_(user_ids))
+        )
+
+        # 5. account_link 삭제
+        await self.session.execute(
+            delete(AccountLinkModel).where(AccountLinkModel.user_account_id.in_(user_ids))
+        )
+
+        # 6. user_target 삭제
+        await self.session.execute(
+            delete(UserTargetModel).where(UserTargetModel.user_account_id.in_(user_ids))
+        )
+
+        # 7. user_account 삭제
+        result = await self.session.execute(
+            delete(UserAccountModel).where(UserAccountModel.user_account_id.in_(user_ids))
+        )
+
+        return len(user_ids)

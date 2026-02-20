@@ -184,3 +184,9 @@ class ErrorCode(Enum):
         message="이미 다른 날짜에 기록된 문제입니다.",
         status_code=400
     )
+
+    TOKEN_REUSE_DETECTED = ErrorCodeInfo(
+        code="TOKEN_REUSE_DETECTED",
+        message="토큰 재사용이 감지되었습니다. 보안을 위해 모든 세션이 종료됩니다.",
+        status_code=401
+    )

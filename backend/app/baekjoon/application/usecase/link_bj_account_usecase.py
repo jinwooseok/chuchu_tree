@@ -59,7 +59,9 @@ class LinkBjAccountUsecase:
         )
         
         if existing_account:
-            
+            # 기존 계정의 problem history 개수로 is_synced 결정
+            event.data.problem_count = len(existing_account.problem_histories)
+
             # 2. 유저 도메인에 링크 이벤트 발행
             await self.domain_event_bus.publish(event)
             return
@@ -104,5 +106,8 @@ class LinkBjAccountUsecase:
                 continue
         # 6. 저장
         saved_account = await self.baekjoon_account_repository.save(baekjoon_account)
-        
+
+        # 새 계정의 problem 수로 is_synced 결정
+        event.data.problem_count = len(user_data.problems)
+
         await self.domain_event_bus.publish(event)

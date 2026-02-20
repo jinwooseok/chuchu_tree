@@ -10,3 +10,4 @@ class GetUserAccountInfoQuery(BaseModel):
     targets: list[TargetQuery] = Field([], description="목표 목록")
     profile_image: str | None = Field(None, description="프로필 이미지 URL")
     registered_at: datetime = Field(..., description="가입일")
+    is_synced: bool = Field(False, description="배치 동기화 완료 여부")
