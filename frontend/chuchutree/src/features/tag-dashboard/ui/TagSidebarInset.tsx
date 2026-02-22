@@ -15,6 +15,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Switch } from '@/components/ui/switch';
+import HelpPopover from '@/shared/ui/help-popover';
 
 // 드래그 가능한 카테고리 컴포넌트
 interface DraggableCategoryProps {
@@ -172,14 +173,50 @@ export function TagSidebarInset({ tagDashboard, isLanding = false }: { tagDashbo
   return (
     <div className="hide-scrollbar flex h-full flex-col gap-4 overflow-y-auto p-4 text-sm">
       {/* 제목과 초기화 버튼 */}
-      {isLanding && <div className="text-white cursor-default select-none bg-primary w-full px-2 py-2 rounded-sm text-sm font-medium">ChuchuTree 튜토리얼</div>}
-      <div className="flex items-center  justify-between">
+      {isLanding && <div className="bg-primary w-full cursor-default rounded-sm px-2 py-2 text-sm font-medium text-white select-none">ChuchuTree 튜토리얼</div>}
+      <div className="flex items-center justify-between">
         <div className="cursor-default text-lg font-semibold">알고리즘 Dashboard</div>
-        <AppTooltip content="필터 초기화" side="right">
-          <Button onClick={clearFilters} variant="ghost" size="icon" aria-label="필터 초기화">
-            <RotateCcw className="h-4 w-4" />
-          </Button>
-        </AppTooltip>
+        <HelpPopover width="w-85">
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold">알고리즘 유형별 나의 실력을 확인하세요.</h4>
+            <div className="border px-2 py-2">
+              <p className="text-sm">유형별 등급은 문제 추천 빈도에 반영됩니다.</p>
+            </div>
+            <p className="text-foreground text-xs">
+              <span className="text-locked-text bg-locked-bg px-1">LOCKED</span> : 시작 전 유형
+            </p>
+            <p className="text-muted-foreground ml-2 text-xs">└ 추천에 포함되지 않습니다. 시작 조건을 달성하세요</p>
+            <p className="text-foreground text-xs">
+              <span className="text-intermediate-text bg-intermediate-bg px-1">INTERMEDIATE</span> : 아직 취약한 유형
+            </p>
+            <p className="text-muted-foreground ml-2 text-xs">└ 가장 먼저 추천됩니다.</p>
+            <p className="text-foreground text-xs">
+              <span className="text-advanced-text bg-advanced-bg px-1">ADVANCED</span> : 익숙해진 유형
+            </p>
+            <p className="text-muted-foreground ml-2 text-xs">└ 빈번하게 추천됩니다.</p>
+            <p className="text-foreground text-xs">
+              <span className="text-master-text bg-master-bg px-1">MASTER</span> : 마스터한 유형
+            </p>
+            <p className="text-muted-foreground ml-2 text-xs">└ 가끔 추천됩니다.</p>
+            <p className="text-foreground text-xs">
+              <span className="text-excluded-text bg-excluded-bg px-1">EXCLUDED</span> : 추천 제외된 유형
+            </p>
+            <p className="text-muted-foreground ml-2 text-xs">└ 추천에 포함되지 않습니다.</p>
+            <div className="border px-2 py-2">
+              <p className="text-sm">3가지 기준에 의해 등급이 결정됩니다.</p>
+            </div>
+            <p className="text-foreground text-xs">
+              <span className="text-locked-text bg-locked-bg px-1">풀이 수</span> : 푼 문제수 / 다음 등급을 위한 최소 문제 수
+            </p>
+            <p className="text-foreground text-xs">
+              <span className="text-locked-text bg-locked-bg px-1">최소 달성 티어</span> : 다음 등급을 위한 사용자 티어
+            </p>
+            <p className="text-foreground text-xs">
+              <span className="text-locked-text bg-locked-bg px-1">최고 난이도</span> : 푼 문제 중 최고 티어 / 풀어야 할 문제의 티어
+            </p>
+            <p className="text-muted-foreground ml-2 text-xs">└ 해당 유형을 포함 하는 문제의 티어가 이 기준 보다 높아야 합니다.</p>
+          </div>
+        </HelpPopover>
       </div>
 
       {/* 정렬 기준 드롭다운 */}
@@ -227,9 +264,16 @@ export function TagSidebarInset({ tagDashboard, isLanding = false }: { tagDashbo
       </div>
 
       {/* 검색 입력 */}
-      <div className="relative">
-        <Search className="text-muted-foreground absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2" />
-        <Input type="text" placeholder="태그 검색..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-8" />
+      <div className="flex items-center justify-between gap-2">
+        <div className="relative w-full">
+          <Search className="text-muted-foreground absolute top-1/2 left-2 h-4 w-4 -translate-y-1/2" />
+          <Input type="text" placeholder="태그 검색..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="pl-8" />
+        </div>
+        <AppTooltip content="필터 초기화" side="right">
+          <Button onClick={clearFilters} variant="outline" size="icon" aria-label="필터 초기화" className="text-muted-foreground hover:text-foreground shrink-0 cursor-pointer">
+            <RotateCcw className="h-4 w-4" />
+          </Button>
+        </AppTooltip>
       </div>
 
       {/* 카테고리별 태그 리스트 (드래그 가능) */}

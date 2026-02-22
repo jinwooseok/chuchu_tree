@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { useBatchSolvedProblems } from '@/entities/calendar';
 import { useState, useMemo, useEffect } from 'react';
 import { toast } from '@/lib/utils/toast';
-import { ExternalLink, Loader2, RotateCcw, HelpCircle, FileText, X } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ExternalLink, Loader2, RotateCcw, FileText, X } from 'lucide-react';
+import HelpPopover from '@/shared/ui/help-popover';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Image from 'next/image';
@@ -229,21 +229,17 @@ export function AddPrevProblemsDialog({ onClose, isLanding = false, user }: prop
               <DialogTitle>가입 이전에 풀었던 문제 등록하기</DialogTitle>
               <DialogDescription>백준에서 HTML을 복사하여 과거 풀이 기록을 자동으로 등록할 수 있습니다.</DialogDescription>
             </div>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="mr-10 h-8 w-8 shrink-0">
-                  <HelpCircle className="text-muted-foreground h-5 w-5" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
+            {/* help popover content */}
+            <div className="mr-10">
+              <HelpPopover>
                 <div className="space-y-2">
                   <h4 className="text-sm font-semibold">왜 이런 방식을 사용하나요?</h4>
                   <p className="text-muted-foreground text-xs">백준은 문제 풀이 시간 정보를 API로 제공하지 않습니다.</p>
                   <p className="text-muted-foreground text-xs">따라서 사용자가 직접 HTML을 제공하는 방식으로 안전하게 데이터를 가져옵니다.</p>
                   <p className="text-muted-foreground text-xs font-semibold">이 과정에서 서버는 어떤 크롤링도 하지 않으며, 오직 사용자가 제공한 HTML만을 브라우저에서 파싱합니다.</p>
                 </div>
-              </PopoverContent>
-            </Popover>
+              </HelpPopover>
+            </div>
           </div>
         </DialogHeader>
 

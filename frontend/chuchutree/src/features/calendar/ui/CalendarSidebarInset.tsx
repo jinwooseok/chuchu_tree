@@ -15,6 +15,7 @@ import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { formatDateString } from '@/lib/utils/date';
 import { getErrorCode, getErrorMessage } from '@/lib/utils/error';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import HelpPopover from '@/shared/ui/help-popover';
 
 // // 클라이언트 전용 렌더링 (hydration mismatch 방지)
 // const SmallCalendar = dynamic(() => import('@/features/calendar/ui/SmallCalendar'), {
@@ -348,7 +349,22 @@ export function CalendarSidebarInset({ isLanding = false, calendarData }: { cale
       <div className="flex cursor-default flex-col gap-2" data-onboarding-id="calendar-sidebar-solved">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold">해결한 문제</h3>
-          <span className="text-xs text-gray-500">{solvedProblems.length}개</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">{solvedProblems.length}개</span>
+            <HelpPopover width="w-85">
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold">
+                  선택한 날짜에 <span className="text-primary font-semibold">풀었던</span> 문제가 기록됩니다.
+                </h4>
+                <p className="text-muted-foreground text-xs">
+                  가입 전에 풀었던 문제는 <span className="text-primary font-semibold">가입 전 풀이 등록하기</span>로 등록해 주세요.
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  새로 푼 문제가 보이지 않는다면, <span className="text-primary font-semibold">Refresh</span> 버튼을 눌러주세요 .
+                </p>
+              </div>
+            </HelpPopover>
+          </div>
         </div>
 
         {solvedProblems.length === 0 ? (
@@ -370,7 +386,20 @@ export function CalendarSidebarInset({ isLanding = false, calendarData }: { cale
       <div className="flex cursor-default flex-col gap-2" data-onboarding-id="calendar-sidebar-scheduled">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold">오늘의 일정</h3>
-          <span className="text-xs text-gray-500">{willSolveProblems.length}개</span>
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-gray-500">{willSolveProblems.length}개</span>
+            <HelpPopover>
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold">
+                  선택한 날짜에 <span className="text-primary font-semibold">일정 등록한</span> 문제가 기록됩니다.
+                </h4>
+                <p className="text-muted-foreground text-xs">풀어야 할 문제들을 등록해보세요.</p>
+                <p className="text-muted-foreground text-xs">
+                  실제로 문제를 푼 뒤 <span className="text-primary font-semibold">Refresh</span> 버튼을 누르면, 해결한 문제로 등록됩니다.
+                </p>
+              </div>
+            </HelpPopover>
+          </div>
         </div>
 
         {willSolveProblems.length === 0 ? (
