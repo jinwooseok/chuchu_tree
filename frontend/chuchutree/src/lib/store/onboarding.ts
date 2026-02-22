@@ -16,6 +16,7 @@ interface OnboardingState {
   startOnboarding: () => void;
   nextStep: () => void;
   skipCurrentStep: () => void; // 현재 step만 건너뛰고 다음으로
+  prevStep: () => void;
   completeOnboarding: () => void; // 온보딩 완전히 종료
   resetOnboarding: () => void;
   setHasHydrated: (state: boolean) => void;
@@ -85,6 +86,13 @@ export const useOnboardingStore = create<OnboardingState>()(
           set((state) => {
             state.currentStep += 1;
           }),
+        prevStep: () => {
+          set((state) => {
+            if(state.currentStep !== 0){
+              state.currentStep -= 1;
+            }
+          }) 
+        },
 
         // 현재 step만 건너뛰고 다음으로 (Step 9에서는 종료)
         skipCurrentStep: () =>
