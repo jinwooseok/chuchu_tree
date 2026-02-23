@@ -96,11 +96,12 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
             // solved는 tag별 색상, will solve는 회색
             const bgColorClass = !isSolved ? 'bg-innerground-darkgray' : tagInfo ? tagInfo.bgColor : 'bg-logo';
             const textColorClass = isSolved && tagInfo ? tagInfo.textColor : 'text-only-gray';
+            const displayTitle = tagInfo ? tagInfo.kr : event.title;
 
             return (
               <div key={`${event.resource.problem.problemId}-${tagCode}-${index}`} className={`rounded px-2 py-0.5 text-xs ${textColorClass} ${bgColorClass} relative line-clamp-1`}>
                 {!isSolved && <div className={`absolute top-0 left-0 h-full w-2 rounded-l ${tagInfo ? tagInfo.bgColor : 'bg-only-gray'}`}></div>}
-                {event.title}
+                {displayTitle}
               </div>
             );
           })}

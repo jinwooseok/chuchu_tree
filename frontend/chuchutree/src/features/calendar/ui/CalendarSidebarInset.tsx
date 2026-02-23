@@ -57,6 +57,7 @@ function DraggableProblemCard({
   const firstTag = problem.tags[0];
   const lastTag = problem.tags.length > 0 ? problem.tags[problem.tags.length - 1] : null;
   const tagInfo = TAG_INFO[problem.representativeTag?.tagCode || lastTag?.tagCode || firstTag?.tagCode];
+  const tagDisplayName = tagInfo ? tagInfo.kr : problem.representativeTag?.tagDisplayName || lastTag?.tagDisplayName;
 
   return (
     <div
@@ -81,7 +82,7 @@ function DraggableProblemCard({
                 className={`group relative flex items-center gap-1 rounded px-2 py-0.5 ${!isSolved ? 'bg-innerground-darkgray' : tagInfo ? tagInfo.bgColor : 'bg-logo'}`}
                 onClick={(e) => e.stopPropagation()}
               >
-                <span className="line-clamp-1">{problem.representativeTag?.tagDisplayName || lastTag.tagDisplayName}</span>
+                <span className="line-clamp-1">{tagDisplayName}</span>
                 <PencilLine className="text-muted-foreground group-hover:text-primary h-2 w-2" />
               </div>
             </PopoverTrigger>
@@ -97,7 +98,7 @@ function DraggableProblemCard({
                       handleRepresentativeTag(onetag.tagCode);
                     }}
                   >
-                    {onetag.tagDisplayName}
+                    {TAG_INFO[onetag.tagCode] ? TAG_INFO[onetag.tagCode].kr : onetag.tagDisplayName}
                   </div>
                 ))}
               </div>

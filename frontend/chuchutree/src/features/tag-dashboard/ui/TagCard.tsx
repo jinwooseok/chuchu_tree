@@ -59,7 +59,13 @@ const TagCard = memo(
       }
       openModal(
         'tag-ban-alert',
-        <TagBanAlertDialog tagDisplayName={tagDisplayName} recommendationYn={recommendationYn} isPending={isPending} onConfirm={handleConfirm} onClose={() => closeModal('tag-ban-alert')} />,
+        <TagBanAlertDialog
+          tagDisplayName={TAG_INFO[tagCode] ? TAG_INFO[tagCode].kr : tagDisplayName}
+          recommendationYn={recommendationYn}
+          isPending={isPending}
+          onConfirm={handleConfirm}
+          onClose={() => closeModal('tag-ban-alert')}
+        />,
       );
     };
 

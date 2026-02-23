@@ -6,7 +6,7 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Input } from '@/components/ui/input';
 import { useTagDashboardSidebarStore, SortBy, SortByName } from '@/lib/store/tagDashboard';
 import type { Categories, TagDashboard as TagDashboardType } from '@/entities/tag-dashboard';
-import { CategoryName } from '@/shared/constants/tagSystem';
+import { CategoryName, TAG_INFO } from '@/shared/constants/tagSystem';
 import { getLevelColorClasses } from '@/features/tag-dashboard/lib/utils';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
@@ -74,7 +74,7 @@ function DraggableCategory({ categoryName, category, isOpen, isVisible, onToggle
               onClick={() => onTagClick(tag.tagId)}
               className={`hover:text-primary text-left text-xs transition-colors ${selectedTagId === tag.tagId ? 'text-primary font-semibold' : 'text-muted-foreground'}`}
             >
-              {tag.tagDisplayName}
+              {TAG_INFO[tag.tagCode] ? TAG_INFO[tag.tagCode].kr : tag.tagDisplayName}
             </button>
           ))}
         </CollapsibleContent>
