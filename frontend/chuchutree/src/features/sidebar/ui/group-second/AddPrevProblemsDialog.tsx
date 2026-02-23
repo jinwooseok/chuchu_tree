@@ -6,8 +6,8 @@ import { Button } from '@/components/ui/button';
 import { useBatchSolvedProblems } from '@/entities/calendar';
 import { useState, useMemo, useEffect } from 'react';
 import { toast } from '@/lib/utils/toast';
-import { ExternalLink, Loader2, RotateCcw, HelpCircle, FileText, X } from 'lucide-react';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ExternalLink, Loader2, RotateCcw, FileText, X } from 'lucide-react';
+import HelpPopover from '@/shared/ui/help-popover';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 import Image from 'next/image';
@@ -222,149 +222,117 @@ export function AddPrevProblemsDialog({ onClose, isLanding = false, user }: prop
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="bg-innerground-white flex max-h-[90vh] min-w-[80vw] flex-col">
+      <DialogContent className="bg-innerground-white flex max-h-[95vh] min-w-[92vw] flex-col">
         <DialogHeader>
           <div className="flex items-center justify-between">
             <div>
               <DialogTitle>가입 이전에 풀었던 문제 등록하기</DialogTitle>
-              <DialogDescription>백준에서 HTML을 복사하여 과거 풀이 기록을 자동으로 등록할 수 있습니다.</DialogDescription>
             </div>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="ghost" size="icon" className="mr-10 h-8 w-8 shrink-0">
-                  <HelpCircle className="text-muted-foreground h-5 w-5" />
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-80">
+            <div className="mr-10">
+              <HelpPopover>
                 <div className="space-y-2">
                   <h4 className="text-sm font-semibold">왜 이런 방식을 사용하나요?</h4>
                   <p className="text-muted-foreground text-xs">백준은 문제 풀이 시간 정보를 API로 제공하지 않습니다.</p>
                   <p className="text-muted-foreground text-xs">따라서 사용자가 직접 HTML을 제공하는 방식으로 안전하게 데이터를 가져옵니다.</p>
                   <p className="text-muted-foreground text-xs font-semibold">이 과정에서 서버는 어떤 크롤링도 하지 않으며, 오직 사용자가 제공한 HTML만을 브라우저에서 파싱합니다.</p>
                 </div>
-              </PopoverContent>
-            </Popover>
+              </HelpPopover>
+            </div>
           </div>
         </DialogHeader>
 
-        <div className="flex-1 space-y-8 overflow-x-hidden overflow-y-auto pt-4 pr-4">
-          {/* 0단계: 이 기능의 목적과 결과 */}
-          <div className="mt-10 mb-20">
-            {/* <h3 className="mb-3 text-lg font-semibold">이 기능을 사용하면?</h3> */}
-            <div className="mr-4 grid grid-cols-[35%_65%] gap-6">
-              {/* 좌측: 설명 */}
-              <div className="flex flex-col justify-between space-y-4">
-                <div className="bg-primary/10 border-primary space-y-3 rounded-lg border p-4">
-                  <p className="text-sm font-semibold">가입 전 풀었던 모든 문제를 캘린더에 등록할 수 있습니다</p>
-                  <ul className="text-muted-foreground list-inside space-y-2 text-sm">
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>과거 풀이 기록이 캘린더에 자동으로 표시됩니다</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>언제 어떤 문제를 풀었는지 한눈에 확인할 수 있어요</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-primary">•</span>
-                      <span>완벽한 풀이 히스토리를 구축할 수 있습니다</span>
-                    </li>
-                  </ul>
-                </div>
-                <div className="bg-innerground-hovergray/50 rounded-lg p-3">
-                  <p className="text-muted-foreground text-xs">💡 등록 후 캘린더에서 이전 달을 넘겨보면, 과거에 풀었던 문제들이 날짜별로 정리된 것을 확인할 수 있습니다</p>
-                </div>
-              </div>
-
-              {/* 우측: 이미지 캐러셀 (4장) */}
-              <Carousel
-                opts={{
-                  loop: true,
-                }}
-                className="w-full"
-              >
-                <CarouselContent>
-                  <CarouselItem>
-                    <div className="relative h-80 w-full">
-                      <Image fill src="/guides/step0-no1.png" alt="등록 완료 후 캘린더 화면 1" className="rounded border object-contain shadow-sm" />
-                    </div>
-                  </CarouselItem>
-                  <CarouselItem>
-                    <div className="relative h-80 w-full">
-                      <Image fill src="/guides/step1-no1.png" alt="등록 완료 후 캘린더 화면 2" className="rounded border object-contain shadow-sm" />
-                    </div>
-                  </CarouselItem>
-                  <CarouselItem>
-                    <div className="relative h-80 w-full">
-                      <Image fill src="/guides/step1-no2.png" alt="등록 완료 후 캘린더 화면 3" className="rounded border object-contain shadow-sm" />
-                    </div>
-                  </CarouselItem>
-                  <CarouselItem>
-                    <div className="relative h-80 w-full">
-                      <Image fill src="/guides/step2-no2.png" alt="등록 완료 후 캘린더 화면 4" className="rounded border object-contain shadow-sm" />
-                    </div>
-                  </CarouselItem>
-                </CarouselContent>
-                <CarouselPrevious className="bg-primary text-innerground-white left-2" />
-                <CarouselNext className="bg-primary text-innerground-white right-2" />
-              </Carousel>
+        <div className="flex-1 space-y-20 overflow-x-hidden overflow-y-auto pt-20 pr-4">
+          {/* 상단 소개 */}
+          <div className="w-full space-y-3 text-center">
+            <p className="text-4xl font-semibold">가입 이전 풀이 기록을 업데이트 한다면,</p>
+            <p className="text-4xl font-semibold">더욱 완벽한 문제 추천을 받을 수 있어요</p>
+            <div className="text-lg">
+              <p>백준 로그인은 필요 없습니다. 풀었던 기록만 확인하면 됩니다.</p>
+              <p>이 기능은 백준 서버를 크롤링하지 않으며, 문제 기록만을 안전하게 사용합니다.</p>
             </div>
           </div>
+          {/* 이미지 */}
+          <Carousel
+            opts={{
+              loop: true,
+            }}
+            className="w-full"
+          >
+            <CarouselContent>
+              <CarouselItem>
+                <div className="relative h-140 w-full">
+                  <Image fill src="/guides/step0-no1.png" alt="등록 완료 후 캘린더 화면 1" className="rounded border object-contain shadow-sm" />
+                </div>
+              </CarouselItem>
+            </CarouselContent>
+            <CarouselPrevious className="bg-primary text-innerground-white left-2" />
+            <CarouselNext className="bg-primary text-innerground-white right-2" />
+          </Carousel>
 
-          {/* 1단계: 백준에서 HTML 복사 (좌우 분할) */}
-          <div className="mb-20">
-            <h3 className="mb-3 text-lg font-semibold">1단계: 백준에서 내가 푼 문제 복사</h3>
+          {/* 1단계 */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold">1단계: 채점현황 페이지 열기</h3>
+            <div>
+              {isLanding && (
+                <Input value={landingDemoUsername} onChange={(e) => setLandingDemoUsername(e.target.value)} placeholder="백준 아이디를 입력하세요 (비회원 전용)" className="mb-2 w-60 text-lg" />
+              )}
+              <Button variant="outline" onClick={() => window.open(baekjoonUrl, '_blank')} className="h-20 w-full flex-1" disabled={!bjAccountId} data-onboarding-id="open-baekjoon-button">
+                <ExternalLink className="mr-2 h-4 w-4" />
+                <p>백준 채점현황 페이지 열기</p>
+              </Button>
+            </div>
+          </div>
+          {/* 2단계 */}
+          <div className="space-y-3">
+            <h3 className="text-lg font-semibold">2단계: 내가 푼 문제 복사하기</h3>
             <div className="mr-4 grid grid-cols-[35%_65%] gap-6">
               {/* 좌측: 버튼 및 설명 */}
-              <div className="flex flex-col justify-between space-y-4">
-                {isLanding && <Input value={landingDemoUsername} onChange={(e) => setLandingDemoUsername(e.target.value)} placeholder="백준 아이디를 입력하세요 (비회원 전용)" />}
-                <Button variant="outline" onClick={() => window.open(baekjoonUrl, '_blank')} className="w-full flex-1" disabled={!bjAccountId} data-onboarding-id="open-baekjoon-button">
-                  <ExternalLink className="mr-2 h-4 w-4" />
-                  백준 채점현황 페이지 열기
-                </Button>
-                <div className="bg-innerground-hovergray/50 space-y-3 rounded-lg p-4">
-                  <ol className="list-inside list-decimal space-y-2 text-sm">
-                    <li className="flex flex-wrap items-center gap-2">
-                      <span>1.</span>
-                      <ExternalLink className="text-muted-foreground h-4 w-4" />
-                      <span>백준 채점현황 페이지 열기 버튼 클릭</span>
-                    </li>
-                    <li className="flex flex-wrap items-center gap-2">
-                      <span>2. 백준 페이지에서</span>
-                      <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">Ctrl</kbd>
-                      <span>+</span>
-                      <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">Shift</kbd>
-                      <span>+</span>
-                      <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">C</kbd>
-                      <span>누르기</span>
-                    </li>
-                    <p className="text-muted-foreground mt-2 text-xs">→ 개발자도구 Elements 탭이 열립니다.</p>
-                    <li className="flex flex-wrap items-center gap-2">
-                      <span>3. </span>
-                      <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">Ctrl</kbd>
-                      <span>+</span>
-                      <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">C</kbd>
-                      <span>누르기</span>
-                    </li>
-                    <p className="text-muted-foreground mt-2 text-xs">→ {`<body>`}에 자동 포커스 되므로, 복사만 하면 됩니다.</p>
-                  </ol>
-                  <p className="text-muted-foreground text-xs">
-                    ※ 잘 안된다면? <br />
-                    새로고침 → F12 → Elements 탭 → {`<body>`}클릭 → Ctrl + C
-                  </p>
-                  <ol className="list-inside list-decimal space-y-2 text-sm">
-                    <li className="mt-8 flex flex-wrap items-center gap-2">
-                      <span>이제 2단계로 가서</span>
-                      <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">Ctrl</kbd>
-                      <span>+</span>
-                      <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">V</kbd>
-                      <span>누르기</span>
-                    </li>
-                  </ol>
+              <div className="bg-background flex h-full flex-col justify-between space-y-3 rounded-sm px-4 pt-8 pb-4">
+                <ol className="flex-1 list-inside list-decimal space-y-6 text-sm">
+                  <li className="flex flex-wrap items-center gap-2">
+                    <span>1.</span>
+                    <ExternalLink className="text-muted-foreground h-4 w-4" />
+                    <span>백준 채점현황 페이지 열기 버튼 클릭</span>
+                  </li>
+                  <li className="flex flex-wrap items-center gap-2">
+                    <span>2. 백준 페이지에서</span>
+                    <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">F12</kbd>
+                    <span>눌러서 개발자도구 열기</span>
+                    <p className="text-muted-foreground ml-2 text-xs">※ Mac 에서는 단축키가 다를 수 있습니다.</p>
+                  </li>
+                  <li className="flex flex-wrap items-center gap-2">
+                    <span>3. 개발자도구</span>
+                    <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">Elements 탭</kbd>
+                    <span>클릭</span>
+                  </li>
+                  <li className="flex flex-wrap items-center gap-2">
+                    <span>4. </span>
+                    <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">{`<body>`} 태그</kbd>
+                    <span>클릭</span>
+                  </li>
+                  <li className="flex flex-wrap items-center gap-2">
+                    <span>5. </span>
+                    <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">Ctrl / ⌘</kbd>
+                    <span>+</span>
+                    <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">C</kbd>
+                    <span>복사하기</span>
+                  </li>
+                  <li className="mt-8 flex flex-wrap items-center gap-2">
+                    <span>이제 2단계로 가서</span>
+                    <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">Ctrl / ⌘</kbd>
+                    <span>+</span>
+                    <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">V</kbd>
+                    <span>누르기</span>
+                  </li>
+                </ol>
+
+                <div>
+                  <p className="text-muted-foreground mb-1 text-xs">💡 이 기능에는 백준 로그인이 필요 없습니다.</p>
+                  <p className="text-muted-foreground mb-1 text-xs">💡 이 기능은 백준 서버를 크롤링하지 않으며, 사용자가 제공한 문제 기록만을 사용합니다.</p>
                 </div>
               </div>
 
-              {/* 우측: 이미지 캐러셀 (2장) */}
+              {/* 우측: 이미지 캐러셀 (3장) */}
               <Carousel
                 opts={{
                   loop: true,
@@ -373,13 +341,18 @@ export function AddPrevProblemsDialog({ onClose, isLanding = false, user }: prop
               >
                 <CarouselContent>
                   <CarouselItem>
-                    <div className="relative h-80 w-full">
-                      <Image fill src="/guides/step1-no1.png" alt="이동 전 chuchutree 화면" className="rounded border object-contain shadow-sm" />
+                    <div className="relative h-120 w-full">
+                      <Image fill src="/guides/step2-01window.png" alt="페이지 이동하기" className="rounded border object-contain shadow-sm" />
                     </div>
                   </CarouselItem>
                   <CarouselItem>
-                    <div className="relative h-80 w-full">
-                      <Image fill src="/guides/step1-no2.png" alt="이동 후 백준 화면" className="rounded border object-contain shadow-sm" />
+                    <div className="relative h-120 w-full">
+                      <Image fill src="/guides/step2-02ctrlc.png" alt="복사" className="rounded border object-contain shadow-sm" />
+                    </div>
+                  </CarouselItem>
+                  <CarouselItem>
+                    <div className="relative h-120 w-full">
+                      <Image fill src="/guides/step2-03ctrlv.png" alt="붙여넣기" className="rounded border object-contain shadow-sm" />
                     </div>
                   </CarouselItem>
                 </CarouselContent>
@@ -389,10 +362,10 @@ export function AddPrevProblemsDialog({ onClose, isLanding = false, user }: prop
             </div>
           </div>
 
-          {/* 2단계: 붙여넣기 및 등록 (좌우 분할) */}
+          {/* 3단계 */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">2단계: 붙여넣기 및 등록</h3>
+              <h3 className="text-lg font-semibold">3단계: 붙여넣기 + 등록하기</h3>
               {accumulatedProblems.length > 0 && (
                 <Button variant="outline" size="sm" onClick={handleReset}>
                   <RotateCcw className="mr-1 h-3 w-3" />
@@ -425,7 +398,7 @@ export function AddPrevProblemsDialog({ onClose, isLanding = false, user }: prop
                   <div className="mb-4 text-center">
                     <p className="text-muted-foreground flex flex-wrap items-center justify-center gap-2 text-sm">
                       <span>여기를 클릭하고</span>
-                      <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">Ctrl</kbd>
+                      <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">Ctrl / ⌘</kbd>
                       <span>+</span>
                       <kbd className="bg-muted border-border rounded border px-2 py-1 text-xs shadow-sm">V</kbd>
                       <span>로 붙여넣기</span>
@@ -474,18 +447,7 @@ export function AddPrevProblemsDialog({ onClose, isLanding = false, user }: prop
                   )}
                 </div>
               </div>
-
-              {/* 우측: 이미지 */}
-              {/* <div className="relative h-80 w-full">
-                <Image fill src="/guides/step2-no1.png" alt="붙여넣기 완료 화면" className="rounded border object-contain shadow-sm" />
-              </div> */}
             </div>
-          </div>
-
-          {/* 안내 */}
-          <div className="bg-innerground-hovergray/30 rounded-lg p-3">
-            <p className="text-muted-foreground mb-1 text-xs">💡 이 기능은 백준 서버를 크롤링하지 않으며, 사용자가 직접 제공한 HTML만 브라우저에서 파싱합니다.</p>
-            <p className="text-muted-foreground text-xs">💡 붙여넣기 하면 자동으로 문제가 추가되며, 중복된 문제는 자동으로 제거됩니다.</p>
           </div>
 
           {/* FAQ */}

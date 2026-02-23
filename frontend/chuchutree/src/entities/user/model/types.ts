@@ -12,6 +12,7 @@ interface UserAccount {
   profileImageUrl: string | null;
   target: Target;
   registeredAt: string;
+  isSynced: boolean;
 }
 
 interface Stat {

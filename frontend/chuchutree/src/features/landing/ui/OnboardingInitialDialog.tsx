@@ -7,10 +7,11 @@ import { useRouter } from 'next/navigation';
 
 // const action =  'next' | 'skip' | 'start' | 'login';
 interface Props {
+  isLanding: boolean;
   onButtonClick: (action: string) => void;
 }
 
-export function OnboardingInitialDialog({ onButtonClick }: Props) {
+export function OnboardingInitialDialog({ onButtonClick, isLanding }: Props) {
   const router = useRouter();
   return (
     <div className="bg-background fixed inset-0 z-50 h-screen w-screen p-4">
@@ -25,9 +26,11 @@ export function OnboardingInitialDialog({ onButtonClick }: Props) {
             <div className="min-w-22">
               <ThemeButton />
             </div>
-            <button className="hover:bg-muted cursor-pointer rounded-sm p-1 text-sm" onClick={() => router.push('/sign-in')}>
-              로그인
-            </button>
+            {isLanding && (
+              <button className="hover:bg-muted cursor-pointer rounded-sm p-1 text-sm" onClick={() => router.push('/sign-in')}>
+                로그인
+              </button>
+            )}
           </div>
         </div>
         {/* 메인 */}
@@ -47,9 +50,11 @@ export function OnboardingInitialDialog({ onButtonClick }: Props) {
             <button onClick={() => onButtonClick('start')} className="bg-primary hover:bg-primary-hover cursor-pointer rounded-sm px-4 py-2 text-white duration-200 ease-in-out select-none">
               튜토리얼 시작하기
             </button>
-            <button onClick={() => router.push('/sign-in')} className="bg-primary/30 hover:bg-primary/20 text-primary cursor-pointer rounded-sm px-4 py-2 duration-200 ease-in-out select-none">
-              로그인 하러가기
-            </button>
+            {isLanding && (
+              <button onClick={() => router.push('/sign-in')} className="bg-primary/30 hover:bg-primary/20 text-primary cursor-pointer rounded-sm px-4 py-2 duration-200 ease-in-out select-none">
+                로그인 하러가기
+              </button>
+            )}
           </div>
         </div>
       </div>

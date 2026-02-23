@@ -208,7 +208,7 @@ export default function LandingPageClient() {
           <LandingPageContent />
         </SidebarInset>
         {/* 온보딩 컨트롤러 */}
-        {isActive && <OnboardingController />}
+        {isActive && <OnboardingController isLanding={true} />}
       </SidebarProvider>
     </>
   );

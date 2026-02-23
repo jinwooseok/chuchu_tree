@@ -14,7 +14,16 @@ import { useRecommend } from '../hooks/useRecommend';
 import { useLandingRecommend } from '@/features/landing';
 import { toast } from '@/lib/utils/toast';
 
-export function RecommendationButton({ isLanding = false }: { isLanding?: boolean }) {
+type TagLevelInfo = {
+  bg: string;
+  char: string;
+  level: string;
+  daysAgo: number | null;
+  isOverdue: boolean;
+  solvedProblemCount: number;
+};
+
+export function RecommendationButton({ isLanding = false, tagLevelMap }: { isLanding?: boolean; tagLevelMap?: Record<string, TagLevelInfo> }) {
   const { selectedDate } = useCalendarStore();
   const {
     selectedLevels,
@@ -39,6 +48,7 @@ export function RecommendationButton({ isLanding = false }: { isLanding?: boolea
   } = useRecommendationStore();
 
   const [isCountPopoverOpen, setIsCountPopoverOpen] = useState(false);
+  const [showTagLevelInfo, setShowTagLevelInfo] = useState(false);
 
   const { recommend, isPending: isRealPending } = useRecommend();
   const { openModal, closeModal } = useModal();
@@ -183,27 +193,78 @@ export function RecommendationButton({ isLanding = false }: { isLanding?: boolea
                 </Button>
               </PopoverTrigger>
             </AppTooltip>
-            <PopoverContent className="w-64 p-2">
+            <PopoverContent className="w-72 p-2">
               <div className="max-h-64 space-y-2 overflow-y-auto">
-                {Object.entries(TAG_INFO).map(([tagKey, tagInfo]) => (
-                  <label key={tagKey} aria-label={tagInfo.kr} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded p-1">
-                    <input
-                      type="checkbox"
-                      checked={selectedTagsList.includes(tagKey)}
-                      onChange={() => toggleTag(tagKey)}
-                      className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 cursor-pointer appearance-none rounded border-2"
-                    />
-                    <span className="text-xs">{tagInfo.kr}</span>
-                  </label>
-                ))}
+                {Object.entries(TAG_INFO)
+                  .sort(([, a], [, b]) => a.kr.localeCompare(b.kr, 'ko'))
+                  .map(([tagKey, tagInfo]) => {
+                    const levelInfo = tagLevelMap?.[tagKey];
+                    return (
+                      <label key={tagKey} aria-label={tagInfo.kr} className="hover:bg-background/60 flex cursor-pointer items-center justify-between gap-2 rounded p-1">
+                        <div className="flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={selectedTagsList.includes(tagKey)}
+                            onChange={() => toggleTag(tagKey)}
+                            className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 cursor-pointer appearance-none rounded border-2"
+                          />
+                          <span className="text-xs">{tagInfo.kr}</span>
+                        </div>
+                        {showTagLevelInfo && levelInfo && (
+                          <div className="flex w-18 shrink-0 items-center justify-between">
+                            <span className={`${levelInfo.bg} text-innerground-white w-4 rounded text-center text-xs font-semibold`}>{levelInfo.char}</span>
+                            {levelInfo.daysAgo !== null ? (
+                              <span className={`text-xs ${levelInfo.isOverdue ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>{levelInfo.daysAgo}일 전</span>
+                            ) : levelInfo.solvedProblemCount === 0 ? (
+                              <span className="text-muted-foreground text-xs">미풀이</span>
+                            ) : (
+                              <span className="text-muted-foreground text-xs">가입전</span>
+                            )}
+                          </div>
+                        )}
+                      </label>
+                    );
+                  })}
               </div>
-              {selectedTagsList.length > 0 && (
-                <div className="mt-2 flex justify-end border-t pt-2">
-                  <button onClick={() => setSelectedTagsList([])} className="text-muted-foreground hover:text-foreground text-xs underline">
-                    전체 해제
-                  </button>
+              {tagLevelMap && (
+                <div className="mt-2 flex flex-wrap gap-1 border-t pt-2">
+                  {[...new Map(Object.values(tagLevelMap).map((info) => [info.level, info.bg])).entries()]
+                    .filter(([level]) => level !== 'EXCLUDED')
+                    .sort(([a], [b]) => ['INTERMEDIATE', 'ADVANCED', 'MASTER', 'LOCKED'].indexOf(a) - ['INTERMEDIATE', 'ADVANCED', 'MASTER', 'LOCKED'].indexOf(b))
+                    .map(([level, bg]) => {
+                      const tagsOfLevel = Object.entries(tagLevelMap)
+                        .filter(([, info]) => info.level === level)
+                        .map(([key]) => key);
+                      const allSelected = tagsOfLevel.every((key) => selectedTagsList.includes(key));
+                      const toggleLevelGroup = () => {
+                        if (allSelected) {
+                          setSelectedTagsList(selectedTagsList.filter((t) => !tagsOfLevel.includes(t)));
+                        } else {
+                          setSelectedTagsList([...selectedTagsList, ...tagsOfLevel.filter((key) => !selectedTagsList.includes(key))]);
+                        }
+                      };
+                      return (
+                        <button
+                          key={level}
+                          onClick={toggleLevelGroup}
+                          className={`${bg} text-innerground-white cursor-pointer rounded px-1.5 text-xs font-semibold transition-opacity ${allSelected ? 'opacity-100' : 'opacity-40'}`}
+                        >
+                          {level}
+                        </button>
+                      );
+                    })}
                 </div>
               )}
+              <div className="mt-2 flex justify-between border-t pt-2">
+                {tagLevelMap && (
+                  <button onClick={() => setShowTagLevelInfo((prev) => !prev)} className="text-muted-foreground hover:text-foreground text-xs underline">
+                    {showTagLevelInfo ? '등급 숨기기' : '알고리즘 등급보기'}
+                  </button>
+                )}
+                <button onClick={() => setSelectedTagsList([])} className="text-muted-foreground hover:text-foreground text-xs underline">
+                  전체 해제
+                </button>
+              </div>
             </PopoverContent>
           </Popover>
         )}
