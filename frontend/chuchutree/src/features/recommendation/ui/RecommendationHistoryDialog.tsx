@@ -360,13 +360,11 @@ export function RecommendationHistoryDialog({ onClose }: props) {
                     </label>
                   ))}
                 </div>
-                {hasFilterChanges && (
-                  <div className="mt-2 flex justify-end border-t pt-2">
-                    <button onClick={resetFilters} className="text-muted-foreground hover:text-foreground text-xs underline">
-                      초기화
-                    </button>
-                  </div>
-                )}
+                <div className="mt-2 flex justify-end border-t pt-2">
+                  <button onClick={resetFilters} className="text-muted-foreground hover:text-foreground text-xs underline">
+                    초기화
+                  </button>
+                </div>
               </PopoverContent>
             </Popover>
           </div>

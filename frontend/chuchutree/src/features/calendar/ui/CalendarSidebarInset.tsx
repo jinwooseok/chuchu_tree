@@ -9,13 +9,14 @@ import { useState, useEffect, useMemo, useId } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, X, Search, PencilLine } from 'lucide-react';
+import { GripVertical, X, Search, PencilLine, EyeOff } from 'lucide-react';
 import { toast } from '@/lib/utils/toast';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { formatDateString } from '@/lib/utils/date';
 import { getErrorCode, getErrorMessage } from '@/lib/utils/error';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import HelpPopover from '@/shared/ui/help-popover';
+import { useCalendarSidebarStore } from '@/lib/store/calendarSidebar';
 
 // // 클라이언트 전용 렌더링 (hydration mismatch 방지)
 // const SmallCalendar = dynamic(() => import('@/features/calendar/ui/SmallCalendar'), {
@@ -28,16 +29,20 @@ import HelpPopover from '@/shared/ui/help-popover';
 // });
 
 // 드래그 가능한 문제 카드
+type SidebarShowFilters = { algorithm: boolean; problemTier: boolean; problemNumber: boolean };
+
 function DraggableProblemCard({
   problem,
   isSolved,
   onDelete,
   onUpdateRepresentativeTag,
+  showFilters,
 }: {
   problem: Problem;
   isSolved: boolean;
   onDelete?: () => void;
   onUpdateRepresentativeTag?: (tagCode: string) => void;
+  showFilters: SidebarShowFilters;
 }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: problem.problemId });
   const [isTagOpen, setIsTagOpen] = useState<boolean>(false);
@@ -74,44 +79,47 @@ function DraggableProblemCard({
       </AppTooltip>
 
       {/* 문제 기본정보 */}
-      <div className="mr-2 flex max-w-[calc(50%-10px)] flex-col gap-1 text-center">
-        {lastTag && (
-          <Popover open={isTagOpen} onOpenChange={setIsTagOpen}>
-            <PopoverTrigger asChild>
-              <div
-                className={`group relative flex items-center gap-1 rounded px-2 py-0.5 ${!isSolved ? 'bg-innerground-darkgray' : tagInfo ? tagInfo.bgColor : 'bg-logo'}`}
-                onClick={(e) => e.stopPropagation()}
-              >
-                <span className="line-clamp-1">{tagDisplayName}</span>
-                <PencilLine className="text-muted-foreground group-hover:text-primary h-2 w-2" />
-              </div>
-            </PopoverTrigger>
-            <PopoverContent className="w-fit p-2" side="top" align="start" onClick={(e) => e.stopPropagation()}>
-              <div className="flex flex-col items-start gap-0.5 text-xs">
-                {problem.tags.map((onetag) => (
-                  <div
-                    key={onetag.tagCode}
-                    aria-label={onetag.tagCode}
-                    className="hover:bg-background w-full cursor-pointer rounded px-1 text-start"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRepresentativeTag(onetag.tagCode);
-                    }}
-                  >
-                    {TAG_INFO[onetag.tagCode] ? TAG_INFO[onetag.tagCode].kr : onetag.tagDisplayName}
-                  </div>
-                ))}
-              </div>
-            </PopoverContent>
-          </Popover>
-        )}
-
-        {!lastTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300'}`}>Undefined</div>}
-        <div className="flex items-center gap-1">
-          <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={12} height={12} />
-          <span>{problem.problemId}</span>
+      {(showFilters.algorithm || showFilters.problemTier || showFilters.problemNumber) && (
+        <div className="mr-2 flex max-w-[calc(50%-10px)] flex-col gap-1 text-center">
+          {showFilters.algorithm && lastTag && (
+            <Popover open={isTagOpen} onOpenChange={setIsTagOpen}>
+              <PopoverTrigger asChild>
+                <div
+                  className={`group relative flex items-center gap-1 rounded px-2 py-0.5 ${!isSolved ? 'bg-innerground-darkgray' : tagInfo ? tagInfo.bgColor : 'bg-logo'}`}
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <span className="line-clamp-1">{tagDisplayName}</span>
+                  <PencilLine className="text-muted-foreground group-hover:text-primary h-2 w-2" />
+                </div>
+              </PopoverTrigger>
+              <PopoverContent className="w-fit p-2" side="top" align="start" onClick={(e) => e.stopPropagation()}>
+                <div className="flex flex-col items-start gap-0.5 text-xs">
+                  {problem.tags.map((onetag) => (
+                    <div
+                      key={onetag.tagCode}
+                      aria-label={onetag.tagCode}
+                      className="hover:bg-background w-full cursor-pointer rounded px-1 text-start"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRepresentativeTag(onetag.tagCode);
+                      }}
+                    >
+                      {TAG_INFO[onetag.tagCode] ? TAG_INFO[onetag.tagCode].kr : onetag.tagDisplayName}
+                    </div>
+                  ))}
+                </div>
+              </PopoverContent>
+            </Popover>
+          )}
+          {showFilters.algorithm && !lastTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300'}`}>Undefined</div>}
+          {(showFilters.problemTier || showFilters.problemNumber) && (
+            <div className="flex items-center gap-1">
+              {showFilters.problemTier && <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={12} height={12} />}
+              {showFilters.problemNumber && <span>{problem.problemId}</span>}
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
       {/* 문제이름 */}
       <div className="line-clamp-2 flex-1 pr-4 text-end">{problem.problemTitle}</div>
@@ -136,7 +144,7 @@ function DraggableProblemCard({
 }
 
 // 검색 결과 문제 카드 (클릭 가능)
-function SearchResultCard({ problem, onClick }: { problem: WillSolveProblems; onClick: () => void }) {
+function SearchResultCard({ problem, onClick, showFilters }: { problem: WillSolveProblems; onClick: () => void; showFilters: SidebarShowFilters }) {
   const firstTag = problem.tags[0];
   const lastTag = problem.tags.length > 0 ? problem.tags[problem.tags.length - 1] : null;
   const tagInfo = TAG_INFO[problem.representativeTag?.tagCode || lastTag?.tagCode || firstTag?.tagCode];
@@ -144,14 +152,18 @@ function SearchResultCard({ problem, onClick }: { problem: WillSolveProblems; on
   return (
     <button onClick={onClick} className="bg-background hover:bg-accent flex w-full items-center gap-2 rounded-md p-2 text-left text-xs transition-colors">
       {/* 문제 기본정보 */}
-      <div className="flex shrink-0 flex-col gap-1 text-center">
-        {lastTag && <div className={`rounded px-2 py-0.5 ${tagInfo ? tagInfo.bgColor : 'bg-only-gray'}`}>{lastTag.tagDisplayName}</div>}
-        {!lastTag && <div className="bg-only-gray rounded px-2 py-0.5">Undefined</div>}
-        <div className="flex items-center gap-1">
-          <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={12} height={12} />
-          <span>{problem.problemId}</span>
+      {(showFilters.algorithm || showFilters.problemTier || showFilters.problemNumber) && (
+        <div className="flex shrink-0 flex-col gap-1 text-center">
+          {showFilters.algorithm && lastTag && <div className={`rounded px-2 py-0.5 ${tagInfo ? tagInfo.bgColor : 'bg-only-gray'}`}>{lastTag.tagDisplayName}</div>}
+          {showFilters.algorithm && !lastTag && <div className="bg-only-gray rounded px-2 py-0.5">Undefined</div>}
+          {(showFilters.problemTier || showFilters.problemNumber) && (
+            <div className="flex items-center gap-1">
+              {showFilters.problemTier && <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={12} height={12} />}
+              {showFilters.problemNumber && <span>{problem.problemId}</span>}
+            </div>
+          )}
         </div>
-      </div>
+      )}
 
       {/* 문제이름 */}
       <div className="line-clamp-2 flex-1 text-end">{problem.problemTitle}</div>
@@ -161,7 +173,9 @@ function SearchResultCard({ problem, onClick }: { problem: WillSolveProblems; on
 
 export function CalendarSidebarInset({ isLanding = false, calendarData }: { calendarData?: Calendar; isLanding?: boolean }) {
   const { selectedDate } = useCalendarStore();
+  const { showFilters, toggleFilter, resetFilters } = useCalendarSidebarStore();
   const [showAddInput, setShowAddInput] = useState(false);
+  const [showFilterSection, setShowFilterSection] = useState(false);
   const [searchKeyword, setSearchKeyword] = useState('');
   const [debouncedKeyword, setDebouncedKeyword] = useState('');
   const solvedContextId = useId(); // DndContext
@@ -347,8 +361,45 @@ export function CalendarSidebarInset({ isLanding = false, calendarData }: { cale
   // 중복 제거 (problemId 기준)
   const uniqueSearchResults = Array.from(new Map(allSearchResults.map((p) => [p.problemId, p])).values());
 
+  const sidebarFilters = [
+    { key: 'problemNumber' as const, label: '문제번호' },
+    { key: 'problemTier' as const, label: '문제티어' },
+    { key: 'algorithm' as const, label: '알고리즘' },
+  ];
+  const hasFilterChanges = !showFilters.algorithm || !showFilters.problemTier || !showFilters.problemNumber;
+
   return (
     <div className="flex flex-col gap-8">
+      {/* 표시항목 */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold">표시항목</h3>
+          <button aria-label="표시항목 설정 열기" onClick={() => setShowFilterSection((prev) => !prev)} className="text-muted-foreground hover:text-foreground relative cursor-pointer">
+            <EyeOff className="h-4 w-4" />
+            {hasFilterChanges && <div className="bg-primary/80 absolute top-0 -right-0.5 h-2 w-2 rounded-full" />}
+          </button>
+        </div>
+        {showFilterSection && (
+          <div className="space-y-2">
+            {sidebarFilters.map((filter) => (
+              <label key={filter.key} aria-label={filter.label} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded p-1">
+                <input
+                  type="checkbox"
+                  checked={showFilters[filter.key]}
+                  onChange={() => toggleFilter(filter.key)}
+                  className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 cursor-pointer appearance-none rounded border-2"
+                />
+                <span className="text-xs">{filter.label}</span>
+              </label>
+            ))}
+            <div className="flex justify-end">
+              <button onClick={resetFilters} aria-label="표시항목 초기화" className="text-muted-foreground hover:text-foreground text-xs underline">
+                초기화
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
       {/* Solved 문제 목록 */}
       <div className="flex cursor-default flex-col gap-2" data-onboarding-id="calendar-sidebar-solved">
         <div className="flex items-center justify-between">
@@ -378,7 +429,13 @@ export function CalendarSidebarInset({ isLanding = false, calendarData }: { cale
             <SortableContext items={solvedProblems.map((p) => p.problemId)} strategy={verticalListSortingStrategy}>
               <div className="flex flex-col gap-2">
                 {solvedProblems.map((problem) => (
-                  <DraggableProblemCard key={problem.problemId} problem={problem} isSolved={true} onUpdateRepresentativeTag={(tagCode) => handleUpdateRepresentativeTag(problem.problemId, tagCode)} />
+                  <DraggableProblemCard
+                    key={problem.problemId}
+                    problem={problem}
+                    isSolved={true}
+                    onUpdateRepresentativeTag={(tagCode) => handleUpdateRepresentativeTag(problem.problemId, tagCode)}
+                    showFilters={showFilters}
+                  />
                 ))}
               </div>
             </SortableContext>
@@ -419,6 +476,7 @@ export function CalendarSidebarInset({ isLanding = false, calendarData }: { cale
                     isSolved={false}
                     onDelete={() => handleDeleteProblem(problem.problemId)}
                     onUpdateRepresentativeTag={(tagCode) => handleUpdateRepresentativeTag(problem.problemId, tagCode)}
+                    showFilters={showFilters}
                   />
                 ))}
               </div>
@@ -465,7 +523,7 @@ export function CalendarSidebarInset({ isLanding = false, calendarData }: { cale
 
                     <div className="flex flex-col gap-1 p-2">
                       {uniqueSearchResults.map((problem) => (
-                        <SearchResultCard key={problem.problemId} problem={problem} onClick={() => handleAddProblemFromSearch(problem.problemId)} />
+                        <SearchResultCard key={problem.problemId} problem={problem} onClick={() => handleAddProblemFromSearch(problem.problemId)} showFilters={showFilters} />
                       ))}
                     </div>
                   </div>

@@ -16,7 +16,7 @@ import { TAG_INFO } from '@/shared/constants/tagSystem';
 
 const TagCard = memo(
   function TagCard({ tag, progress, isLanding = false, onboardingId }: { tag: CategoryTags; progress: number; isLanding: boolean; onboardingId?: string }) {
-    const { tagCode, tagDisplayName, accountStat, nextLevelStat, excludedYn, recommendationYn } = tag;
+    const { tagCode, tagDisplayName, accountStat, nextLevelStat, excludedYn, recommendationYn, lockedYn } = tag;
     const { openModal, closeModal } = useModal();
 
     // Tag Ban mutations
@@ -70,7 +70,7 @@ const TagCard = memo(
     };
 
     // 색상 클래스
-    const currentLevelColors = getLevelColorClasses(accountStat.currentLevel);
+    const currentLevelColors = getLevelColorClasses(excludedYn ? 'EXCLUDED' : lockedYn ? 'LOCKED' : accountStat.currentLevel);
 
     // 마지막 풀이일
     const daysAgo = getDaysAgo(accountStat.lastSolvedDate);
@@ -82,13 +82,13 @@ const TagCard = memo(
 
     return (
       <div
-        className={`bg-innerground-white flex flex-col gap-2 rounded-lg border-3 ${!excludedYn ? currentLevelColors.border : 'border-excluded-bg'} group relative w-80 cursor-default p-4 text-xs transition-all duration-100 ease-in-out hover:shadow-md`}
+        className={`bg-innerground-white flex flex-col gap-2 rounded-lg border-3 ${currentLevelColors.border} group relative w-80 cursor-default p-4 text-xs transition-all duration-100 ease-in-out hover:shadow-md`}
         {...(onboardingId ? { 'data-onboarding-id': onboardingId } : {})}
       >
         {/* 우상단 */}
         <div className="absolute top-0 right-0 overflow-hidden">
           <div
-            className={`${!excludedYn ? currentLevelColors.bg : 'bg-excluded-bg'} text-innerground-white translate-x-full rounded-bl-lg px-2 text-center font-semibold transition-transform duration-300 ease-out group-hover:translate-x-0`}
+            className={`${currentLevelColors.bg} text-innerground-white translate-x-full rounded-bl-lg px-2 text-center font-semibold transition-transform duration-300 ease-out group-hover:translate-x-0`}
           >
             {!excludedYn ? accountStat.currentLevel : 'EXCLUDED'}
           </div>
