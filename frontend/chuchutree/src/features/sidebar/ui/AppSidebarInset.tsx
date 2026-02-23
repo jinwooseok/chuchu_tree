@@ -16,10 +16,10 @@ import {
   RefreshCw,
   PackageOpen,
   House,
-  LogIn,
   Lightbulb,
   SquarePlay,
   Loader,
+  Bell,
 } from 'lucide-react';
 import { useLayoutStore } from '@/lib/store/layout';
 import { useRouter } from 'next/navigation';
@@ -296,7 +296,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                 <div className={`text-md ml-9 flex flex-col font-bold ${sidebarOpenState !== 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>
                   <span>ChuChuTree</span>
                   {isLanding ? (
-                    <span className="text-white bg-primary text-end text-sm font-medium rounded-sm px-2">튜토리얼</span>
+                    <span className="bg-primary rounded-sm px-2 text-end text-sm font-medium text-white">튜토리얼</span>
                   ) : (
                     <span className="text-muted-foreground text-end text-sm font-medium">ver1.0</span>
                   )}
@@ -432,19 +432,22 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                   </SidebarMenuItem>
                 </>
               )}
-              {/* 실 서비스 전용 랜딩페이지로 가기*/}
-              {!isLanding && (
-                <SidebarMenuItem key="enter-landing-page" aria-label={'랜딩페이지로이동하기'}>
-                  <AppTooltip content="튜토리얼 이동하기" side="right">
+              {/* 실 서비스 전용 튜토리얼 이동하기*/}
+              {/* {!isLanding && (
+                <SidebarMenuItem key="bell" aria-label={'알림 및 업데이트 알림'}>
+                  <AppTooltip content="알림 및 업데이트 알림" side="right">
                     <SidebarMenuButton asChild>
-                      <div onClick={handleTutorialStart} className="cursor-pointer">
-                        <Lightbulb size={ICON_SIZE} />
-                        <span>튜토리얼</span>
+                      <div onClick={() => {}} className="cursor-pointer">
+                        <div className="relative h-4 w-4">
+                          <Bell className="h-4 w-4" />
+                          {true && <div className="bg-primary absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full" />}
+                        </div>
+                        <span>알림</span>
                       </div>
                     </SidebarMenuButton>
                   </AppTooltip>
                 </SidebarMenuItem>
-              )}
+              )} */}
             </SidebarMenu>
           </SidebarGroupContent>
           {/* 드롭다운 */}
@@ -469,6 +472,18 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                       <span>설정</span>
                     </DropdownMenuItem>
                   </AppTooltip>
+                  {!isLanding && (
+                    <AppTooltip content="튜토리얼 이동하기" side="right">
+                      <DropdownMenuItem
+                        onSelect={(e) => {
+                          handleTutorialStart();
+                        }}
+                      >
+                        <Lightbulb className="mr-2 h-4 w-4" />
+                        <span>튜토리얼</span>
+                      </DropdownMenuItem>
+                    </AppTooltip>
+                  )}
                   <DropdownMenuItem
                     onSelect={(e) => {
                       e.preventDefault();
