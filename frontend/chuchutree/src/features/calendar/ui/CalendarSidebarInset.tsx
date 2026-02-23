@@ -77,7 +77,10 @@ function DraggableProblemCard({
         {lastTag && (
           <Popover open={isTagOpen} onOpenChange={setIsTagOpen}>
             <PopoverTrigger asChild>
-              <div className={`group relative flex items-center gap-1 rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-innerground-darkgray'}`} onClick={(e) => e.stopPropagation()}>
+              <div
+                className={`group relative flex items-center gap-1 rounded px-2 py-0.5 ${!isSolved ? 'bg-innerground-darkgray' : tagInfo ? tagInfo.bgColor : 'bg-logo'}`}
+                onClick={(e) => e.stopPropagation()}
+              >
                 <span className="line-clamp-1">{problem.representativeTag?.tagDisplayName || lastTag.tagDisplayName}</span>
                 <PencilLine className="text-muted-foreground group-hover:text-primary h-2 w-2" />
               </div>

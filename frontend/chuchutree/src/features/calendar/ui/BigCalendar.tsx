@@ -94,7 +94,7 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
             const isSolved = event.resource.type === 'solved';
 
             // solved는 tag별 색상, will solve는 회색
-            const bgColorClass = isSolved && tagInfo ? tagInfo.bgColor : 'bg-innerground-darkgray';
+            const bgColorClass = !isSolved ? 'bg-innerground-darkgray' : tagInfo ? tagInfo.bgColor : 'bg-logo';
             const textColorClass = isSolved && tagInfo ? tagInfo.textColor : 'text-only-gray';
 
             return (
