@@ -12,6 +12,7 @@ import { TagBanAlertDialog } from './TagBanAlertDialog';
 import TagCardProgressBar from '@/features/tag-dashboard/ui/TagCardProgressBar';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { TIER_INFO } from '@/shared/constants/tierSystem';
+import { TAG_INFO } from '@/shared/constants/tagSystem';
 
 const TagCard = memo(
   function TagCard({ tag, progress, isLanding = false, onboardingId }: { tag: CategoryTags; progress: number; isLanding: boolean; onboardingId?: string }) {
@@ -88,7 +89,7 @@ const TagCard = memo(
         </div>
         {/* 카드 헤더 */}
         <div className="flex items-center justify-between">
-          <div className={`text-foreground text-sm font-semibold`}>{tagDisplayName}</div>
+          <div className={`text-foreground text-sm font-semibold`}>{TAG_INFO[tagCode].kr}</div>
           <div className="flex h-full items-center justify-center gap-2">
             <div className={`text-muted-foreground flex flex-col gap-0.5`}>
               {/* Tag Ban */}
@@ -105,8 +106,7 @@ const TagCard = memo(
               {accountStat.lastSolvedDate !== null ? (
                 <AppTooltip content="마지막 풀이" side="left" delayDuration={300}>
                   <div className="mr-1 flex justify-end gap-0.5">
-                    <p className={` ${accountStat.recommendation_period < daysAgo ? 'text-primary font-semibold' : ''}`}>{daysAgo}</p>
-                    <p>일 전 풀이</p>
+                    <p className={` ${accountStat.recommendation_period < daysAgo ? 'text-primary font-semibold' : ''}`}>{daysAgo !== 0 ? `${daysAgo}일 전 풀이` : '오늘 풀이'}</p>
                   </div>
                 </AppTooltip>
               ) : accountStat.solvedProblemCount === 0 ? (
