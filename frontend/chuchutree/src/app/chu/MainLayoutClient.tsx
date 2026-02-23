@@ -20,7 +20,7 @@ export function MainLayoutClient({ children }: MainLayoutClientProps) {
       <AppSidebar />
       <SidebarInset>{children}</SidebarInset>
       {/* 온보딩 컨트롤러 */}
-      {isActive && <OnboardingController />}
+      {isActive && <OnboardingController isLanding={false} />}
     </SidebarProvider>
   );
 }

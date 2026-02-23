@@ -13,7 +13,7 @@ import { OnboardingHeader } from './OnboardingHeader';
 import { useSidebar } from '@/components/ui/sidebar';
 import { OnboardingInitialDialog } from '@/features/landing/ui/OnboardingInitialDialog';
 
-export function OnboardingController() {
+export function OnboardingController({ isLanding }: { isLanding: boolean }) {
   const router = useRouter();
   const { closeModal } = useModal();
   const { currentStep, nextStep, completeOnboarding } = useOnboardingStore();
@@ -81,31 +81,6 @@ export function OnboardingController() {
 
     // 's' 타입: 시스템 동작 실행
     if (sequenceData.type === 's') {
-      // Step 1의 레이아웃 초기화
-      // if (currentStep === 1 && currentSequence === 1) {
-      //   setTopSection(null);
-      //   setCenterSection('calendar');
-      //   // bottomSection이 열려있으면 닫기
-      //   if (bottomSection === 'recommend') {
-      //     toggleBottomSection();
-      //   }
-      //   if (sidebarOpenState !== 'collapsed') {
-      //     setSidebarOpenState();
-      //   }
-      // }
-
-      // Step 4의 Bottom Section 닫기
-      // if (currentStep === 4 && currentSequence === 1) {
-      //   if (bottomSection === 'recommend') {
-      //     toggleBottomSection();
-      //   }
-      // }
-
-      // Step 5의 Top Section을 Streak으로 변경
-      // if (currentStep === 5 && currentSequence === 1) {
-      //   setTopSection('streak');
-      // }
-
       // Step 6의 Top Section 닫기 (사용자가 dashboard 버튼 클릭할 예정)
       if (currentStep === 6 && currentSequence === 1) {
         setTopSection(null);
@@ -187,10 +162,10 @@ export function OnboardingController() {
       {sequenceData.type !== 'init' && <OnboardingHeader />}
       <OnboardingBackdrop spotlightTarget={spotlightTarget} allowInteraction={sequenceData.type === 'u'} />
 
-      {sequenceData.type === 'init' && <OnboardingInitialDialog onButtonClick={handleDialogButtonClick} />}
+      {sequenceData.type === 'init' && <OnboardingInitialDialog onButtonClick={handleDialogButtonClick} isLanding={isLanding} />}
 
       {sequenceData.type === 'd' && sequenceData.dialogMessages && sequenceData.dialogButtons && (
-        <OnboardingDialog messages={sequenceData.dialogMessages} buttons={sequenceData.dialogButtons} onButtonClick={handleDialogButtonClick} />
+        <OnboardingDialog messages={sequenceData.dialogMessages} buttons={sequenceData.dialogButtons} onButtonClick={handleDialogButtonClick} isLanding={isLanding} currentStep={currentStep} />
       )}
 
       {sequenceData.type === 'f' && sequenceData.targetSelector && sequenceData.message && (
