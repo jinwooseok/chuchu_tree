@@ -52,7 +52,7 @@ export default function DashboardLayout() {
   // TopSection 리사이즈
   const { size: topHeight, handleMouseDown: handleTopResize } = useResizable({
     direction: 'vertical',
-    initialSize: topSection === 'tierbar' ? topSectionTierbarHeight : topSectionStreakHeight,
+    initialSize: topSection === 'streak' ? topSectionStreakHeight : topSectionTierbarHeight,
     minSize: topSection === 'streak' ? 240 : 60,
     maxSize: topSection === 'streak' ? 300 : 120,
     onResizeStart: () => setResizing(true),
@@ -117,7 +117,7 @@ export default function DashboardLayout() {
       <main className="flex min-w-0 flex-1 flex-col">
         {/* 상단 영역 (티어바/스트릭) */}
         <div
-          className={cn('hide-scrollbar relative overflow-scroll', !isResizing && 'transition-all duration-300 ease-in-out')}
+          className={`hide-scrollbar relative overflow-scroll ${!isResizing ? 'transition-all duration-300 ease-in-out' : ''}`}
           style={topSection ? { height: `${topHeight}px`, marginBottom: '0.5rem' } : { height: 0 }}
         >
           <div className={cn('bg-background h-full', !isResizing && 'transition-transform duration-300 ease-in-out', topTranslate, topInnerHeight)}>
@@ -126,10 +126,8 @@ export default function DashboardLayout() {
           </div>
           {topSection && <ResizeHandle direction="vertical" onMouseDown={handleTopResize} className="absolute bottom-0 left-0 w-full" />}
         </div>
-
         {/* 중앙 영역 (캘린더/태그 대시보드) */}
         <div className="flex-1 overflow-hidden transition-all duration-300 ease-in-out">{centerSection === 'calendar' ? <MainCalendar /> : <MainTagDashboard />}</div>
-
         {/* 하단 영역 (문제 추천) */}
         <div
           className={cn('hide-scrollbar relative overflow-scroll', !isResizing && 'transition-all duration-300 ease-in-out')}
