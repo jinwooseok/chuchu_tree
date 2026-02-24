@@ -6,6 +6,7 @@ import { useGetBannedProblems, useUnbanProblem } from '@/entities/recommendation
 import { toast } from '@/lib/utils/toast';
 import Image from 'next/image';
 import { X, Loader2 } from 'lucide-react';
+import { TAG_INFO } from '@/shared/constants/tagSystem';
 
 interface props {
   onClose: () => void;
@@ -62,7 +63,7 @@ export function BannedProblemsDialog({ onClose }: props) {
                         <div className="flex flex-wrap gap-1">
                           {problem.tags.map((tag) => (
                             <span key={tag.tagId} className="bg-innerground-darkgray text-muted-foreground rounded px-2 py-0.5 text-xs">
-                              {tag.tagDisplayName}
+                              {TAG_INFO[tag.tagCode] ? TAG_INFO[tag.tagCode].kr : tag.tagDisplayName}
                             </span>
                           ))}
                         </div>

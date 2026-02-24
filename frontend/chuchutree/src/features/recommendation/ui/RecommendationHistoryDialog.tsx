@@ -14,6 +14,7 @@ import { formatDateString } from '@/lib/utils/date';
 import { getErrorCode, getErrorMessage } from '@/lib/utils/error';
 import Image from 'next/image';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { TAG_INFO } from '@/shared/constants/tagSystem';
 
 interface props {
   onClose: () => void;
@@ -276,7 +277,9 @@ export function RecommendationHistoryDialog({ onClose }: props) {
                               ) : (
                                 <div className="flex min-w-30 flex-col items-end">
                                   <div className="flex items-center justify-center gap-1">
-                                    {showFilters.algorithm && problem.tags.length > 0 && <p className="line-clamp-1">{problem.tags[0].tagDisplayName}</p>}
+                                    {showFilters.algorithm && problem.tags.length > 0 && (
+                                      <p className="line-clamp-1">{TAG_INFO[problem.tags[0].tagCode as keyof typeof TAG_INFO]?.kr ?? problem.tags[0].tagDisplayName}</p>
+                                    )}
                                     <AppTooltip content={isBanned ? '문제 추천에 포함' : '문제 추천에서 제외'} side="left">
                                       <div
                                         aria-label={isBanned ? '문제 추천에 포함' : '문제 추천에서 제외'}
@@ -357,13 +360,11 @@ export function RecommendationHistoryDialog({ onClose }: props) {
                     </label>
                   ))}
                 </div>
-                {hasFilterChanges && (
-                  <div className="mt-2 flex justify-end border-t pt-2">
-                    <button onClick={resetFilters} className="text-muted-foreground hover:text-foreground text-xs underline">
-                      초기화
-                    </button>
-                  </div>
-                )}
+                <div className="mt-2 flex justify-end border-t pt-2">
+                  <button onClick={resetFilters} className="text-muted-foreground hover:text-foreground text-xs underline">
+                    초기화
+                  </button>
+                </div>
               </PopoverContent>
             </Popover>
           </div>

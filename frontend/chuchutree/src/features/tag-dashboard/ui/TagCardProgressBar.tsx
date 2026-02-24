@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid'; // filled
 import { CheckCircleIcon as CheckCircleIconOutline } from '@heroicons/react/24/outline'; // outline
 import { BadgeCheck } from 'lucide-react';
+import { TAG_INFO } from '@/shared/constants/tagSystem';
 
 export default function TagCardProgressBar({ tag, progress }: { tag: CategoryTags; progress: number }) {
   const { accountStat, nextLevelStat, lockedYn, excludedYn, requiredStat } = tag;
@@ -33,7 +34,7 @@ export default function TagCardProgressBar({ tag, progress }: { tag: CategoryTag
             <p className="mb-2 font-semibold">추천 시작 조건</p>
             {requiredStat.prevTags.map((c) => (
               <div key={c.tagId} className={`flex w-full items-center justify-start ${excludedYn ? 'text-excluded-text' : c.satisfiedYn ? 'text-advanced-bg font-semibold' : 'text-muted-foreground'}`}>
-                <p>{c.tagDisplayName}</p>
+                <p>{TAG_INFO[c.tagCode].kr}</p>
                 <div className="ml-2">{c.satisfiedYn ? <CheckCircleIconSolid height={12} width={12} /> : <CheckCircleIconOutline height={12} width={12} />}</div>
               </div>
             ))}

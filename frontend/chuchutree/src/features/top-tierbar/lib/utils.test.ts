@@ -17,6 +17,7 @@ describe('getTierDetail', () => {
           targetDisplayName: '데일리',
         },
         registeredAt: '2024-01-01',
+        isSynced: true,
       },
       bjAccount: {
         bjAccountId: 'testuser',
@@ -53,6 +54,7 @@ describe('getTierDetail', () => {
           targetDisplayName: '데일리',
         },
         registeredAt: '2024-01-01',
+        isSynced: true,
       },
       bjAccount: {
         bjAccountId: 'testuser',
@@ -88,6 +90,7 @@ describe('getTierDetail', () => {
           targetDisplayName: '데일리',
         },
         registeredAt: '2024-01-01',
+        isSynced: true,
       },
       bjAccount: {
         bjAccountId: 'testuser',
@@ -125,6 +128,7 @@ describe('getTierDetail', () => {
           targetDisplayName: '데일리',
         },
         registeredAt: '2024-01-01',
+        isSynced: true,
       },
       bjAccount: {
         bjAccountId: 'testuser',
@@ -161,6 +165,7 @@ describe('getTierDetail', () => {
           targetDisplayName: '데일리',
         },
         registeredAt: '2024-01-01',
+        isSynced: true,
       },
       bjAccount: {
         bjAccountId: 'testuser',
@@ -197,6 +202,7 @@ describe('getTierDetail', () => {
           targetDisplayName: '초보자',
         },
         registeredAt: '2024-01-01',
+        isSynced: true,
       },
       bjAccount: {
         bjAccountId: 'testuser',
@@ -233,6 +239,7 @@ describe('getTierDetail', () => {
           targetDisplayName: '초보자',
         },
         registeredAt: '2024-01-01',
+        isSynced: true,
       },
       bjAccount: {
         bjAccountId: 'testuser',
@@ -269,6 +276,7 @@ describe('getTierDetail', () => {
           targetDisplayName: '코딩테스트',
         },
         registeredAt: '2024-01-01',
+        isSynced: true,
       },
       bjAccount: {
         bjAccountId: 'testuser',
@@ -313,6 +321,7 @@ describe('getTierDetail', () => {
           targetDisplayName: '데일리',
         },
         registeredAt: '2024-01-01',
+        isSynced: true,
       },
       bjAccount: {
         bjAccountId: 'testuser',

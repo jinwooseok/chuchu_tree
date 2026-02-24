@@ -2,10 +2,10 @@
 
 import { useOnboardingStore } from '@/lib/store/onboarding';
 import { ONBOARDING_STEPS } from './onboardingSteps';
-import { X, ChevronRight } from 'lucide-react';
+import { X, ChevronRight, ChevronLeft } from 'lucide-react';
 
 export function OnboardingHeader() {
-  const { currentStep, skipCurrentStep, completeOnboarding } = useOnboardingStore();
+  const { currentStep, skipCurrentStep, completeOnboarding, prevStep } = useOnboardingStore();
   const totalSteps = ONBOARDING_STEPS.length;
 
   return (
@@ -17,6 +17,13 @@ export function OnboardingHeader() {
         </span>
       </div>
 
+      {/* 이전 버튼 */}
+      {currentStep !== 1 && (
+        <button onClick={prevStep} className="bg-background hover:bg-innerground-darkgray flex h-full cursor-pointer items-center gap-1 rounded-lg border pr-3 pl-4 select-none">
+          <ChevronLeft className="h-4 w-4" />
+          <span>돌아가기</span>
+        </button>
+      )}
       {/* 건너뛰기 버튼 */}
       <button onClick={skipCurrentStep} className="bg-background hover:bg-innerground-darkgray flex h-full cursor-pointer items-center gap-1 rounded-lg border pr-3 pl-4 select-none">
         <span>건너뛰기</span>

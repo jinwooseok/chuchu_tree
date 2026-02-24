@@ -9,9 +9,12 @@ interface OnboardingDialogProps {
     action: 'next' | 'skip' | 'start' | 'login';
   }>;
   onButtonClick: (action: string) => void;
+  isLanding: boolean;
+  currentStep: number;
 }
 
-export function OnboardingDialog({ messages, buttons, onButtonClick }: OnboardingDialogProps) {
+export function OnboardingDialog({ messages, buttons, onButtonClick, isLanding, currentStep }: OnboardingDialogProps) {
+  const isLandingOfLastStep = !isLanding && currentStep === 8;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
       <div className="bg-background mx-4 max-w-md rounded-lg border p-8 shadow-lg">
@@ -26,7 +29,7 @@ export function OnboardingDialog({ messages, buttons, onButtonClick }: Onboardin
 
         {/* 버튼 */}
         <div className="flex justify-center gap-3">
-          {buttons.map((button, index) => (
+          {(isLandingOfLastStep ? buttons.slice(0, 1) : buttons).map((button, index) => (
             <Button key={index} variant={button.action === 'skip' ? 'outline' : 'default'} onClick={() => onButtonClick(button.action)} className="flex-1">
               {button.text}
             </Button>

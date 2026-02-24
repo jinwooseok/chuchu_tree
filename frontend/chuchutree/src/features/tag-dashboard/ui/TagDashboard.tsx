@@ -5,6 +5,7 @@ import TagCard from '@/features/tag-dashboard/ui/TagCard';
 import { useTagDashboardSidebarStore } from '@/lib/store/tagDashboard';
 import { TagDashboard as TagDashboardType } from '@/entities/tag-dashboard';
 import { calculateProgress } from '@/features/tag-dashboard/lib/utils';
+import { TAG_INFO } from '@/shared/constants/tagSystem';
 
 export function TagDashboard({ tagDashboard, isLanding = false }: { tagDashboard?: TagDashboardType; isLanding?: boolean }) {
   // store에서 필터/정렬 상태 가져오기
@@ -29,7 +30,14 @@ export function TagDashboard({ tagDashboard, isLanding = false }: { tagDashboard
 
     // 검색어 필터링
     if (searchQuery) {
-      result = result.filter((tag) => tag.tagDisplayName.toLowerCase().includes(searchQuery.toLowerCase()));
+      const query = searchQuery.toLowerCase();
+      result = result.filter(
+        (tag) =>
+          tag.tagDisplayName.toLowerCase().includes(query) ||
+          tag.tagCode.toLowerCase().includes(query) ||
+          TAG_INFO[tag.tagCode].kr.toLowerCase().includes(query) ||
+          tag.tagAliases.some((a) => a.alias.toLowerCase().includes(query)),
+      );
     }
 
     // 선택된 태그 필터링 (sidebar에서 클릭한 경우)
@@ -51,7 +59,7 @@ export function TagDashboard({ tagDashboard, isLanding = false }: { tagDashboard
     switch (sortBy) {
       case 'name':
         result.sort((a, b) => {
-          const comparison = a.tagDisplayName.localeCompare(b.tagDisplayName);
+          const comparison = TAG_INFO[a.tagCode].kr.localeCompare(TAG_INFO[b.tagCode].kr);
           return sortDirection === 'asc' ? comparison : -comparison;
         });
         break;

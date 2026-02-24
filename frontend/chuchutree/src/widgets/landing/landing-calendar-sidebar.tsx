@@ -37,7 +37,7 @@ export default function LandingCalendarSidebar() {
   return (
     <div className="hide-scrollbar flex h-full flex-col gap-8 overflow-y-auto p-4">
       <div>
-        <div className="text-muted-foreground w-full pr-2 text-start text-sm font-medium">ChuchuTree 연습페이지</div>
+        <div className="text-white cursor-default select-none bg-primary w-full px-2 py-2 rounded-sm text-sm font-medium mb-2">ChuchuTree 튜토리얼</div>
         <SmallCalendar calendarData={calendarData} activeStartDate={activeStartDate} onActiveStartDateChange={setActiveStartDate} />
       </div>
       <CalendarSidebarInset calendarData={calendarData} isLanding={true} />

@@ -4,6 +4,7 @@ import { ActivityCalendar, Props as CalendarProps, ThemeInput } from 'react-acti
 import { useTheme } from 'next-themes';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { useState, useMemo } from 'react';
+import HelpPopover from '@/shared/ui/help-popover';
 
 const lightTheme: ThemeInput = {
   light: ['#e4e4e4', '#A1E4AC', '#78CB94', '#4EB17C', '#007950'],
@@ -139,6 +140,18 @@ export default function TopStreakbar() {
           <div className="text-muted-foreground flex items-center gap-2 text-sm">
             <Leaf height={14} width={14} />
             스트릭
+            <HelpPopover width="w-85">
+              <div className="space-y-2">
+                <h4 className="text-sm font-semibold">1년간 문제 풀이 기록</h4>
+                <p className="text-muted-foreground text-xs">
+                  알고리즘 기록은 매일 오전 00:00
+                  <span className="align-super text-[10px]">UTC+9</span>에 변경됩니다.
+                </p>
+                <p className="text-muted-foreground text-xs">
+                  새로 푼 문제가 보이지 않는다면, <span className="text-primary font-semibold">Refresh</span> 버튼을 눌러주세요 .
+                </p>
+              </div>
+            </HelpPopover>
           </div>
           {/* 네비게이션 버튼 */}
           <div className="flex gap-2">

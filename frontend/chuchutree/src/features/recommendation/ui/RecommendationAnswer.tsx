@@ -12,6 +12,7 @@ import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { useMemo } from 'react';
 import { formatDateString } from '@/lib/utils/date';
 import { getErrorCode, getErrorMessage } from '@/lib/utils/error';
+import { TAG_INFO } from '@/shared/constants/tagSystem';
 
 export function RecommendationAnswer({ calendarData, bannedListData, isLanding = false }: { calendarData?: Calendar; bannedListData?: BannedProblems; isLanding?: boolean }) {
   const { problems, isLoading, showFilters } = useRecommendationStore();
@@ -233,7 +234,11 @@ export function RecommendationAnswer({ calendarData, bannedListData, isLanding =
                 ) : (
                   <div className="flex min-w-30 flex-col items-end">
                     <div className="flex items-center justify-center gap-1">
-                      {showFilters.algorithm && problem.tags.length > 0 && <p className="line-clamp-1">{problem.tags[0].tagDisplayName}</p>}
+                      {showFilters.algorithm && problem.tags.length > 0 && (
+                        <p className="line-clamp-1">
+                          {TAG_INFO[problem.tags[0].tagCode as keyof typeof TAG_INFO]?.kr ?? problem.tags[0].tagDisplayName}
+                        </p>
+                      )}
                       <AppTooltip content={isBanned ? '문제 추천에 포함' : '문제 추천에서 제외'} side="left">
                         <div
                           aria-label={isBanned ? '문제 추천에 포함' : '문제 추천에서 제외'}
