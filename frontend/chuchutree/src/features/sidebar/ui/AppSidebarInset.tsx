@@ -20,11 +20,29 @@ import {
   SquarePlay,
   Loader,
   Bell,
+  Star,
+  Bookmark,
+  CircleFadingPlus,
 } from 'lucide-react';
 import { useLayoutStore } from '@/lib/store/layout';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupAction,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarRail,
+} from '@/components/ui/sidebar';
 import { useSidebar } from '@/components/ui/sidebar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { TargetCode } from '@/shared/constants/tagSystem';
@@ -43,6 +61,7 @@ import { User } from '@/entities/user';
 import { useState } from 'react';
 import { useLandingRecommend } from '@/features/landing';
 import { useOnboardingStore } from '@/lib/store/onboarding';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 
 const ICON_SIZE = 32;
 
@@ -84,7 +103,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
     }
   };
 
-  // 로그아웃 훅 및 핸들러
+  // 로그아웃 훅
   const { mutate: logout } = useLogout({
     onSuccess: () => {
       toast.success('로그아웃되었습니다.');
@@ -339,6 +358,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
             </SidebarGroupContent>
           </SidebarGroup>
           <div className="mt-10" />
+
           {/* 그룹2 */}
           <SidebarGroup>
             <SidebarGroupContent>
@@ -397,6 +417,56 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
+          <div className="mt-10" />
+          {/* 그룹3 : 스터디 전용 */}
+          {/* <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem key="addstudy" aria-label={'스터디 생성'}>
+                  <AppTooltip content={'스터디 생성'} side="right">
+                    <SidebarMenuButton asChild>
+                      <div onClick={() => {}} className="cursor-pointer">
+                        <CircleFadingPlus size={ICON_SIZE} className="relative z-10" />
+                        <span className="relative z-10">스터디 만들기</span>
+                      </div>
+                    </SidebarMenuButton>
+                  </AppTooltip>
+                </SidebarMenuItem>
+                <SidebarMenuItem key="studygroup" aria-label={'스터디'}>
+                  <AppTooltip content={'스터디를 만들어보세요'} side="right">
+                    <SidebarMenuButton asChild>
+                      <div onClick={() => {}} className="cursor-pointer">
+                        <Star size={ICON_SIZE} className="relative z-10" />
+                        <span className="relative z-10">스터디 목록</span>
+                      </div>
+                    </SidebarMenuButton>
+                  </AppTooltip>
+                  <SidebarMenuSub>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton asChild>
+                        <div onClick={() => {}} className="cursor-pointer">
+                          <Bookmark size={ICON_SIZE} className="relative z-10" />
+                          <span className="relative z-10">스터디1</span>
+                        </div>
+                      </SidebarMenuSubButton>
+                      <SidebarMenuSubButton asChild>
+                        <div onClick={() => {}} className="cursor-pointer">
+                          <Bookmark size={ICON_SIZE} className="relative z-10" />
+                          <span className="relative z-10">스터디2</span>
+                        </div>
+                      </SidebarMenuSubButton>
+                      <SidebarMenuSubButton asChild>
+                        <div onClick={() => {}} className="cursor-pointer">
+                          <Bookmark size={ICON_SIZE} className="relative z-10" />
+                          <span className="relative z-10">스터디3</span>
+                        </div>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  </SidebarMenuSub>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup> */}
         </SidebarContent>
         {/* footer */}
         <SidebarFooter>
