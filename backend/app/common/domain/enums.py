@@ -39,3 +39,23 @@ class SkillCode(str, Enum):
     IM = "IM"      # Intermediate
     AD = "AD"      # Advanced
     MAS = "MAS"    # Master
+
+
+class SystemLogType(str, Enum):
+    SCHEDULER = "SCHEDULER"
+    REFRESH = "REFRESH"
+    BULK_UPDATE = "BULK_UPDATE"
+    PROBLEM_METADATA = "PROBLEM_METADATA"
+    WEEKLY_UPDATE = "WEEKLY_UPDATE"
+
+
+class SystemLogStatus(str, Enum):
+    SUCCESS = "SUCCESS"
+    FAILED = "FAILED"
+    SKIPPED = "SKIPPED"
+
+
+class MetadataEntityType(str, Enum):
+    PROBLEM = "PROBLEM"
+    TAG_PROFICIENCY = "TAG_PROFICIENCY"
+    RECOMMENDATION_FILTER = "RECOMMENDATION_FILTER"

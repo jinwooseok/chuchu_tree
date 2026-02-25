@@ -190,3 +190,9 @@ class ErrorCode(Enum):
         message="토큰 재사용이 감지되었습니다. 보안을 위해 모든 세션이 종료됩니다.",
         status_code=401
     )
+
+    CANNOT_MOVE_TO_LATER_DATE = ErrorCodeInfo(
+        code="CANNOT_MOVE_TO_LATER_DATE",
+        message="이미 기록된 날짜보다 더 최근 날짜로 이동할 수 없습니다.",
+        status_code=400
+    )

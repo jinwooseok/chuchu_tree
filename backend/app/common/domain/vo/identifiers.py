@@ -47,3 +47,15 @@ class ProblemHistoryId:
 @dataclass(frozen=True)
 class StreakId:
     value: int
+
+@dataclass(frozen=True)
+class UserDateRecordId:
+    value: int
+
+@dataclass(frozen=True)
+class SchedulerLogId:
+    value: int
+
+@dataclass(frozen=True)
+class SystemLogId:
+    value: int
