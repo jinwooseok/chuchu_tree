@@ -63,6 +63,8 @@ import { useLandingRecommend } from '@/features/landing';
 import { useOnboardingStore } from '@/lib/store/onboarding';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { CreateStudyDialog } from '@/features/sidebar/ui/group-study/CreateStudyDialog';
+import { NoticeDialog } from '@/features/sidebar/ui/group-notification/NoticeDialog';
+import { useNotificationStore } from '@/lib/store/notification';
 
 const ICON_SIZE = 32;
 
@@ -73,6 +75,9 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
   const { state: sidebarOpenState, toggleSidebar: setSidebarOpenState } = useSidebar();
   // 레이아웃 상태
   const { topSection, centerSection, bottomSection, toggleTopSection, setCenterSection, toggleBottomSection } = useLayoutStore();
+
+  // 알림 dot 상태
+  const { hasUnread } = useNotificationStore();
 
   // 리프래시버튼 훅
   const { isRefreshButtonVisible, showRefreshButton } = useRefreshButtonStore();
@@ -169,6 +174,14 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       return;
     }
     openModal('create-study', <CreateStudyDialog user={user} onClose={() => closeModal('create-study')} />);
+  };
+  // 알림 모달 열기
+  const handleNotice = () => {
+    if (isLanding) {
+      toast.info('로그인 후 이용가능합니다.');
+      return;
+    }
+    openModal('notice-list', <NoticeDialog onClose={() => closeModal('notice-list')} />);
   };
 
   // 튜토리얼 다시보기
@@ -513,21 +526,21 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                 </>
               )}
               {/* 실 서비스 전용 튜토리얼 이동하기*/}
-              {/* {!isLanding && (
+              {!isLanding && (
                 <SidebarMenuItem key="bell" aria-label={'알림 및 업데이트 알림'}>
                   <AppTooltip content="알림 및 업데이트 알림" side="right">
                     <SidebarMenuButton asChild>
-                      <div onClick={() => {}} className="cursor-pointer">
+                      <div onClick={handleNotice} className="cursor-pointer">
                         <div className="relative h-4 w-4">
                           <Bell className="h-4 w-4" />
-                          {true && <div className="bg-primary absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full" />}
+                          {hasUnread && <div className="bg-primary absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full" />}
                         </div>
                         <span>알림</span>
                       </div>
                     </SidebarMenuButton>
                   </AppTooltip>
                 </SidebarMenuItem>
-              )} */}
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
           {/* 드롭다운 */}
