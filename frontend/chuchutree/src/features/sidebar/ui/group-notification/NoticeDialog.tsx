@@ -4,12 +4,15 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button';
 import { useNotificationStore } from '@/lib/store/notification';
 import { useState, useEffect } from 'react';
-import { Bell, BookOpen, ClipboardList, Users } from 'lucide-react';
+import { Bell, CalendarPlus, CheckCheck, ClipboardList, Tag, TrendingUp, Users } from 'lucide-react';
+import { WillSolveProblems, SolvedProblems } from '@/entities/calendar/model/calendar.types';
+import { TIER_INFO, TierNumKey } from '@/shared/constants/tierSystem';
+import { TAG_INFO, TagKey, CategoryName } from '@/shared/constants/tagSystem';
+import { getLevelColorClasses } from '@/features/tag-dashboard/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type NoticeCategory = 'study-invitation-status' | 'study-application-status' | 'study-problems-status' | 'user-problems-status';
-// 추후 카테고리 추가 예정
+export type NoticeCategory = 'study-invitation-status' | 'study-application-status' | 'study-problems-status' | 'user-problems-status' | 'user-tier-status' | 'user-tag-status';
 
 export type NoticeStatusValue = 'pending' | 'accepted' | 'rejected';
 
@@ -36,15 +39,37 @@ export interface StudyApplicationNotice extends BaseNotice {
 
 export interface StudyProblemsNotice extends BaseNotice {
   category: 'study-problems-status';
-  // TBD
+  studyName: string;
+  problem: WillSolveProblems;
+  calendarDate: string; // YYYY-MM-DD
 }
 
 export interface UserProblemsNotice extends BaseNotice {
   category: 'user-problems-status';
-  // TBD
+  problem: SolvedProblems;
+  date: string; // YYYY-MM-DD
 }
 
-export type Notice = StudyInvitationNotice | StudyApplicationNotice | StudyProblemsNotice | UserProblemsNotice;
+export interface UserTierNotice extends BaseNotice {
+  category: 'user-tier-status';
+  tierLevel: TierNumKey;
+}
+
+export interface UserTagNotice extends BaseNotice {
+  category: 'user-tag-status';
+  tagId: number;
+  tagCode: TagKey;
+  accountStatCurrentLevel: CategoryName;
+}
+
+export type Notice = StudyInvitationNotice | StudyApplicationNotice | StudyProblemsNotice | UserProblemsNotice | UserTierNotice | UserTagNotice;
+
+// ─── Tab ─────────────────────────────────────────────────────────────────────
+
+type NoticeTab = 'study' | 'personal';
+
+const STUDY_CATEGORIES: NoticeCategory[] = ['study-invitation-status', 'study-application-status', 'study-problems-status'];
+const PERSONAL_CATEGORIES: NoticeCategory[] = ['user-problems-status', 'user-tier-status', 'user-tag-status'];
 
 // ─── Mock Data (SSE 연동 전 임시 데이터) ─────────────────────────────────────
 
@@ -85,6 +110,56 @@ const MOCK_NOTICES: Notice[] = [
     studyName: 'mock스터디04',
     status: 'pending',
   },
+  {
+    id: 5,
+    category: 'study-problems-status',
+    isRead: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+    studyName: 'mock스터디01',
+    problem: {
+      problemId: 2557,
+      problemTitle: '선분 교차 1',
+      problemTierLevel: 14,
+      problemTierName: 'G2',
+      problemClassLevel: null,
+      tags: [],
+      representativeTag: null,
+    },
+    calendarDate: '2026-02-28',
+  },
+  {
+    id: 6,
+    category: 'user-problems-status',
+    isRead: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+    problem: {
+      problemId: 1000,
+      problemTitle: '수 정렬하기',
+      problemTierLevel: 6,
+      problemTierName: 'S5',
+      problemClassLevel: 1,
+      realSolvedYn: true,
+      tags: [],
+      representativeTag: null,
+    },
+    date: '2026-02-25',
+  },
+  {
+    id: 7,
+    category: 'user-tier-status',
+    isRead: true,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
+    tierLevel: 11,
+  },
+  {
+    id: 8,
+    category: 'user-tag-status',
+    isRead: true,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 10).toISOString(),
+    tagId: 1,
+    tagCode: 'dp',
+    accountStatCurrentLevel: 'ADVANCED',
+  },
 ];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -100,6 +175,11 @@ function formatRelativeTime(isoString: string): string {
   return `${days}일 전`;
 }
 
+function formatCalendarDate(dateString: string): string {
+  const [, month, day] = dateString.split('-');
+  return `${parseInt(month)}월 ${parseInt(day)}일`;
+}
+
 const STATUS_CONFIG: Record<NoticeStatusValue, { label: string; className: string }> = {
   pending: { label: '대기 중', className: 'text-muted-foreground' },
   accepted: { label: '수락됨', className: 'text-advanced-bg' },
@@ -109,15 +189,19 @@ const STATUS_CONFIG: Record<NoticeStatusValue, { label: string; className: strin
 const CATEGORY_LABEL: Record<NoticeCategory, string> = {
   'study-invitation-status': '스터디 초대',
   'study-application-status': '가입 신청',
-  'study-problems-status': '스터디 문제',
-  'user-problems-status': '개인 문제',
+  'study-problems-status': '문제 등록',
+  'user-problems-status': '문제 업데이트',
+  'user-tier-status': '티어 상승',
+  'user-tag-status': '태그 등급 상승',
 };
 
 const CATEGORY_ICON: Record<NoticeCategory, React.ReactNode> = {
   'study-invitation-status': <Users className="mt-0.5 h-4 w-4 shrink-0" />,
   'study-application-status': <ClipboardList className="mt-0.5 h-4 w-4 shrink-0" />,
-  'study-problems-status': <BookOpen className="mt-0.5 h-4 w-4 shrink-0" />,
-  'user-problems-status': <BookOpen className="mt-0.5 h-4 w-4 shrink-0" />,
+  'study-problems-status': <CalendarPlus className="mt-0.5 h-4 w-4 shrink-0" />,
+  'user-problems-status': <CheckCheck className="mt-0.5 h-4 w-4 shrink-0" />,
+  'user-tier-status': <TrendingUp className="mt-0.5 h-4 w-4 shrink-0" />,
+  'user-tag-status': <Tag className="mt-0.5 h-4 w-4 shrink-0" />,
 };
 
 // ─── Notice Card ──────────────────────────────────────────────────────────────
@@ -135,10 +219,10 @@ function NoticeCard({ notice, showUnreadDot, onCancel }: NoticeCardProps) {
         const n = notice as StudyInvitationNotice;
         return (
           <p className="text-sm leading-snug">
-            <span className="font-medium">{n.studyName}</span> 스터디에{' '}
+            <span className="font-medium">{n.studyName}</span> 스터디에
             <span className="font-medium">
               {n.userId}#{n.userCode}
-            </span>{' '}
+            </span>
             님을 초대했습니다.
           </p>
         );
@@ -152,9 +236,53 @@ function NoticeCard({ notice, showUnreadDot, onCancel }: NoticeCardProps) {
           </p>
         );
       }
-      case 'study-problems-status':
-      case 'user-problems-status':
-        return <p className="text-muted-foreground text-sm">알림 내용이 준비 중입니다.</p>;
+      case 'study-problems-status': {
+        const n = notice as StudyProblemsNotice;
+        return (
+          <p className="text-sm leading-snug">
+            <span className="font-medium">{n.studyName}</span> 스터디에{' '}
+            <span className="font-medium">
+              #{n.problem.problemId} {n.problem.problemTitle}
+            </span>{' '}
+            문제가 {formatCalendarDate(n.calendarDate)}에 등록되었습니다.
+          </p>
+        );
+      }
+      case 'user-problems-status': {
+        const n = notice as UserProblemsNotice;
+        return (
+          <p className="text-sm leading-snug">
+            {formatCalendarDate(n.date)}에
+            <span className="text-primary bg-logo mx-1 rounded-xs px-1 font-medium">
+              #{n.problem.problemId} {n.problem.problemTitle}
+            </span>
+            문제가 등록되었습니다.
+          </p>
+        );
+      }
+      case 'user-tier-status': {
+        const n = notice as UserTierNotice;
+        return (
+          <p className="text-sm leading-snug">
+            티어가{' '}
+            <span className="text-primary bg-logo mx-1 rounded-xs px-1 font-medium">
+              {TIER_INFO[n.tierLevel].name} {TIER_INFO[n.tierLevel].num}
+            </span>
+            로 상승했습니다!
+          </p>
+        );
+      }
+      case 'user-tag-status': {
+        const n = notice as UserTagNotice;
+        const tagKr = TAG_INFO[n.tagCode]?.kr ?? n.tagCode;
+        const levelColors = getLevelColorClasses(n.accountStatCurrentLevel);
+        return (
+          <p className="text-sm leading-snug">
+            <span className="font-medium">{tagKr}</span> 태그가 <span className={`${levelColors.bg} ${levelColors.text} mx-1 rounded-xs px-1 font-medium`}>{n.accountStatCurrentLevel}</span> 등급으로
+            상승했습니다.
+          </p>
+        );
+      }
     }
   };
 
@@ -175,17 +303,15 @@ function NoticeCard({ notice, showUnreadDot, onCancel }: NoticeCardProps) {
       <span className="text-muted-foreground">{CATEGORY_ICON[notice.category]}</span>
 
       <div className="flex flex-1 flex-col gap-1.5">
-        <div className="flex items-center gap-1.5">
+        <div className="flex items-center gap-4">
           <span className="text-muted-foreground text-xs font-semibold tracking-wide uppercase">{CATEGORY_LABEL[notice.category]}</span>
+          <span className="text-muted-foreground text-xs">{formatRelativeTime(notice.createdAt)}</span>
         </div>
 
         {renderBody()}
 
         <div className="flex items-center justify-start gap-2">
-          <div className="flex items-center gap-2">
-            {renderStatus()}
-            <span className="text-muted-foreground text-xs">{formatRelativeTime(notice.createdAt)}</span>
-          </div>
+          <div className="flex items-center gap-2">{renderStatus()}</div>
 
           {canCancel && (
             <Button variant="ghost" size="sm" className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground h-7 px-2 text-xs" onClick={() => onCancel(notice.id)}>
@@ -206,6 +332,7 @@ interface props {
 
 export function NoticeDialog({ onClose }: props) {
   const { setHasUnread } = useNotificationStore();
+  const [activeTab, setActiveTab] = useState<NoticeTab>('study');
 
   // 최신순 정렬 (SSE 연동 시 SSE 데이터로 교체 예정)
   const [notices, setNotices] = useState<Notice[]>(() => [...MOCK_NOTICES].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()));
@@ -225,6 +352,9 @@ export function NoticeDialog({ onClose }: props) {
     // TODO: cancelNotice(id) API 연동 예정
   };
 
+  const tabCategories = activeTab === 'study' ? STUDY_CATEGORIES : PERSONAL_CATEGORIES;
+  const filteredNotices = notices.filter((n) => tabCategories.includes(n.category));
+
   return (
     <Dialog open={true} onOpenChange={onClose}>
       <DialogContent className="flex max-h-[90vh] max-w-xl flex-col">
@@ -233,11 +363,29 @@ export function NoticeDialog({ onClose }: props) {
             <Bell className="h-4 w-4" />
             알림
           </DialogTitle>
+          <DialogDescription className="sr-only">스터디 알림 및 개인 알림을 확인할 수 있습니다.</DialogDescription>
         </DialogHeader>
-        {notices.length > 0 ? (
+
+        {/* 탭 전환 */}
+        <div className="flex border-b">
+          <button
+            className={`flex-1 py-2 text-sm font-medium transition-colors ${activeTab === 'study' ? 'border-primary text-foreground border-b-2' : 'text-muted-foreground hover:text-foreground'}`}
+            onClick={() => setActiveTab('study')}
+          >
+            스터디 알림
+          </button>
+          <button
+            className={`flex-1 py-2 text-sm font-medium transition-colors ${activeTab === 'personal' ? 'border-primary text-foreground border-b-2' : 'text-muted-foreground hover:text-foreground'}`}
+            onClick={() => setActiveTab('personal')}
+          >
+            내 알림
+          </button>
+        </div>
+
+        {filteredNotices.length > 0 ? (
           <div className="min-h-0 flex-1 overflow-y-auto pt-2 pr-1">
             <div className="space-y-2">
-              {notices.map((notice) => (
+              {filteredNotices.map((notice) => (
                 <NoticeCard key={notice.id} notice={notice} showUnreadDot={initiallyUnreadIds.has(notice.id)} onCancel={handleCancel} />
               ))}
             </div>
