@@ -66,9 +66,23 @@ export function AddPrevProblemsDialog({ onClose, isLanding = false, user }: prop
           const problemId = parseInt(problemLink.textContent?.trim() || '0');
           const solvedDate = dateElement.getAttribute('data-original-title') || '';
 
-          // 중복 제거: 이미 등록되지 않은 경우만 추가
-          if (!problemMap.has(problemId) && problemId > 0 && solvedDate) {
-            problemMap.set(problemId, solvedDate);
+          // 동일 문제 중복 처리 (오래된 날짜의 문제를 우선 적용)
+          if (problemId > 0 && solvedDate) {
+            if (problemMap.has(problemId)) {
+              const prevDate = problemMap.get(problemId)!;
+              const parseKoreanDate = (dateStr: string) => {
+                const match = dateStr.match(/(\d{4})년\s*(\d{1,2})월\s*(\d{1,2})일\s*(\d{1,2}):(\d{2}):(\d{2})/);
+                if (!match) return new Date(0);
+                const [, year, month, day, hour, minute, second] = match;
+                return new Date(+year, +month - 1, +day, +hour, +minute, +second);
+              };
+              // 더 오래된(이른) 날짜로 저장
+              if (parseKoreanDate(solvedDate) < parseKoreanDate(prevDate)) {
+                problemMap.set(problemId, solvedDate);
+              }
+            } else {
+              problemMap.set(problemId, solvedDate);
+            }
           }
         }
       });
