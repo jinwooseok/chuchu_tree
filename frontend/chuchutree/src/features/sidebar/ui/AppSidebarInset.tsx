@@ -62,6 +62,7 @@ import { useState } from 'react';
 import { useLandingRecommend } from '@/features/landing';
 import { useOnboardingStore } from '@/lib/store/onboarding';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { CreateStudyDialog } from '@/features/sidebar/ui/group-study/CreateStudyDialog';
 
 const ICON_SIZE = 32;
 
@@ -159,6 +160,15 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
         onClose={() => closeModal('settings')}
       />,
     );
+  };
+
+  // 스터디 생성 모달 열기
+  const handleCreateStudy = () => {
+    if (isLanding) {
+      toast.info('로그인 후 이용가능합니다.');
+      return;
+    }
+    openModal('create-study', <CreateStudyDialog user={user} onClose={() => closeModal('create-study')} />);
   };
 
   // 튜토리얼 다시보기
@@ -419,13 +429,13 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
           </SidebarGroup>
           <div className="mt-10" />
           {/* 그룹3 : 스터디 전용 */}
-          {/* <SidebarGroup>
+          <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem key="addstudy" aria-label={'스터디 생성'}>
                   <AppTooltip content={'스터디 생성'} side="right">
                     <SidebarMenuButton asChild>
-                      <div onClick={() => {}} className="cursor-pointer">
+                      <div onClick={handleCreateStudy} className="cursor-pointer">
                         <CircleFadingPlus size={ICON_SIZE} className="relative z-10" />
                         <span className="relative z-10">스터디 만들기</span>
                       </div>
@@ -466,7 +476,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
-          </SidebarGroup> */}
+          </SidebarGroup>
         </SidebarContent>
         {/* footer */}
         <SidebarFooter>
