@@ -118,3 +118,13 @@ class UserActivityRepository(ABC):
     async def save_problem_status(self, status: UserProblemStatus) -> None:
         """단일 UserProblemStatus 저장"""
         pass
+
+    @abstractmethod
+    async def count_solved_by_date(
+        self,
+        user_id: UserAccountId,
+        bj_account_id: str,
+        target_date: date
+    ) -> int:
+        """특정 날짜의 활성 SOLVED 레코드 수 조회"""
+        pass

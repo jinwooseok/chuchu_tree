@@ -232,7 +232,7 @@ class GetUserTagsUsecase:
             return AccountStatQuery(
                 current_level=self._skill_code_full_names.get(current_level, current_level.value),
                 solved_problem_count=0,
-                required_min_tier=None,
+                required_min_tier=user_current_tier_id,
                 higher_problem_tier=None,
                 last_solved_date=None,
             )

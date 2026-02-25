@@ -41,6 +41,6 @@ class ApiResponse(JSONResponse):
             message=message,
             data=data,
             error=error
-        ).model_dump(by_alias=True)
+        ).model_dump(by_alias=True, mode='json')
         
         super().__init__(content=content, status_code=status_code, *args, **kwargs)

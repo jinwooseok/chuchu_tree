@@ -4,6 +4,10 @@ from typing import override
 from sqlalchemy import String, and_, cast, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.common.domain.entity.system_log import SystemLog
+from app.common.domain.entity.system_log_data import MetadataUpdateLogData
+from app.common.domain.enums import SystemLogType, SystemLogStatus, MetadataEntityType
+from app.common.domain.repository.system_log_repository import SystemLogRepository
 from app.common.domain.vo.identifiers import ProblemId, TagId
 from app.common.domain.vo.primitives import TierLevel, TierRange
 from app.core.database import Database
@@ -19,8 +23,9 @@ from app.recommendation.domain.vo.search_criteria import SearchCriteria
 class ProblemRepositoryImpl(ProblemRepository):
     """Problem Repository 구현체"""
 
-    def __init__(self, db: Database):
+    def __init__(self, db: Database, system_log_repository: SystemLogRepository | None = None):
         self.db = db
+        self.system_log_repository = system_log_repository
 
     @property
     def session(self) -> AsyncSession:
@@ -28,8 +33,41 @@ class ProblemRepositoryImpl(ProblemRepository):
 
     @override
     async def save(self, problem: Problem) -> Problem:
-        """문제 저장 (구현 필요)"""
-        raise NotImplementedError()
+        """문제 저장 및 변경 이력을 system_log에 기록"""
+        stmt = select(ProblemModel).where(ProblemModel.problem_id == problem.problem_id.value)
+        result = await self.session.execute(stmt)
+        model = result.scalar_one_or_none()
+
+        if model is None:
+            model = ProblemMapper.to_model(problem)
+            self.session.add(model)
+        else:
+            model.problem_title = problem.title
+            model.problem_tier_level = problem.tier_level.value
+            model.class_level = problem.class_level
+            model.solved_user_count = problem.solved_user_count
+            model.updated_at = problem.updated_at
+            model.deleted_at = problem.deleted_at
+
+        await self.session.flush()
+
+        # 변경 이력을 system_log에 저장
+        if problem.update_histories and self.system_log_repository is not None:
+            log_data = MetadataUpdateLogData(
+                entity_type=MetadataEntityType.PROBLEM.value,
+                entity_id=problem.problem_id.value,
+                changes=problem.update_histories,
+            )
+            log = SystemLog.create(
+                log_type=SystemLogType.PROBLEM_METADATA,
+                status=SystemLogStatus.SUCCESS,
+                log_data=log_data.to_dict(),
+                should_notify=False,
+            )
+            await self.system_log_repository.save(log)
+            problem.update_histories.clear()
+
+        return ProblemMapper.to_entity(model)
 
     @override
     async def find_by_id(self, problem_id: ProblemId) -> Problem | None:

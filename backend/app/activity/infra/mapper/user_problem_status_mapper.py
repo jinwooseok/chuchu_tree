@@ -57,6 +57,7 @@ class UserProblemStatusMapper:
             memo_title=status_model.memo_title,
             content=status_model.content,
             date_records=date_records,
+            bj_account_id=status_model.bj_account_id,
             created_at=status_model.created_at,
             updated_at=status_model.updated_at,
             deleted_at=status_model.deleted_at
@@ -82,6 +83,7 @@ class UserProblemStatusMapper:
 
         return UserProblemStatusModel(
             user_account_id=entity.user_account_id.value,
+            bj_account_id=entity.bj_account_id,
             problem_id=entity.problem_id.value,
             banned_yn=entity.banned_yn,
             solved_yn=entity.solved_yn,

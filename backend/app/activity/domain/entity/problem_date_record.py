@@ -13,7 +13,7 @@ class RecordType(str, Enum):
 class ProblemDateRecord:
     """Entity - 날짜별 문제 기록 (problem_date_record 테이블과 1:1 대응)"""
     problem_date_record_id: int | None
-    user_problem_status_id: int | None
+    user_problem_status_id: int | None  # nullable: 초기 연동 시 미매핑 가능
     marked_date: date
     record_type: RecordType
     display_order: int
@@ -26,7 +26,7 @@ class ProblemDateRecord:
         user_problem_status_id: int | None,
         marked_date: date,
         record_type: RecordType,
-        display_order: int = 0
+        display_order: int = 0,
     ) -> 'ProblemDateRecord':
         now = datetime.now()
         return ProblemDateRecord(
