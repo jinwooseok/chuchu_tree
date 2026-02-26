@@ -71,6 +71,7 @@ from app.problem.infra.repository.problem_repository_impl import ProblemReposito
 from app.recommendation.infra.repository.tag_skill_repository_impl import TagSkillRepositoryImpl
 from app.tag.infra.repository.tag_repository_impl import TagRepositoryImpl
 from app.target.infra.repository.target_repository_impl import TargetRepositoryImpl
+from app.user.application.usecase.get_tag_problems_usecase import GetTagProblemsUsecase
 from app.user.application.usecase.get_user_tags_usecase import GetUserTagsUsecase
 
 
@@ -448,6 +449,19 @@ class Container(containers.DeclarativeContainer):
         tag_skill_repository=tag_skill_repository,
         tier_repository=tier_repository,
         activity_repository=user_activity_repository
+    )
+
+    # ========================================================================
+    # Tag Problems Usecase
+    # ========================================================================
+    get_tag_problems_usecase = providers.Singleton(
+        GetTagProblemsUsecase,
+        baekjoon_account_repository=baekjoon_account_repository,
+        tag_repository=tag_repository,
+        problem_repository=problem_repository,
+        user_activity_repository=user_activity_repository,
+        tier_repository=tier_repository,
+        target_repository=target_repository,
     )
 
     recommand_problems_usecase = providers.Singleton(

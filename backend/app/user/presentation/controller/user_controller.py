@@ -3,11 +3,14 @@ from dependency_injector.wiring import inject, Provide
 
 from app.common.domain.vo.current_user import CurrentUser
 from app.common.presentation.dependency.auth_dependencies import get_current_member
+from app.user.application.command.get_tag_problems_command import GetTagProblemsCommand
 from app.user.application.command.get_user_tags_command import GetUserTagsCommand
 from app.user.application.command.update_user_target_command import UpdateUserTargetCommand
 from app.user.application.service.user_account_application_service import UserAccountApplicationService
+from app.user.application.usecase.get_tag_problems_usecase import GetTagProblemsUsecase
 from app.user.application.usecase.get_user_tags_usecase import GetUserTagsUsecase
 from app.user.presentation.schema.request.user_target_request import UpdateUserTargetRequest
+from app.user.presentation.schema.response.get_tag_problems_response import GetTagProblemsResponse
 from app.user.presentation.schema.response.user_response import (
     ProfileImageResponse,
     AdminUserAccountsResponse
@@ -98,6 +101,28 @@ async def get_all_user_accounts(
         userAccounts=[]
     )
 
+    return ApiResponse(data=response_data.model_dump(by_alias=True))
+
+
+@router.get("/me/tags/problems", response_model=ApiResponseSchema[GetTagProblemsResponse])
+@inject
+async def get_tag_problems(
+    code: str = Query(..., description="태그 코드"),
+    current_user: CurrentUser = Depends(get_current_member),
+    usecase: GetTagProblemsUsecase = Depends(Provide[Container.get_tag_problems_usecase]),
+):
+    """
+    태그 별 푼 문제 조회
+
+    Args:
+        code: 태그 코드
+
+    Returns:
+        해당 태그의 유저 푼 문제 목록 (solved_date 포함)
+    """
+    command = GetTagProblemsCommand(user_account_id=current_user.user_account_id, tag_code=code)
+    query = await usecase.execute(command)
+    response_data = GetTagProblemsResponse.from_query(query)
     return ApiResponse(data=response_data.model_dump(by_alias=True))
 
 
