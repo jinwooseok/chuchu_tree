@@ -483,7 +483,7 @@ def run_migration(dry_run: bool = False) -> None:
                     FROM streak
                     GROUP BY bj_account_id, streak_date
                 ) dd
-                JOIN account_link al
+                JOIN (SELECT DISTINCT user_account_id, bj_account_id FROM account_link) al
                     ON al.bj_account_id = dd.bj_account_id
                 WHERE dd.daily_count > 0
                   AND NOT EXISTS (
@@ -519,7 +519,7 @@ def run_migration(dry_run: bool = False) -> None:
                     FROM streak
                     GROUP BY bj_account_id, streak_date
                 ) dd
-                JOIN account_link al
+                JOIN (SELECT DISTINCT user_account_id, bj_account_id FROM account_link) al
                     ON al.bj_account_id = dd.bj_account_id
                 WHERE dd.daily_count > 0
                   AND NOT EXISTS (
