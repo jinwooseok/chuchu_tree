@@ -139,8 +139,8 @@ class UserAccountRepositoryImpl(UserAccountRepository):
         특정 Provider의 모든 유저 삭제 (Hard Delete)
 
         CASCADE 삭제 순서:
-        1. bj_account 관련 (problem_history, tag_skill_history, streak)
-        2. activity 관련 (problem_record, will_solve_problem, problem_banned_record, tag_customization)
+        1. bj_account 관련 (problem_history, tag_skill_history, scheduler_log)
+        2. activity 관련 (user_date_record, problem_record, will_solve_problem, problem_banned_record, tag_customization)
         3. account_link
         4. user_target
         5. user_account
@@ -150,10 +150,11 @@ class UserAccountRepositoryImpl(UserAccountRepository):
         from app.user.infra.model.account_link import AccountLinkModel
         from app.baekjoon.infra.model.bj_account import BjAccountModel
         from app.baekjoon.infra.model.problem_history import ProblemHistoryModel
-        from app.baekjoon.infra.model.streak import StreakModel
+        from app.baekjoon.infra.model.scheduler_log import SchedulerLogModel
         from app.baekjoon.infra.model.tag_skill_history import TagSkillHistoryModel
         from app.activity.infra.model.user_problem_status import UserProblemStatusModel
         from app.activity.infra.model.tag_custom import TagCustomModel
+        from app.activity.infra.model.user_date_record import UserDateRecordModel
 
         # 1. Provider.NONE인 유저 ID 목록 조회
         stmt = select(UserAccountModel.user_account_id).where(
@@ -181,13 +182,16 @@ class UserAccountRepositoryImpl(UserAccountRepository):
                 delete(TagSkillHistoryModel).where(TagSkillHistoryModel.bj_account_id.in_(bj_account_ids))
             )
             await self.session.execute(
-                delete(StreakModel).where(StreakModel.bj_account_id.in_(bj_account_ids))
+                delete(SchedulerLogModel).where(SchedulerLogModel.bj_account_id.in_(bj_account_ids))
             )
             await self.session.execute(
                 delete(BjAccountModel).where(BjAccountModel.bj_account_id.in_(bj_account_ids))
             )
 
         # 4. activity 관련 데이터 삭제 (UserProblemStatusModel 삭제 시 ProblemDateRecordModel CASCADE 삭제)
+        await self.session.execute(
+            delete(UserDateRecordModel).where(UserDateRecordModel.user_account_id.in_(user_ids))
+        )
         await self.session.execute(
             delete(UserProblemStatusModel).where(UserProblemStatusModel.user_account_id.in_(user_ids))
         )

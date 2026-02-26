@@ -6,7 +6,7 @@ from app.common.domain.vo.identifiers import ProblemId, TagId
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
 from app.problem.domain.entity.problem_tag import ProblemTag
-from app.problem.domain.entity.problem_update_history import ProblemUpdateHistory
+from app.common.domain.entity.system_log_data import FieldChange
 from app.common.domain.vo.primitives import TierLevel
 
 @dataclass
@@ -21,7 +21,7 @@ class Problem:
     updated_at: datetime
     deleted_at: datetime|None = None
     tags: list[ProblemTag] = field(default_factory=list)
-    update_histories: list[ProblemUpdateHistory] = field(default_factory=list)
+    update_histories: list[FieldChange] = field(default_factory=list)
     
     @staticmethod
     def create(
@@ -88,5 +88,5 @@ class Problem:
     def _record_update(self, field: str, old_value: any, new_value: any) -> None:
         """변경 이력 기록"""
         self.update_histories.append(
-            ProblemUpdateHistory.create(self.problem_id, field, old_value, new_value)
+            FieldChange(field=field, old_value=old_value, new_value=new_value)
         )

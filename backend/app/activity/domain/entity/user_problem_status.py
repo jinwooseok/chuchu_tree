@@ -9,8 +9,8 @@ from app.common.domain.vo.identifiers import ProblemId, TagId, UserAccountId
 class UserProblemStatus:
     """Entity - 문제별 사용자 상태 (user_problem_status 테이블과 1:1 대응)
 
-    하나의 (user, problem) 쌍에 대한 마스터 레코드.
-    - banned_yn=True: 차단된 문제 (date_records 없음)
+    하나의 (user, bj_account, problem) 쌍에 대한 마스터 레코드.
+    - banned_yn=True: 차단된 문제 (date_records 없음, bj_account_id=None)
     - solved_yn=True: 해결된 문제 (date_records에 SOLVED 레코드)
     - 둘 다 False: 풀 예정 문제 (date_records에 WILL_SOLVE 레코드)
     """
@@ -23,6 +23,7 @@ class UserProblemStatus:
     memo_title: str | None
     content: str | None
     date_records: list[ProblemDateRecord] = field(default_factory=list)
+    bj_account_id: str | None = None
     created_at: datetime = field(default_factory=datetime.now)
     updated_at: datetime = field(default_factory=datetime.now)
     deleted_at: datetime | None = None
@@ -34,7 +35,8 @@ class UserProblemStatus:
         user_account_id: UserAccountId,
         problem_id: ProblemId,
         marked_date: date,
-        display_order: int = 0
+        display_order: int = 0,
+        bj_account_id: str | None = None
     ) -> 'UserProblemStatus':
         """풀 예정 문제 생성"""
         now = datetime.now()
@@ -54,6 +56,7 @@ class UserProblemStatus:
             memo_title=None,
             content=None,
             date_records=[date_record],
+            bj_account_id=bj_account_id,
             created_at=now,
             updated_at=now,
             deleted_at=None
@@ -64,7 +67,8 @@ class UserProblemStatus:
         user_account_id: UserAccountId,
         problem_id: ProblemId,
         marked_date: date,
-        display_order: int = 0
+        display_order: int = 0,
+        bj_account_id: str | None = None
     ) -> 'UserProblemStatus':
         """해결된 문제 생성"""
         now = datetime.now()
@@ -84,6 +88,7 @@ class UserProblemStatus:
             memo_title=None,
             content=None,
             date_records=[date_record],
+            bj_account_id=bj_account_id,
             created_at=now,
             updated_at=now,
             deleted_at=None
@@ -94,7 +99,7 @@ class UserProblemStatus:
         user_account_id: UserAccountId,
         problem_id: ProblemId
     ) -> 'UserProblemStatus':
-        """차단된 문제 생성 (date_records 없음)"""
+        """차단된 문제 생성 (date_records 없음, bj_account_id=None: 유저 레벨)"""
         now = datetime.now()
         return UserProblemStatus(
             user_problem_status_id=None,
@@ -106,6 +111,7 @@ class UserProblemStatus:
             memo_title=None,
             content=None,
             date_records=[],
+            bj_account_id=None,
             created_at=now,
             updated_at=now,
             deleted_at=None

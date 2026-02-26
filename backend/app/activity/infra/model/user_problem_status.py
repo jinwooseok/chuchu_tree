@@ -14,20 +14,24 @@ if TYPE_CHECKING:
 class UserProblemStatusModel(Base):
     """유저의 문제별 상태 (마스터 테이블)
 
-    - 사용자와 문제 조합당 단일 레코드
+    - (user, bj_account, problem) 조합당 단일 레코드
+    - BANNED 레코드는 bj_account_id=NULL (유저 레벨)
     - banned_yn, solved_yn 등 상태 플래그 관리
     - representative_tag_id, memo_title, content 등 문제별 속성 관리
     """
     __tablename__ = "user_problem_status"
     __table_args__ = (
-        UniqueConstraint('user_account_id', 'problem_id', name='uk_user_problem'),
-        Index('idx_user_status', 'user_account_id', 'banned_yn', 'solved_yn'),
+        UniqueConstraint('user_account_id', 'bj_account_id', 'problem_id', name='uk_user_problem'),
+        Index('idx_user_status', 'user_account_id', 'bj_account_id', 'banned_yn', 'solved_yn'),
         {'comment': '유저의 문제별 상태 (마스터)'}
     )
 
     user_problem_status_id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     user_account_id: Mapped[int] = mapped_column(
         Integer, ForeignKey('user_account.user_account_id'), nullable=False
+    )
+    bj_account_id: Mapped[Optional[str]] = mapped_column(
+        String(50), ForeignKey('bj_account.bj_account_id'), nullable=True
     )
     problem_id: Mapped[int] = mapped_column(
         Integer, ForeignKey('problem.problem_id'), nullable=False

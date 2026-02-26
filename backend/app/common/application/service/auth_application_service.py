@@ -242,7 +242,7 @@ class AuthApplicationService:
             payload={
                 "user_account_id": user_account_id
             },
-            expires_delta=timedelta(minutes=60)
+            expires_delta=timedelta(hours=6)
         )
 
         refresh_token, jti = self.token_service.create_refresh_token(

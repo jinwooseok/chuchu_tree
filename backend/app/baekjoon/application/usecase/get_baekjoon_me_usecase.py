@@ -3,6 +3,7 @@
 import logging
 from datetime import date, timedelta
 
+from app.activity.domain.repository.user_date_record_repository import UserDateRecordRepository
 from app.baekjoon.application.command.get_baekjoon_me_command import GetBaekjoonMeCommand
 from app.baekjoon.application.query.baekjoon_account_info_query import (
     BjAccountStatQuery,
@@ -13,7 +14,6 @@ from app.baekjoon.application.query.baekjoon_account_info_query import (
 from app.baekjoon.application.query.streaks_query import StreakItemQuery
 from app.baekjoon.domain.event.get_user_account_info_payload import GetUserAccountInfoPayload
 from app.baekjoon.domain.repository.baekjoon_account_repository import BaekjoonAccountRepository
-from app.baekjoon.domain.repository.streak_repository import StreakRepository
 from app.common.domain.entity.domain_event import DomainEvent
 from app.common.domain.service.event_publisher import DomainEventBus
 from app.common.domain.vo.identifiers import UserAccountId, TierId
@@ -31,26 +31,17 @@ class GetBaekjoonMeUsecase:
     def __init__(
         self,
         baekjoon_account_repository: BaekjoonAccountRepository,
-        streak_repository: StreakRepository,
+        user_date_record_repository: UserDateRecordRepository,
         tier_repository: TierRepository,
         domain_event_bus: DomainEventBus
     ):
         self.baekjoon_account_repository = baekjoon_account_repository
-        self.streak_repository = streak_repository
+        self.user_date_record_repository = user_date_record_repository
         self.tier_repository = tier_repository
         self.domain_event_bus = domain_event_bus
 
     @transactional(readonly=True)
     async def execute(self, command: GetBaekjoonMeCommand) -> BaekjoonMeQuery:
-        """
-        백준 내 정보 조회
-
-        Args:
-            command: 백준 내 정보 조회 명령
-
-        Returns:
-            BaekjoonMeQuery: 백준 내 정보 (유저 계정 + 백준 계정 + 스트릭)
-        """
         user_account_id = UserAccountId(command.user_account_id)
 
         # 1. 이벤트 발행하여 UserAccount 정보 조회
@@ -81,11 +72,12 @@ class GetBaekjoonMeUsecase:
         tier = await self.tier_repository.find_by_id(bj_account.current_tier_id)
         tier_name = tier.tier_code
 
-        # 4. 최근 365일 스트릭 조회
+        # 4. 최근 365일 user_date_record 조회 (streak 대체)
         end_date = date.today()
         start_date = end_date - timedelta(days=365)
-        streaks = await self.streak_repository.find_by_account_and_date_range(
-            bj_account_id=bj_account.bj_account_id,
+        date_records = await self.user_date_record_repository.find_by_user_and_date_range(
+            user_account_id=user_account_id,
+            bj_account_id=bj_account.bj_account_id.value,
             start_date=start_date,
             end_date=end_date
         )
@@ -108,12 +100,13 @@ class GetBaekjoonMeUsecase:
             tier_start_date=bj_account.tier_start_date
         )
 
+        # user_date_record → StreakItemQuery (streak_date = marked_date)
         streak_queries = [
             StreakItemQuery(
-                streak_date=streak.streak_date,
-                solved_count=streak.solved_count
+                streak_date=udr.marked_date,
+                solved_count=udr.solved_count
             )
-            for streak in streaks
+            for udr in date_records
         ]
 
         bj_account_query = BjAccountQuery(

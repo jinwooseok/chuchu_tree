@@ -9,6 +9,7 @@ from app.baekjoon.application.command.get_monthly_problems_command import GetMon
 from app.baekjoon.application.command.get_streaks_command import GetStreaksCommand
 from app.baekjoon.application.query.baekjoon_account_info_query import BaekjoonMeQuery
 from app.baekjoon.application.query.get_unrecorded_problems_query import GetUnrecordedProblemsQuery
+from app.baekjoon.application.usecase.get_scheduler_inactive_periods_usecase import GetSchedulerInactivePeriodsUsecase
 from app.baekjoon.application.usecase.get_unrecorded_problems_usecase import GetUnrecordedProblemsUsecase
 from app.baekjoon.application.usecase.link_bj_account_usecase import LinkBjAccountUsecase
 from app.baekjoon.application.usecase.get_baekjoon_me_usecase import GetBaekjoonMeUsecase
@@ -28,6 +29,9 @@ from app.baekjoon.presentation.schema.response.get_monthly_problems_response imp
 )
 from app.baekjoon.presentation.schema.response.get_streaks_response import (
     GetStreaksResponse
+)
+from app.baekjoon.presentation.schema.response.get_scheduler_inactive_periods_response import (
+    GetSchedulerInactivePeriodsResponse
 )
 from app.baekjoon.presentation.schema.response.get_unrecorded_problems_response import (
     GetUnrecordedProblemsResponse
@@ -192,6 +196,28 @@ async def get_unrecorded_problems_me(
 
     # Response 객체로 변환
     return ApiResponse(data=GetUnrecordedProblemsResponse.from_query(query))
+
+@router.get("/me/scheduler-inactive-periods", response_model=ApiResponseSchema[GetSchedulerInactivePeriodsResponse])
+@inject
+async def get_scheduler_inactive_periods(
+    current_user: CurrentUser = Depends(get_current_member),
+    get_scheduler_inactive_periods_usecase: GetSchedulerInactivePeriodsUsecase = Depends(
+        Provide[Container.get_scheduler_inactive_periods_usecase]
+    )
+):
+    """
+    스케줄러 미작동 구간 조회
+
+    연동일부터 오늘까지 스케줄러 SUCCESS 기록이 없는 날짜 구간을 반환합니다.
+
+    Returns:
+        미작동 구간 목록
+    """
+    result = await get_scheduler_inactive_periods_usecase.execute(
+        user_account_id=current_user.user_account_id
+    )
+    return ApiResponse(data=GetSchedulerInactivePeriodsResponse.from_query(result))
+
 
 @router.post("/me/refresh", response_model=ApiResponseSchema[dict])
 @inject

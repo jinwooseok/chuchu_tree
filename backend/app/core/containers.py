@@ -1,6 +1,8 @@
 import os
 from dependency_injector import containers, providers
 
+from app.activity.infra.repository.user_date_record_repository_impl import UserDateRecordRepositoryImpl
+from app.baekjoon.application.usecase.get_scheduler_inactive_periods_usecase import GetSchedulerInactivePeriodsUsecase
 from app.baekjoon.application.usecase.get_unrecorded_problems_usecase import GetUnrecordedProblemsUsecase
 from app.baekjoon.application.usecase.link_bj_account_usecase import LinkBjAccountUsecase
 from app.baekjoon.application.usecase.get_baekjoon_me_usecase import GetBaekjoonMeUsecase
@@ -9,7 +11,7 @@ from app.baekjoon.application.usecase.get_streaks_usecase import GetStreaksUseca
 from app.baekjoon.application.usecase.update_bj_account_usecase import UpdateBjAccountUsecase
 from app.baekjoon.infra.repository.baekjoon_account_repository_impl import BaekjoonAccountRepositoryImpl
 from app.baekjoon.infra.repository.problem_history_repository_impl import ProblemHistoryRepositoryImpl
-from app.baekjoon.infra.repository.streak_repository_impl import StreakRepositoryImpl
+from app.common.infra.repository.system_log_repository_impl import SystemLogRepositoryImpl
 from app.baekjoon.infra.scheduler.metric_scheduler import BjAccountUpdateScheduler
 from app.config.settings import get_settings
 from app.core.database import Database, set_global_database
@@ -56,6 +58,8 @@ from app.common.infra.event.in_memory_event_bus import get_event_bus
 from app.activity.application.service.activity_application_service import ActivityApplicationService
 from app.common.application.service.auth_application_service import AuthApplicationService
 from app.problem.application.service.problem_application_service import ProblemApplicationService
+from app.problem.application.service.problem_metadata_sync_service import ProblemMetadataSyncService
+from app.problem.application.service.problem_update_service import ProblemUpdateService
 from app.user.application.service.user_account_application_service import UserAccountApplicationService
 from app.user.infra.repository.user_account_repository_impl import UserAccountRepositoryImpl
 
@@ -112,12 +116,12 @@ class Container(containers.DeclarativeContainer):
         Database,
         db_url=db_url,
     )
-    
+
     database_middleware = providers.Factory(
         DatabaseContextMiddleware,
         db=database,
     )
-    
+
     # ========================================================================
     # Infrastructure - Redis Client (Singleton)
     # ========================================================================
@@ -210,7 +214,7 @@ class Container(containers.DeclarativeContainer):
     )
 
     # ========================================================================
-    # UserAccount (유저의 계정 도메인) 
+    # UserAccount (유저의 계정 도메인)
     # ========================================================================
 
     # ========================================================================
@@ -220,17 +224,17 @@ class Container(containers.DeclarativeContainer):
         UserAccountRepositoryImpl,
         db=database,
     )
-    
+
     # ========================================================================
     # Application Services
     # ========================================================================
-    
+
     user_account_application_service = providers.Singleton(
         UserAccountApplicationService,
         user_account_repository=user_account_repository,
         domain_event_bus=domain_event_bus
     )
-    
+
     # ========================================================================
     # Tier (티어 도메인)
     # ========================================================================
@@ -251,49 +255,81 @@ class Container(containers.DeclarativeContainer):
         db=database,
     )
 
-    streak_repository = providers.Singleton(
-        StreakRepositoryImpl,
-        db=database,
-    )
-
     problem_history_repository = providers.Singleton(
         ProblemHistoryRepositoryImpl,
         db=database,
     )
 
     # ========================================================================
-    # Application Services
+    # Activity domain - Repositories
+    # ========================================================================
+    user_activity_repository = providers.Singleton(
+        UserActivityRepositoryImpl,
+        db=database
+    )
+
+    user_date_record_repository = providers.Singleton(
+        UserDateRecordRepositoryImpl,
+        db=database
+    )
+
+    system_log_repository = providers.Singleton(
+        SystemLogRepositoryImpl,
+        db=database
+    )
+
+    # ========================================================================
+    # Problem domain - Services (usecases below depend on these)
+    # ========================================================================
+    problem_update_service = providers.Singleton(
+        ProblemUpdateService,
+        db=database,
+    )
+
+    problem_metadata_sync_service = providers.Singleton(
+        ProblemMetadataSyncService,
+        db=database,
+        system_log_repository=system_log_repository,
+    )
+
+    # ========================================================================
+    # Application Services / Usecases
     # ========================================================================
 
     link_bj_account_usecase = providers.Singleton(
         LinkBjAccountUsecase,
         baekjoon_account_repository=baekjoon_account_repository,
         solvedac_gateway=solvedac_gateway,
-        domain_event_bus=domain_event_bus
+        domain_event_bus=domain_event_bus,
+        user_date_record_repository=user_date_record_repository,
+        user_activity_repository=user_activity_repository,
     )
 
     get_baekjoon_me_usecase = providers.Singleton(
         GetBaekjoonMeUsecase,
         baekjoon_account_repository=baekjoon_account_repository,
-        streak_repository=streak_repository,
+        user_date_record_repository=user_date_record_repository,
         tier_repository=tier_repository,
         domain_event_bus=domain_event_bus
     )
 
     get_streaks_usecase = providers.Singleton(
         GetStreaksUsecase,
-        streak_repository=streak_repository,
+        user_date_record_repository=user_date_record_repository,
         baekjoon_account_repository=baekjoon_account_repository
     )
-    
+
     update_bj_account_usecase = providers.Singleton(
         UpdateBjAccountUsecase,
         baekjoon_account_repository=baekjoon_account_repository,
         problem_history_repository=problem_history_repository,
-        streak_repository=streak_repository,
-        solvedac_gateway=solvedac_gateway
+        solvedac_gateway=solvedac_gateway,
+        user_date_record_repository=user_date_record_repository,
+        user_activity_repository=user_activity_repository,
+        system_log_repository=system_log_repository,
+        problem_update_service=problem_update_service,
     )
-    
+
     get_unrecorded_problems_usecase = providers.Singleton(
         GetUnrecordedProblemsUsecase,
         baekjoon_account_repository=baekjoon_account_repository,
@@ -301,23 +337,26 @@ class Container(containers.DeclarativeContainer):
         domain_event_bus=domain_event_bus
     )
 
-
-    # ========================================================================
-    # Activity domain
-    # ========================================================================
-    user_activity_repository = providers.Singleton(
-        UserActivityRepositoryImpl,
-        db=database
+    get_scheduler_inactive_periods_usecase = providers.Singleton(
+        GetSchedulerInactivePeriodsUsecase,
+        baekjoon_account_repository=baekjoon_account_repository,
+        system_log_repository=system_log_repository,
     )
 
+    # ========================================================================
+    # Activity domain - Application Service
+    # ========================================================================
     activity_application_service = providers.Singleton(
         ActivityApplicationService,
         user_activity_repository=user_activity_repository,
         domain_event_bus=domain_event_bus,
         baekjoon_account_repository=baekjoon_account_repository,
         problem_history_repository=problem_history_repository,
+        user_date_record_repository=user_date_record_repository,
+        problem_update_service=problem_update_service,
+        system_log_repository=system_log_repository,
     )
-    
+
     # ========================================================================
     # Application Services
     # ========================================================================
@@ -340,7 +379,7 @@ class Container(containers.DeclarativeContainer):
         TagRepositoryImpl,
         db=database
     )
-    
+
     tag_application_service = providers.Singleton(
         TagApplicationService,
         tag_repository=tag_repository
@@ -353,7 +392,7 @@ class Container(containers.DeclarativeContainer):
         TagSkillRepositoryImpl,
         db=database
     )
-    
+
     recommand_filter_repository = providers.Singleton(
         LevelFilterRepositoryImpl,
         db=database
@@ -366,7 +405,7 @@ class Container(containers.DeclarativeContainer):
         TargetRepositoryImpl,
         db=database
     )
-    
+
     target_application_service = providers.Singleton(
         TargetApplicationService,
         target_repository=target_repository
@@ -377,9 +416,10 @@ class Container(containers.DeclarativeContainer):
     # ========================================================================
     problem_repository = providers.Singleton(
         ProblemRepositoryImpl,
-        db=database
+        db=database,
+        system_log_repository=system_log_repository,
     )
-    
+
     problem_application_service = providers.Singleton(
         ProblemApplicationService,
         problem_repository=problem_repository,
@@ -388,7 +428,6 @@ class Container(containers.DeclarativeContainer):
         tier_repository=tier_repository
     )
 
-    
     # ========================================================================
     # Monthly Problems Usecase
     # ========================================================================
@@ -410,27 +449,29 @@ class Container(containers.DeclarativeContainer):
         tier_repository=tier_repository,
         activity_repository=user_activity_repository
     )
-    
+
     recommand_problems_usecase = providers.Singleton(
         RecommendProblemsUsecase,
-        user_account_repository = user_account_repository,
-        baekjoon_account_repository = baekjoon_account_repository,
-        user_activity_repository = user_activity_repository,
-        tag_repository = tag_repository,
-        tag_skill_repository = tag_skill_repository,
-        recommend_filter_repository = recommand_filter_repository,
-        problem_repository = problem_repository,
-        tier_repository = tier_repository,
-        problem_history_repository = problem_history_repository,
-        target_repository = target_repository
+        user_account_repository=user_account_repository,
+        baekjoon_account_repository=baekjoon_account_repository,
+        user_activity_repository=user_activity_repository,
+        tag_repository=tag_repository,
+        tag_skill_repository=tag_skill_repository,
+        recommend_filter_repository=recommand_filter_repository,
+        problem_repository=problem_repository,
+        tier_repository=tier_repository,
+        problem_history_repository=problem_history_repository,
+        target_repository=target_repository
     )
-    
+
     # ========================================================================
     # Scheduler (스케줄러)
     # ========================================================================
     bj_account_update_scheduler = providers.Singleton(
         BjAccountUpdateScheduler,
-        update_bj_account_use_case=update_bj_account_usecase
+        update_bj_account_use_case=update_bj_account_usecase,
+        problem_metadata_sync_service=problem_metadata_sync_service,
+        system_log_repository=system_log_repository,
     )
 
     async def init_resources(self):
@@ -449,10 +490,10 @@ class Container(containers.DeclarativeContainer):
         self.problem_application_service()
         self.tag_application_service()
         self.target_application_service()
-        
+
         # 3. 스케줄러 시작 (추가)
         scheduler = self.bj_account_update_scheduler()
         scheduler.start()
         return self
-    
+
     init_resources_provider = providers.Callable(init_resources)
