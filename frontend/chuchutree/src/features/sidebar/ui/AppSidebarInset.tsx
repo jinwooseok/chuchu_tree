@@ -74,7 +74,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
   // 사이드바 상태
   const { state: sidebarOpenState, toggleSidebar: setSidebarOpenState } = useSidebar();
   // 레이아웃 상태
-  const { topSection, centerSection, bottomSection, toggleTopSection, setCenterSection, toggleBottomSection } = useLayoutStore();
+  const { topSection, centerSection, bottomSection, studySection, toggleTopSection, setCenterSection, toggleBottomSection, setStudySection } = useLayoutStore();
 
   // 알림 dot 상태
   const { hasUnread } = useNotificationStore();
@@ -296,7 +296,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       short2: 'C',
       action: () => setCenterSection('calendar'),
       icon: Calendar,
-      isActive: centerSection === 'calendar',
+      isActive: studySection === null && centerSection === 'calendar',
       tooltipText: '문제 풀이 일정 관리',
     },
     {
@@ -305,7 +305,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       short2: 'D',
       action: () => setCenterSection('dashboard'),
       icon: LibraryBig,
-      isActive: centerSection === 'dashboard',
+      isActive: studySection === null && centerSection === 'dashboard',
       tooltipText: '유형별 실력 현황',
       onboardingId: 'dashboard-button',
     },
@@ -314,6 +314,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       short1: 'Shift',
       short2: '3',
       action: () => toggleBottomSection(),
+      isVisible: studySection === null,
       icon: Dices,
       isActive: bottomSection === 'recommend',
       tooltipText: '사용자 맞춤 문제 추천',
@@ -365,18 +366,20 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                   </SidebarMenuItem>
                 </div>
                 {/* 나머지 link */}
-                {items.map((item) => (
-                  <SidebarMenuItem key={item.title} aria-label={item.tooltipText}>
-                    <AppTooltip content={item.tooltipText} side="right" shortCut1={item.short1} shortCut2={item.short2}>
-                      <SidebarMenuButton asChild isActive={item.isActive}>
-                        <div onClick={item.action} className="cursor-pointer" {...(item.onboardingId ? { 'data-onboarding-id': item.onboardingId } : {})}>
-                          <item.icon size={ICON_SIZE} />
-                          <span>{item.title}</span>
-                        </div>
-                      </SidebarMenuButton>
-                    </AppTooltip>
-                  </SidebarMenuItem>
-                ))}
+                {items
+                  .filter((item) => item.isVisible !== false)
+                  .map((item) => (
+                    <SidebarMenuItem key={item.title} aria-label={item.tooltipText}>
+                      <AppTooltip content={item.tooltipText} side="right" shortCut1={item.short1} shortCut2={item.short2}>
+                        <SidebarMenuButton asChild isActive={item.isActive}>
+                          <div onClick={item.action} className="cursor-pointer" {...(item.onboardingId ? { 'data-onboarding-id': item.onboardingId } : {})}>
+                            <item.icon size={ICON_SIZE} />
+                            <span>{item.title}</span>
+                          </div>
+                        </SidebarMenuButton>
+                      </AppTooltip>
+                    </SidebarMenuItem>
+                  ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -466,20 +469,35 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                   </AppTooltip>
                   <SidebarMenuSub>
                     <SidebarMenuSubItem>
-                      <SidebarMenuSubButton asChild>
-                        <div onClick={() => {}} className="cursor-pointer">
+                      <SidebarMenuSubButton asChild isActive={studySection === '스터디1'}>
+                        <div
+                          onClick={() => {
+                            setStudySection('스터디1');
+                          }}
+                          className="mb-1 cursor-pointer"
+                        >
                           <Bookmark size={ICON_SIZE} className="relative z-10" />
                           <span className="relative z-10">스터디1</span>
                         </div>
                       </SidebarMenuSubButton>
-                      <SidebarMenuSubButton asChild>
-                        <div onClick={() => {}} className="cursor-pointer">
+                      <SidebarMenuSubButton asChild isActive={studySection === '스터디2'}>
+                        <div
+                          onClick={() => {
+                            setStudySection('스터디2');
+                          }}
+                          className="mb-1 cursor-pointer"
+                        >
                           <Bookmark size={ICON_SIZE} className="relative z-10" />
                           <span className="relative z-10">스터디2</span>
                         </div>
                       </SidebarMenuSubButton>
-                      <SidebarMenuSubButton asChild>
-                        <div onClick={() => {}} className="cursor-pointer">
+                      <SidebarMenuSubButton asChild isActive={studySection === '스터디3'}>
+                        <div
+                          onClick={() => {
+                            setStudySection('스터디3');
+                          }}
+                          className="mb-1 cursor-pointer"
+                        >
                           <Bookmark size={ICON_SIZE} className="relative z-10" />
                           <span className="relative z-10">스터디3</span>
                         </div>

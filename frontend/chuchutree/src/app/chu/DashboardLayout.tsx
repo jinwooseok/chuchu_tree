@@ -13,11 +13,14 @@ import TagSidebar from '@/widgets/tag-sidebar';
 import { useResizable } from '@/lib/hooks/useResizable';
 import { ResizeHandle } from '@/components/custom/ResizeHandle';
 import { cn } from '@/lib/utils';
+import MainStudy from '@/widgets/main-study';
+import StudySidebar from '@/widgets/study-sidebar';
 
 export default function DashboardLayout() {
   const {
     topSection,
     centerSection,
+    studySection,
     bottomSection,
     topSectionTierbarHeight,
     topSectionStreakHeight,
@@ -108,7 +111,7 @@ export default function DashboardLayout() {
       {/* Info 사이드바 - AppSidebar가 닫혔을 때만 표시 */}
       {showInfoSidebar && (
         <div className={cn('relative h-full border-r', !isResizing && 'transition-all delay-200 duration-300 ease-in-out')} style={{ width: `${sidebarWidth}px` }}>
-          <div className="bg-innerground-white h-full overflow-hidden">{centerSection === 'calendar' ? <CalendarSidebar /> : <TagSidebar />}</div>
+          <div className="bg-innerground-white h-full overflow-hidden">{studySection !== null ? <StudySidebar /> : centerSection === 'calendar' ? <CalendarSidebar /> : <TagSidebar />}</div>
           <ResizeHandle direction="horizontal" onMouseDown={handleSidebarResize} className="absolute top-0 right-0 h-full" />
         </div>
       )}
@@ -126,8 +129,10 @@ export default function DashboardLayout() {
           </div>
           {topSection && <ResizeHandle direction="vertical" onMouseDown={handleTopResize} className="absolute bottom-0 left-0 w-full" />}
         </div>
-        {/* 중앙 영역 (캘린더/태그 대시보드) */}
-        <div className="flex-1 overflow-hidden transition-all duration-300 ease-in-out">{centerSection === 'calendar' ? <MainCalendar /> : <MainTagDashboard />}</div>
+        {/* 중앙 영역 (캘린더/태그 대시보드) + 스터디 영역 */}
+        <div className="flex-1 overflow-hidden transition-all duration-300 ease-in-out">
+          {studySection !== null ? <MainStudy studyName={studySection} /> : centerSection === 'calendar' ? <MainCalendar /> : <MainTagDashboard />}
+        </div>
         {/* 하단 영역 (문제 추천) */}
         <div
           className={cn('hide-scrollbar relative overflow-scroll', !isResizing && 'transition-all duration-300 ease-in-out')}
