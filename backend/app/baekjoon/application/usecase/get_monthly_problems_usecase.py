@@ -134,14 +134,15 @@ class GetMonthlyProblemsUsecase:
                     )
 
         # c. Will Solve Problems 처리 (가장 낮은 우선순위)
+        # 같은 problem_id를 여러 날짜에 등록 가능하므로 별도 리스트로 관리
+        will_solve_entries: list[ProblemEntry] = []
         for daily in activity_data.daily_activities:
             current_date = daily.target_date
             for index, p in enumerate(daily.will_solve_problems):
                 problem_id = p.problem_id
-                # Rule 8 (Record/Streak priority over will_solve):
-                # merged_problem_map에 없어야만 will_solve로 추가
+                # solved/streak이 있는 문제는 will_solve로 표시하지 않음
                 if problem_id not in merged_problem_map:
-                    merged_problem_map[problem_id] = ProblemEntry(
+                    will_solve_entries.append(ProblemEntry(
                         problem_id=problem_id,
                         display_date=current_date,
                         order=index,
@@ -149,12 +150,13 @@ class GetMonthlyProblemsUsecase:
                         is_streak=False,
                         source='will_solve',
                         representative_tag_id=p.representative_tag_id
-                    )
+                    ))
 
         # 7. 대표 태그 정보 일괄 조회
+        all_entries = list(merged_problem_map.values()) + will_solve_entries
         all_tag_ids = {
             entry.representative_tag_id
-            for entry in merged_problem_map.values()
+            for entry in all_entries
             if entry.representative_tag_id is not None
         }
         tag_info_map = await self._fetch_tag_infos(all_tag_ids)
@@ -163,7 +165,7 @@ class GetMonthlyProblemsUsecase:
         final_daily_data = defaultdict(lambda: {'solved_problems': [], 'will_solve_problems': []})
         all_processed_problem_ids = set()
 
-        for entry in merged_problem_map.values():
+        for entry in all_entries:
             problem_info = problems_info.problems.get(entry.problem_id)
             if not problem_info:
                 logger.warning(f"Problem ID {entry.problem_id} not found in problems_info. Skipping.")
