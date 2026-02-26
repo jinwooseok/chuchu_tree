@@ -117,7 +117,6 @@ services:
       - MINIO_ROOT_USER=${LOCAL_STORAGE_ACCESS_KEY}
       - MINIO_ROOT_PASSWORD=${LOCAL_STORAGE_SECRET_KEY}
       - TZ=Asia/Seoul
-    network_mode: host
     healthcheck:
       test: ["CMD", "curl", "-f", "http://${PROD_STORAGE_ENDPOINT}/minio/health/live"]
       timeout: 10s
