@@ -326,7 +326,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
     <>
       <Sidebar variant="inset" collapsible="icon">
         {/* 메인 콘텐츠 */}
-        <SidebarContent className="relative">
+        <SidebarContent className="relative hide-scrollbar">
           {/* 그룹1 */}
           <SidebarGroup>
             {/* 그룹1/헤더 */}
