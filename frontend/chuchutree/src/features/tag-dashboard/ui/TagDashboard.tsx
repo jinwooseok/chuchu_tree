@@ -1,15 +1,27 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import TagCard from '@/features/tag-dashboard/ui/TagCard';
+import { TagDetailCard } from '@/features/tag-dashboard/ui/TagDetailCard';
 import { useTagDashboardSidebarStore } from '@/lib/store/tagDashboard';
 import { TagDashboard as TagDashboardType } from '@/entities/tag-dashboard';
 import { calculateProgress } from '@/features/tag-dashboard/lib/utils';
+import { useColumns } from '@/features/tag-dashboard/lib/useColumns';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 
 export function TagDashboard({ tagDashboard, isLanding = false }: { tagDashboard?: TagDashboardType; isLanding?: boolean }) {
   // store에서 필터/정렬 상태 가져오기
   const { searchQuery, sortBy, sortDirection, selectedTagId, categoryVisibility } = useTagDashboardSidebarStore();
+
+  // 현재 뷰포트 컬럼 수 (1 / 2 / 3)
+  const colCount = useColumns();
+
+  // 확장된 태그 ID (detail 패널 표시)
+  const [expandedTagId, setExpandedTagId] = useState<number | null>(null);
+
+  const handleTagClick = useCallback((tagId: number) => {
+    setExpandedTagId((prev) => (prev === tagId ? null : tagId));
+  }, []);
 
   // 필터링 및 정렬된 태그 목록 (progress 포함)
   const filteredAndSortedTags = useMemo(() => {
@@ -96,6 +108,56 @@ export function TagDashboard({ tagDashboard, isLanding = false }: { tagDashboard
     return result;
   }, [tagDashboard, searchQuery, sortBy, sortDirection, selectedTagId, categoryVisibility]);
 
+  // flat CSS Grid 배치를 위한 gridItems 계산
+  // TagCard가 단일 grid 컨테이너 안에 유지되어 부모 이동(리마운트) 없이 style만 변경됨
+  type TagWithProgress = (typeof filteredAndSortedTags)[0];
+  type GridItem =
+    | { type: 'card'; tag: TagWithProgress; row: number; col: number }
+    | { type: 'detail'; tag: TagWithProgress; row: number; col: number; colSpan: number };
+
+  const gridItems = useMemo((): GridItem[] => {
+    const items: GridItem[] = [];
+    const expandedIdx = expandedTagId !== null ? filteredAndSortedTags.findIndex((t) => t.tagId === expandedTagId) : -1;
+
+    if (expandedIdx === -1) {
+      filteredAndSortedTags.forEach((tag, i) => {
+        items.push({ type: 'card', tag, row: Math.floor(i / colCount) + 1, col: (i % colCount) + 1 });
+      });
+      return items;
+    }
+
+    // expanded 이전 카드들
+    for (let i = 0; i < expandedIdx; i++) {
+      items.push({ type: 'card', tag: filteredAndSortedTags[i], row: Math.floor(i / colCount) + 1, col: (i % colCount) + 1 });
+    }
+
+    // expanded 카드는 항상 col 1 (행의 좌측)
+    // expandedRow: 이전 카드들이 채운 행 수 + 1
+    const expandedRow = Math.ceil(expandedIdx / colCount) + 1;
+    items.push({ type: 'card', tag: filteredAndSortedTags[expandedIdx], row: expandedRow, col: 1 });
+
+    // detail 카드: 1컬럼이면 다음 행, 2~3컬럼이면 같은 행의 나머지 열
+    if (colCount === 1) {
+      items.push({ type: 'detail', tag: filteredAndSortedTags[expandedIdx], row: expandedRow + 1, col: 1, colSpan: 1 });
+    } else {
+      items.push({ type: 'detail', tag: filteredAndSortedTags[expandedIdx], row: expandedRow, col: 2, colSpan: colCount - 1 });
+    }
+
+    // expanded 이후 카드들 (detail 행만큼 offset)
+    const detailRowOffset = colCount === 1 ? 1 : 0;
+    for (let i = expandedIdx + 1; i < filteredAndSortedTags.length; i++) {
+      const afterIdx = i - expandedIdx - 1;
+      items.push({
+        type: 'card',
+        tag: filteredAndSortedTags[i],
+        row: expandedRow + 1 + detailRowOffset + Math.floor(afterIdx / colCount),
+        col: (afterIdx % colCount) + 1,
+      });
+    }
+
+    return items;
+  }, [filteredAndSortedTags, expandedTagId, colCount]);
+
   // 데이터 로딩 중
   if (!tagDashboard) {
     return (
@@ -114,10 +176,39 @@ export function TagDashboard({ tagDashboard, isLanding = false }: { tagDashboard
 
   return (
     <div className="hide-scrollbar flex h-full w-full overflow-y-auto">
-      <div className="mx-auto grid w-fit grid-cols-1 content-start gap-x-4 gap-y-8 lg:grid-cols-2 xl:grid-cols-3">
-        {filteredAndSortedTags.map((tag, index) => (
-          <TagCard key={tag.tagId} tag={tag} progress={tag.progress} isLanding={isLanding} onboardingId={index === 0 ? 'first-tag-card' : undefined} />
-        ))}
+      {/* 단일 flat CSS Grid: TagCard가 부모 이동 없이 style만 변경되어 리마운트 방지 */}
+      <div
+        className="mx-auto py-1"
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${colCount}, 320px)`,
+          columnGap: '1rem',
+          rowGap: '2rem',
+          alignContent: 'start',
+        }}
+      >
+        {gridItems.map((item) =>
+          item.type === 'card' ? (
+            <div key={item.tag.tagId} style={{ gridRow: item.row, gridColumn: item.col }}>
+              <TagCard
+                tag={item.tag}
+                progress={item.tag.progress}
+                isLanding={isLanding}
+                onboardingId={item.tag.tagId === filteredAndSortedTags[0]?.tagId ? 'first-tag-card' : undefined}
+                onTagClick={handleTagClick}
+                isExpanded={item.tag.tagId === expandedTagId}
+              />
+            </div>
+          ) : (
+            <div
+              key={`detail-${item.tag.tagId}`}
+              style={{ gridRow: item.row, gridColumn: `${item.col} / span ${item.colSpan}` }}
+              className="animate-in fade-in duration-200"
+            >
+              <TagDetailCard tag={item.tag} />
+            </div>
+          ),
+        )}
       </div>
     </div>
   );

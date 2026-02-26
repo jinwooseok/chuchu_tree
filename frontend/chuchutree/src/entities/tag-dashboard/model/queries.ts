@@ -60,10 +60,11 @@ export const usePostTagBan = (callbacks?: UseMutationCallback) => {
   });
 };
 
-// Tag Detail mutation
-export const useTagDetail = () => {
-  return useMutation({
-    mutationFn: (code: TagKey) => tagDashboardApi.getTagDetail({ code }),
+// Tag Detail query (useQuery로 캐싱 활성화 - 한번 본 태그는 재요청 없이 즉시 표시)
+export const useTagDetail = (code: TagKey) => {
+  return useQuery({
+    queryKey: tagDashboardKeys.detail(code),
+    queryFn: () => tagDashboardApi.getTagDetail({ code }),
   });
 };
 
