@@ -448,11 +448,8 @@ class UserActivityRepositoryImpl(UserActivityRepository):
 
     @override
     async def save_problem_banned_record(self, activity: UserActivity) -> None:
-        """밴된 문제 저장 (banned_yn=true로 저장, 날짜 레코드 없음)"""
+        """밴/언밴 문제 저장 (banned_yn 변경, 날짜 레코드 없음)"""
         for entity in activity.problem_statuses:
-            if not entity.banned_yn:
-                continue
-
             existing_status = await self._get_existing_status(
                 entity.user_account_id.value,
                 entity.problem_id.value,
@@ -506,6 +503,40 @@ class UserActivityRepositoryImpl(UserActivityRepository):
                 ))
 
         return statuses
+
+    @override
+    async def find_solved_statuses_by_problem_ids(
+        self,
+        user_id: UserAccountId,
+        problem_ids: list[int]
+    ) -> list[UserProblemStatus]:
+        """특정 문제 ID들의 solved_yn=True 상태 조회 (date_record 유무 무관)"""
+        if not problem_ids:
+            return []
+
+        active_bj_id = await self._get_active_bj_account_id(user_id.value)
+
+        stmt = (
+            select(UserProblemStatusModel)
+            .options(selectinload(UserProblemStatusModel.date_records))
+            .where(
+                and_(
+                    UserProblemStatusModel.user_account_id == user_id.value,
+                    UserProblemStatusModel.bj_account_id == active_bj_id,
+                    UserProblemStatusModel.problem_id.in_(problem_ids),
+                    UserProblemStatusModel.solved_yn == True,
+                    UserProblemStatusModel.deleted_at.is_(None)
+                )
+            )
+        )
+
+        result = await self.session.execute(stmt)
+        status_models = result.scalars().unique().all()
+
+        return [
+            UserProblemStatusMapper.status_to_entity(status_model)
+            for status_model in status_models
+        ]
 
     @override
     async def find_will_solve_problems_by_problem_ids(

@@ -120,7 +120,7 @@ class UserProblemStatus:
     # ===== 상태 판별 =====
 
     def is_banned(self) -> bool:
-        return self.banned_yn and self.deleted_at is None
+        return self.banned_yn
 
     def is_solved(self) -> bool:
         return self.solved_yn and not self.banned_yn

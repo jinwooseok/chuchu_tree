@@ -165,6 +165,13 @@ class ProblemRepositoryImpl(ProblemRepository):
         raise NotImplementedError()
 
     @override
+    async def find_ids_by_tag_id(self, tag_id: TagId) -> list[int]:
+        """태그 ID에 해당하는 문제 ID 목록 조회"""
+        stmt = select(ProblemTagModel.problem_id).where(ProblemTagModel.tag_id == tag_id.value)
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
+    @override
     async def find_recommended_problem(
         self,
         tag_id: TagId,

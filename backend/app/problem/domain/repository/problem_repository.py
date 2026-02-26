@@ -49,6 +49,11 @@ class ProblemRepository(ABC):
         pass
 
     @abstractmethod
+    async def find_ids_by_tag_id(self, tag_id: TagId) -> list[int]:
+        """태그 ID에 해당하는 문제 ID 목록 조회"""
+        pass
+
+    @abstractmethod
     async def find_recommended_problem(
         self,
         tag_id: TagId,

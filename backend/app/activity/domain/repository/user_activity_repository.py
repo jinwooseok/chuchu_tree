@@ -83,6 +83,15 @@ class UserActivityRepository(ABC):
         pass
 
     @abstractmethod
+    async def find_solved_statuses_by_problem_ids(
+        self,
+        user_id: UserAccountId,
+        problem_ids: list[int]
+    ) -> list[UserProblemStatus]:
+        """특정 문제 ID들의 solved_yn=True 상태 조회 (date_record 유무 무관)"""
+        pass
+
+    @abstractmethod
     async def find_will_solve_problems_by_problem_ids(
         self,
         user_id: UserAccountId,
