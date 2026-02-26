@@ -44,7 +44,7 @@ class UserActivity:
         """활성 차단 문제 목록"""
         return [
             s for s in self.problem_statuses
-            if s.banned_yn and s.deleted_at is None
+            if s.banned_yn
         ]
 
     @property
@@ -89,12 +89,11 @@ class UserActivity:
         )
 
     def remove_ban_problem(self, problem_id: ProblemId) -> None:
-        """문제 차단 해제 (논리적 삭제)"""
+        """문제 차단 해제 (banned_yn=False)"""
         for status in self.problem_statuses:
-            if status.problem_id.value == problem_id.value and status.banned_yn and status.deleted_at is None:
-                now = datetime.now()
-                status.deleted_at = now
-                status.updated_at = now
+            if status.problem_id.value == problem_id.value and status.banned_yn:
+                status.banned_yn = False
+                status.updated_at = datetime.now()
                 break
 
     def record_problem_solved(self, problem_id: 'ProblemId') -> None:
@@ -181,7 +180,7 @@ class UserActivity:
 
     def _is_problem_banned(self, problem_id: 'ProblemId') -> bool:
         return any(
-            s.problem_id.value == problem_id.value and s.banned_yn and s.deleted_at is None
+            s.problem_id.value == problem_id.value and s.banned_yn
             for s in self.problem_statuses
         )
 

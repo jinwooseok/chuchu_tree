@@ -448,11 +448,8 @@ class UserActivityRepositoryImpl(UserActivityRepository):
 
     @override
     async def save_problem_banned_record(self, activity: UserActivity) -> None:
-        """밴된 문제 저장 (banned_yn=true로 저장, 날짜 레코드 없음)"""
+        """밴/언밴 문제 저장 (banned_yn 변경, 날짜 레코드 없음)"""
         for entity in activity.problem_statuses:
-            if not entity.banned_yn:
-                continue
-
             existing_status = await self._get_existing_status(
                 entity.user_account_id.value,
                 entity.problem_id.value,
