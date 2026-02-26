@@ -508,6 +508,40 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         return statuses
 
     @override
+    async def find_solved_statuses_by_problem_ids(
+        self,
+        user_id: UserAccountId,
+        problem_ids: list[int]
+    ) -> list[UserProblemStatus]:
+        """특정 문제 ID들의 solved_yn=True 상태 조회 (date_record 유무 무관)"""
+        if not problem_ids:
+            return []
+
+        active_bj_id = await self._get_active_bj_account_id(user_id.value)
+
+        stmt = (
+            select(UserProblemStatusModel)
+            .options(selectinload(UserProblemStatusModel.date_records))
+            .where(
+                and_(
+                    UserProblemStatusModel.user_account_id == user_id.value,
+                    UserProblemStatusModel.bj_account_id == active_bj_id,
+                    UserProblemStatusModel.problem_id.in_(problem_ids),
+                    UserProblemStatusModel.solved_yn == True,
+                    UserProblemStatusModel.deleted_at.is_(None)
+                )
+            )
+        )
+
+        result = await self.session.execute(stmt)
+        status_models = result.scalars().unique().all()
+
+        return [
+            UserProblemStatusMapper.status_to_entity(status_model)
+            for status_model in status_models
+        ]
+
+    @override
     async def find_will_solve_problems_by_problem_ids(
         self,
         user_id: UserAccountId,
