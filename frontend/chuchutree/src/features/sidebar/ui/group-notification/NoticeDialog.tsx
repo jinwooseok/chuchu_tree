@@ -4,15 +4,13 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Button } from '@/components/ui/button';
 import { useNotificationStore } from '@/lib/store/notification';
 import { useState, useEffect } from 'react';
-import { Bell, CalendarPlus, CheckCheck, ClipboardList, Tag, TrendingUp, Users } from 'lucide-react';
+import { Bell, CalendarPlus, CheckCheck, ClipboardList, Megaphone, TrendingUp, UserCheck, UserPlus, Users } from 'lucide-react';
 import { WillSolveProblems, SolvedProblems } from '@/entities/calendar/model/calendar.types';
 import { TIER_INFO, TierNumKey } from '@/shared/constants/tierSystem';
-import { TAG_INFO, TagKey, CategoryName } from '@/shared/constants/tagSystem';
-import { getLevelColorClasses } from '@/features/tag-dashboard/lib/utils';
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
-export type NoticeCategory = 'study-invitation-status' | 'study-application-status' | 'study-problems-status' | 'user-problems-status' | 'user-tier-status' | 'user-tag-status';
+export type NoticeCategory = 'study-invitation-status' | 'study-application-status' | 'study-problems-status' | 'user-problems-status' | 'user-tier-status' | 'system-announcement' | 'study-received-invitation' | 'study-received-application';
 
 export type NoticeStatusValue = 'pending' | 'accepted' | 'rejected';
 
@@ -55,25 +53,60 @@ export interface UserTierNotice extends BaseNotice {
   tierLevel: TierNumKey;
 }
 
-export interface UserTagNotice extends BaseNotice {
-  category: 'user-tag-status';
-  tagId: number;
-  tagCode: TagKey;
-  accountStatCurrentLevel: CategoryName;
+export interface SystemAnnouncementNotice extends BaseNotice {
+  category: 'system-announcement';
+  text: string;
 }
 
-export type Notice = StudyInvitationNotice | StudyApplicationNotice | StudyProblemsNotice | UserProblemsNotice | UserTierNotice | UserTagNotice;
+export interface StudyReceivedInvitationNotice extends BaseNotice {
+  category: 'study-received-invitation';
+  studyName: string;
+  inviterUserId: string; // bjAccountId
+  inviterUserCode: string; // defaultCode
+  status: NoticeStatusValue;
+}
+
+export interface StudyReceivedApplicationNotice extends BaseNotice {
+  category: 'study-received-application';
+  studyName: string;
+  applicantUserId: string; // bjAccountId
+  applicantUserCode: string; // defaultCode
+  status: NoticeStatusValue;
+}
+
+export type Notice = StudyInvitationNotice | StudyApplicationNotice | StudyProblemsNotice | UserProblemsNotice | UserTierNotice | SystemAnnouncementNotice | StudyReceivedInvitationNotice | StudyReceivedApplicationNotice;
 
 // ─── Tab ─────────────────────────────────────────────────────────────────────
 
-type NoticeTab = 'study' | 'personal';
+type NoticeTab = 'study' | 'personal' | 'announcement';
 
-const STUDY_CATEGORIES: NoticeCategory[] = ['study-invitation-status', 'study-application-status', 'study-problems-status'];
-const PERSONAL_CATEGORIES: NoticeCategory[] = ['user-problems-status', 'user-tier-status', 'user-tag-status'];
+const STUDY_CATEGORIES: NoticeCategory[] = ['study-received-invitation', 'study-received-application', 'study-invitation-status', 'study-application-status', 'study-problems-status'];
+const PERSONAL_CATEGORIES: NoticeCategory[] = ['user-problems-status', 'user-tier-status'];
+const ANNOUNCEMENT_CATEGORIES: NoticeCategory[] = ['system-announcement'];
 
 // ─── Mock Data (SSE 연동 전 임시 데이터) ─────────────────────────────────────
 
 const MOCK_NOTICES: Notice[] = [
+  {
+    id: 10,
+    category: 'study-received-application',
+    isRead: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
+    studyName: 'mock스터디05',
+    applicantUserId: 'user04',
+    applicantUserCode: '1111',
+    status: 'pending',
+  },
+  {
+    id: 9,
+    category: 'study-received-invitation',
+    isRead: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
+    studyName: 'mock스터디05',
+    inviterUserId: 'user03',
+    inviterUserCode: '9999',
+    status: 'pending',
+  },
   {
     id: 1,
     category: 'study-invitation-status',
@@ -153,12 +186,10 @@ const MOCK_NOTICES: Notice[] = [
   },
   {
     id: 8,
-    category: 'user-tag-status',
-    isRead: true,
-    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 10).toISOString(),
-    tagId: 1,
-    tagCode: 'dp',
-    accountStatCurrentLevel: 'ADVANCED',
+    category: 'system-announcement',
+    isRead: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+    text: '2026년 3월 업데이트 안내: 스터디 기능이 추가되었습니다. 친구들과 함께 문제를 풀어보세요!',
   },
 ];
 
@@ -187,21 +218,25 @@ const STATUS_CONFIG: Record<NoticeStatusValue, { label: string; className: strin
 };
 
 const CATEGORY_LABEL: Record<NoticeCategory, string> = {
+  'study-received-invitation': '스터디 초대 받음',
+  'study-received-application': '가입 신청 받음',
   'study-invitation-status': '스터디 초대',
   'study-application-status': '가입 신청',
   'study-problems-status': '문제 등록',
   'user-problems-status': '문제 업데이트',
   'user-tier-status': '티어 상승',
-  'user-tag-status': '태그 등급 상승',
+  'system-announcement': '공지사항',
 };
 
 const CATEGORY_ICON: Record<NoticeCategory, React.ReactNode> = {
+  'study-received-invitation': <UserPlus className="mt-0.5 h-4 w-4 shrink-0" />,
+  'study-received-application': <UserCheck className="mt-0.5 h-4 w-4 shrink-0" />,
   'study-invitation-status': <Users className="mt-0.5 h-4 w-4 shrink-0" />,
   'study-application-status': <ClipboardList className="mt-0.5 h-4 w-4 shrink-0" />,
   'study-problems-status': <CalendarPlus className="mt-0.5 h-4 w-4 shrink-0" />,
   'user-problems-status': <CheckCheck className="mt-0.5 h-4 w-4 shrink-0" />,
   'user-tier-status': <TrendingUp className="mt-0.5 h-4 w-4 shrink-0" />,
-  'user-tag-status': <Tag className="mt-0.5 h-4 w-4 shrink-0" />,
+  'system-announcement': <Megaphone className="mt-0.5 h-4 w-4 shrink-0" />,
 };
 
 // ─── Notice Card ──────────────────────────────────────────────────────────────
@@ -210,11 +245,37 @@ interface NoticeCardProps {
   notice: Notice;
   showUnreadDot: boolean;
   onCancel: (id: number) => void;
+  onAccept?: (id: number) => void;
+  onReject?: (id: number) => void;
+  onApprove?: (id: number) => void;
+  onDecline?: (id: number) => void;
 }
 
-function NoticeCard({ notice, showUnreadDot, onCancel }: NoticeCardProps) {
+function NoticeCard({ notice, showUnreadDot, onCancel, onAccept, onReject, onApprove, onDecline }: NoticeCardProps) {
   const renderBody = () => {
     switch (notice.category) {
+      case 'study-received-application': {
+        const n = notice as StudyReceivedApplicationNotice;
+        return (
+          <p className="text-sm leading-snug">
+            <span className="font-medium">
+              {n.applicantUserId}#{n.applicantUserCode}
+            </span>
+            님이 <span className="font-medium">{n.studyName}</span> 스터디에 가입 신청했습니다.
+          </p>
+        );
+      }
+      case 'study-received-invitation': {
+        const n = notice as StudyReceivedInvitationNotice;
+        return (
+          <p className="text-sm leading-snug">
+            <span className="font-medium">
+              {n.inviterUserId}#{n.inviterUserCode}
+            </span>
+            님이 <span className="font-medium">{n.studyName}</span> 스터디에 초대했습니다.
+          </p>
+        );
+      }
       case 'study-invitation-status': {
         const n = notice as StudyInvitationNotice;
         return (
@@ -272,29 +333,34 @@ function NoticeCard({ notice, showUnreadDot, onCancel }: NoticeCardProps) {
           </p>
         );
       }
-      case 'user-tag-status': {
-        const n = notice as UserTagNotice;
-        const tagKr = TAG_INFO[n.tagCode]?.kr ?? n.tagCode;
-        const levelColors = getLevelColorClasses(n.accountStatCurrentLevel);
-        return (
-          <p className="text-sm leading-snug">
-            <span className="font-medium">{tagKr}</span> 태그가 <span className={`${levelColors.bg} ${levelColors.text} mx-1 rounded-xs px-1 font-medium`}>{n.accountStatCurrentLevel}</span> 등급으로
-            상승했습니다.
-          </p>
-        );
+      case 'system-announcement': {
+        const n = notice as SystemAnnouncementNotice;
+        return <p className="text-sm leading-snug">{n.text}</p>;
       }
     }
   };
 
   const renderStatus = () => {
-    if (notice.category !== 'study-invitation-status' && notice.category !== 'study-application-status') return null;
-    const n = notice as StudyInvitationNotice | StudyApplicationNotice;
+    if (
+      notice.category !== 'study-invitation-status' &&
+      notice.category !== 'study-application-status' &&
+      notice.category !== 'study-received-invitation' &&
+      notice.category !== 'study-received-application'
+    ) return null;
+    const n = notice as StudyInvitationNotice | StudyApplicationNotice | StudyReceivedInvitationNotice | StudyReceivedApplicationNotice;
+    if (n.status === 'pending') return null;
     const { label, className } = STATUS_CONFIG[n.status];
     return <span className={`text-xs font-medium ${className}`}>{label}</span>;
   };
 
   const canCancel =
     (notice.category === 'study-invitation-status' || notice.category === 'study-application-status') && (notice as StudyInvitationNotice | StudyApplicationNotice).status === 'pending';
+
+  const canRespond =
+    notice.category === 'study-received-invitation' && (notice as StudyReceivedInvitationNotice).status === 'pending';
+
+  const canApprove =
+    notice.category === 'study-received-application' && (notice as StudyReceivedApplicationNotice).status === 'pending';
 
   return (
     <div className="bg-innerground-hovergray/50 hover:bg-innerground-darkgray/70 relative flex items-start gap-3 rounded-lg p-3 transition-colors">
@@ -317,6 +383,28 @@ function NoticeCard({ notice, showUnreadDot, onCancel }: NoticeCardProps) {
             <Button variant="ghost" size="sm" className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground h-7 px-2 text-xs" onClick={() => onCancel(notice.id)}>
               {CATEGORY_LABEL[notice.category]} 취소하기
             </Button>
+          )}
+
+          {canRespond && (
+            <>
+              <Button variant="ghost" size="sm" className="hover:bg-advanced-bg/10 text-advanced-bg h-7 px-2 text-xs" onClick={() => onAccept?.(notice.id)}>
+                가입하기
+              </Button>
+              <Button variant="ghost" size="sm" className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground h-7 px-2 text-xs" onClick={() => onReject?.(notice.id)}>
+                거절하기
+              </Button>
+            </>
+          )}
+
+          {canApprove && (
+            <>
+              <Button variant="ghost" size="sm" className="hover:bg-advanced-bg/10 text-advanced-bg h-7 px-2 text-xs" onClick={() => onApprove?.(notice.id)}>
+                승인하기
+              </Button>
+              <Button variant="ghost" size="sm" className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground h-7 px-2 text-xs" onClick={() => onDecline?.(notice.id)}>
+                거절하기
+              </Button>
+            </>
           )}
         </div>
       </div>
@@ -352,18 +440,38 @@ export function NoticeDialog({ onClose }: props) {
     // TODO: cancelNotice(id) API 연동 예정
   };
 
-  const tabCategories = activeTab === 'study' ? STUDY_CATEGORIES : PERSONAL_CATEGORIES;
+  const handleAccept = (id: number) => {
+    setNotices((prev) => prev.map((n) => (n.id === id ? { ...n, status: 'accepted' } as Notice : n)));
+    // TODO: acceptStudyInvitation(id) API 연동 예정
+  };
+
+  const handleReject = (id: number) => {
+    setNotices((prev) => prev.map((n) => (n.id === id ? { ...n, status: 'rejected' } as Notice : n)));
+    // TODO: rejectStudyInvitation(id) API 연동 예정
+  };
+
+  const handleApprove = (id: number) => {
+    setNotices((prev) => prev.map((n) => (n.id === id ? { ...n, status: 'accepted' } as Notice : n)));
+    // TODO: approveStudyApplication(id) API 연동 예정
+  };
+
+  const handleDecline = (id: number) => {
+    setNotices((prev) => prev.map((n) => (n.id === id ? { ...n, status: 'rejected' } as Notice : n)));
+    // TODO: declineStudyApplication(id) API 연동 예정
+  };
+
+  const tabCategories = activeTab === 'study' ? STUDY_CATEGORIES : activeTab === 'personal' ? PERSONAL_CATEGORIES : ANNOUNCEMENT_CATEGORIES;
   const filteredNotices = notices.filter((n) => tabCategories.includes(n.category));
 
   return (
     <Dialog open={true} onOpenChange={onClose}>
-      <DialogContent className="flex max-h-[90vh] max-w-xl flex-col">
+      <DialogContent className="flex h-[80vh] max-w-xl flex-col">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Bell className="h-4 w-4" />
             알림
           </DialogTitle>
-          <DialogDescription className="sr-only">스터디 알림 및 개인 알림을 확인할 수 있습니다.</DialogDescription>
+          <DialogDescription className="sr-only">스터디 알림, 개인 알림, 공지사항을 확인할 수 있습니다.</DialogDescription>
         </DialogHeader>
 
         {/* 탭 전환 */}
@@ -380,13 +488,19 @@ export function NoticeDialog({ onClose }: props) {
           >
             내 알림
           </button>
+          <button
+            className={`flex-1 py-2 text-sm font-medium transition-colors ${activeTab === 'announcement' ? 'border-primary text-foreground border-b-2' : 'text-muted-foreground hover:text-foreground'}`}
+            onClick={() => setActiveTab('announcement')}
+          >
+            공지사항
+          </button>
         </div>
 
         {filteredNotices.length > 0 ? (
           <div className="min-h-0 flex-1 overflow-y-auto pt-2 pr-1">
             <div className="space-y-2">
               {filteredNotices.map((notice) => (
-                <NoticeCard key={notice.id} notice={notice} showUnreadDot={initiallyUnreadIds.has(notice.id)} onCancel={handleCancel} />
+                <NoticeCard key={notice.id} notice={notice} showUnreadDot={initiallyUnreadIds.has(notice.id)} onCancel={handleCancel} onAccept={handleAccept} onReject={handleReject} onApprove={handleApprove} onDecline={handleDecline} />
               ))}
             </div>
           </div>
