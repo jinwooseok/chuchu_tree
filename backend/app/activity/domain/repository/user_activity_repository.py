@@ -129,6 +129,16 @@ class UserActivityRepository(ABC):
         pass
 
     @abstractmethod
+    async def find_will_solve_statuses_in_history(
+        self,
+        user_id: UserAccountId,
+        bj_account_id: str,
+        history_problem_ids: set[int],
+    ) -> list[UserProblemStatus]:
+        """problem_history에 있는 문제 중 will_solve 상태인 user_problem_status 조회"""
+        pass
+
+    @abstractmethod
     async def count_solved_by_date(
         self,
         user_id: UserAccountId,
