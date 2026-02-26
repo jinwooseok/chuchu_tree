@@ -79,7 +79,6 @@ def run_migration(dry_run: bool = False) -> None:
                 SELECT 1
                 FROM user_problem_status ups
                 WHERE ups.user_account_id = al.user_account_id
-                  AND ups.bj_account_id   = ph.bj_account_id
                   AND ups.problem_id      = ph.problem_id
             )
         """)).scalar()
@@ -105,7 +104,6 @@ def run_migration(dry_run: bool = False) -> None:
                     SELECT 1
                     FROM user_problem_status ups
                     WHERE ups.user_account_id = al.user_account_id
-                      AND ups.bj_account_id   = ph.bj_account_id
                       AND ups.problem_id      = ph.problem_id
                 )
             """))
@@ -136,6 +134,88 @@ def run_migration(dry_run: bool = False) -> None:
               AND banned_yn = FALSE
         """)).scalar()
         logger.info(f"  bj_account_id 미설정(SOLVED/WILL_SOLVE) 대상: {ups_null_cnt}건")
+
+        # ------------------------------------------------------------------
+        # Step 0 사전 정리: 이전 부분 실행으로 target bj_account_id 행이 이미
+        # 존재하는 NULL 행은 UPDATE 시 중복 key 에러가 발생하므로 먼저 삭제한다.
+        # ------------------------------------------------------------------
+        dup_null_cnt = conn.execute(text("""
+            SELECT COUNT(ups_null.user_problem_status_id)
+            FROM user_problem_status ups_null
+            JOIN (
+                SELECT user_account_id, bj_account_id
+                FROM (
+                    SELECT user_account_id, bj_account_id,
+                           ROW_NUMBER() OVER (
+                               PARTITION BY user_account_id
+                               ORDER BY
+                                   CASE WHEN deleted_at IS NULL THEN 0 ELSE 1 END,
+                                   created_at DESC
+                           ) AS rn
+                    FROM account_link
+                ) al_sub WHERE al_sub.rn = 1
+            ) latest_al ON latest_al.user_account_id = ups_null.user_account_id
+            JOIN user_problem_status ups_real
+                ON ups_real.user_account_id = ups_null.user_account_id
+                AND ups_real.bj_account_id  = latest_al.bj_account_id
+                AND ups_real.problem_id     = ups_null.problem_id
+            WHERE ups_null.bj_account_id IS NULL
+              AND ups_null.banned_yn = FALSE
+        """)).scalar()
+        logger.info(f"  중복 NULL 행 (target bj_account_id 이미 존재): {dup_null_cnt}건")
+
+        if not dry_run and dup_null_cnt > 0:
+            # 1) problem_date_record FK를 새 ups_real로 재연결
+            #    (NULL로 끊지 않고 바로 교체 → pdr 데이터 보존)
+            conn.execute(text("""
+                UPDATE problem_date_record pdr
+                JOIN user_problem_status ups_null
+                    ON pdr.user_problem_status_id = ups_null.user_problem_status_id
+                JOIN (
+                    SELECT user_account_id, bj_account_id
+                    FROM (
+                        SELECT user_account_id, bj_account_id,
+                               ROW_NUMBER() OVER (
+                                   PARTITION BY user_account_id
+                                   ORDER BY
+                                       CASE WHEN deleted_at IS NULL THEN 0 ELSE 1 END,
+                                       created_at DESC
+                               ) AS rn
+                        FROM account_link
+                    ) al_sub WHERE al_sub.rn = 1
+                ) latest_al ON latest_al.user_account_id = ups_null.user_account_id
+                JOIN user_problem_status ups_real
+                    ON ups_real.user_account_id = ups_null.user_account_id
+                    AND ups_real.bj_account_id  = latest_al.bj_account_id
+                    AND ups_real.problem_id     = ups_null.problem_id
+                SET pdr.user_problem_status_id = ups_real.user_problem_status_id
+                WHERE ups_null.bj_account_id IS NULL
+                  AND ups_null.banned_yn = FALSE
+            """))
+            # 2) 중복 NULL 행 삭제
+            del_result = conn.execute(text("""
+                DELETE ups_null FROM user_problem_status ups_null
+                JOIN (
+                    SELECT user_account_id, bj_account_id
+                    FROM (
+                        SELECT user_account_id, bj_account_id,
+                               ROW_NUMBER() OVER (
+                                   PARTITION BY user_account_id
+                                   ORDER BY
+                                       CASE WHEN deleted_at IS NULL THEN 0 ELSE 1 END,
+                                       created_at DESC
+                               ) AS rn
+                        FROM account_link
+                    ) al_sub WHERE al_sub.rn = 1
+                ) latest_al ON latest_al.user_account_id = ups_null.user_account_id
+                JOIN user_problem_status ups_real
+                    ON ups_real.user_account_id = ups_null.user_account_id
+                    AND ups_real.bj_account_id  = latest_al.bj_account_id
+                    AND ups_real.problem_id     = ups_null.problem_id
+                WHERE ups_null.bj_account_id IS NULL
+                  AND ups_null.banned_yn = FALSE
+            """))
+            logger.info(f"  → {del_result.rowcount}건 삭제 완료")
 
         # 유저별 최신 account_link: 활성(deleted_at IS NULL) 우선, 그 다음 created_at 내림차순
         if not dry_run and ups_null_cnt > 0:
