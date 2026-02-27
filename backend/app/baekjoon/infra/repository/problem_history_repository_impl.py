@@ -179,32 +179,18 @@ class ProblemHistoryRepositoryImpl(ProblemHistoryRepository):
             .where(
                 and_(
                     UserProblemStatusModel.user_account_id == user_account_id.value,
-                    UserProblemStatusModel.banned_yn == False,
                     UserProblemStatusModel.deleted_at.is_(None)
                 )
             )
         ).scalar_subquery()
 
-        # ② 유저가 밴한 problem_id (제외 대상)
-        banned_subq = (
-            select(UserProblemStatusModel.problem_id)
-            .where(
-                and_(
-                    UserProblemStatusModel.user_account_id == user_account_id.value,
-                    UserProblemStatusModel.banned_yn == True,
-                    UserProblemStatusModel.deleted_at.is_(None)
-                )
-            )
-        ).scalar_subquery()
-
-        # 미기록 = problem_history에 있으나 기록됨/밴 제외
+        # 미기록 = problem_history에 있으나 활성 SOLVED 기록 없음 (밴 여부 무관)
         stmt = (
             select(ProblemHistoryModel.problem_id)
             .where(
                 and_(
                     ProblemHistoryModel.bj_account_id == bj_account_id.value,
                     ProblemHistoryModel.problem_id.not_in(recorded_subq),
-                    ProblemHistoryModel.problem_id.not_in(banned_subq)
                 )
             )
         )

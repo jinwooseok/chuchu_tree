@@ -57,8 +57,21 @@ class SolvedacGatewayImpl(SolvedacGateway):
                 )
 
                 if first_page_data is None or first_page_data.get("count", 0) == 0:
-                    logger.warning(f"[SolvedacGateway] 유저 '{bj_user_id}'가 푼 문제가 없거나 존재하지 않는 ID입니다.")
-                    return None
+                    if not user_info_data:
+                        logger.warning(f"[SolvedacGateway] 존재하지 않는 유저: {bj_user_id}")
+                        return None
+                    # 유저는 존재하지만 푼 문제가 0개인 경우 → 빈 데이터로 등록 허용
+                    logger.info(f"[SolvedacGateway] 유저 '{bj_user_id}'는 푼 문제가 없지만 계정이 존재합니다.")
+                    result = {
+                        "user_id": bj_user_id,
+                        "count": 0,
+                        "total_count": 0,
+                        "items": [],
+                        "user_info": user_info_data,
+                        "history": history_data,
+                        "collected_at": datetime.now().isoformat()
+                    }
+                    return SolvedacUserDataVO.from_collector_response(result)
 
                 total_count = first_page_data.get("count", 0)
                 all_problems = first_page_data.get("items", [])
@@ -256,8 +269,13 @@ class SolvedacGatewayImpl(SolvedacGateway):
 
         return all_problems
 
-    async def _fetch_user_info(self, client: httpx.AsyncClient, user_id: str) -> dict:
-        """유저 정보 수집 (user/show API)"""
+    async def _fetch_user_info(self, client: httpx.AsyncClient, user_id: str) -> dict | None:
+        """유저 정보 수집 (user/show API)
+
+        Returns:
+            dict: 유저 정보
+            None: 존재하지 않는 유저 (404)
+        """
         try:
             url = self.user_show_url_template.format(user_id=user_id)
             response = await client.get(url)
@@ -267,6 +285,12 @@ class SolvedacGatewayImpl(SolvedacGateway):
             logger.info(f"[SolvedacGateway] 유저 정보 수집 완료: tier={user_info.get('tier')}, rating={user_info.get('rating')}")
             return user_info
 
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 404:
+                logger.warning(f"[SolvedacGateway] 존재하지 않는 유저: {user_id}")
+                return None
+            logger.warning(f"[SolvedacGateway] 유저 정보 수집 실패 (HTTP {e.response.status_code}): {e}")
+            return {}
         except Exception as e:
             logger.warning(f"[SolvedacGateway] 유저 정보 수집 실패: {e}")
             return {}

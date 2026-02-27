@@ -1,6 +1,6 @@
 """UserActivity Repository 구현 - 정규화된 테이블 구조"""
 from calendar import monthrange
-from datetime import date
+from datetime import date, datetime
 from typing import override
 
 from sqlalchemy import and_, delete, func, or_, select
@@ -325,6 +325,20 @@ class UserActivityRepositoryImpl(UserActivityRepository):
         if not existing_status:
             self.session.add(status_model)
             await self.session.flush()
+        elif not existing_status.solved_yn and entity.solved_yn:
+            # WILL_SOLVE → SOLVED 전환: 기존 활성 WILL_SOLVE date_record 소프트 삭제
+            will_solve_stmt = select(ProblemDateRecordModel).where(
+                and_(
+                    ProblemDateRecordModel.user_problem_status_id == existing_status.user_problem_status_id,
+                    ProblemDateRecordModel.record_type == RecordType.WILL_SOLVE,
+                    ProblemDateRecordModel.deleted_at.is_(None),
+                )
+            )
+            will_solve_result = await self.session.execute(will_solve_stmt)
+            now = datetime.now()
+            for dr in will_solve_result.scalars().all():
+                dr.deleted_at = now
+                dr.updated_at = now
 
         for date_record in entity.date_records:
             if date_record.problem_date_record_id:
@@ -461,6 +475,35 @@ class UserActivityRepositoryImpl(UserActivityRepository):
                 self.session.add(status_model)
 
         await self.session.flush()
+
+    @override
+    async def find_will_solve_statuses_in_history(
+        self,
+        user_id: UserAccountId,
+        bj_account_id: str,
+        history_problem_ids: set[int],
+    ) -> list[UserProblemStatus]:
+        """problem_history에 있는 문제 중 will_solve 상태인 user_problem_status 조회"""
+        if not history_problem_ids:
+            return []
+
+        stmt = select(UserProblemStatusModel).where(
+            and_(
+                UserProblemStatusModel.user_account_id == user_id.value,
+                UserProblemStatusModel.bj_account_id == bj_account_id,
+                UserProblemStatusModel.problem_id.in_(history_problem_ids),
+                UserProblemStatusModel.solved_yn == False,
+                UserProblemStatusModel.banned_yn == False,
+                UserProblemStatusModel.deleted_at.is_(None),
+            )
+        )
+        result = await self.session.execute(stmt)
+        status_models = result.scalars().all()
+
+        return [
+            UserProblemStatusMapper.status_to_entity(model)
+            for model in status_models
+        ]
 
     @override
     async def find_problem_records_by_problem_ids(

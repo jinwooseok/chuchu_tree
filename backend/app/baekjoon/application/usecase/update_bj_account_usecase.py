@@ -165,13 +165,34 @@ class UpdateBjAccountUsecase:
                     ]
                     await self.user_activity_repository.save_all_problem_records(statuses)
 
-                # b. 오늘 날짜 user_date_record 생성/업데이트 (solved_count += 신규 건수)
-                if new_problems:
+                # b. problem_history에 이미 있는데 will_solve 상태인 문제 → solved로 정합성 보정
+                will_solve_in_history = await self.user_activity_repository.find_will_solve_statuses_in_history(
+                    user_id=ua_id,
+                    bj_account_id=bj_account.bj_account_id.value,
+                    history_problem_ids=existing_problem_history_ids,
+                )
+                if will_solve_in_history:
+                    now = datetime.now()
+                    for status in will_solve_in_history:
+                        status.solved_yn = True
+                        status.updated_at = now
+                        status.date_records = [
+                            ProblemDateRecord.create(
+                                user_problem_status_id=status.user_problem_status_id,
+                                marked_date=today,
+                                record_type=RecordType.SOLVED,
+                            )
+                        ]
+                    await self.user_activity_repository.save_all_problem_records(will_solve_in_history)
+
+                # c. 오늘 날짜 user_date_record 생성/업데이트 (신규 + 보정 건수)
+                total_solved = len(new_problems) + len(will_solve_in_history)
+                if total_solved > 0:
                     await self.user_date_record_repository.upsert_increment(
                         user_account_id=ua_id,
                         bj_account_id=bj_account.bj_account_id.value,
                         target_date=today,
-                        increment=len(new_problems)
+                        increment=total_solved
                     )
 
             # system_log에 SUCCESS 기록
