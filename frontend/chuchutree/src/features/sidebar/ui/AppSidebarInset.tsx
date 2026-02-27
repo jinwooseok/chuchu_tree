@@ -326,7 +326,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
     <>
       <Sidebar variant="inset" collapsible="icon">
         {/* 메인 콘텐츠 */}
-        <SidebarContent className="relative hide-scrollbar">
+        <SidebarContent className="hide-scrollbar relative">
           {/* 그룹1 */}
           <SidebarGroup>
             {/* 그룹1/헤더 */}
@@ -445,7 +445,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
           </SidebarGroup>
           <div className="mt-10" />
           {/* 그룹3 : 스터디 전용 */}
-          <SidebarGroup>
+          {/* <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem key="addstudy" aria-label={'스터디 생성'}>
@@ -507,7 +507,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
-          </SidebarGroup>
+          </SidebarGroup> */}
         </SidebarContent>
         {/* footer */}
         <SidebarFooter>
@@ -544,7 +544,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                 </>
               )}
               {/* 실 서비스 전용 튜토리얼 이동하기*/}
-              {!isLanding && (
+              {/* {!isLanding && (
                 <SidebarMenuItem key="bell" aria-label={'알림 및 업데이트 알림'}>
                   <AppTooltip content="알림 및 업데이트 알림" side="right">
                     <SidebarMenuButton asChild>
@@ -558,7 +558,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                     </SidebarMenuButton>
                   </AppTooltip>
                 </SidebarMenuItem>
-              )}
+              )} */}
             </SidebarMenu>
           </SidebarGroupContent>
           {/* 드롭다운 */}
