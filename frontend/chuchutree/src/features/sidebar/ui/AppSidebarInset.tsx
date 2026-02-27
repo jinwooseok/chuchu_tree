@@ -63,7 +63,7 @@ import { useLandingRecommend } from '@/features/landing';
 import { useOnboardingStore } from '@/lib/store/onboarding';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { CreateStudyDialog } from '@/features/sidebar/ui/group-study/CreateStudyDialog';
-import { NoticeDialog } from '@/features/sidebar/ui/group-notification/NoticeDialog';
+import { NoticeDialog } from '@/features/notification';
 import { useNotificationStore } from '@/lib/store/notification';
 
 const ICON_SIZE = 32;
