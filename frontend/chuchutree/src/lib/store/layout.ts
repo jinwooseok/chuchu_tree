@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { combine, devtools, persist } from 'zustand/middleware';
+import { devtools, persist } from 'zustand/middleware';
 import { immer } from 'zustand/middleware/immer';
 
 // 상단 영역 타입 (티어바, 스트릭, 닫힘)
@@ -14,6 +14,7 @@ interface LayoutState {
   topSection: TopSection;
   centerSection: CenterSection;
   bottomSection: BottomSection;
+  studySection: string | null;
   infoSidebarWidth: number;
   topSectionTierbarHeight: number;
   topSectionStreakHeight: number;
@@ -24,6 +25,7 @@ interface LayoutState {
   setTopSection: (section: TopSection) => void;
   toggleTopSection: (section: 'tierbar' | 'streak') => void;
   setCenterSection: (section: CenterSection) => void;
+  setStudySection: (studyName: string) => void;
   toggleBottomSection: () => void;
   setResizing: (isResizing: boolean) => void;
   setInfoSidebarWidth: (width: number) => void;
@@ -40,6 +42,7 @@ export const useLayoutStore = create<LayoutState>()(
         topSection: null,
         centerSection: 'calendar',
         bottomSection: null,
+        studySection: null,
         infoSidebarWidth: 280,
         topSectionTierbarHeight: 120,
         topSectionStreakHeight: 240,
@@ -68,19 +71,28 @@ export const useLayoutStore = create<LayoutState>()(
         // 중앙 영역 설정 (캘린더 <-> 대시보드 토글)
         setCenterSection: (section) =>
           set((state) => {
+            state.studySection = null;
             state.centerSection = section;
+          }),
+        // 스터디 섹션 설정
+        setStudySection: (studyName) =>
+          set((state) => {
+            state.bottomSection = null;
+            state.studySection = studyName;
           }),
 
         // 하단 영역 토글 (문제추천 열기/닫기)
         toggleBottomSection: () =>
           set((state) => {
-            if (state.bottomSection === 'recommend') {
-              // 이미 열려있으면 닫기
-              state.bottomSection = null;
-            } else {
-              // 닫혀있으면 열기 + 상단 영역 닫기
-              state.bottomSection = 'recommend';
-              state.topSection = null;
+            if (state.studySection === null) {
+              if (state.bottomSection === 'recommend') {
+                // 이미 열려있으면 닫기
+                state.bottomSection = null;
+              } else {
+                // 닫혀있으면 열기 + 상단 영역 닫기
+                state.bottomSection = 'recommend';
+                state.topSection = null;
+              }
             }
           }),
 
@@ -120,6 +132,7 @@ export const useLayoutStore = create<LayoutState>()(
           topSection: state.topSection,
           centerSection: state.centerSection,
           bottomSection: state.bottomSection,
+          studySection: state.studySection,
           infoSidebarWidth: state.infoSidebarWidth,
           topSectionTierbarHeight: state.topSectionTierbarHeight,
           topSectionStreakHeight: state.topSectionStreakHeight,

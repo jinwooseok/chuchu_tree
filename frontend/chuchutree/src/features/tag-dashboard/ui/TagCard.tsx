@@ -15,7 +15,7 @@ import { TIER_INFO } from '@/shared/constants/tierSystem';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 
 const TagCard = memo(
-  function TagCard({ tag, progress, isLanding = false, onboardingId }: { tag: CategoryTags; progress: number; isLanding: boolean; onboardingId?: string }) {
+  function TagCard({ tag, progress, isLanding = false, onboardingId, onTagClick, isExpanded = false }: { tag: CategoryTags; progress: number; isLanding: boolean; onboardingId?: string; onTagClick?: (tagId: number) => void; isExpanded?: boolean }) {
     const { tagCode, tagDisplayName, accountStat, nextLevelStat, excludedYn, recommendationYn, lockedYn } = tag;
     const { openModal, closeModal } = useModal();
 
@@ -82,7 +82,8 @@ const TagCard = memo(
 
     return (
       <div
-        className={`bg-innerground-white flex flex-col gap-2 rounded-lg border-3 ${currentLevelColors.border} group relative w-80 cursor-default p-4 text-xs transition-all duration-100 ease-in-out hover:shadow-md`}
+        className={`bg-innerground-white flex flex-col gap-2 rounded-lg border-3 ${currentLevelColors.border} group relative w-80 p-4 text-xs transition-all duration-100 ease-in-out hover:shadow-md ${onTagClick ? 'cursor-pointer' : 'cursor-default'} ${isExpanded ? 'shadow-md' : ''}`}
+        onClick={() => onTagClick?.(tag.tagId)}
         {...(onboardingId ? { 'data-onboarding-id': onboardingId } : {})}
       >
         {/* 우상단 */}
@@ -101,7 +102,7 @@ const TagCard = memo(
               {/* Tag Ban */}
               <AppTooltip side="left" content={recommendationYn ? '추천 목록에서 제외' : '추천 목록에 추가'}>
                 <button
-                  onClick={handleTagBanClick}
+                  onClick={(e) => { e.stopPropagation(); handleTagBanClick(); }}
                   aria-label="추천 여부 토글버튼"
                   disabled={isPending}
                   className={`hover:bg-excluded-bg hover:text-innerground-white border-innerground-darkgray cursor-pointer rounded border px-2 text-center transition-colors disabled:cursor-not-allowed disabled:opacity-50`}
@@ -199,7 +200,8 @@ const TagCard = memo(
       prevProps.tag.nextLevelStat.solvedProblemCount === nextProps.tag.nextLevelStat.solvedProblemCount &&
       prevProps.tag.nextLevelStat.requiredMinTier === nextProps.tag.nextLevelStat.requiredMinTier &&
       prevProps.tag.nextLevelStat.higherProblemTier === nextProps.tag.nextLevelStat.higherProblemTier &&
-      prevProps.progress === nextProps.progress
+      prevProps.progress === nextProps.progress &&
+      prevProps.isExpanded === nextProps.isExpanded
     );
   },
 );

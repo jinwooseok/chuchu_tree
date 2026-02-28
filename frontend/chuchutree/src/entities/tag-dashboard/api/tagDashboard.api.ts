@@ -1,6 +1,7 @@
 import { axiosInstance } from '@/lib/axios';
-import { TagBan, TagDashboard } from '../model/tagDashboard.types';
+import { TagBan, TagDashboard, TagDetail } from '../model/tagDashboard.types';
 import { ApiResponse } from '@/shared/types/api';
+import { TagKey } from '@/shared/constants/tagSystem';
 
 export const tagDashboardApi = {
   getTagDashboard: async (): Promise<TagDashboard> => {
@@ -16,5 +17,13 @@ export const tagDashboardApi = {
         tagCode,
       },
     });
+  },
+  getTagDetail: async ({ code }: { code: TagKey }): Promise<TagDetail> => {
+    const { data } = await axiosInstance.get<ApiResponse<TagDetail>>('user-accounts/me/tags/problems', {
+      params: {
+        code,
+      },
+    });
+    return data.data;
   },
 };

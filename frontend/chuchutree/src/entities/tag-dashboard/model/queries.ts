@@ -5,6 +5,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { CategoryTags, TagBan, TagDashboard } from './tagDashboard.types';
 import { UseMutationCallback } from '@/shared/types/api';
 import { tagDashboardKeys } from './keys';
+import { TagKey } from '@/shared/constants/tagSystem';
 import '@/shared/types/query';
 
 export const useTagDashboard = () => {
@@ -56,6 +57,14 @@ export const usePostTagBan = (callbacks?: UseMutationCallback) => {
       // 전체 리페치를 방지하여 변경된 태그만 업데이트됨
       if (callbacks?.onSuccess) callbacks.onSuccess();
     },
+  });
+};
+
+// Tag Detail query (useQuery로 캐싱 활성화 - 한번 본 태그는 재요청 없이 즉시 표시)
+export const useTagDetail = (code: TagKey) => {
+  return useQuery({
+    queryKey: tagDashboardKeys.detail(code),
+    queryFn: () => tagDashboardApi.getTagDetail({ code }),
   });
 };
 

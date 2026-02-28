@@ -1,0 +1,120 @@
+import { Notice, NoticeCategory } from './notice.types';
+
+export const STUDY_CATEGORIES: NoticeCategory[] = [
+  'study-received-invitation',
+  'study-received-application',
+  'study-invitation-status',
+  'study-application-status',
+  'study-problems-status',
+];
+export const PERSONAL_CATEGORIES: NoticeCategory[] = ['user-problems-status', 'user-tier-status'];
+export const ANNOUNCEMENT_CATEGORIES: NoticeCategory[] = ['system-announcement'];
+
+// ─── Mock Data (SSE 연동 전 임시 데이터) ─────────────────────────────────────
+
+export const MOCK_NOTICES: Notice[] = [
+  {
+    id: 10,
+    category: 'study-received-application',
+    isRead: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 8).toISOString(),
+    studyName: 'mock스터디05',
+    applicantUserId: 'user04',
+    applicantUserCode: '1111',
+    status: 'pending',
+  },
+  {
+    id: 9,
+    category: 'study-received-invitation',
+    isRead: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 5).toISOString(),
+    studyName: 'mock스터디05',
+    inviterUserId: 'user03',
+    inviterUserCode: '9999',
+    status: 'pending',
+  },
+  {
+    id: 1,
+    category: 'study-invitation-status',
+    isRead: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 3).toISOString(),
+    studyName: 'mock스터디01',
+    userId: 'user01',
+    userCode: '1234',
+    status: 'pending',
+  },
+  {
+    id: 2,
+    category: 'study-application-status',
+    isRead: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 28).toISOString(),
+    studyName: 'mock스터디02',
+    status: 'accepted',
+  },
+  {
+    id: 3,
+    category: 'study-invitation-status',
+    isRead: true,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 3).toISOString(),
+    studyName: 'mock스터디03',
+    userId: 'user02',
+    userCode: '5678',
+    status: 'rejected',
+  },
+  {
+    id: 4,
+    category: 'study-application-status',
+    isRead: true,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 26).toISOString(),
+    studyName: 'mock스터디04',
+    status: 'pending',
+  },
+  {
+    id: 5,
+    category: 'study-problems-status',
+    isRead: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 10).toISOString(),
+    studyName: 'mock스터디01',
+    problem: {
+      problemId: 2557,
+      problemTitle: '선분 교차 1',
+      problemTierLevel: 14,
+      problemTierName: 'G2',
+      problemClassLevel: null,
+      tags: [],
+      representativeTag: null,
+    },
+    calendarDate: '2026-02-28',
+  },
+  {
+    id: 6,
+    category: 'user-problems-status',
+    isRead: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 15).toISOString(),
+    problem: {
+      problemId: 1000,
+      problemTitle: '수 정렬하기',
+      problemTierLevel: 6,
+      problemTierName: 'S5',
+      problemClassLevel: 1,
+      realSolvedYn: true,
+      tags: [],
+      representativeTag: null,
+    },
+    date: '2026-02-25',
+  },
+  {
+    id: 7,
+    category: 'user-tier-status',
+    isRead: true,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 5).toISOString(),
+    tierLevel: 11,
+  },
+  {
+    id: 8,
+    category: 'system-announcement',
+    isRead: false,
+    createdAt: new Date(Date.now() - 1000 * 60 * 60 * 2).toISOString(),
+    text: '2026년 3월 업데이트 안내: 스터디 기능이 추가되었습니다. 친구들과 함께 문제를 풀어보세요!',
+  },
+];

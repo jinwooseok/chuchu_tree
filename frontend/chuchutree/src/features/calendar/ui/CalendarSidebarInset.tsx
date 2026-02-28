@@ -189,7 +189,7 @@ export function CalendarSidebarInset({ isLanding = false, calendarData }: { cale
   const updateWillSolve = useUpdateWillSolveProblems({
     onError: (error) => {
       const errorCode = getErrorCode(error);
-      const errorMessage = errorCode === 'ALREADY_SOLVED_PROBLEM' ? getErrorMessage(error) : '문제 추가에 실패했습니다.';
+      const errorMessage = errorCode === 'ALREADY_SOLVED_PROBLEM' ? getErrorMessage(error) : '이미 추가한 문제입니다.';
       toast.error(errorMessage);
     },
   });

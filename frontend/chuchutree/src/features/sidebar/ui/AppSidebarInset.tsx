@@ -20,11 +20,29 @@ import {
   SquarePlay,
   Loader,
   Bell,
+  Star,
+  Bookmark,
+  CircleFadingPlus,
 } from 'lucide-react';
 import { useLayoutStore } from '@/lib/store/layout';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupAction, SidebarGroupContent, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupAction,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubButton,
+  SidebarMenuSubItem,
+  SidebarRail,
+} from '@/components/ui/sidebar';
 import { useSidebar } from '@/components/ui/sidebar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { TargetCode } from '@/shared/constants/tagSystem';
@@ -43,6 +61,10 @@ import { User } from '@/entities/user';
 import { useState } from 'react';
 import { useLandingRecommend } from '@/features/landing';
 import { useOnboardingStore } from '@/lib/store/onboarding';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { CreateStudyDialog } from '@/features/sidebar/ui/group-study/CreateStudyDialog';
+import { NoticeDialog } from '@/features/notification';
+import { useNotificationStore } from '@/lib/store/notification';
 
 const ICON_SIZE = 32;
 
@@ -52,7 +74,10 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
   // 사이드바 상태
   const { state: sidebarOpenState, toggleSidebar: setSidebarOpenState } = useSidebar();
   // 레이아웃 상태
-  const { topSection, centerSection, bottomSection, toggleTopSection, setCenterSection, toggleBottomSection } = useLayoutStore();
+  const { topSection, centerSection, bottomSection, studySection, toggleTopSection, setCenterSection, toggleBottomSection, setStudySection } = useLayoutStore();
+
+  // 알림 dot 상태
+  const { hasUnread } = useNotificationStore();
 
   // 리프래시버튼 훅
   const { isRefreshButtonVisible, showRefreshButton } = useRefreshButtonStore();
@@ -84,7 +109,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
     }
   };
 
-  // 로그아웃 훅 및 핸들러
+  // 로그아웃 훅
   const { mutate: logout } = useLogout({
     onSuccess: () => {
       toast.success('로그아웃되었습니다.');
@@ -140,6 +165,23 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
         onClose={() => closeModal('settings')}
       />,
     );
+  };
+
+  // 스터디 생성 모달 열기
+  const handleCreateStudy = () => {
+    if (isLanding) {
+      toast.info('로그인 후 이용가능합니다.');
+      return;
+    }
+    openModal('create-study', <CreateStudyDialog user={user} onClose={() => closeModal('create-study')} />);
+  };
+  // 알림 모달 열기
+  const handleNotice = () => {
+    if (isLanding) {
+      toast.info('로그인 후 이용가능합니다.');
+      return;
+    }
+    openModal('notice-list', <NoticeDialog onClose={() => closeModal('notice-list')} />);
   };
 
   // 튜토리얼 다시보기
@@ -254,7 +296,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       short2: 'C',
       action: () => setCenterSection('calendar'),
       icon: Calendar,
-      isActive: centerSection === 'calendar',
+      isActive: studySection === null && centerSection === 'calendar',
       tooltipText: '문제 풀이 일정 관리',
     },
     {
@@ -263,7 +305,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       short2: 'D',
       action: () => setCenterSection('dashboard'),
       icon: LibraryBig,
-      isActive: centerSection === 'dashboard',
+      isActive: studySection === null && centerSection === 'dashboard',
       tooltipText: '유형별 실력 현황',
       onboardingId: 'dashboard-button',
     },
@@ -272,6 +314,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       short1: 'Shift',
       short2: '3',
       action: () => toggleBottomSection(),
+      isVisible: studySection === null,
       icon: Dices,
       isActive: bottomSection === 'recommend',
       tooltipText: '사용자 맞춤 문제 추천',
@@ -283,7 +326,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
     <>
       <Sidebar variant="inset" collapsible="icon">
         {/* 메인 콘텐츠 */}
-        <SidebarContent className="relative">
+        <SidebarContent className="hide-scrollbar relative">
           {/* 그룹1 */}
           <SidebarGroup>
             {/* 그룹1/헤더 */}
@@ -323,22 +366,25 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                   </SidebarMenuItem>
                 </div>
                 {/* 나머지 link */}
-                {items.map((item) => (
-                  <SidebarMenuItem key={item.title} aria-label={item.tooltipText}>
-                    <AppTooltip content={item.tooltipText} side="right" shortCut1={item.short1} shortCut2={item.short2}>
-                      <SidebarMenuButton asChild isActive={item.isActive}>
-                        <div onClick={item.action} className="cursor-pointer" {...(item.onboardingId ? { 'data-onboarding-id': item.onboardingId } : {})}>
-                          <item.icon size={ICON_SIZE} />
-                          <span>{item.title}</span>
-                        </div>
-                      </SidebarMenuButton>
-                    </AppTooltip>
-                  </SidebarMenuItem>
-                ))}
+                {items
+                  .filter((item) => item.isVisible !== false)
+                  .map((item) => (
+                    <SidebarMenuItem key={item.title} aria-label={item.tooltipText}>
+                      <AppTooltip content={item.tooltipText} side="right" shortCut1={item.short1} shortCut2={item.short2}>
+                        <SidebarMenuButton asChild isActive={item.isActive}>
+                          <div onClick={item.action} className="cursor-pointer" {...(item.onboardingId ? { 'data-onboarding-id': item.onboardingId } : {})}>
+                            <item.icon size={ICON_SIZE} />
+                            <span>{item.title}</span>
+                          </div>
+                        </SidebarMenuButton>
+                      </AppTooltip>
+                    </SidebarMenuItem>
+                  ))}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
           <div className="mt-10" />
+
           {/* 그룹2 */}
           <SidebarGroup>
             <SidebarGroupContent>
@@ -397,6 +443,71 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
+          <div className="mt-10" />
+          {/* 그룹3 : 스터디 전용 */}
+          {/* <SidebarGroup>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                <SidebarMenuItem key="addstudy" aria-label={'스터디 생성'}>
+                  <AppTooltip content={'스터디 생성'} side="right">
+                    <SidebarMenuButton asChild>
+                      <div onClick={handleCreateStudy} className="cursor-pointer">
+                        <CircleFadingPlus size={ICON_SIZE} className="relative z-10" />
+                        <span className="relative z-10">스터디 만들기</span>
+                      </div>
+                    </SidebarMenuButton>
+                  </AppTooltip>
+                </SidebarMenuItem>
+                <SidebarMenuItem key="studygroup" aria-label={'스터디'}>
+                  <AppTooltip content={'스터디를 만들어보세요'} side="right">
+                    <SidebarMenuButton asChild>
+                      <div onClick={() => {}} className="cursor-pointer">
+                        <Star size={ICON_SIZE} className="relative z-10" />
+                        <span className="relative z-10">스터디 목록</span>
+                      </div>
+                    </SidebarMenuButton>
+                  </AppTooltip>
+                  <SidebarMenuSub>
+                    <SidebarMenuSubItem>
+                      <SidebarMenuSubButton asChild isActive={studySection === '스터디1'}>
+                        <div
+                          onClick={() => {
+                            setStudySection('스터디1');
+                          }}
+                          className="mb-1 cursor-pointer"
+                        >
+                          <Bookmark size={ICON_SIZE} className="relative z-10" />
+                          <span className="relative z-10">스터디1</span>
+                        </div>
+                      </SidebarMenuSubButton>
+                      <SidebarMenuSubButton asChild isActive={studySection === '스터디2'}>
+                        <div
+                          onClick={() => {
+                            setStudySection('스터디2');
+                          }}
+                          className="mb-1 cursor-pointer"
+                        >
+                          <Bookmark size={ICON_SIZE} className="relative z-10" />
+                          <span className="relative z-10">스터디2</span>
+                        </div>
+                      </SidebarMenuSubButton>
+                      <SidebarMenuSubButton asChild isActive={studySection === '스터디3'}>
+                        <div
+                          onClick={() => {
+                            setStudySection('스터디3');
+                          }}
+                          className="mb-1 cursor-pointer"
+                        >
+                          <Bookmark size={ICON_SIZE} className="relative z-10" />
+                          <span className="relative z-10">스터디3</span>
+                        </div>
+                      </SidebarMenuSubButton>
+                    </SidebarMenuSubItem>
+                  </SidebarMenuSub>
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup> */}
         </SidebarContent>
         {/* footer */}
         <SidebarFooter>
@@ -437,10 +548,10 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                 <SidebarMenuItem key="bell" aria-label={'알림 및 업데이트 알림'}>
                   <AppTooltip content="알림 및 업데이트 알림" side="right">
                     <SidebarMenuButton asChild>
-                      <div onClick={() => {}} className="cursor-pointer">
+                      <div onClick={handleNotice} className="cursor-pointer">
                         <div className="relative h-4 w-4">
                           <Bell className="h-4 w-4" />
-                          {true && <div className="bg-primary absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full" />}
+                          {hasUnread && <div className="bg-primary absolute -top-0.5 -right-0.5 h-2 w-2 rounded-full" />}
                         </div>
                         <span>알림</span>
                       </div>
