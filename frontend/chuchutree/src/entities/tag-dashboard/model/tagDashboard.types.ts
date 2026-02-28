@@ -1,13 +1,13 @@
 import { CategoryName, TagKey, TargetCode } from '@/shared/constants/tagSystem';
 import { TierKey, TierNumKey } from '@/shared/constants/tierSystem';
 
-interface TagTargets {
+export interface TagTargets {
   targetId: number;
   targetCode: TargetCode;
   targetDisplayName: string;
 }
 
-interface TagAliases {
+export interface TagAliases {
   alias: string;
 }
 
@@ -67,4 +67,29 @@ export interface TagDashboard {
 
 export interface TagBan {
   tagCode: TagKey;
+}
+
+// 태그 디테일
+
+export interface TagDetailTag {
+  tagId: number;
+  tagCode: TagKey;
+  tagDisplayName: string;
+  tagAliases: TagAliases[];
+  tagTargets: TagTargets[];
+}
+
+export interface TagDetailProblem {
+  problemId: number;
+  problemTitle: string;
+  problemTierLevel: number;
+  problemTierName: TierKey;
+  problemClassLevel: number | null;
+  tags: TagDetailTag[];
+  solvedDate: string | null;
+}
+
+export interface TagDetail {
+  totalProblemCount: number;
+  problems: TagDetailProblem[];
 }
