@@ -18,6 +18,11 @@ from app.user.presentation.schema.response.user_response import (
 from app.user.presentation.schema.response.user_tag_response import TargetResponse, UserTagsResponse
 from app.core.containers import Container
 from app.core.api_response import ApiResponse, ApiResponseSchema
+from app.core.error_codes import ErrorCode
+from app.core.exception import APIException
+
+_ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
+_MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5 MB
 
 router = APIRouter(prefix="/user-accounts", tags=["user-accounts"])
 
@@ -27,26 +32,32 @@ router = APIRouter(prefix="/user-accounts", tags=["user-accounts"])
 async def set_profile_image(
     profile_image: UploadFile = File(...),
     current_user: CurrentUser = Depends(get_current_member),
-    # user_service = Depends(Provide[Container.user_service])
+    user_account_application_service: UserAccountApplicationService = Depends(Provide[Container.user_account_application_service]),
 ):
     """
     프로필 사진 설정
 
     Args:
-        profile_image: 프로필 이미지 파일 (multipart/form-data)
+        profile_image: 프로필 이미지 파일 (multipart/form-data, 최대 5MB, jpeg/png/gif/webp)
 
     Returns:
-        프로필 이미지 URL
+        프로필 이미지 presigned URL
     """
-    # TODO: Implement profile image upload logic
-    # 1. Validate image file
-    # 2. Upload to storage (MinIO)
-    # 3. Update user account
+    if profile_image.content_type not in _ALLOWED_IMAGE_TYPES:
+        raise APIException(ErrorCode.INVALID_INPUT_TYPE)
 
-    response_data = ProfileImageResponse(
-        profileImageUrl="https://example.com/profile.jpg"
+    file_content = await profile_image.read()
+    if len(file_content) > _MAX_IMAGE_SIZE:
+        raise APIException(ErrorCode.INVALID_INPUT_VALUE)
+
+    presigned_url = await user_account_application_service.set_profile_image(
+        user_account_id=current_user.user_account_id,
+        file_content=file_content,
+        file_name=profile_image.filename or "profile",
+        content_type=profile_image.content_type,
     )
 
+    response_data = ProfileImageResponse(profileImageUrl=presigned_url)
     return ApiResponse(data=response_data.model_dump(by_alias=True))
 
 
@@ -54,7 +65,7 @@ async def set_profile_image(
 @inject
 async def delete_profile_image(
     current_user: CurrentUser = Depends(get_current_member),
-    # user_service = Depends(Provide[Container.user_service])
+    user_account_application_service: UserAccountApplicationService = Depends(Provide[Container.user_account_application_service]),
 ):
     """
     프로필 사진 제거
@@ -62,10 +73,9 @@ async def delete_profile_image(
     Returns:
         빈 데이터
     """
-    # TODO: Implement profile image deletion logic
-    # 1. Remove image from storage
-    # 2. Update user account
-
+    await user_account_application_service.delete_profile_image(
+        user_account_id=current_user.user_account_id,
+    )
     return ApiResponse(data={})
 
 

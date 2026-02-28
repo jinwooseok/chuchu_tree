@@ -11,6 +11,7 @@ from app.baekjoon.application.usecase.get_streaks_usecase import GetStreaksUseca
 from app.baekjoon.application.usecase.update_bj_account_usecase import UpdateBjAccountUsecase
 from app.baekjoon.infra.repository.baekjoon_account_repository_impl import BaekjoonAccountRepositoryImpl
 from app.baekjoon.infra.repository.problem_history_repository_impl import ProblemHistoryRepositoryImpl
+from app.common.infra.client.storage_client import S3Client
 from app.common.infra.repository.system_log_repository_impl import SystemLogRepositoryImpl
 from app.baekjoon.infra.scheduler.metric_scheduler import BjAccountUpdateScheduler
 from app.config.settings import get_settings
@@ -26,7 +27,6 @@ from app.tier.infra.repository.tier_repository_impl import TierRepositoryImpl
 # Infrastructure - Clients
 # ============================================================================
 from app.common.infra.client.redis_client import AsyncRedisClient
-from app.common.infra.client.storage_client import MinioClient, NCloudClient
 from app.common.infra.client.kakao_oauth_client import KakaoOAuthClient
 from app.common.infra.client.naver_oauth_client import NaverOAuthClient
 from app.common.infra.client.google_oauth_client import GoogleOAuthClient
@@ -42,7 +42,7 @@ from app.common.infra.security.fastapi_cookie_service import FastAPICookieServic
 # ============================================================================
 # Infrastructure - Gateways
 # ============================================================================
-from app.common.infra.gateway.storage_gateway_impl import StorageGatewayImpl
+from app.common.infra.gateway.storage_gateway_impl import S3StorageGatewayImpl
 from app.common.infra.gateway.csrf_token_gateway_impl import CsrfTokenGatewayImpl
 from app.common.infra.gateway.refresh_token_whitelist_gateway_impl import RefreshTokenWhitelistGatewayImpl
 from app.baekjoon.infra.gateway.solvedac_gateway_impl import SolvedacGatewayImpl
@@ -134,13 +134,7 @@ class Container(containers.DeclarativeContainer):
     # ========================================================================
     # Infrastructure - Storage Client (Singleton, Factory Pattern)
     # ========================================================================
-    storage_client = providers.Singleton(
-        lambda settings: (
-            MinioClient() if settings.STORAGE_PROVIDER == "minio"
-            else NCloudClient()
-        ),
-        settings=config,
-    )
+    storage_client = providers.Singleton(S3Client)
 
     # ========================================================================
     # Infrastructure - Security Services (Singleton)
@@ -174,7 +168,7 @@ class Container(containers.DeclarativeContainer):
     )
 
     storage_gateway = providers.Singleton(
-        StorageGatewayImpl,
+        S3StorageGatewayImpl,
         storage_client=storage_client,
     )
 
@@ -233,7 +227,8 @@ class Container(containers.DeclarativeContainer):
     user_account_application_service = providers.Singleton(
         UserAccountApplicationService,
         user_account_repository=user_account_repository,
-        domain_event_bus=domain_event_bus
+        domain_event_bus=domain_event_bus,
+        storage_gateway=storage_gateway,
     )
 
     # ========================================================================

@@ -1,3 +1,4 @@
+from typing import Literal
 from pydantic import Field
 
 from app.config.base_config import BaseConfig
@@ -5,6 +6,7 @@ from app.config.base_config import BaseConfig
 
 class DevConfig(BaseConfig):
     """개발 환경 설정"""
+    ENVIRONMENT: Literal["local", "dev", "prod"] = "dev"
     DEBUG: bool = Field(default=True, description="디버그 모드")
 
     # 백엔드 URL
@@ -20,21 +22,7 @@ class DevConfig(BaseConfig):
     REDIS_PORT: int = Field(alias="DEV_REDIS_PORT", default=6380)
     REDIS_BINDING_PORT: int = Field(alias="DEV_REDIS_BINDING_PORT", default=6379)
     
-    # Storage 포트
-    STORAGE_API_PORT: int = Field(alias="DEV_STORAGE_API_PORT", default=9002)
-    STORAGE_CONSOLE_PORT: int = Field(alias="DEV_STORAGE_CONSOLE_PORT", default=9003)
-    STORAGE_ENDPOINT: str = Field(alias="DEV_STORAGE_ENDPOINT", default="localhost", description="스토리지 엔드포인트")
-    
-    # ================================
-    # Storage 설정 (S3 호환)
-    # ================================
-    STORAGE_PROVIDER: str = Field(alias="LOCAL_STORAGE_PROVIDER", default="minio", description="스토리지 제공자")
-    STORAGE_ACCESS_KEY: str = Field(alias="LOCAL_STORAGE_ACCESS_KEY", default="minioadmin", description="스토리지 액세스 키")
-    STORAGE_SECRET_KEY: str = Field(alias="LOCAL_STORAGE_SECRET_KEY", default="minioadmin", description="스토리지 시크릿 키")
-    STORAGE_BUCKET: str = Field(alias="LOCAL_STORAGE_BUCKET", default="adkick-bucket", description="스토리지 버킷명")
-    STORAGE_REGION: str = Field(alias="LOCAL_STORAGE_REGION", default="us-east-1", description="스토리지 리전")
-    STORAGE_PATH: str = Field(alias="DEV_STORAGE_PATH", default="./storage_data", description="로컬 스토리지 경로")
-    
+    STORAGE_ENDPOINT: str = Field(alias="PROD_STORAGE_ENDPOINT", default="localhost:9000", description="스토리지 엔드포인트")
     # ================================
     # OAuth Providers
     # ================================
