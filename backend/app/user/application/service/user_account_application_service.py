@@ -27,6 +27,8 @@ from app.core.database import transactional
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_PROFILE_IMAGE_PATH = "default-user-image.svg"
+
 
 @event_register_handlers()
 class UserAccountApplicationService:
@@ -81,6 +83,7 @@ class UserAccountApplicationService:
             provider_id=command.provider_id,
             email=command.email
         )
+        new_user.update_profile_image(DEFAULT_PROFILE_IMAGE_PATH)
 
         saved_user = await self.user_account_repository.insert(new_user)
 
@@ -178,6 +181,8 @@ class UserAccountApplicationService:
         profile_image_url = None
         if user_account.profile_image:
             profile_image_url = await self.storage_gateway.generate_presigned_url(user_account.profile_image)
+        if not profile_image_url:
+            profile_image_url = await self.storage_gateway.generate_presigned_url(DEFAULT_PROFILE_IMAGE_PATH)
 
         return GetUserAccountInfoQuery(
             user_account_id=user_account.user_account_id.value,
@@ -247,7 +252,7 @@ class UserAccountApplicationService:
         if not user_account:
             raise APIException(ErrorCode.INVALID_REQUEST)
 
-        if user_account.profile_image:
+        if user_account.profile_image and user_account.profile_image != DEFAULT_PROFILE_IMAGE_PATH:
             await self.storage_gateway.delete_file(user_account.profile_image)
 
         path_prefix = f"profile-images/{user_account_id}/"
@@ -271,10 +276,10 @@ class UserAccountApplicationService:
         if not user_account:
             raise APIException(ErrorCode.INVALID_REQUEST)
 
-        if user_account.profile_image:
+        if user_account.profile_image and user_account.profile_image != DEFAULT_PROFILE_IMAGE_PATH:
             await self.storage_gateway.delete_file(user_account.profile_image)
-            user_account.profile_image = None
-            await self.user_account_repository.update(user_account)
+        user_account.update_profile_image(DEFAULT_PROFILE_IMAGE_PATH)
+        await self.user_account_repository.update(user_account)
 
     @event_handler("USER_ACCOUNT_WITHDRAWAL_REQUESTED")
     @transactional
