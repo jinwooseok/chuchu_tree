@@ -20,6 +20,9 @@ from app.common.domain.vo.identifiers import UserAccountId, TierId
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
+from app.study.application.query.study_query import MyStudyItemQuery
+from app.study.domain.repository.study_repository import StudyRepository
+from app.study.domain.repository.user_search_repository import UserSearchRepository
 from app.tier.domain.repository.tier_repository import TierRepository
 
 logger = logging.getLogger(__name__)
@@ -33,12 +36,16 @@ class GetBaekjoonMeUsecase:
         baekjoon_account_repository: BaekjoonAccountRepository,
         user_date_record_repository: UserDateRecordRepository,
         tier_repository: TierRepository,
-        domain_event_bus: DomainEventBus
+        domain_event_bus: DomainEventBus,
+        study_repository: StudyRepository,
+        user_search_repository: UserSearchRepository,
     ):
         self.baekjoon_account_repository = baekjoon_account_repository
         self.user_date_record_repository = user_date_record_repository
         self.tier_repository = tier_repository
         self.domain_event_bus = domain_event_bus
+        self.study_repository = study_repository
+        self.user_search_repository = user_search_repository
 
     @transactional(readonly=True)
     async def execute(self, command: GetBaekjoonMeCommand) -> BaekjoonMeQuery:
@@ -89,6 +96,7 @@ class GetBaekjoonMeUsecase:
             registered_at=user_account_info.registered_at,
             targets=user_account_info.targets,
             is_synced=user_account_info.is_synced,
+            user_code=user_account_info.user_code,
         )
 
         stat_query = BjAccountStatQuery(
@@ -116,8 +124,32 @@ class GetBaekjoonMeUsecase:
             registered_at=bj_account.created_at
         )
 
+        # 6. 참여 중인 스터디 목록 조회
+        studies = await self.study_repository.find_by_member_user_account_id(user_account_id)
+        owner_ids = list({s.owner_user_account_id.value for s in studies})
+        owner_infos = await self.user_search_repository.find_by_user_account_ids(owner_ids)
+        owner_map = {u.user_account_id: u for u in owner_infos}
+
+        study_queries = [
+            MyStudyItemQuery(
+                study_id=s.study_id.value,
+                study_name=s.study_name,
+                owner_user_account_id=s.owner_user_account_id.value,
+                owner_bj_account_id=owner_map[s.owner_user_account_id.value].bj_account_id
+                if s.owner_user_account_id.value in owner_map else "",
+                owner_user_code=owner_map[s.owner_user_account_id.value].user_code
+                if s.owner_user_account_id.value in owner_map else "",
+                description=s.description,
+                max_members=s.max_members,
+                member_count=s.active_member_count(),
+                created_at=s.created_at.isoformat(),
+            )
+            for s in studies
+        ]
+
         return BaekjoonMeQuery(
             user_account=user_account_query,
             bj_account=bj_account_query,
-            linked_at=linked_at
+            linked_at=linked_at,
+            studies=study_queries,
         )

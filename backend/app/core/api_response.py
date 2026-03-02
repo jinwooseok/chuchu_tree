@@ -39,7 +39,7 @@ class ApiResponse(JSONResponse):
         content = ApiResponseSchema(
             status=status_code,
             message=message,
-            data=data,
+            data=data if data is not None else {},
             error=error
         ).model_dump(by_alias=True, mode='json')
         

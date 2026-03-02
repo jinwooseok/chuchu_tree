@@ -3,6 +3,9 @@ from dependency_injector.wiring import inject, Provide
 
 from app.common.domain.vo.current_user import CurrentUser
 from app.common.presentation.dependency.auth_dependencies import get_current_member
+from app.study.application.command.study_command import SearchUserCommand
+from app.study.application.usecase.search_user_usecase import SearchUserUsecase
+from app.study.presentation.schema.response.user_search_response import UserSearchResponse
 from app.user.application.command.get_tag_problems_command import GetTagProblemsCommand
 from app.user.application.command.get_user_tags_command import GetUserTagsCommand
 from app.user.application.command.update_user_target_command import UpdateUserTargetCommand
@@ -25,6 +28,24 @@ _ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
 _MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5 MB
 
 router = APIRouter(prefix="/user-accounts", tags=["user-accounts"])
+
+
+@router.get("/search", response_model=ApiResponseSchema[UserSearchResponse])
+@inject
+async def search_users(
+    keyword: str = Query(..., description="검색어 (백준 ID 또는 유저 코드)"),
+    limit: int = Query(5),
+    current_user: CurrentUser = Depends(get_current_member),
+    usecase: SearchUserUsecase = Depends(Provide[Container.search_user_usecase]),
+):
+    """
+    유저 검색 API
+
+    Returns:
+        백준 연동된 유저 목록 (bj_account_id, user_code로 검색)
+    """
+    queries = await usecase.execute(SearchUserCommand(keyword=keyword, limit=limit))
+    return ApiResponse(data=UserSearchResponse.from_query(queries).model_dump(by_alias=True))
 
 
 @router.post("/profile-image", response_model=ApiResponseSchema[ProfileImageResponse])

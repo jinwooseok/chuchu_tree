@@ -1,3 +1,4 @@
+import random
 from typing import override
 from sqlalchemy import and_, select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -6,6 +7,8 @@ from sqlalchemy.orm import joinedload
 from app.common.domain.vo.identifiers import UserAccountId
 from app.common.domain.enums import Provider
 from app.core.database import Database
+from app.core.error_codes import ErrorCode
+from app.core.exception import APIException
 from app.user.domain.entity.user_account import UserAccount
 from app.user.domain.repository.user_account_repository import UserAccountRepository
 from app.user.infra.mapper.user_account_mapper import UserAccountMapper
@@ -23,16 +26,28 @@ class UserAccountRepositoryImpl(UserAccountRepository):
     def session(self) -> AsyncSession:
         return self.db.get_current_session()
     
+    async def _generate_unique_user_code(self) -> str:
+        for _ in range(100):
+            code = f"{random.randint(0, 999999):06d}"
+            result = await self.session.execute(
+                select(UserAccountModel.user_account_id)
+                .where(UserAccountModel.user_code == code)
+            )
+            if not result.scalar_one_or_none():
+                return code
+        raise APIException(ErrorCode.USER_CODE_EXHAUSTED)
+
     @override
     async def insert(self, user_account: UserAccount) -> UserAccount:
         """유저 저장"""
-            
+
         # 새 회원 생성
         model = UserAccountMapper.to_model(user_account)
+        model.user_code = await self._generate_unique_user_code()
         self.session.add(model)
-        
+
         await self.session.flush()  # ID 생성을 위해 flush
-        
+
         # 생성된 ID를 엔티티에 설정
         return UserAccountMapper.to_entity(model)
     

@@ -11,3 +11,4 @@ class GetUserAccountInfoQuery(BaseModel):
     profile_image_url: str | None = Field(None, description="프로필 이미지 presigned URL")
     registered_at: datetime = Field(..., description="가입일")
     is_synced: bool = Field(False, description="배치 동기화 완료 여부")
+    user_code: str = Field("", description="유저 코드")

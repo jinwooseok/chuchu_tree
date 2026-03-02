@@ -22,6 +22,7 @@ class UserAccount:
     deleted_at: datetime|None = None
     account_links: list[AccountLink] = field(default_factory=list)
     targets: list[UserTarget] = field(default_factory=list)
+    user_code: str = ""
     
     @staticmethod
     def create(provider: Provider, provider_id: str|None, email: str|None = None) -> 'UserAccount':

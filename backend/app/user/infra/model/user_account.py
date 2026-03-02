@@ -16,6 +16,7 @@ class UserAccountModel(Base):
     __tablename__ = "user_account"
     __table_args__ = (
         Index('idx_provider_id', 'provider', 'provider_id'),
+        Index('idx_user_code', 'user_code'),
         {'comment': '유저 계정'}
     )
 
@@ -24,6 +25,7 @@ class UserAccountModel(Base):
     provider_id: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
     email: Mapped[str | None] = mapped_column(String(255), nullable=True)
     profile_image: Mapped[Optional[str]] = mapped_column(String(500), nullable=True)
+    user_code: Mapped[str] = mapped_column(String(6), nullable=False, unique=True, server_default="000000")
     registered_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow, onupdate=datetime.utcnow)

@@ -8,6 +8,7 @@ from app.baekjoon.application.query.baekjoon_account_info_query import (
     BaekjoonMeQuery
 )
 from app.baekjoon.presentation.schema.response.get_streaks_response import StreakItemResponse
+from app.study.presentation.schema.response.study_response import MyStudyItemResponse
 from app.user.application.query.user_tags_query import TargetQuery
 
 class BjAccountStatResponse(BaseModel):
@@ -87,6 +88,7 @@ class UserAccountResponse(BaseModel):
     target: TargetResponse | None = Field(None, description="목표 정보")
     registered_at: str = Field(..., description="가입일")
     is_synced: bool = Field(False, description="배치 동기화 완료 여부")
+    user_code: str = Field("", description="유저 코드")
 
     model_config = ConfigDict(
         alias_generator=to_camel,
@@ -102,6 +104,7 @@ class UserAccountResponse(BaseModel):
             target=TargetResponse.from_query(query.targets[0]) if query.targets else TargetResponse(),
             registered_at=query.registered_at.isoformat(),
             is_synced=query.is_synced,
+            user_code=query.user_code,
         )
 
 
@@ -110,6 +113,7 @@ class GetBaekjoonMeResponse(BaseModel):
     user_account: UserAccountResponse = Field(..., description="유저 계정 정보")
     bj_account: BjAccountResponse = Field(..., description="백준 계정 정보")
     linked_at: str = Field(..., description="계정 연동일")
+    studies: list[MyStudyItemResponse] = Field([], description="참여 중인 스터디 목록")
 
     model_config = ConfigDict(
         alias_generator=to_camel,
@@ -122,5 +126,6 @@ class GetBaekjoonMeResponse(BaseModel):
         return cls(
             user_account=UserAccountResponse.from_query(query.user_account),
             bj_account=BjAccountResponse.from_query(query.bj_account),
-            linked_at=query.linked_at.isoformat()
+            linked_at=query.linked_at.isoformat(),
+            studies=[MyStudyItemResponse.from_query(s) for s in query.studies],
         )

@@ -190,7 +190,8 @@ class UserAccountApplicationService:
             targets=[target_info] if target_info else [],
             profile_image_url=profile_image_url,
             registered_at=user_account.registered_at,
-            is_synced=is_synced
+            is_synced=is_synced,
+            user_code=user_account.user_code,
         )
     
     @transactional(readonly=True)

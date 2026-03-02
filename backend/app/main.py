@@ -30,6 +30,12 @@ from app.activity.presentation.controller.activity_controller import router as a
 from app.problem.presentation.controller.problem_controller import router as problem_router
 from app.tag.presentation.controller.tag_controller import router as tag_router, user_router as tag_user_router
 from app.recommendation.presentation.controller.recommendation_controller import router as recommendation_router
+from app.study.presentation.controller.study_controller import router as study_router
+from app.study.presentation.controller.member_controller import member_router as study_member_router
+from app.study.presentation.controller.invitation_controller import invitation_router as study_invitation_router
+from app.study.presentation.controller.application_controller import application_router as study_application_router
+from app.study.presentation.controller.study_problem_controller import study_problem_router
+from app.study.presentation.controller.notice_controller import notice_router
 
 setup_logging()
 
@@ -102,6 +108,14 @@ app.include_router(tag_user_router, prefix=API_V1_PREFIX)
 
 # Recommendation router
 app.include_router(recommendation_router, prefix=API_V1_PREFIX)
+
+# Study routers
+app.include_router(study_router, prefix=API_V1_PREFIX)
+app.include_router(study_member_router, prefix=API_V1_PREFIX)
+app.include_router(study_invitation_router, prefix=API_V1_PREFIX)
+app.include_router(study_application_router, prefix=API_V1_PREFIX)
+app.include_router(study_problem_router, prefix=API_V1_PREFIX)
+app.include_router(notice_router, prefix=API_V1_PREFIX)
 
 # Test auth router (local/dev 환경에서만 등록, prod에서는 비활성화)
 if os.getenv("environment", "local") != "prod":

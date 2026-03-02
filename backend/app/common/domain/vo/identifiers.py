@@ -59,3 +59,31 @@ class SchedulerLogId:
 @dataclass(frozen=True)
 class SystemLogId:
     value: int
+
+@dataclass(frozen=True)
+class StudyId:
+    value: int
+
+@dataclass(frozen=True)
+class StudyMemberId:
+    value: int
+
+@dataclass(frozen=True)
+class StudyInvitationId:
+    value: int
+
+@dataclass(frozen=True)
+class StudyApplicationId:
+    value: int
+
+@dataclass(frozen=True)
+class StudyProblemId:
+    value: int
+
+@dataclass(frozen=True)
+class StudyProblemMemberId:
+    value: int
+
+@dataclass(frozen=True)
+class NoticeId:
+    value: int
