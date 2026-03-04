@@ -3,6 +3,7 @@ import os
 from typing import BinaryIO, Any
 from datetime import timedelta
 import logging
+from urllib.parse import urlparse, urlunparse
 
 import boto3
 from botocore.config import Config as BotoConfig
@@ -173,6 +174,12 @@ class S3Client(StorageClient):
                 Params={"Bucket": bucket_name, "Key": object_name},
                 ExpiresIn=int(expires.total_seconds()),
             )
+            # boto3는 내부 endpoint_url(localhost)로 presigned URL을 생성하므로
+            # scheme+host를 STORAGE_PUBLIC_URL로 교체
+            if settings.STORAGE_PUBLIC_URL:
+                parsed = urlparse(url)
+                public = urlparse(settings.STORAGE_PUBLIC_URL)
+                url = urlunparse(parsed._replace(scheme=public.scheme, netloc=public.netloc))
             return url
         except ClientError as e:
             logger.error("파일 '%s'의 URL 생성 중 오류: %s", object_name, e)
