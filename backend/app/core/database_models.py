@@ -39,6 +39,15 @@ from app.recommendation.infra.model.tag_skill import TagSkillModel
 # Common Domain
 from app.common.infra.model.system_log import SystemLogModel
 
+# Study Domain
+from app.study.infra.model.study import StudyModel
+from app.study.infra.model.study_member import StudyMemberModel
+from app.study.infra.model.study_invitation import StudyInvitationModel
+from app.study.infra.model.study_application import StudyApplicationModel
+from app.study.infra.model.study_problem import StudyProblemModel
+from app.study.infra.model.study_problem_member import StudyProblemMemberModel
+from app.study.infra.model.notice import NoticeModel
+
 __all__ = [
     # User
     "UserAccountModel",
@@ -70,4 +79,12 @@ __all__ = [
     "TagSkillModel",
     # Common
     "SystemLogModel",
+    # Study
+    "StudyModel",
+    "StudyMemberModel",
+    "StudyInvitationModel",
+    "StudyApplicationModel",
+    "StudyProblemModel",
+    "StudyProblemMemberModel",
+    "NoticeModel",
 ]

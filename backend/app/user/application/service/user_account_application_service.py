@@ -3,6 +3,7 @@
 import logging
 
 from app.common.domain.entity.domain_event import DomainEvent
+from app.common.domain.gateway.storage_gateway import StorageGateway
 from app.common.domain.service.event_publisher import DomainEventBus
 from app.common.domain.vo.identifiers import BaekjoonAccountId, TargetId, UserAccountId
 from app.common.infra.event.decorators import event_register_handlers, event_handler
@@ -26,6 +27,8 @@ from app.core.database import transactional
 
 logger = logging.getLogger(__name__)
 
+DEFAULT_PROFILE_IMAGE_PATH = "default-user-image.svg"
+
 
 @event_register_handlers()
 class UserAccountApplicationService:
@@ -36,10 +39,12 @@ class UserAccountApplicationService:
     def __init__(
         self,
         user_account_repository: UserAccountRepository,
-        domain_event_bus: DomainEventBus
+        domain_event_bus: DomainEventBus,
+        storage_gateway: StorageGateway,
     ):
         self.user_account_repository = user_account_repository
         self.domain_event_bus = domain_event_bus
+        self.storage_gateway = storage_gateway
 
     @event_handler("SOCIAL_LOGIN_SUCCESSED")
     @transactional
@@ -78,6 +83,7 @@ class UserAccountApplicationService:
             provider_id=command.provider_id,
             email=command.email
         )
+        new_user.update_profile_image(DEFAULT_PROFILE_IMAGE_PATH)
 
         saved_user = await self.user_account_repository.insert(new_user)
 
@@ -172,13 +178,20 @@ class UserAccountApplicationService:
         )
         is_synced = active_link.is_synced if active_link else False
 
+        profile_image_url = None
+        if user_account.profile_image:
+            profile_image_url = await self.storage_gateway.generate_presigned_url(user_account.profile_image)
+        if not profile_image_url:
+            profile_image_url = await self.storage_gateway.generate_presigned_url(DEFAULT_PROFILE_IMAGE_PATH)
+
         return GetUserAccountInfoQuery(
             user_account_id=user_account.user_account_id.value,
             provider=user_account.provider.value,
             targets=[target_info] if target_info else [],
-            profile_image=user_account.profile_image,
+            profile_image_url=profile_image_url,
             registered_at=user_account.registered_at,
-            is_synced=is_synced
+            is_synced=is_synced,
+            user_code=user_account.user_code,
         )
     
     @transactional(readonly=True)
@@ -225,6 +238,48 @@ class UserAccountApplicationService:
         print(user_account.targets)
         user_account.set_target(TargetId(value=target_info.target_id))
         print(user_account.targets)
+        await self.user_account_repository.update(user_account)
+
+    @transactional
+    async def set_profile_image(
+        self,
+        user_account_id: int,
+        file_content: bytes,
+        file_name: str,
+        content_type: str,
+    ) -> str:
+        """프로필 이미지 업로드 후 presigned URL 반환"""
+        user_account = await self.user_account_repository.find_by_id(UserAccountId(user_account_id))
+        if not user_account:
+            raise APIException(ErrorCode.INVALID_REQUEST)
+
+        if user_account.profile_image and user_account.profile_image != DEFAULT_PROFILE_IMAGE_PATH:
+            await self.storage_gateway.delete_file(user_account.profile_image)
+
+        path_prefix = f"profile-images/{user_account_id}/"
+        relative_path, _ = await self.storage_gateway.upload_file(
+            file_content=file_content,
+            file_name=file_name,
+            content_type=content_type,
+            path_prefix=path_prefix,
+        )
+
+        user_account.update_profile_image(relative_path)
+        await self.user_account_repository.update(user_account)
+
+        presigned_url = await self.storage_gateway.generate_presigned_url(relative_path)
+        return presigned_url
+
+    @transactional
+    async def delete_profile_image(self, user_account_id: int) -> None:
+        """프로필 이미지 삭제"""
+        user_account = await self.user_account_repository.find_by_id(UserAccountId(user_account_id))
+        if not user_account:
+            raise APIException(ErrorCode.INVALID_REQUEST)
+
+        if user_account.profile_image and user_account.profile_image != DEFAULT_PROFILE_IMAGE_PATH:
+            await self.storage_gateway.delete_file(user_account.profile_image)
+        user_account.update_profile_image(DEFAULT_PROFILE_IMAGE_PATH)
         await self.user_account_repository.update(user_account)
 
     @event_handler("USER_ACCOUNT_WITHDRAWAL_REQUESTED")

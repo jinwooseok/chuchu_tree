@@ -1,4 +1,5 @@
 from pathlib import Path
+from typing import Literal
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -11,6 +12,7 @@ class BaseConfig(BaseSettings):
     # ================================
     # 앱 기본 설정
     # ================================
+    ENVIRONMENT: Literal["local", "dev", "prod"] = Field(default="local", description="실행 환경")
     APP_NAME: str = Field(default="chuchu_tree", description="애플리케이션 이름")
     DEBUG: bool = Field(default=False, description="디버그 모드")
     VERSION: str = Field(default="0.0.1", description="애플리케이션 버전")
@@ -36,7 +38,16 @@ class BaseConfig(BaseSettings):
     REDIS_CONNECT_TIMEOUT: int = Field(default=5, description="Redis 연결 타임아웃 (초)")
     REDIS_HEALTH_CHECK_INTERVAL: int = Field(default=30, description="Redis 헬스체크 간격 (초)")
     REDIS_DATA_PATH: str = Field(default="./redis_data", description="Redis 데이터 경로")
-
+    
+    # STORAGE (RustFS / S3-compatible)
+    STORAGE_ACCESS_KEY: str = Field(default="minioadmin", description="스토리지 액세스 키")
+    STORAGE_SECRET_KEY: str = Field(default="minioadmin", description="스토리지 시크릿 키")
+    STORAGE_BUCKET_NAME: str = Field(default="chuchu-tree", description="기본 버킷명")
+    STORAGE_PUBLIC_URL: str = Field(
+        default="https://coffeebara-storage.duckdns.org",
+        description="FE에서 접근 가능한 스토리지 공개 URL"
+    )
+    
     model_config = SettingsConfigDict(
         env_file=str(BASE_DIR / ".env"),
         env_file_encoding="utf-8",

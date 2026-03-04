@@ -19,6 +19,7 @@ class UserAccountMapper:
         model.provider_id = entity.provider_id
         model.email = entity.email
         model.profile_image = entity.profile_image
+        model.user_code = entity.user_code
         model.registered_at = entity.registered_at
         model.created_at = entity.created_at
         model.updated_at = entity.updated_at
@@ -43,6 +44,7 @@ class UserAccountMapper:
             provider_id=model.provider_id,
             email=model.email,
             profile_image=model.profile_image,
+            user_code=model.user_code,
             registered_at=model.registered_at,
             created_at=model.created_at,
             updated_at=model.updated_at,
