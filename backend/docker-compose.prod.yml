@@ -12,7 +12,7 @@ services:
       bash -c "
         echo 'Running migrations...' &&
         sleep 10 &&
-        poetry run alembic upgrade head &&
+        poetry run alembic upgrade heads &&
         echo 'Migrations completed!'
       "
     network_mode: host
