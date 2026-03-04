@@ -115,8 +115,9 @@ class GetUserTagsUsecase:
                         continue
                     
                     parent_tag_stat = tag_stats_dict.get(parent_tag.tag_id.value)
-                    satisfied_yn = parent_tag_stat is not None and parent_tag_stat.solved_problem_count > 0
-                    
+                    parent_current_level = self._calculate_current_level(parent_tag_stat, parent_tag, tag_skills_dict)
+                    satisfied_yn = parent_current_level != SkillCode.IM
+
                     if not satisfied_yn:
                         locked_yn = True
                     
