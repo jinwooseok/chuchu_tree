@@ -708,7 +708,7 @@ class Container(containers.DeclarativeContainer):
         study_repository=study_repository,
         study_problem_repository=study_problem_repository,
         user_search_repository=user_search_repository,
-        problem_repository=problem_repository,
+        domain_event_bus=domain_event_bus,
         problem_history_repository=problem_history_repository,
     )
 
