@@ -62,6 +62,8 @@ export function TagDashboard({ tagDashboard, isLanding = false }: { tagDashboard
       // EXCLUDED는 excludedYn으로 판단
       if (tag.excludedYn) {
         return categoryVisibility.EXCLUDED;
+      } else if (tag.lockedYn) {
+        return categoryVisibility.LOCKED;
       }
       // 나머지는 currentLevel로 판단
       return categoryVisibility[tag.accountStat.currentLevel];
@@ -111,9 +113,7 @@ export function TagDashboard({ tagDashboard, isLanding = false }: { tagDashboard
   // flat CSS Grid 배치를 위한 gridItems 계산
   // TagCard가 단일 grid 컨테이너 안에 유지되어 부모 이동(리마운트) 없이 style만 변경됨
   type TagWithProgress = (typeof filteredAndSortedTags)[0];
-  type GridItem =
-    | { type: 'card'; tag: TagWithProgress; row: number; col: number }
-    | { type: 'detail'; tag: TagWithProgress; row: number; col: number; colSpan: number };
+  type GridItem = { type: 'card'; tag: TagWithProgress; row: number; col: number } | { type: 'detail'; tag: TagWithProgress; row: number; col: number; colSpan: number };
 
   const gridItems = useMemo((): GridItem[] => {
     const items: GridItem[] = [];
@@ -200,11 +200,7 @@ export function TagDashboard({ tagDashboard, isLanding = false }: { tagDashboard
               />
             </div>
           ) : (
-            <div
-              key={`detail-${item.tag.tagId}`}
-              style={{ gridRow: item.row, gridColumn: `${item.col} / span ${item.colSpan}` }}
-              className="animate-in fade-in duration-200"
-            >
+            <div key={`detail-${item.tag.tagId}`} style={{ gridRow: item.row, gridColumn: `${item.col} / span ${item.colSpan}` }} className="animate-in fade-in duration-200">
               <TagDetailCard tag={item.tag} />
             </div>
           ),
