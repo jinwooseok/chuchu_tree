@@ -15,7 +15,21 @@ import { TIER_INFO } from '@/shared/constants/tierSystem';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 
 const TagCard = memo(
-  function TagCard({ tag, progress, isLanding = false, onboardingId, onTagClick, isExpanded = false }: { tag: CategoryTags; progress: number; isLanding: boolean; onboardingId?: string; onTagClick?: (tagId: number) => void; isExpanded?: boolean }) {
+  function TagCard({
+    tag,
+    progress,
+    isLanding = false,
+    onboardingId,
+    onTagClick,
+    isExpanded = false,
+  }: {
+    tag: CategoryTags;
+    progress: number;
+    isLanding: boolean;
+    onboardingId?: string;
+    onTagClick?: (tagId: number) => void;
+    isExpanded?: boolean;
+  }) {
     const { tagCode, tagDisplayName, accountStat, nextLevelStat, excludedYn, recommendationYn, lockedYn } = tag;
     const { openModal, closeModal } = useModal();
 
@@ -100,14 +114,17 @@ const TagCard = memo(
           <div className="flex h-full items-center justify-center gap-2">
             <div className={`text-muted-foreground flex flex-col gap-0.5`}>
               {/* Tag Ban */}
-              <AppTooltip side="left" content={recommendationYn ? '추천 목록에서 제외' : '추천 목록에 추가'}>
+              <AppTooltip side="left" content={recommendationYn ? '추천 목록에서 제외' : lockedYn ? '추천 기준 미달성' : '추천 목록에 추가'}>
                 <button
-                  onClick={(e) => { e.stopPropagation(); handleTagBanClick(); }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleTagBanClick();
+                  }}
                   aria-label="추천 여부 토글버튼"
-                  disabled={isPending}
+                  disabled={isPending || lockedYn}
                   className={`hover:bg-excluded-bg hover:text-innerground-white border-innerground-darkgray cursor-pointer rounded border px-2 text-center transition-colors disabled:cursor-not-allowed disabled:opacity-50`}
                 >
-                  {recommendationYn ? '추천 포함됨' : '추천 제외됨'}
+                  {recommendationYn ? '추천 포함됨' : lockedYn ? '시작 전' : '추천 제외됨'}
                 </button>
               </AppTooltip>
               {accountStat.lastSolvedDate !== null ? (
