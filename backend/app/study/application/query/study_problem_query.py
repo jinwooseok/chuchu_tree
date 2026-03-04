@@ -1,5 +1,7 @@
 from dataclasses import dataclass, field
 
+from app.problem.application.query.problems_info_query import TagInfoQuery
+
 
 @dataclass
 class MemberSolveInfoQuery:
@@ -14,10 +16,12 @@ class MemberSolveInfoQuery:
 class StudyProblemItemQuery:
     study_problem_id: int
     problem_id: int
-    title: str
-    tier: int
+    problem_title: str
+    problem_tier_level: int
+    problem_tier_name: str
+    problem_class_level: int | None
+    tags: list[TagInfoQuery]
     solve_info: list[MemberSolveInfoQuery] = field(default_factory=list)
-    status: str = "will_solve"  # "solved" | "in_progress" | "will_solve"
 
 
 @dataclass
@@ -28,4 +32,4 @@ class StudyDayDataQuery:
 
 @dataclass
 class StudyProblemsQuery:
-    items: list[StudyDayDataQuery] = field(default_factory=list)
+    study_data: list[StudyDayDataQuery] = field(default_factory=list)
