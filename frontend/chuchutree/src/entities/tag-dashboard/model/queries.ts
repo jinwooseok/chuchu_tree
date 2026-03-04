@@ -2,7 +2,7 @@
 
 import { tagDashboardApi } from '../api/tagDashboard.api';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { CategoryTags, TagBan, TagDashboard } from './tagDashboard.types';
+import { Categories, CategoryTags, TagBan, TagDashboard } from './tagDashboard.types';
 import { UseMutationCallback } from '@/shared/types/api';
 import { tagDashboardKeys } from './keys';
 import { TagKey } from '@/shared/constants/tagSystem';
@@ -22,39 +22,45 @@ export const usePostTagBan = (callbacks?: UseMutationCallback) => {
   return useMutation({
     mutationFn: (data: TagBan) => tagDashboardApi.postTagBan(data),
     onMutate: async (data) => {
-      // 진행 중인 쿼리 취소하여 낙관적 업데이트가 덮어써지지 않도록 함
       await queryClient.cancelQueries({ queryKey: tagDashboardKeys.dashboard() });
 
-      // 이전 데이터 백업 (롤백용)
       const previousData = queryClient.getQueryData(tagDashboardKeys.dashboard());
 
-      // 낙관적으로 캐시 업데이트 (해당 태그만)
       queryClient.setQueryData(tagDashboardKeys.dashboard(), (old: TagDashboard) => {
         if (!old) return old;
 
-        return {
-          ...old,
-          tags: old.tags.map((tag: CategoryTags) =>
-            tag.tagCode === data.tagCode
-              ? { ...tag, excludedYn: true, recommendationYn: false } // 추천 제외
-              : tag,
-          ),
-        };
+        const targetTag = old.tags.find((tag: CategoryTags) => tag.tagCode === data.tagCode);
+
+        const updatedTags = old.tags.map((tag: CategoryTags) =>
+          tag.tagCode === data.tagCode
+            ? { ...tag, excludedYn: true, recommendationYn: false }
+            : tag,
+        );
+
+        let updatedCategories = old.categories;
+        if (targetTag) {
+          const tagInfo = { tagId: targetTag.tagId, tagCode: targetTag.tagCode, tagDisplayName: targetTag.tagDisplayName };
+          updatedCategories = old.categories.map((category: Categories) => {
+            if (category.categoryName === 'EXCLUDED') {
+              const alreadyThere = category.tags.some((t) => t.tagId === targetTag.tagId);
+              return alreadyThere ? category : { ...category, tags: [...category.tags, tagInfo] };
+            }
+            return { ...category, tags: category.tags.filter((t) => t.tagId !== targetTag.tagId) };
+          });
+        }
+
+        return { ...old, tags: updatedTags, categories: updatedCategories };
       });
 
-      // context로 이전 데이터 반환
       return { previousData };
     },
-    onError: (error, data, context) => {
-      // 에러 발생 시 이전 데이터로 롤백
+    onError: (error, _data, context) => {
       if (context?.previousData) {
         queryClient.setQueryData(tagDashboardKeys.dashboard(), context.previousData);
       }
       if (callbacks?.onError) callbacks.onError(error);
     },
     onSuccess: () => {
-      // invalidateQueries 제거 (낙관적 업데이트로 이미 반영됨)
-      // 전체 리페치를 방지하여 변경된 태그만 업데이트됨
       if (callbacks?.onSuccess) callbacks.onSuccess();
     },
   });
@@ -75,39 +81,49 @@ export const useDeleteTagBan = (callbacks?: UseMutationCallback) => {
   return useMutation({
     mutationFn: (data: TagBan) => tagDashboardApi.deleteTagBan(data),
     onMutate: async (data) => {
-      // 진행 중인 쿼리 취소하여 낙관적 업데이트가 덮어써지지 않도록 함
       await queryClient.cancelQueries({ queryKey: tagDashboardKeys.dashboard() });
 
-      // 이전 데이터 백업 (롤백용)
       const previousData = queryClient.getQueryData(tagDashboardKeys.dashboard());
 
-      // 낙관적으로 캐시 업데이트 (해당 태그만)
       queryClient.setQueryData(tagDashboardKeys.dashboard(), (old: TagDashboard) => {
         if (!old) return old;
 
-        return {
-          ...old,
-          tags: old.tags.map((tag: CategoryTags) =>
-            tag.tagCode === data.tagCode
-              ? { ...tag, excludedYn: false, recommendationYn: tag.lockedYn ? false : true } // 추천 포함
-              : tag,
-          ),
-        };
+        const targetTag = old.tags.find((tag: CategoryTags) => tag.tagCode === data.tagCode);
+
+        const updatedTags = old.tags.map((tag: CategoryTags) =>
+          tag.tagCode === data.tagCode
+            ? { ...tag, excludedYn: false, recommendationYn: tag.lockedYn ? false : true }
+            : tag,
+        );
+
+        let updatedCategories = old.categories;
+        if (targetTag) {
+          const tagInfo = { tagId: targetTag.tagId, tagCode: targetTag.tagCode, tagDisplayName: targetTag.tagDisplayName };
+          const targetCategoryName = targetTag.lockedYn ? 'LOCKED' : targetTag.accountStat.currentLevel;
+          updatedCategories = old.categories.map((category: Categories) => {
+            if (category.categoryName === targetCategoryName) {
+              const alreadyThere = category.tags.some((t) => t.tagId === targetTag.tagId);
+              return alreadyThere ? category : { ...category, tags: [...category.tags, tagInfo] };
+            }
+            if (category.categoryName === 'EXCLUDED') {
+              return { ...category, tags: category.tags.filter((t) => t.tagId !== targetTag.tagId) };
+            }
+            return category;
+          });
+        }
+
+        return { ...old, tags: updatedTags, categories: updatedCategories };
       });
 
-      // context로 이전 데이터 반환
       return { previousData };
     },
-    onError: (error, data, context) => {
-      // 에러 발생 시 이전 데이터로 롤백
+    onError: (error, _data, context) => {
       if (context?.previousData) {
         queryClient.setQueryData(tagDashboardKeys.dashboard(), context.previousData);
       }
       if (callbacks?.onError) callbacks.onError(error);
     },
     onSuccess: () => {
-      // invalidateQueries 제거 (낙관적 업데이트로 이미 반영됨)
-      // 전체 리페치를 방지하여 변경된 태그만 업데이트됨
       if (callbacks?.onSuccess) callbacks.onSuccess();
     },
   });
