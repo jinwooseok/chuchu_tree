@@ -196,3 +196,129 @@ class ErrorCode(Enum):
         message="이미 기록된 날짜보다 더 최근 날짜로 이동할 수 없습니다.",
         status_code=400
     )
+
+    USER_CODE_EXHAUSTED = ErrorCodeInfo(
+        code="USER_CODE_EXHAUSTED",
+        message="유저 코드를 생성할 수 없습니다. 잠시 후 다시 시도해 주세요.",
+        status_code=500
+    )
+
+    BJ_ACCOUNT_NOT_LINKED = ErrorCodeInfo(
+        code="BJ_ACCOUNT_NOT_LINKED",
+        message="백준 계정이 연동되지 않은 유저입니다.",
+        status_code=400
+    )
+
+    STUDY_NOT_FOUND = ErrorCodeInfo(
+        code="STUDY_NOT_FOUND",
+        message="스터디를 찾을 수 없습니다.",
+        status_code=404
+    )
+
+    STUDY_NAME_ALREADY_TAKEN = ErrorCodeInfo(
+        code="STUDY_NAME_ALREADY_TAKEN",
+        message="이미 사용 중인 스터디 이름입니다.",
+        status_code=400
+    )
+
+    STUDY_FULL = ErrorCodeInfo(
+        code="STUDY_FULL",
+        message="스터디 정원이 가득 찼습니다.",
+        status_code=400
+    )
+
+    STUDY_ALREADY_MEMBER = ErrorCodeInfo(
+        code="STUDY_ALREADY_MEMBER",
+        message="이미 스터디 멤버입니다.",
+        status_code=400
+    )
+
+    STUDY_NOT_MEMBER = ErrorCodeInfo(
+        code="STUDY_NOT_MEMBER",
+        message="스터디 멤버가 아닙니다.",
+        status_code=403
+    )
+
+    STUDY_OWNER_CANNOT_LEAVE = ErrorCodeInfo(
+        code="STUDY_OWNER_CANNOT_LEAVE",
+        message="스터디 방장은 탈퇴할 수 없습니다.",
+        status_code=400
+    )
+
+    STUDY_OWNER_ONLY = ErrorCodeInfo(
+        code="STUDY_OWNER_ONLY",
+        message="스터디 방장만 수행할 수 있는 작업입니다.",
+        status_code=403
+    )
+
+    CANNOT_KICK_OWNER = ErrorCodeInfo(
+        code="CANNOT_KICK_OWNER",
+        message="방장은 강퇴할 수 없습니다.",
+        status_code=400
+    )
+
+    INVITATION_NOT_FOUND = ErrorCodeInfo(
+        code="INVITATION_NOT_FOUND",
+        message="초대를 찾을 수 없습니다.",
+        status_code=404
+    )
+
+    INVITATION_ALREADY_SENT = ErrorCodeInfo(
+        code="INVITATION_ALREADY_SENT",
+        message="이미 초대를 보낸 유저입니다.",
+        status_code=400
+    )
+
+    INVITATION_ALREADY_RESPONDED = ErrorCodeInfo(
+        code="INVITATION_ALREADY_RESPONDED",
+        message="이미 응답한 초대입니다.",
+        status_code=400
+    )
+
+    INVITATION_NOT_FOR_ME = ErrorCodeInfo(
+        code="INVITATION_NOT_FOR_ME",
+        message="본인에게 온 초대가 아닙니다.",
+        status_code=403
+    )
+
+    APPLICATION_NOT_FOUND = ErrorCodeInfo(
+        code="APPLICATION_NOT_FOUND",
+        message="가입 신청을 찾을 수 없습니다.",
+        status_code=404
+    )
+
+    APPLICATION_ALREADY_SENT = ErrorCodeInfo(
+        code="APPLICATION_ALREADY_SENT",
+        message="이미 가입 신청을 보냈습니다.",
+        status_code=400
+    )
+
+    APPLICATION_ALREADY_RESPONDED = ErrorCodeInfo(
+        code="APPLICATION_ALREADY_RESPONDED",
+        message="이미 처리된 가입 신청입니다.",
+        status_code=400
+    )
+
+    STUDY_PROBLEM_NOT_FOUND = ErrorCodeInfo(
+        code="STUDY_PROBLEM_NOT_FOUND",
+        message="스터디 풀문제를 찾을 수 없습니다.",
+        status_code=404
+    )
+
+    STUDY_PROBLEM_INVALID_TARGETS = ErrorCodeInfo(
+        code="STUDY_PROBLEM_INVALID_TARGETS",
+        message="유효하지 않은 대상 멤버가 포함되어 있습니다.",
+        status_code=400
+    )
+
+    NOTICE_NOT_FOUND = ErrorCodeInfo(
+        code="NOTICE_NOT_FOUND",
+        message="알림을 찾을 수 없습니다.",
+        status_code=404
+    )
+
+    NOTICE_NOT_FOR_ME = ErrorCodeInfo(
+        code="NOTICE_NOT_FOR_ME",
+        message="본인의 알림이 아닙니다.",
+        status_code=403
+    )

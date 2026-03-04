@@ -2,6 +2,7 @@ from datetime import datetime, date
 from pydantic import BaseModel, Field
 
 from app.baekjoon.application.query.streaks_query import StreakItemQuery
+from app.study.application.query.study_query import MyStudyItemQuery
 
 
 class BjAccountStatQuery(BaseModel):
@@ -34,6 +35,7 @@ class UserAccountQuery(BaseModel):
     targets: list[TargetQuery] = Field([], description="목표 목록")
     registered_at: datetime = Field(..., description="가입일")
     is_synced: bool = Field(False, description="배치 동기화 완료 여부")
+    user_code: str = Field("", description="유저 코드")
 
 
 class BaekjoonMeQuery(BaseModel):
@@ -41,3 +43,4 @@ class BaekjoonMeQuery(BaseModel):
     user_account: UserAccountQuery = Field(..., description="유저 계정 정보")
     bj_account: BjAccountQuery = Field(..., description="백준 계정 정보")
     linked_at: datetime = Field(..., description="계정 연동일")
+    studies: list[MyStudyItemQuery] = Field([], description="참여 중인 스터디 목록")

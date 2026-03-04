@@ -69,7 +69,8 @@ class RecommendProblemsUsecase:
         level_filter_codes: list[FilterCode] | None = None,
         tag_filter_codes: list[str] | None = None,
         count: int = 3,
-        exclusion_mode: ExclusionMode = ExclusionMode.LENIENT
+        exclusion_mode: ExclusionMode = ExclusionMode.LENIENT,
+        additional_excluded_problem_ids: set[int] | None = None,
     ) -> RecommendProblemsQuery:
         # 1. 초기 데이터 로딩
         bj_account = await self.baekjoon_account_repository.find_by_user_id(user_account_id)
@@ -248,6 +249,8 @@ class RecommendProblemsUsecase:
             # Convert ProblemIdSet to set[int] for repository
             excluded_problem_ids = {pid.value for pid in excluded_problem_ids_vo}
             excluded_problem_ids |= recommended_problem_ids  # 이미 추천한 문제도 제외
+            if additional_excluded_problem_ids:
+                excluded_problem_ids |= additional_excluded_problem_ids
 
             problem = await self.problem_repository.find_recommended_problem(
                 tag_id=tag_candidate.tag.tag_id,

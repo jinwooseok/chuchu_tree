@@ -134,17 +134,18 @@ async def test_login(
     result = await _find_or_create_user(
         auth_application_service, body.username
     )
-
-    auth_application_service._create_and_set_tokens(
+    
+    await auth_application_service._create_and_set_tokens(
         response, result.user_account_id
     )
-
-    return ApiResponse(
-        TestLoginResponse(
+    api_response = ApiResponse(TestLoginResponse(
             user_account_id=result.user_account_id,
             username=body.username,
-        )
-    )
+        ))
+    for cookie in response.headers.getlist("set-cookie"):
+        api_response.headers.append("set-cookie", cookie)
+    return api_response
+
 
 
 @router.post("/token", response_model=ApiResponseSchema[TestTokenResponse])

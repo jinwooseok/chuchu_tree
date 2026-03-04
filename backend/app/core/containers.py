@@ -1,6 +1,46 @@
 import os
 from dependency_injector import containers, providers
 
+# ============================================================================
+# Study domain imports
+# ============================================================================
+from app.study.infra.repository.study_repository_impl import StudyRepositoryImpl
+from app.study.infra.repository.study_invitation_repository_impl import StudyInvitationRepositoryImpl
+from app.study.infra.repository.study_application_repository_impl import StudyApplicationRepositoryImpl
+from app.study.infra.repository.study_problem_repository_impl import StudyProblemRepositoryImpl
+from app.study.infra.repository.notice_repository_impl import NoticeRepositoryImpl
+from app.study.infra.repository.user_search_repository_impl import UserSearchRepositoryImpl
+from app.study.infra.sse.notice_manager import NoticeSSEManager
+from app.study.application.usecase.search_user_usecase import SearchUserUsecase
+from app.study.application.usecase.create_study_usecase import CreateStudyUsecase
+from app.study.application.usecase.get_study_detail_usecase import GetStudyDetailUsecase
+from app.study.application.usecase.search_study_usecase import SearchStudyUsecase
+from app.study.application.usecase.update_study_usecase import UpdateStudyUsecase
+from app.study.application.usecase.delete_study_usecase import DeleteStudyUsecase
+from app.study.application.usecase.get_my_studies_usecase import GetMyStudiesUsecase
+from app.study.application.usecase.validate_study_name_usecase import ValidateStudyNameUsecase
+from app.study.application.usecase.leave_study_usecase import LeaveStudyUsecase
+from app.study.application.usecase.kick_study_member_usecase import KickStudyMemberUsecase
+from app.study.application.usecase.send_study_invitation_usecase import SendStudyInvitationUsecase
+from app.study.application.usecase.cancel_study_invitation_usecase import CancelStudyInvitationUsecase
+from app.study.application.usecase.get_my_invitations_usecase import GetMyInvitationsUsecase
+from app.study.application.usecase.accept_study_invitation_usecase import AcceptStudyInvitationUsecase
+from app.study.application.usecase.reject_study_invitation_usecase import RejectStudyInvitationUsecase
+from app.study.application.usecase.apply_to_study_usecase import ApplyToStudyUsecase
+from app.study.application.usecase.cancel_study_application_usecase import CancelStudyApplicationUsecase
+from app.study.application.usecase.get_study_applications_usecase import GetStudyApplicationsUsecase
+from app.study.application.usecase.accept_study_application_usecase import AcceptStudyApplicationUsecase
+from app.study.application.usecase.reject_study_application_usecase import RejectStudyApplicationUsecase
+from app.study.application.usecase.assign_study_problem_all_usecase import AssignStudyProblemAllUsecase
+from app.study.application.usecase.assign_study_problem_usecase import AssignStudyProblemUsecase
+from app.study.application.usecase.delete_study_problem_usecase import DeleteStudyProblemUsecase
+from app.study.application.usecase.get_study_problems_usecase import GetStudyProblemsUsecase
+from app.study.application.usecase.get_my_notices_usecase import GetMyNoticesUsecase
+from app.study.application.usecase.mark_notices_read_usecase import MarkNoticesReadUsecase
+from app.study.application.usecase.get_study_invitations_usecase import GetStudyInvitationsUsecase
+from app.study.application.usecase.recommend_study_problems_usecase import RecommendStudyProblemsUsecase
+from app.study.application.service.study_withdrawal_service import StudyWithdrawalService
+
 from app.activity.infra.repository.user_date_record_repository_impl import UserDateRecordRepositoryImpl
 from app.baekjoon.application.usecase.get_scheduler_inactive_periods_usecase import GetSchedulerInactivePeriodsUsecase
 from app.baekjoon.application.usecase.get_unrecorded_problems_usecase import GetUnrecordedProblemsUsecase
@@ -11,6 +51,7 @@ from app.baekjoon.application.usecase.get_streaks_usecase import GetStreaksUseca
 from app.baekjoon.application.usecase.update_bj_account_usecase import UpdateBjAccountUsecase
 from app.baekjoon.infra.repository.baekjoon_account_repository_impl import BaekjoonAccountRepositoryImpl
 from app.baekjoon.infra.repository.problem_history_repository_impl import ProblemHistoryRepositoryImpl
+from app.common.infra.client.storage_client import S3Client
 from app.common.infra.repository.system_log_repository_impl import SystemLogRepositoryImpl
 from app.baekjoon.infra.scheduler.metric_scheduler import BjAccountUpdateScheduler
 from app.config.settings import get_settings
@@ -26,7 +67,6 @@ from app.tier.infra.repository.tier_repository_impl import TierRepositoryImpl
 # Infrastructure - Clients
 # ============================================================================
 from app.common.infra.client.redis_client import AsyncRedisClient
-from app.common.infra.client.storage_client import MinioClient, NCloudClient
 from app.common.infra.client.kakao_oauth_client import KakaoOAuthClient
 from app.common.infra.client.naver_oauth_client import NaverOAuthClient
 from app.common.infra.client.google_oauth_client import GoogleOAuthClient
@@ -42,7 +82,7 @@ from app.common.infra.security.fastapi_cookie_service import FastAPICookieServic
 # ============================================================================
 # Infrastructure - Gateways
 # ============================================================================
-from app.common.infra.gateway.storage_gateway_impl import StorageGatewayImpl
+from app.common.infra.gateway.storage_gateway_impl import S3StorageGatewayImpl
 from app.common.infra.gateway.csrf_token_gateway_impl import CsrfTokenGatewayImpl
 from app.common.infra.gateway.refresh_token_whitelist_gateway_impl import RefreshTokenWhitelistGatewayImpl
 from app.baekjoon.infra.gateway.solvedac_gateway_impl import SolvedacGatewayImpl
@@ -94,6 +134,7 @@ class Container(containers.DeclarativeContainer):
             "app.target.presentation",
             "app.activity.presentation",
             "app.recommendation.presentation",
+            "app.study.presentation",
         ],
     )
 
@@ -134,13 +175,7 @@ class Container(containers.DeclarativeContainer):
     # ========================================================================
     # Infrastructure - Storage Client (Singleton, Factory Pattern)
     # ========================================================================
-    storage_client = providers.Singleton(
-        lambda settings: (
-            MinioClient() if settings.STORAGE_PROVIDER == "minio"
-            else NCloudClient()
-        ),
-        settings=config,
-    )
+    storage_client = providers.Singleton(S3Client)
 
     # ========================================================================
     # Infrastructure - Security Services (Singleton)
@@ -174,7 +209,7 @@ class Container(containers.DeclarativeContainer):
     )
 
     storage_gateway = providers.Singleton(
-        StorageGatewayImpl,
+        S3StorageGatewayImpl,
         storage_client=storage_client,
     )
 
@@ -233,7 +268,8 @@ class Container(containers.DeclarativeContainer):
     user_account_application_service = providers.Singleton(
         UserAccountApplicationService,
         user_account_repository=user_account_repository,
-        domain_event_bus=domain_event_bus
+        domain_event_bus=domain_event_bus,
+        storage_gateway=storage_gateway,
     )
 
     # ========================================================================
@@ -294,6 +330,16 @@ class Container(containers.DeclarativeContainer):
     )
 
     # ========================================================================
+    # Study domain - Repositories (BJ usecase에서 사용하므로 먼저 선언)
+    # ========================================================================
+    study_repository = providers.Singleton(StudyRepositoryImpl, db=database)
+    study_invitation_repository = providers.Singleton(StudyInvitationRepositoryImpl, db=database)
+    study_application_repository = providers.Singleton(StudyApplicationRepositoryImpl, db=database)
+    study_problem_repository = providers.Singleton(StudyProblemRepositoryImpl, db=database)
+    notice_repository = providers.Singleton(NoticeRepositoryImpl, db=database)
+    user_search_repository = providers.Singleton(UserSearchRepositoryImpl, db=database)
+
+    # ========================================================================
     # Application Services / Usecases
     # ========================================================================
 
@@ -311,7 +357,9 @@ class Container(containers.DeclarativeContainer):
         baekjoon_account_repository=baekjoon_account_repository,
         user_date_record_repository=user_date_record_repository,
         tier_repository=tier_repository,
-        domain_event_bus=domain_event_bus
+        domain_event_bus=domain_event_bus,
+        study_repository=study_repository,
+        user_search_repository=user_search_repository,
     )
 
     get_streaks_usecase = providers.Singleton(
@@ -488,6 +536,213 @@ class Container(containers.DeclarativeContainer):
         system_log_repository=system_log_repository,
     )
 
+    # ========================================================================
+    # Study domain - SSE Manager
+    # ========================================================================
+    notice_sse_manager = providers.Singleton(NoticeSSEManager)
+
+    # ========================================================================
+    # Study domain - Usecases
+    # ========================================================================
+    search_user_usecase = providers.Singleton(
+        SearchUserUsecase,
+        user_search_repository=user_search_repository,
+    )
+
+    validate_study_name_usecase = providers.Singleton(
+        ValidateStudyNameUsecase,
+        study_repository=study_repository,
+    )
+
+    create_study_usecase = providers.Singleton(
+        CreateStudyUsecase,
+        study_repository=study_repository,
+        invitation_repository=study_invitation_repository,
+        user_search_repository=user_search_repository,
+    )
+
+    get_study_detail_usecase = providers.Singleton(
+        GetStudyDetailUsecase,
+        study_repository=study_repository,
+        user_search_repository=user_search_repository,
+        invitation_repository=study_invitation_repository,
+        application_repository=study_application_repository,
+    )
+
+    search_study_usecase = providers.Singleton(
+        SearchStudyUsecase,
+        study_repository=study_repository,
+    )
+
+    update_study_usecase = providers.Singleton(
+        UpdateStudyUsecase,
+        study_repository=study_repository,
+    )
+
+    delete_study_usecase = providers.Singleton(
+        DeleteStudyUsecase,
+        study_repository=study_repository,
+    )
+
+    get_my_studies_usecase = providers.Singleton(
+        GetMyStudiesUsecase,
+        study_repository=study_repository,
+        user_search_repository=user_search_repository,
+    )
+
+    leave_study_usecase = providers.Singleton(
+        LeaveStudyUsecase,
+        study_repository=study_repository,
+    )
+
+    kick_study_member_usecase = providers.Singleton(
+        KickStudyMemberUsecase,
+        study_repository=study_repository,
+    )
+
+    send_study_invitation_usecase = providers.Singleton(
+        SendStudyInvitationUsecase,
+        study_repository=study_repository,
+        invitation_repository=study_invitation_repository,
+        user_search_repository=user_search_repository,
+        notice_repository=notice_repository,
+        notice_sse_manager=notice_sse_manager,
+    )
+
+    cancel_study_invitation_usecase = providers.Singleton(
+        CancelStudyInvitationUsecase,
+        study_repository=study_repository,
+        invitation_repository=study_invitation_repository,
+    )
+
+    get_my_invitations_usecase = providers.Singleton(
+        GetMyInvitationsUsecase,
+        invitation_repository=study_invitation_repository,
+        study_repository=study_repository,
+        user_search_repository=user_search_repository,
+    )
+
+    accept_study_invitation_usecase = providers.Singleton(
+        AcceptStudyInvitationUsecase,
+        invitation_repository=study_invitation_repository,
+        study_repository=study_repository,
+        user_search_repository=user_search_repository,
+        notice_repository=notice_repository,
+        notice_sse_manager=notice_sse_manager,
+    )
+
+    reject_study_invitation_usecase = providers.Singleton(
+        RejectStudyInvitationUsecase,
+        invitation_repository=study_invitation_repository,
+        study_repository=study_repository,
+        user_search_repository=user_search_repository,
+        notice_repository=notice_repository,
+        notice_sse_manager=notice_sse_manager,
+    )
+
+    apply_to_study_usecase = providers.Singleton(
+        ApplyToStudyUsecase,
+        study_repository=study_repository,
+        application_repository=study_application_repository,
+        user_search_repository=user_search_repository,
+        notice_repository=notice_repository,
+        notice_sse_manager=notice_sse_manager,
+    )
+
+    cancel_study_application_usecase = providers.Singleton(
+        CancelStudyApplicationUsecase,
+        study_repository=study_repository,
+        application_repository=study_application_repository,
+    )
+
+    get_study_applications_usecase = providers.Singleton(
+        GetStudyApplicationsUsecase,
+        study_repository=study_repository,
+        application_repository=study_application_repository,
+        user_search_repository=user_search_repository,
+    )
+
+    accept_study_application_usecase = providers.Singleton(
+        AcceptStudyApplicationUsecase,
+        study_repository=study_repository,
+        application_repository=study_application_repository,
+        user_search_repository=user_search_repository,
+        notice_repository=notice_repository,
+        notice_sse_manager=notice_sse_manager,
+    )
+
+    reject_study_application_usecase = providers.Singleton(
+        RejectStudyApplicationUsecase,
+        study_repository=study_repository,
+        application_repository=study_application_repository,
+        notice_repository=notice_repository,
+        notice_sse_manager=notice_sse_manager,
+    )
+
+    assign_study_problem_all_usecase = providers.Singleton(
+        AssignStudyProblemAllUsecase,
+        study_repository=study_repository,
+        study_problem_repository=study_problem_repository,
+        user_search_repository=user_search_repository,
+        notice_repository=notice_repository,
+        notice_sse_manager=notice_sse_manager,
+    )
+
+    assign_study_problem_usecase = providers.Singleton(
+        AssignStudyProblemUsecase,
+        study_repository=study_repository,
+        study_problem_repository=study_problem_repository,
+        user_search_repository=user_search_repository,
+        notice_repository=notice_repository,
+        notice_sse_manager=notice_sse_manager,
+    )
+
+    delete_study_problem_usecase = providers.Singleton(
+        DeleteStudyProblemUsecase,
+        study_repository=study_repository,
+        study_problem_repository=study_problem_repository,
+    )
+
+    get_study_problems_usecase = providers.Singleton(
+        GetStudyProblemsUsecase,
+        study_repository=study_repository,
+        study_problem_repository=study_problem_repository,
+        user_search_repository=user_search_repository,
+        problem_repository=problem_repository,
+        problem_history_repository=problem_history_repository,
+    )
+
+    get_my_notices_usecase = providers.Singleton(
+        GetMyNoticesUsecase,
+        notice_repository=notice_repository,
+    )
+
+    mark_notices_read_usecase = providers.Singleton(
+        MarkNoticesReadUsecase,
+        notice_repository=notice_repository,
+    )
+
+    get_study_invitations_usecase = providers.Singleton(
+        GetStudyInvitationsUsecase,
+        study_repository=study_repository,
+        invitation_repository=study_invitation_repository,
+        user_search_repository=user_search_repository,
+    )
+
+    recommend_study_problems_usecase = providers.Singleton(
+        RecommendStudyProblemsUsecase,
+        study_repository=study_repository,
+        user_search_repository=user_search_repository,
+        problem_history_repository=problem_history_repository,
+        recommend_problems_usecase=recommand_problems_usecase,
+    )
+
+    study_withdrawal_service = providers.Singleton(
+        StudyWithdrawalService,
+        study_repository=study_repository,
+        study_problem_repository=study_problem_repository,
+    )
+
     async def init_resources(self):
         """앱 시작 시점에 싱글톤 객체들을 미리 생성"""
         # 1. 인프라 클라이언트 (Redis, Storage 등)
@@ -504,6 +759,7 @@ class Container(containers.DeclarativeContainer):
         self.problem_application_service()
         self.tag_application_service()
         self.target_application_service()
+        self.study_withdrawal_service()
 
         # 3. 스케줄러 시작 (추가)
         scheduler = self.bj_account_update_scheduler()
