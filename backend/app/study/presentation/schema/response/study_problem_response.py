@@ -1,6 +1,10 @@
 from pydantic import BaseModel, ConfigDict
 from pydantic.alias_generators import to_camel
 
+from app.baekjoon.presentation.schema.response.get_monthly_problems_response import (
+    RepresentativeTagSummaryResponse,
+    TagInfoResponse,
+)
 from app.study.application.query.study_problem_query import (
     MemberSolveInfoQuery,
     StudyDayDataQuery,
@@ -34,20 +38,26 @@ class StudyProblemItemResponse(BaseModel):
 
     study_problem_id: int
     problem_id: int
-    title: str
-    tier: int
+    problem_title: str
+    problem_tier_level: int
+    problem_tier_name: str
+    problem_class_level: int | None
+    tags: list[TagInfoResponse]
+    representative_tag: RepresentativeTagSummaryResponse | None = None
     solve_info: list[MemberSolveInfoResponse]
-    status: str
 
     @classmethod
     def from_query(cls, q: StudyProblemItemQuery) -> "StudyProblemItemResponse":
         return cls(
             study_problem_id=q.study_problem_id,
             problem_id=q.problem_id,
-            title=q.title,
-            tier=q.tier,
+            problem_title=q.problem_title,
+            problem_tier_level=q.problem_tier_level,
+            problem_tier_name=q.problem_tier_name,
+            problem_class_level=q.problem_class_level,
+            tags=[TagInfoResponse.from_query(t) for t in q.tags],
+            representative_tag=None,
             solve_info=[MemberSolveInfoResponse.from_query(m) for m in q.solve_info],
-            status=q.status,
         )
 
 
@@ -68,8 +78,8 @@ class StudyDayDataResponse(BaseModel):
 class StudyProblemsResponse(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
-    items: list[StudyDayDataResponse]
+    study_data: list[StudyDayDataResponse]
 
     @classmethod
     def from_query(cls, q: StudyProblemsQuery) -> "StudyProblemsResponse":
-        return cls(items=[StudyDayDataResponse.from_query(d) for d in q.items])
+        return cls(study_data=[StudyDayDataResponse.from_query(d) for d in q.study_data])

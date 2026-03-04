@@ -1,9 +1,14 @@
 from calendar import monthrange
 from datetime import date
+
+from app.baekjoon.domain.event.get_problems_info_payload import GetProblemsInfoPayload
+from app.common.domain.entity.domain_event import DomainEvent
+from app.common.domain.service.event_publisher import DomainEventBus
 from app.common.domain.vo.identifiers import BaekjoonAccountId, StudyId, UserAccountId
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
+from app.problem.application.query.problems_info_query import ProblemsInfoQuery
 from app.study.application.command.study_command import GetStudyProblemsCommand
 from app.study.application.query.study_problem_query import (
     MemberSolveInfoQuery,
@@ -15,7 +20,6 @@ from app.study.domain.repository.study_problem_repository import StudyProblemRep
 from app.study.domain.repository.study_repository import StudyRepository
 from app.study.domain.repository.user_search_repository import UserSearchRepository
 from app.baekjoon.domain.repository.problem_history_repository import ProblemHistoryRepository
-from app.problem.domain.repository.problem_repository import ProblemRepository
 
 
 class GetStudyProblemsUsecase:
@@ -24,13 +28,13 @@ class GetStudyProblemsUsecase:
         study_repository: StudyRepository,
         study_problem_repository: StudyProblemRepository,
         user_search_repository: UserSearchRepository,
-        problem_repository: ProblemRepository,
+        domain_event_bus: DomainEventBus,
         problem_history_repository: ProblemHistoryRepository,
     ):
         self.study_repository = study_repository
         self.study_problem_repository = study_problem_repository
         self.user_search_repository = user_search_repository
-        self.problem_repository = problem_repository
+        self.domain_event_bus = domain_event_bus
         self.problem_history_repository = problem_history_repository
 
     @transactional(readonly=True)
@@ -52,13 +56,12 @@ class GetStudyProblemsUsecase:
         )
 
         if not study_problems:
-            return StudyProblemsQuery(items=[])
+            return StudyProblemsQuery(study_data=[])
 
-        # 문제 정보 bulk 조회
-        from app.common.domain.vo.identifiers import ProblemId
+        # 문제 정보 bulk 조회 (domain event bus)
         problem_ids = list({sp.problem_id.value for sp in study_problems})
-        problems = await self.problem_repository.find_by_ids([ProblemId(pid) for pid in problem_ids])
-        problem_map = {p.problem_id.value: p for p in problems}
+        problems_info = await self._fetch_problems_info(problem_ids)
+        problem_info_map = problems_info.problems
 
         # 활성 멤버의 user_account_id → UserSearchResult 매핑
         all_user_ids = {
@@ -78,16 +81,12 @@ class GetStudyProblemsUsecase:
             solved_map[bj_id] = set(solved_ids)
 
         # (target_date, study_problem_id) → StudyProblemItemQuery 누적 빌드
-        # key: (date_str, sp_id)
         item_map: dict[tuple[str, int], StudyProblemItemQuery] = {}
-        # 날짜 → [item keys] 순서 보존용
         date_order: list[str] = []
         date_items: dict[str, list[tuple[str, int]]] = {}
 
         for sp in study_problems:
-            problem = problem_map.get(sp.problem_id.value)
-            title = problem.title if problem else ""
-            tier = problem.tier_level.value if problem and problem.tier_level else 0
+            problem_info = problem_info_map.get(sp.problem_id.value)
             active_members = [m for m in sp.members if m.deleted_at is None]
 
             for member in active_members:
@@ -98,8 +97,11 @@ class GetStudyProblemsUsecase:
                     item_map[key] = StudyProblemItemQuery(
                         study_problem_id=sp.study_problem_id.value,
                         problem_id=sp.problem_id.value,
-                        title=title,
-                        tier=tier,
+                        problem_title=problem_info.problem_title if problem_info else "",
+                        problem_tier_level=problem_info.problem_tier_level if problem_info else 0,
+                        problem_tier_name=problem_info.problem_tier_name if problem_info else "",
+                        problem_class_level=problem_info.problem_class_level if problem_info else None,
+                        tags=list(problem_info.tags) if problem_info else [],
                         solve_info=[],
                     )
                     if date_str not in date_items:
@@ -118,28 +120,27 @@ class GetStudyProblemsUsecase:
                         bj_account_id=bj_id,
                         user_code=user.user_code,
                         solved=solved,
-                        solve_date=None,  # 상세 날짜 미제공
+                        solve_date=None,
                     )
                 )
 
-        # 상태 결정
-        for item in item_map.values():
-            if not item.solve_info:
-                item.status = "will_solve"
-            elif all(m.solved for m in item.solve_info):
-                item.status = "solved"
-            elif any(m.solved for m in item.solve_info):
-                item.status = "in_progress"
-            else:
-                item.status = "will_solve"
-
         # 날짜 정렬 후 결과 조립
         date_order_sorted = sorted(date_order)
-        items = [
+        study_data = [
             StudyDayDataQuery(
                 target_date=date_str,
                 problems=[item_map[k] for k in date_items[date_str]],
             )
             for date_str in date_order_sorted
         ]
-        return StudyProblemsQuery(items=items)
+        return StudyProblemsQuery(study_data=study_data)
+
+    async def _fetch_problems_info(self, problem_ids: list[int]) -> ProblemsInfoQuery:
+        if not problem_ids:
+            return ProblemsInfoQuery(problems={})
+        event = DomainEvent(
+            event_type="GET_PROBLEM_INFOS_REQUESTED",
+            data=GetProblemsInfoPayload(problem_ids=problem_ids),
+            result_type=ProblemsInfoQuery
+        )
+        return await self.domain_event_bus.publish(event)
