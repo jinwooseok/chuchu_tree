@@ -213,7 +213,9 @@ export function RecommendationButton({ isLanding = false, tagLevelMap }: { isLan
                         {showTagLevelInfo && levelInfo && (
                           <div className="flex w-18 shrink-0 items-center justify-between">
                             <span className={`${levelInfo.bg} text-innerground-white w-4 rounded text-center text-xs font-semibold`}>{levelInfo.char}</span>
-                            {levelInfo.daysAgo !== null ? (
+                            {levelInfo.level === 'LOCKED' ? (
+                              <span className="text-muted-foreground text-xs">시작 전</span>
+                            ) : levelInfo.daysAgo !== null ? (
                               <span className={`text-xs ${levelInfo.isOverdue ? 'text-primary font-semibold' : 'text-muted-foreground'}`}>{levelInfo.daysAgo}일 전</span>
                             ) : levelInfo.solvedProblemCount === 0 ? (
                               <span className="text-muted-foreground text-xs">미풀이</span>
@@ -229,7 +231,7 @@ export function RecommendationButton({ isLanding = false, tagLevelMap }: { isLan
               {tagLevelMap && (
                 <div className="mt-2 flex flex-wrap gap-1 border-t pt-2">
                   {[...new Map(Object.values(tagLevelMap).map((info) => [info.level, info.bg])).entries()]
-                    .filter(([level]) => level !== 'EXCLUDED')
+                    .filter(([level]) => level !== 'EXCLUDED' && level !== 'LOCKED')
                     .sort(([a], [b]) => ['INTERMEDIATE', 'ADVANCED', 'MASTER', 'LOCKED'].indexOf(a) - ['INTERMEDIATE', 'ADVANCED', 'MASTER', 'LOCKED'].indexOf(b))
                     .map(([level, bg]) => {
                       const tagsOfLevel = Object.entries(tagLevelMap)
