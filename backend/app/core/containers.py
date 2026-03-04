@@ -350,6 +350,7 @@ class Container(containers.DeclarativeContainer):
         domain_event_bus=domain_event_bus,
         user_date_record_repository=user_date_record_repository,
         user_activity_repository=user_activity_repository,
+        problem_update_service=problem_update_service,
     )
 
     get_baekjoon_me_usecase = providers.Singleton(

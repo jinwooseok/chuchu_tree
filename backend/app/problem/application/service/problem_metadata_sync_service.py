@@ -28,7 +28,9 @@ from app.core.database import Database, transactional
 logger = logging.getLogger(__name__)
 
 _BATCH_SIZE = 500       # 문제 upsert 배치 크기
-_PAGE_DELAY = 0.5       # 페이지 요청 간 딜레이 (초)
+_PAGE_DELAY = 1.0       # 페이지 요청 간 딜레이 (초)
+_MAX_RETRIES = 5        # 429 발생 시 최대 재시도 횟수
+_RETRY_BACKOFF = 2.0    # 재시도 기본 대기 시간 (초, 지수 증가)
 
 
 @dataclass
@@ -196,22 +198,35 @@ class ProblemMetadataSyncService:
         # 나머지 페이지 순차 수집
         for page in range(2, total_pages + 1):
             await asyncio.sleep(_PAGE_DELAY)
-            try:
-                async with httpx.AsyncClient(timeout=30.0) as client:
-                    page_resp = await client.get(
-                        self.SOLVED_AC_PROBLEM_SEARCH_URL,
-                        params={"query": "", "page": page},
-                    )
+            for attempt in range(_MAX_RETRIES):
+                try:
+                    async with httpx.AsyncClient(timeout=30.0) as client:
+                        page_resp = await client.get(
+                            self.SOLVED_AC_PROBLEM_SEARCH_URL,
+                            params={"query": "", "page": page},
+                        )
+                    if page_resp.status_code == 429:
+                        retry_after = float(page_resp.headers.get("Retry-After", _RETRY_BACKOFF * (2 ** attempt)))
+                        logger.warning(
+                            f"[ProblemMetadataSyncService] page {page} rate limited, "
+                            f"waiting {retry_after:.1f}s (attempt {attempt + 1}/{_MAX_RETRIES})"
+                        )
+                        await asyncio.sleep(retry_after)
+                        continue
                     if page_resp.status_code != 200:
                         logger.warning(
                             f"[ProblemMetadataSyncService] page {page} returned "
                             f"{page_resp.status_code}, skipping"
                         )
-                        continue
+                        break
                     all_problems.extend(page_resp.json().get("items", []))
-            except Exception as exc:
-                logger.error(f"[ProblemMetadataSyncService] page {page} failed: {exc}")
-                continue
+                    break
+                except Exception as exc:
+                    logger.error(f"[ProblemMetadataSyncService] page {page} attempt {attempt + 1} failed: {exc}")
+                    if attempt < _MAX_RETRIES - 1:
+                        await asyncio.sleep(_RETRY_BACKOFF * (2 ** attempt))
+                    else:
+                        logger.error(f"[ProblemMetadataSyncService] page {page} skipped after {_MAX_RETRIES} attempts")
 
             if page % 100 == 0:
                 logger.info(

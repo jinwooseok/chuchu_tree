@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 class SolvedacGatewayImpl(SolvedacGateway):
     """solved.ac API 데이터 수집 Gateway 구현체"""
 
-    def __init__(self, request_delay: float = 0.3, concurrent_requests: int = 3):
+    def __init__(self, request_delay: float = 0.5, concurrent_requests: int = 3):
         self.request_delay = request_delay
         self.concurrent_requests = concurrent_requests  # 동시 요청 개수
         self.base_url = "https://solved.ac/api/v3/search/problem"
