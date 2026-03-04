@@ -134,11 +134,11 @@ class RecommendProblemsUsecase:
             # (1) BAN 및 유저 필터 제외
             # 제외된 태그는 메인 추천 태그로 사용하지 않음
             # 단, 문제가 여러 태그를 가질 수 있으므로, 제외된 태그가 포함된 문제도 다른 태그를 통해 추천 가능
-            if tag.tag_id in excluded_tag_ids: continue
+            if not tag_filter_codes and tag.tag_id in excluded_tag_ids: continue
             if tag_filter_codes and tag.code not in tag_filter_codes: continue
 
-            # (2) 선수 태그 조건 검사
-            if not self._is_pre_requisite_satisfied(tag, stats_map, bj_account.current_tier_id, tag_skills_dict):
+            # (2) 선수 태그 조건 검사 (유저가 태그를 직접 선택한 경우 제외)
+            if not tag_filter_codes and not self._is_pre_requisite_satisfied(tag, stats_map, bj_account.current_tier_id, tag_skills_dict):
                 continue
 
             # (3) 스코어 계산을 위한 Stat 보정 (기록 없는 태그 포함)
@@ -540,19 +540,17 @@ class RecommendProblemsUsecase:
         user_tier: TierId,
         tag_skills_dict: dict[tuple[int, SkillCode], TagSkill]
     ) -> bool:
-        """선수 태그 조건을 만족하는지 확인"""
+        """선수 태그 조건을 만족하는지 확인 (parent tag 숙련도가 ADVANCED 이상이어야 함)"""
         if not tag.parent_tag_relations:
             return True
         for relation in tag.parent_tag_relations:
             parent_stat = stats_map.get(relation.leading_tag_id)
             if not parent_stat:
                 return False
-
-        # 선수 태그의 숙련도를 계산
-        parent_skill = self._match_tag_skill(parent_stat, user_tier, tag_skills_dict)
-
-        # 예: 선수 태그가 최소 'BEGINNER' 이상이어야 함
-        return parent_skill and parent_skill.tag_level >= TagLevel.BEGINNER
+            parent_skill = self._match_tag_skill(parent_stat, user_tier, tag_skills_dict)
+            if not parent_skill or parent_skill.skill_code == SkillCode.IM:
+                return False
+        return True
     
     def _calculate_tag_score(
         self,
