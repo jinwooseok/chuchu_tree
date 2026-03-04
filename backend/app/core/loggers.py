@@ -18,7 +18,7 @@ def setup_logging():
     
     # 환경에 따라 파일 로깅 제어 (로컬/테스트 환경에서는 파일 로깅 비활성화)
     env = os.getenv("environment", "local")
-    if env == "prod":
+    if env != "local":
         today = date.today()
         # 오늘 날짜 기준 주의 월요일 구하기
         monday = today - timedelta(days=today.weekday())  # weekday(): 월=0, 일=6
