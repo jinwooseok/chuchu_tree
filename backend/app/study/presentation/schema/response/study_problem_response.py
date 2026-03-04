@@ -78,7 +78,7 @@ class StudyDayDataResponse(BaseModel):
 class StudyProblemsResponse(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
-    study_data: list[StudyDayDataResponse]
+    monthly_data: list[StudyDayDataResponse]
 
     @classmethod
     def from_query(cls, q: StudyProblemsQuery) -> "StudyProblemsResponse":
