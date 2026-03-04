@@ -126,14 +126,17 @@ export function TagDashboard({ tagDashboard, isLanding = false }: { tagDashboard
       return items;
     }
 
-    // expanded 이전 카드들
-    for (let i = 0; i < expandedIdx; i++) {
+    // expanded 카드의 원래 행 (0-indexed)
+    const expandedOriginalRow = Math.floor(expandedIdx / colCount);
+    const expandedRow = expandedOriginalRow + 1; // CSS grid 1-indexed
+    const rowStart = expandedOriginalRow * colCount; // 해당 행의 첫 번째 카드 인덱스
+
+    // expanded 행 이전의 카드들: 원래 위치 그대로
+    for (let i = 0; i < rowStart; i++) {
       items.push({ type: 'card', tag: filteredAndSortedTags[i], row: Math.floor(i / colCount) + 1, col: (i % colCount) + 1 });
     }
 
-    // expanded 카드는 항상 col 1 (행의 좌측)
-    // expandedRow: 이전 카드들이 채운 행 수 + 1
-    const expandedRow = Math.ceil(expandedIdx / colCount) + 1;
+    // expanded 카드: 원래 행의 col 1로 이동
     items.push({ type: 'card', tag: filteredAndSortedTags[expandedIdx], row: expandedRow, col: 1 });
 
     // detail 카드: 1컬럼이면 다음 행, 2~3컬럼이면 같은 행의 나머지 열
@@ -143,17 +146,24 @@ export function TagDashboard({ tagDashboard, isLanding = false }: { tagDashboard
       items.push({ type: 'detail', tag: filteredAndSortedTags[expandedIdx], row: expandedRow, col: 2, colSpan: colCount - 1 });
     }
 
-    // expanded 이후 카드들 (detail 행만큼 offset)
-    const detailRowOffset = colCount === 1 ? 1 : 0;
-    for (let i = expandedIdx + 1; i < filteredAndSortedTags.length; i++) {
-      const afterIdx = i - expandedIdx - 1;
+    // afterList: 같은 행에 있던 나머지 카드들(순서 유지) + 이후 행 카드들
+    const afterList: number[] = [];
+    for (let i = rowStart; i < rowStart + colCount && i < filteredAndSortedTags.length; i++) {
+      if (i !== expandedIdx) afterList.push(i);
+    }
+    for (let i = rowStart + colCount; i < filteredAndSortedTags.length; i++) {
+      afterList.push(i);
+    }
+
+    const afterStartRow = colCount === 1 ? expandedRow + 2 : expandedRow + 1;
+    afterList.forEach((idx, position) => {
       items.push({
         type: 'card',
-        tag: filteredAndSortedTags[i],
-        row: expandedRow + 1 + detailRowOffset + Math.floor(afterIdx / colCount),
-        col: (afterIdx % colCount) + 1,
+        tag: filteredAndSortedTags[idx],
+        row: afterStartRow + Math.floor(position / colCount),
+        col: (position % colCount) + 1,
       });
-    }
+    });
 
     return items;
   }, [filteredAndSortedTags, expandedTagId, colCount]);
