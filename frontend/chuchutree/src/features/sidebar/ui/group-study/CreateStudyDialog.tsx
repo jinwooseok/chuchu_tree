@@ -3,10 +3,12 @@
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/lib/utils/toast';
 import { User } from '@/entities/user';
 import { useState, useEffect } from 'react';
-import { X, Loader2, Search } from 'lucide-react';
+import { X, Loader2, Search, CheckCircle2, XCircle } from 'lucide-react';
+import { useValidateStudyName, useSearchUsers, useCreateStudy, SearchedUser } from '@/entities/study';
 
 interface props {
   user?: User;
@@ -14,12 +16,6 @@ interface props {
 }
 
 type TabType = 'create' | 'join';
-
-// TODO: 실제 API 타입으로 교체 예정
-interface SearchedUser {
-  bjAccountId: string;
-  defaultCode: string;
-}
 
 interface SearchedStudy {
   studyId: number;
@@ -33,24 +29,24 @@ export function CreateStudyDialog({ user, onClose }: props) {
   const [activeTab, setActiveTab] = useState<TabType>('create');
 
   // --- 생성 탭 state ---
+  const bjAccountId = user?.bjAccount?.bjAccountId;
+  const userCode = user?.userAccount?.userCode;
+  const studyNamePlaceholder = bjAccountId ? (userCode ? `${bjAccountId}#${userCode}의 스터디` : `${bjAccountId}의 스터디`) : '스터디명을 입력하세요';
+
   const [studyName, setStudyName] = useState('');
+  const [description, setDescription] = useState('');
+  const [maxMembers, setMaxMembers] = useState(10);
   const [userSearchKeyword, setUserSearchKeyword] = useState('');
   const [debouncedUserKeyword, setDebouncedUserKeyword] = useState('');
   const [invitedUsers, setInvitedUsers] = useState<SearchedUser[]>([]);
+
+  // --- 이름 중복검증 state ---
+  const [nameValidated, setNameValidated] = useState<boolean | null>(null); // null=미검증, true=사용가능, false=중복
 
   // --- 가입 탭 state ---
   const [studySearchKeyword, setStudySearchKeyword] = useState('');
   const [debouncedStudyKeyword, setDebouncedStudyKeyword] = useState('');
   const [appliedStudyIds, setAppliedStudyIds] = useState<Set<number>>(new Set());
-
-  const bjAccountId = user?.bjAccount?.bjAccountId;
-  // defaultCode는 추후 User 타입에 추가 예정
-  const defaultCode = (user as User & { defaultCode?: string })?.defaultCode;
-  const studyNamePlaceholder = bjAccountId
-    ? defaultCode
-      ? `${bjAccountId}#${defaultCode}의 스터디`
-      : `${bjAccountId}의 스터디`
-    : '스터디명을 입력하세요';
 
   // 사용자 검색 debounce
   useEffect(() => {
@@ -64,26 +60,38 @@ export function CreateStudyDialog({ user, onClose }: props) {
     return () => clearTimeout(timer);
   }, [studySearchKeyword]);
 
-  // TODO: 실제 API 훅으로 교체 예정
-  // const { data: userSearchResults, isLoading: isSearchingUsers } = useSearchUsers(debouncedUserKeyword);
-  // const { data: studySearchResults, isLoading: isSearchingStudies } = useSearchStudies(debouncedStudyKeyword);
-  // const { mutate: createStudy, isPending: isCreatingStudy } = useCreateStudy();
-  // const { mutate: applyStudy } = useApplyStudy();
-  const userSearchResults: SearchedUser[] = [];
-  const isSearchingUsers = false;
+  const { mutate: validateName, isPending: isValidating } = useValidateStudyName();
+  const { data: userSearchResults = [], isLoading: isSearchingUsers } = useSearchUsers(debouncedUserKeyword);
+  const { mutate: createStudy, isPending: isCreatingStudy } = useCreateStudy({
+    onSuccess: () => {
+      toast.success(`${studyName} 스터디가 생성되었습니다.`);
+      onClose();
+    },
+    onError: () => {
+      toast.error('스터디 생성에 실패했습니다.');
+    },
+  });
+
   const studySearchResults: SearchedStudy[] = [];
   const isSearchingStudies = false;
-  const isCreatingStudy = false;
+
+  const handleValidateName = () => {
+    if (!studyName.trim()) return;
+    validateName(studyName.trim(), {
+      onSuccess: (result) => setNameValidated(result.available),
+      onError: () => toast.error('스터디명 검증에 실패했습니다.'),
+    });
+  };
 
   const handleAddInvitedUser = (searched: SearchedUser) => {
-    if (!invitedUsers.some((u) => u.bjAccountId === searched.bjAccountId)) {
+    if (!invitedUsers.some((u) => u.userAccountId === searched.userAccountId)) {
       setInvitedUsers((prev) => [...prev, searched]);
     }
     setUserSearchKeyword('');
   };
 
-  const handleRemoveInvitedUser = (id: string) => {
-    setInvitedUsers((prev) => prev.filter((u) => u.bjAccountId !== id));
+  const handleRemoveInvitedUser = (userAccountId: number) => {
+    setInvitedUsers((prev) => prev.filter((u) => u.userAccountId !== userAccountId));
   };
 
   const handleCreateStudy = () => {
@@ -91,18 +99,23 @@ export function CreateStudyDialog({ user, onClose }: props) {
       toast.error('스터디명을 입력해주세요.');
       return;
     }
-    // TODO: mutation 연동 예정
-    // createStudy(
-    //   { studyName: studyName.trim(), invitedUserIds: invitedUsers.map(u => u.bjAccountId) },
-    //   {
-    //     onSuccess: () => { toast.success(`${studyName} 스터디가 생성되었습니다.`); onClose(); },
-    //     onError: () => { toast.error('스터디 생성에 실패했습니다.'); },
-    //   },
-    // );
+    if (nameValidated === null) {
+      toast.error('스터디명 중복 검증을 해주세요.');
+      return;
+    }
+    if (nameValidated === false) {
+      toast.error('이미 사용 중인 스터디명입니다.');
+      return;
+    }
+    createStudy({
+      studyName: studyName.trim(),
+      description: description.trim(),
+      maxMembers,
+      inviteeUserAccountIds: invitedUsers.map((u) => u.userAccountId),
+    });
   };
 
   const handleToggleApply = (study: SearchedStudy) => {
-    // TODO: mutation 연동 예정
     setAppliedStudyIds((prev) => {
       const next = new Set(prev);
       if (next.has(study.studyId)) {
@@ -125,21 +138,13 @@ export function CreateStudyDialog({ user, onClose }: props) {
         {/* 탭 전환 */}
         <div className="flex border-b">
           <button
-            className={`flex-1 py-2 text-sm font-medium transition-colors ${
-              activeTab === 'create'
-                ? 'border-b-2 border-primary text-foreground'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
+            className={`flex-1 py-2 text-sm font-medium transition-colors ${activeTab === 'create' ? 'border-primary text-foreground border-b-2' : 'text-muted-foreground hover:text-foreground'}`}
             onClick={() => setActiveTab('create')}
           >
             생성
           </button>
           <button
-            className={`flex-1 py-2 text-sm font-medium transition-colors ${
-              activeTab === 'join'
-                ? 'border-b-2 border-primary text-foreground'
-                : 'text-muted-foreground hover:text-foreground'
-            }`}
+            className={`flex-1 py-2 text-sm font-medium transition-colors ${activeTab === 'join' ? 'border-primary text-foreground border-b-2' : 'text-muted-foreground hover:text-foreground'}`}
             onClick={() => setActiveTab('join')}
           >
             가입 신청
@@ -149,27 +154,53 @@ export function CreateStudyDialog({ user, onClose }: props) {
         {activeTab === 'create' ? (
           /* ───────────── 생성 탭 ───────────── */
           <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pr-1">
-            {/* 스터디명 */}
+            {/* 스터디명 + 중복검증 */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium">스터디명</label>
-              <Input
-                value={studyName}
-                onChange={(e) => setStudyName(e.target.value)}
-                placeholder={studyNamePlaceholder}
-              />
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Input
+                    value={studyName}
+                    onChange={(e) => {
+                      setStudyName(e.target.value);
+                      setNameValidated(null);
+                    }}
+                    placeholder={studyNamePlaceholder}
+                    onBlur={handleValidateName}
+                    onKeyDown={(e) => e.key === 'Enter' && handleValidateName()}
+                  />
+                  {nameValidated !== null && (
+                    <span className="absolute top-1/2 right-2 -translate-y-1/2">
+                      {nameValidated ? <CheckCircle2 className="h-4 w-4 text-green-500" /> : <XCircle className="text-destructive h-4 w-4" />}
+                    </span>
+                  )}
+                </div>
+                <Button variant="outline" size="sm" onClick={handleValidateName} disabled={!studyName.trim() || isValidating} className="shrink-0">
+                  {isValidating ? <Loader2 className="h-4 w-4 animate-spin" /> : '중복확인'}
+                </Button>
+              </div>
+              {nameValidated === false && <p className="text-destructive text-xs">이미 사용 중인 스터디명입니다.</p>}
+              {nameValidated === true && <p className="text-xs text-green-500">사용 가능한 스터디명입니다.</p>}
+            </div>
+
+            {/* 설명 */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium">설명</label>
+              <Textarea value={description} onChange={(e) => setDescription(e.target.value)} placeholder="스터디 설명을 입력하세요" className="resize-none" rows={3} />
+            </div>
+
+            {/* 최대 인원 */}
+            <div className="flex flex-col gap-1.5">
+              <label className="text-sm font-medium">최대 인원</label>
+              <Input type="number" min={2} max={50} value={maxMembers} onChange={(e) => setMaxMembers(Math.max(2, Math.min(50, Number(e.target.value))))} className="w-24" />
             </div>
 
             {/* 사용자 검색 */}
             <div className="flex flex-col gap-1.5">
               <label className="text-sm font-medium">멤버 초대</label>
               <div className="relative">
-                <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-                <Input
-                  value={userSearchKeyword}
-                  onChange={(e) => setUserSearchKeyword(e.target.value)}
-                  placeholder="백준 아이디 또는 코드로 검색"
-                  className="pl-9"
-                />
+                <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+                <Input value={userSearchKeyword} onChange={(e) => setUserSearchKeyword(e.target.value)} placeholder="백준 아이디 또는 코드로 검색" className="pl-9" />
               </div>
 
               {debouncedUserKeyword && (
@@ -179,14 +210,10 @@ export function CreateStudyDialog({ user, onClose }: props) {
                       <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
                     </div>
                   ) : userSearchResults.length > 0 ? (
-                    userSearchResults.slice(0, 5).map((u) => (
-                      <button
-                        key={u.bjAccountId}
-                        className="hover:bg-muted flex w-full items-center justify-between px-3 py-2 text-sm transition-colors"
-                        onClick={() => handleAddInvitedUser(u)}
-                      >
+                    userSearchResults.map((u) => (
+                      <button key={u.userAccountId} className="hover:bg-muted flex w-full items-center justify-between px-3 py-2 text-sm transition-colors" onClick={() => handleAddInvitedUser(u)}>
                         <span className="font-medium">{u.bjAccountId}</span>
-                        <span className="text-muted-foreground">#{u.defaultCode}</span>
+                        <span className="text-muted-foreground">#{u.userCode}</span>
                       </button>
                     ))
                   ) : (
@@ -202,16 +229,10 @@ export function CreateStudyDialog({ user, onClose }: props) {
                 <label className="text-sm font-medium">초대 목록 ({invitedUsers.length}명)</label>
                 <div className="flex flex-wrap gap-1.5">
                   {invitedUsers.map((u) => (
-                    <div
-                      key={u.bjAccountId}
-                      className="bg-muted flex items-center gap-1.5 rounded-full px-3 py-1 text-sm"
-                    >
+                    <div key={u.userAccountId} className="bg-muted flex items-center gap-1.5 rounded-full px-3 py-1 text-sm">
                       <span>{u.bjAccountId}</span>
-                      <span className="text-muted-foreground">#{u.defaultCode}</span>
-                      <button
-                        onClick={() => handleRemoveInvitedUser(u.bjAccountId)}
-                        className="text-muted-foreground hover:text-foreground"
-                      >
+                      <span className="text-muted-foreground">#{u.userCode}</span>
+                      <button onClick={() => handleRemoveInvitedUser(u.userAccountId)} className="text-muted-foreground hover:text-foreground">
                         <X className="h-3 w-3" />
                       </button>
                     </div>
@@ -234,13 +255,8 @@ export function CreateStudyDialog({ user, onClose }: props) {
           /* ───────────── 가입 신청 탭 ───────────── */
           <div className="flex min-h-0 flex-1 flex-col gap-4">
             <div className="relative">
-              <Search className="text-muted-foreground absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" />
-              <Input
-                value={studySearchKeyword}
-                onChange={(e) => setStudySearchKeyword(e.target.value)}
-                placeholder="스터디명, 방장 아이디 또는 코드로 검색"
-                className="pl-9"
-              />
+              <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
+              <Input value={studySearchKeyword} onChange={(e) => setStudySearchKeyword(e.target.value)} placeholder="스터디명, 방장 아이디 또는 코드로 검색" className="pl-9" />
             </div>
 
             {debouncedStudyKeyword ? (
@@ -252,10 +268,7 @@ export function CreateStudyDialog({ user, onClose }: props) {
                 <div className="min-h-0 flex-1 overflow-y-auto pr-1">
                   <div className="space-y-2">
                     {studySearchResults.map((study) => (
-                      <div
-                        key={study.studyId}
-                        className="bg-innerground-hovergray/50 hover:bg-innerground-darkgray/70 flex items-center justify-between rounded-lg p-3 transition-colors"
-                      >
+                      <div key={study.studyId} className="flex items-center justify-between rounded-lg border p-3">
                         <div className="flex flex-col gap-0.5">
                           <span className="font-medium">{study.studyName}</span>
                           <div className="text-muted-foreground flex items-center gap-2 text-sm">
@@ -266,12 +279,7 @@ export function CreateStudyDialog({ user, onClose }: props) {
                             </span>
                           </div>
                         </div>
-                        <Button
-                          variant={appliedStudyIds.has(study.studyId) ? 'secondary' : 'default'}
-                          size="sm"
-                          onClick={() => handleToggleApply(study)}
-                          className="ml-2 shrink-0"
-                        >
+                        <Button variant={appliedStudyIds.has(study.studyId) ? 'secondary' : 'default'} size="sm" onClick={() => handleToggleApply(study)} className="ml-2 shrink-0">
                           {appliedStudyIds.has(study.studyId) ? '취소하기' : '가입 신청'}
                         </Button>
                       </div>

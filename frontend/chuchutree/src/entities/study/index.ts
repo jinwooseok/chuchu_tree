@@ -1,2 +1,2 @@
-export { useMyStudies } from './model/queries';
-export type { Study } from './model/types';
+export { useMyStudies, useValidateStudyName, useSearchUsers, useCreateStudy } from './model/queries';
+export type { Study, SearchedUser, CreateStudyRequest } from './model/types';

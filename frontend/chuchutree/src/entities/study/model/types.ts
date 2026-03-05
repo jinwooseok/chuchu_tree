@@ -9,3 +9,16 @@ export interface Study {
   memberCount: number;
   createdAt: string;
 }
+
+export interface SearchedUser {
+  userAccountId: number;
+  bjAccountId: string;
+  userCode: string;
+}
+
+export interface CreateStudyRequest {
+  studyName: string;
+  description: string;
+  maxMembers: number;
+  inviteeUserAccountIds: number[];
+}
