@@ -58,6 +58,7 @@ import { SettingsDialog } from '@/features/sidebar/ui/settings/SettingsDialog';
 import { AddPrevProblemsDialog } from '@/features/sidebar/ui/group-second/AddPrevProblemsDialog';
 import { BannedProblemsDialog } from '@/features/sidebar/ui/group-second/BannedProblemsDialog';
 import { User } from '@/entities/user';
+import { useMyStudies } from '@/entities/study';
 import { useState } from 'react';
 import { useLandingRecommend } from '@/features/landing';
 import { useOnboardingStore } from '@/lib/store/onboarding';
@@ -185,6 +186,9 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
     }
     openModal('notice-list', <NoticeDialog onClose={() => closeModal('notice-list')} />);
   };
+
+  // 스터디 목록 조회
+  const { data: studies = [] } = useMyStudies();
 
   // 튜토리얼 다시보기
   const { resetOnboarding, startOnboarding } = useOnboardingStore();
@@ -447,7 +451,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
           </SidebarGroup>
           <div className="mt-10" />
           {/* 그룹3 : 스터디 전용 */}
-          {/* <SidebarGroup>
+          <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
                 <SidebarMenuItem key="addstudy" aria-label={'스터디 생성'}>
@@ -471,45 +475,20 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                   </AppTooltip>
                   <SidebarMenuSub>
                     <SidebarMenuSubItem>
-                      <SidebarMenuSubButton asChild isActive={studySection === '스터디1'}>
-                        <div
-                          onClick={() => {
-                            setStudySection('스터디1');
-                          }}
-                          className="mb-1 cursor-pointer"
-                        >
-                          <Bookmark size={ICON_SIZE} className="relative z-10" />
-                          <span className="relative z-10">스터디1</span>
-                        </div>
-                      </SidebarMenuSubButton>
-                      <SidebarMenuSubButton asChild isActive={studySection === '스터디2'}>
-                        <div
-                          onClick={() => {
-                            setStudySection('스터디2');
-                          }}
-                          className="mb-1 cursor-pointer"
-                        >
-                          <Bookmark size={ICON_SIZE} className="relative z-10" />
-                          <span className="relative z-10">스터디2</span>
-                        </div>
-                      </SidebarMenuSubButton>
-                      <SidebarMenuSubButton asChild isActive={studySection === '스터디3'}>
-                        <div
-                          onClick={() => {
-                            setStudySection('스터디3');
-                          }}
-                          className="mb-1 cursor-pointer"
-                        >
-                          <Bookmark size={ICON_SIZE} className="relative z-10" />
-                          <span className="relative z-10">스터디3</span>
-                        </div>
-                      </SidebarMenuSubButton>
+                      {studies.map((study) => (
+                        <SidebarMenuSubButton key={study.studyId} asChild isActive={studySection === study.studyId.toString()}>
+                          <div onClick={() => setStudySection(study.studyId.toString())} className="mb-1 cursor-pointer">
+                            <Bookmark size={ICON_SIZE} className="relative z-10" />
+                            <span className="relative z-10">{study.studyName}</span>
+                          </div>
+                        </SidebarMenuSubButton>
+                      ))}
                     </SidebarMenuSubItem>
                   </SidebarMenuSub>
                 </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
-          </SidebarGroup> */}
+          </SidebarGroup>
         </SidebarContent>
         {/* footer */}
         <SidebarFooter>
