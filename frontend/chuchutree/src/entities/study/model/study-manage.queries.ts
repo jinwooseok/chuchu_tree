@@ -1,9 +1,9 @@
 'use client';
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { studyApi } from '../api/study.api';
-import { studyKeys } from './keys';
-import { CreateStudyRequest } from './types';
+import { studyApi } from '../api/study-manage.api';
+import { studyKeys } from './study-manage.keys';
+import { CreateStudyRequest } from './study-manage.types';
 import { UseMutationCallback } from '@/shared/types/api';
 
 export const useMyStudies = () => {

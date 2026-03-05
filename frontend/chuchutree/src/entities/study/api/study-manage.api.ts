@@ -1,5 +1,5 @@
 import { ApiResponse } from '@/shared/types/api';
-import { Study, SearchedUser, SearchedStudy, CreateStudyRequest } from '../model/types';
+import { Study, SearchedUser, SearchedStudy, CreateStudyRequest } from '../model/study-manage.types';
 import { axiosInstance } from '@/lib/axios';
 
 export const studyApi = {
