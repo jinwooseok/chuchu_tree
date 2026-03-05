@@ -16,4 +16,13 @@ export const userApi = {
     });
     return data.data;
   },
+  postProfileImage: async (formData: FormData): Promise<{ profileImageUrl: string }> => {
+    const { data } = await axiosInstance.post<ApiResponse<{ profileImageUrl: string }>>('/user-accounts/profile-image', formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return data.data;
+  },
+  deleteProfileImage: async (): Promise<void> => {
+    await axiosInstance.delete('/user-accounts/profile-image');
+  },
 };

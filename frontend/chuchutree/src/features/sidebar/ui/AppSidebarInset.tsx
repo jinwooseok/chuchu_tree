@@ -159,6 +159,8 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       'settings',
       <SettingsDialog
         currentBjAccountId={user?.bjAccount?.bjAccountId || 'guest'}
+        currentUserCode={user?.userAccount.userCode || ''}
+        currentProfileImageUrl={user?.userAccount.profileImageUrl || null}
         currentTarget={user?.userAccount?.target?.targetCode as TargetCode}
         linkedAt={user?.linkedAt}
         isLanding={isLanding}

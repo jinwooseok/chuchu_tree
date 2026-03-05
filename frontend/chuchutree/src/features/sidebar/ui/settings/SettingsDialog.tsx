@@ -9,16 +9,19 @@ import BjAccountSection from './BjAccountSection';
 import TargetSection from './TargetSection';
 import PolicyLinksSection from './PolicyLinksSection';
 import AccountDeletionSection from './AccountDeletionSection';
+import UserProfileSection from '@/features/sidebar/ui/settings/UserProfileSection';
 
 interface SettingsDialogProps {
   onClose: () => void;
   currentBjAccountId: string;
   currentTarget: TargetCode;
   linkedAt?: string;
+  currentUserCode: string;
+  currentProfileImageUrl: string | null;
   isLanding?: boolean;
 }
 
-export function SettingsDialog({ onClose, currentBjAccountId, currentTarget, linkedAt, isLanding = false }: SettingsDialogProps) {
+export function SettingsDialog({ onClose, currentBjAccountId, currentTarget, linkedAt, currentUserCode, currentProfileImageUrl, isLanding = false }: SettingsDialogProps) {
   return (
     <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="flex max-h-[90vh] flex-col sm:max-w-2xl">
@@ -32,11 +35,13 @@ export function SettingsDialog({ onClose, currentBjAccountId, currentTarget, lin
 
           <Separator />
 
-          <BjAccountSection currentBjAccountId={currentBjAccountId} linkedAt={linkedAt} onClose={onClose} isLanding={isLanding}/>
+          <UserProfileSection currentBjAccountId={currentBjAccountId} currentUserCode={currentUserCode} currentProfileImageUrl={currentProfileImageUrl}/>
+
+          <BjAccountSection currentBjAccountId={currentBjAccountId} linkedAt={linkedAt} onClose={onClose} isLanding={isLanding} />
 
           <Separator />
 
-          <TargetSection currentTarget={currentTarget} onClose={onClose} isLanding={isLanding}/>
+          <TargetSection currentTarget={currentTarget} onClose={onClose} isLanding={isLanding} />
 
           <Separator />
 
@@ -44,7 +49,7 @@ export function SettingsDialog({ onClose, currentBjAccountId, currentTarget, lin
 
           <Separator className="border-destructive/20 mb-20" />
 
-          <AccountDeletionSection isLanding={isLanding}/>
+          <AccountDeletionSection isLanding={isLanding} />
         </div>
       </DialogContent>
     </Dialog>
