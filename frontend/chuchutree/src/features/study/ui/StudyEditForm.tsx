@@ -32,9 +32,7 @@ export function StudyEditForm({ studyDetail, onClose }: StudyEditFormProps) {
   };
 
   return (
-    <div className="mt-3 space-y-3 rounded-lg border p-4">
-      <p className="text-sm font-medium">스터디 정보 수정</p>
-
+    <div className="space-y-3">
       <div className="flex flex-col gap-1.5">
         <label className="text-muted-foreground text-xs">설명</label>
         <Textarea

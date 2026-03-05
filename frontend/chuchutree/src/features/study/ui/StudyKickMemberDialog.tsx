@@ -29,25 +29,22 @@ export function StudyKickMemberDialog({ studyDetail, currentUserAccountId, onClo
 
   return (
     <>
-      <div className="mt-3 space-y-2 rounded-lg border p-4">
-        <p className="text-sm font-medium">멤버 강제 퇴장</p>
-        {kickableMembers.length === 0 ? (
-          <p className="text-muted-foreground text-sm">퇴장할 수 있는 멤버가 없습니다.</p>
-        ) : (
-          <div className="divide-y">
-            {kickableMembers.map((member) => (
-              <div key={member.userAccountId} className="flex items-center justify-between py-2">
-                <span className="text-sm">
-                  {member.bjAccountId}#{member.userCode}
-                </span>
-                <button onClick={() => setSelectedMember(member)} className="text-destructive hover:text-destructive/80 text-xs font-medium transition-colors">
-                  퇴장
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+      {kickableMembers.length === 0 ? (
+        <p className="text-muted-foreground text-sm">퇴장할 수 있는 멤버가 없습니다.</p>
+      ) : (
+        <div className="divide-y">
+          {kickableMembers.map((member) => (
+            <div key={member.userAccountId} className="flex items-center justify-between py-2">
+              <span className="truncate text-sm">
+                {member.bjAccountId}#{member.userCode}
+              </span>
+              <button onClick={() => setSelectedMember(member)} className="text-destructive hover:text-destructive/80 text-xs font-medium whitespace-nowrap transition-colors">
+                퇴장
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       {selectedMember && (
         <AlertDialog open={true} onOpenChange={(open) => !open && setSelectedMember(null)}>

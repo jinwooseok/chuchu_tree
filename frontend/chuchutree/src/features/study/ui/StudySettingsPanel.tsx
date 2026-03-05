@@ -1,24 +1,35 @@
 'use client';
 
-import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import { StudyDetail, useLeaveStudy, useDeleteStudy } from '@/entities/study';
 import { useLayoutStore } from '@/lib/store/layout';
 import { toast } from '@/lib/utils/toast';
-import { StudyEditForm } from './StudyEditForm';
 import { StudyLeaveAlertDialog } from './StudyLeaveAlertDialog';
 import { StudyDeleteAlertDialog } from './StudyDeleteAlertDialog';
 import { StudyKickMemberDialog } from './StudyKickMemberDialog';
-
-type SettingView = 'menu' | 'edit' | 'kick';
+import { useState } from 'react';
+import type { SettingsView } from './StudyDashboard';
 
 interface StudySettingsPanelProps {
   studyDetail: StudyDetail;
   currentUserAccountId: number;
   isOwner: boolean;
+  settingsView: SettingsView;
+  setSettingsView: (view: SettingsView) => void;
+  onStartEdit: () => void;
+  onCancelEdit: () => void;
+  onSaveEdit: () => void;
+  isSaving: boolean;
 }
 
-export function StudySettingsPanel({ studyDetail, currentUserAccountId, isOwner }: StudySettingsPanelProps) {
-  const [view, setView] = useState<SettingView>('menu');
+const VIEW_TITLE: Record<SettingsView, string> = {
+  menu: '설정',
+  edit: '스터디 정보수정',
+  kick: '멤버강제퇴장',
+};
+
+export function StudySettingsPanel({ studyDetail, currentUserAccountId, isOwner, settingsView, setSettingsView, onStartEdit, onCancelEdit, onSaveEdit, isSaving }: StudySettingsPanelProps) {
   const [isLeaveOpen, setIsLeaveOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
@@ -41,55 +52,63 @@ export function StudySettingsPanel({ studyDetail, currentUserAccountId, isOwner 
   });
 
   return (
-    <div className="mt-3 rounded-lg border p-4">
-      <p className="mb-3 text-sm font-medium">설정</p>
+    <div className="flex w-full flex-col rounded-lg border p-4 sm:h-full">
+      {/* 패널 헤더: 동적 제목 + 뷰별 액션 버튼 */}
+      <div className="mb-3 flex shrink-0 items-center justify-between">
+        <p className="text-sm font-medium">{VIEW_TITLE[settingsView]}</p>
 
-      {view === 'menu' && (
-        <div className="space-y-1">
-          {isOwner && (
-            <button
-              onClick={() => setView('edit')}
-              className="hover:bg-muted w-full rounded px-3 py-2 text-left text-sm transition-colors"
-            >
-              스터디 정보 수정
-            </button>
-          )}
-          <button
-            onClick={() => setIsLeaveOpen(true)}
-            className="text-destructive hover:bg-destructive/10 w-full rounded px-3 py-2 text-left text-sm transition-colors"
-          >
-            스터디 탈퇴
+        {settingsView === 'edit' && (
+          <div className="flex gap-1.5">
+            <Button variant="outline" size="sm" onClick={onCancelEdit} disabled={isSaving} className="h-7 px-2 text-xs">
+              취소
+            </Button>
+            <Button size="sm" onClick={onSaveEdit} disabled={isSaving} className="h-7 px-2 text-xs">
+              {isSaving && <Loader2 className="mr-1 h-3 w-3 animate-spin" />}
+              저장
+            </Button>
+          </div>
+        )}
+
+        {settingsView === 'kick' && (
+          <button onClick={() => setSettingsView('menu')} className="text-muted-foreground hover:text-foreground text-xs transition-colors">
+            취소
           </button>
-          {isOwner && (
-            <>
-              <button
-                onClick={() => setView('kick')}
-                className="hover:bg-muted w-full rounded px-3 py-2 text-left text-sm transition-colors"
-              >
-                멤버 강제 퇴장
-              </button>
-              <button
-                onClick={() => setIsDeleteOpen(true)}
-                className="text-destructive hover:bg-destructive/10 w-full rounded px-3 py-2 text-left text-sm transition-colors"
-              >
-                스터디 삭제
-              </button>
-            </>
-          )}
-        </div>
-      )}
+        )}
+      </div>
 
-      {view === 'edit' && (
-        <StudyEditForm studyDetail={studyDetail} onClose={() => setView('menu')} />
-      )}
+      {/* 콘텐츠 */}
+      <div className="hide-scrollbar min-h-0 flex-1 overflow-y-auto">
+        {settingsView === 'menu' && (
+          <div className="space-y-1">
+            {isOwner && (
+              <button onClick={onStartEdit} className="hover:bg-muted w-full rounded px-3 py-2 text-left text-sm whitespace-nowrap transition-colors">
+                스터디 정보 수정
+              </button>
+            )}
+            <button onClick={() => setIsLeaveOpen(true)} className="text-destructive hover:bg-destructive/10 w-full rounded px-3 py-2 text-left text-sm whitespace-nowrap transition-colors">
+              스터디 탈퇴
+            </button>
+            {isOwner && (
+              <>
+                <button onClick={() => setSettingsView('kick')} className="hover:bg-muted w-full rounded px-3 py-2 text-left text-sm whitespace-nowrap transition-colors">
+                  멤버 강제 퇴장
+                </button>
+                <button onClick={() => setIsDeleteOpen(true)} className="text-destructive hover:bg-destructive/10 w-full rounded px-3 py-2 text-left text-sm whitespace-nowrap transition-colors">
+                  스터디 삭제
+                </button>
+              </>
+            )}
+          </div>
+        )}
 
-      {view === 'kick' && (
-        <StudyKickMemberDialog
-          studyDetail={studyDetail}
-          currentUserAccountId={currentUserAccountId}
-          onClose={() => setView('menu')}
-        />
-      )}
+        {settingsView === 'kick' && (
+          <StudyKickMemberDialog
+            studyDetail={studyDetail}
+            currentUserAccountId={currentUserAccountId}
+            onClose={() => setSettingsView('menu')}
+          />
+        )}
+      </div>
 
       {isLeaveOpen && (
         <StudyLeaveAlertDialog
