@@ -8,7 +8,7 @@ import { toast } from '@/lib/utils/toast';
 import { User } from '@/entities/user';
 import { useState, useEffect } from 'react';
 import { X, Loader2, Search, CheckCircle2, XCircle } from 'lucide-react';
-import { useValidateStudyName, useSearchUsers, useCreateStudy, SearchedUser } from '@/entities/study';
+import { useMyStudies, useValidateStudyName, useSearchUsers, useSearchStudies, useApplyStudy, useCancelApplyStudy, useCreateStudy, SearchedUser } from '@/entities/study';
 
 interface props {
   user?: User;
@@ -16,14 +16,6 @@ interface props {
 }
 
 type TabType = 'create' | 'join';
-
-interface SearchedStudy {
-  studyId: number;
-  studyName: string;
-  ownerName: string;
-  memberCount: number;
-  maxMemberCount: number;
-}
 
 export function CreateStudyDialog({ user, onClose }: props) {
   const [activeTab, setActiveTab] = useState<TabType>('create');
@@ -72,8 +64,13 @@ export function CreateStudyDialog({ user, onClose }: props) {
     },
   });
 
-  const studySearchResults: SearchedStudy[] = [];
-  const isSearchingStudies = false;
+  const { data: myStudies = [] } = useMyStudies();
+  const joinedStudyIds = new Set(myStudies.map((s) => s.studyId));
+
+  const { data: studySearchResults = [], isLoading: isSearchingStudies } = useSearchStudies(debouncedStudyKeyword);
+
+  const { mutate: applyStudy } = useApplyStudy();
+  const { mutate: cancelApplyStudy } = useCancelApplyStudy();
 
   const handleValidateName = () => {
     if (!studyName.trim()) return;
@@ -115,15 +112,23 @@ export function CreateStudyDialog({ user, onClose }: props) {
     });
   };
 
-  const handleToggleApply = (study: SearchedStudy) => {
-    setAppliedStudyIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(study.studyId)) {
-        next.delete(study.studyId);
-      } else {
-        next.add(study.studyId);
-      }
-      return next;
+  const handleApply = (studyId: number) => {
+    setAppliedStudyIds((prev) => new Set([...prev, studyId]));
+    applyStudy(studyId, {
+      onError: () => {
+        toast.error('가입 신청에 실패했습니다.');
+        setAppliedStudyIds((prev) => { const next = new Set(prev); next.delete(studyId); return next; });
+      },
+    });
+  };
+
+  const handleCancelApply = (studyId: number) => {
+    setAppliedStudyIds((prev) => { const next = new Set(prev); next.delete(studyId); return next; });
+    cancelApplyStudy(studyId, {
+      onError: () => {
+        toast.error('신청 취소에 실패했습니다.');
+        setAppliedStudyIds((prev) => new Set([...prev, studyId]));
+      },
     });
   };
 
@@ -272,16 +277,18 @@ export function CreateStudyDialog({ user, onClose }: props) {
                         <div className="flex flex-col gap-0.5">
                           <span className="font-medium">{study.studyName}</span>
                           <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                            <span>방장: {study.ownerName}</span>
+                            <span>방장: {study.ownerBjAccountId}#{study.ownerUserCode}</span>
                             <span>·</span>
-                            <span>
-                              {study.memberCount}/{study.maxMemberCount}명
-                            </span>
+                            <span>{study.memberCount}명</span>
                           </div>
                         </div>
-                        <Button variant={appliedStudyIds.has(study.studyId) ? 'secondary' : 'default'} size="sm" onClick={() => handleToggleApply(study)} className="ml-2 shrink-0">
-                          {appliedStudyIds.has(study.studyId) ? '취소하기' : '가입 신청'}
-                        </Button>
+                        {joinedStudyIds.has(study.studyId) ? (
+                          <Button variant="secondary" size="sm" disabled className="ml-2 shrink-0">참여중</Button>
+                        ) : appliedStudyIds.has(study.studyId) ? (
+                          <Button variant="outline" size="sm" onClick={() => handleCancelApply(study.studyId)} className="ml-2 shrink-0">신청취소</Button>
+                        ) : (
+                          <Button size="sm" onClick={() => handleApply(study.studyId)} className="ml-2 shrink-0">신청</Button>
+                        )}
                       </div>
                     ))}
                   </div>

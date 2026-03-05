@@ -16,6 +16,14 @@ export interface SearchedUser {
   userCode: string;
 }
 
+export interface SearchedStudy {
+  studyId: number;
+  studyName: string;
+  ownerBjAccountId: string;
+  ownerUserCode: string;
+  memberCount: number;
+}
+
 export interface CreateStudyRequest {
   studyName: string;
   description: string;

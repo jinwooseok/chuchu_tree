@@ -27,6 +27,30 @@ export const useSearchUsers = (keyword: string) => {
   });
 };
 
+export const useSearchStudies = (keyword: string) => {
+  return useQuery({
+    queryKey: studyKeys.searchStudies(keyword),
+    queryFn: () => studyApi.searchStudies(keyword),
+    enabled: keyword.length > 0,
+  });
+};
+
+export const useApplyStudy = (callbacks?: UseMutationCallback) => {
+  return useMutation({
+    mutationFn: (studyId: number) => studyApi.applyStudy(studyId),
+    onSuccess: () => callbacks?.onSuccess?.(),
+    onError: (error) => callbacks?.onError?.(error),
+  });
+};
+
+export const useCancelApplyStudy = (callbacks?: UseMutationCallback) => {
+  return useMutation({
+    mutationFn: (studyId: number) => studyApi.cancelApplyStudy(studyId),
+    onSuccess: () => callbacks?.onSuccess?.(),
+    onError: (error) => callbacks?.onError?.(error),
+  });
+};
+
 export const useCreateStudy = (callbacks?: UseMutationCallback) => {
   const queryClient = useQueryClient();
 

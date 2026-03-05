@@ -1,5 +1,5 @@
 import { ApiResponse } from '@/shared/types/api';
-import { Study, SearchedUser, CreateStudyRequest } from '../model/types';
+import { Study, SearchedUser, SearchedStudy, CreateStudyRequest } from '../model/types';
 import { axiosInstance } from '@/lib/axios';
 
 export const studyApi = {
@@ -21,5 +21,17 @@ export const studyApi = {
   },
   createStudy: async (body: CreateStudyRequest): Promise<void> => {
     await axiosInstance.post('/studies', body);
+  },
+  searchStudies: async (keyword: string): Promise<SearchedStudy[]> => {
+    const { data } = await axiosInstance.get<ApiResponse<{ studies: SearchedStudy[] }>>('/studies/search', {
+      params: { keyword, limit: 5 },
+    });
+    return data.data.studies;
+  },
+  applyStudy: async (studyId: number): Promise<void> => {
+    await axiosInstance.post(`/studies/${studyId}/applications`, { message: '가입신청' });
+  },
+  cancelApplyStudy: async (studyId: number): Promise<void> => {
+    await axiosInstance.delete(`/studies/${studyId}/applications/me`);
   },
 };
