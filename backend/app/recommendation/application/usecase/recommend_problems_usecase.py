@@ -203,7 +203,7 @@ class RecommendProblemsUsecase:
         recommended_problem_ids: set[int] = set()  # 이미 추천한 문제 ID 추적
         sampled_tags_log: list[tuple[str, bool]] = []  # 샘플링된 태그 로그 (태그명, 성공여부)
         failed_attempts = 0
-        max_failed_attempts = count * 15  # 무한 루프 방지
+        max_failed_attempts = count * 20  # 무한 루프 방지
 
         effective_filter_codes = level_filter_codes if len(level_filter_codes) != 0 else [FilterCode.NORMAL]
         display_filter_code = effective_filter_codes[0]  # 표시 목적용

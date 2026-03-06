@@ -12,6 +12,7 @@ class StudySearchResult:
     owner_bj_account_id: str
     owner_user_code: str
     member_count: int
+    owner_profile_image: str | None = None
 
 
 class StudyRepository(ABC):
