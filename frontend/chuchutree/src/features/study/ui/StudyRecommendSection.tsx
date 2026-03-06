@@ -1,21 +1,20 @@
 'use client';
 
-import { useState } from 'react';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ChevronDown } from 'lucide-react';
-import { useGetStudyRecommendation, StudyRecommendedProblem, StudyRecommendMemberSolveInfo } from '@/entities/study';
-import { StudyDetail } from '@/entities/study';
+import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
+import { EyeOff, Search, SlidersHorizontal, EllipsisVertical, ChevronDown } from 'lucide-react';
+import { useStudyRecommendStore } from '@/lib/store/studyRecommend';
+import { useStudyRecommend } from '../hooks/useStudyRecommend';
+import { StudyDetail, StudyRecommendedProblem, StudyRecommendMemberSolveInfo } from '@/entities/study';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
+import { useState } from 'react';
 
-interface StudyRecommendSectionProps {
-  studyDetail: StudyDetail;
-  currentUserAccountId: number;
-}
+// ── 멤버 풀이 배지 ─────────────────────────────────────────────────
 
-function MemberSolveInfoBadge({ info }: { info: StudyRecommendMemberSolveInfo }) {
+function MemberSolveBadge({ info }: { info: StudyRecommendMemberSolveInfo }) {
   return (
     <span
       className={`inline-flex items-center rounded px-1 py-0.5 text-xs font-medium ${
@@ -29,83 +28,203 @@ function MemberSolveInfoBadge({ info }: { info: StudyRecommendMemberSolveInfo })
   );
 }
 
-function StudyRecommendProblemCard({ problem }: { problem: StudyRecommendedProblem }) {
+// ── 문제 카드 ──────────────────────────────────────────────────────
+
+function StudyRecommendProblemCard({
+  problem,
+  showFilters,
+  totalCount,
+}: {
+  problem: StudyRecommendedProblem;
+  showFilters: { problemNumber: boolean; problemTier: boolean; recommendReason: boolean; algorithm: boolean };
+  totalCount: number;
+}) {
   const firstTag = problem.tags[0];
   const tagName = firstTag ? (TAG_INFO[firstTag.tagCode as keyof typeof TAG_INFO]?.kr ?? firstTag.tagDisplayName) : null;
 
   return (
     <div
-      className="bg-innerground-hovergray/50 hover:bg-innerground-darkgray/70 flex cursor-pointer flex-col gap-1 rounded-lg p-2 text-xs transition-colors"
+      className={`mr-2 flex ${totalCount <= 3 ? 'h-full' : 'h-auto'}`}
       onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')}
     >
-      <div className="flex items-center gap-2">
-        <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />
-        <span className="text-muted-foreground">#{problem.problemId}</span>
-        <span className="line-clamp-1 flex-1 font-medium">{problem.problemTitle}</span>
-        {tagName && <span className="text-muted-foreground shrink-0">{tagName}</span>}
-      </div>
-      {problem.recommandReasons.length > 0 && (
-        <p className="text-muted-foreground line-clamp-1">{problem.recommandReasons[0].reason}</p>
-      )}
-      {problem.studyMemberSolveInfo.length > 0 && (
-        <div className="flex flex-wrap gap-1">
-          {problem.studyMemberSolveInfo.map((info) => (
-            <MemberSolveInfoBadge key={info.userAccountId} info={info} />
-          ))}
+      <div className="bg-innerground-hovergray/50 hover:bg-innerground-darkgray/70 flex flex-1 cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-colors">
+        <div className="flex items-center gap-2">
+          {showFilters.problemTier && (
+            <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />
+          )}
+          {showFilters.problemNumber && <span className="text-muted-foreground">#{problem.problemId}</span>}
+          <span className="line-clamp-2 font-medium">{problem.problemTitle}</span>
         </div>
-      )}
+        <div className="flex min-w-30 flex-col items-end gap-0.5">
+          <div className="flex items-center gap-1">
+            {showFilters.algorithm && tagName && <span className="text-muted-foreground line-clamp-1">{tagName}</span>}
+          </div>
+          {showFilters.recommendReason && problem.recommandReasons.length > 0 && (
+            <p className="text-muted-foreground line-clamp-1">{problem.recommandReasons[0].reason}</p>
+          )}
+          {problem.studyMemberSolveInfo.length > 0 && (
+            <div className="flex flex-wrap justify-end gap-1">
+              {problem.studyMemberSolveInfo.map((info) => (
+                <MemberSolveBadge key={info.userAccountId} info={info} />
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
 
-export function StudyRecommendSection({ studyDetail, currentUserAccountId }: StudyRecommendSectionProps) {
-  const [targetMemberId, setTargetMemberId] = useState<number>(currentUserAccountId);
-  const [recommendAllUnsolved, setRecommendAllUnsolved] = useState(false);
-  const [count, setCount] = useState(3);
-  const [isCountPopoverOpen, setIsCountPopoverOpen] = useState(false);
-  const [result, setResult] = useState<StudyRecommendedProblem[]>([]);
+// ── 결과 패널 ──────────────────────────────────────────────────────
 
-  const { mutate: getRecommendation, isPending } = useGetStudyRecommendation({
-    onSuccess: () => {},
-    onError: () => {},
-  });
+function StudyRecommendAnswer() {
+  const { problems, isLoading, showFilters } = useStudyRecommendStore();
 
-  const handleRecommend = () => {
-    getRecommendation(
-      {
-        study_id: studyDetail.studyId,
-        target_user_account_id: targetMemberId,
-        recommend_all_unsolved: recommendAllUnsolved,
-        count,
-      },
-      {
-        onSuccess: (data) => {
-          setResult(data.problems);
-        },
-      },
+  if (isLoading) {
+    return (
+      <div className="ml-1 flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-2">
+        <div className="text-muted-foreground text-sm">추천 중...</div>
+      </div>
     );
-  };
+  }
 
-  const selectedMember = studyDetail.members.find((m) => m.userAccountId === targetMemberId);
+  if (problems.length === 0) {
+    return (
+      <div className="ml-2 flex h-full flex-1 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-2">
+        <div className="text-muted-foreground text-sm">추천받기 버튼을 눌러주세요</div>
+      </div>
+    );
+  }
+
+  const totalSlots = 3;
+  const emptySlots = problems.length < totalSlots ? totalSlots - problems.length : 0;
+
+  return (
+    <div className="ml-1 h-full w-full flex-1 rounded-lg border-2 border-dashed p-2">
+      <div className={`flex h-full flex-col gap-1 overflow-x-hidden ${problems.length <= 3 ? 'overflow-y-hidden' : 'overflow-y-scroll'}`}>
+        {problems.map((problem) => (
+          <StudyRecommendProblemCard key={problem.problemId} problem={problem} showFilters={showFilters} totalCount={problems.length} />
+        ))}
+        {Array.from({ length: emptySlots }).map((_, index) => (
+          <div key={`empty-${index}`} className="mr-2 flex h-full rounded-lg">
+            <div className="bg-innerground-hovergray/50 text-muted-foreground flex h-full flex-1 cursor-default items-center justify-center rounded-lg text-xs">
+              필터를 조정하면 더 많은 문제를 추천받을 수 있습니다
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── 컨트롤 패널 ────────────────────────────────────────────────────
+
+function StudyRecommendButton({
+  studyDetail,
+  currentUserAccountId,
+  studyId,
+}: {
+  studyDetail: StudyDetail;
+  currentUserAccountId: number;
+  studyId: number;
+}) {
+  const {
+    targetMemberId,
+    recommendAllUnsolved,
+    selectedLevels,
+    selectedTagsList,
+    selectedExclusionMode,
+    selectedCount,
+    showFilters,
+    showLevelSection,
+    showTagSection,
+    showFilterSection,
+    showExcludedModeSection,
+    setTargetMemberId,
+    setRecommendAllUnsolved,
+    setSelectedLevels,
+    setSelectedTagsList,
+    setSelectedExclusionMode,
+    setSelectedCount,
+    toggleFilter,
+    resetFilters,
+    toggleLevelSection,
+    toggleTagSection,
+    toggleFilterSection,
+    toggleExcludedModeSection,
+  } = useStudyRecommendStore();
+
+  const [isCountPopoverOpen, setIsCountPopoverOpen] = useState(false);
+  const { recommend, isPending } = useStudyRecommend(studyId);
+
+  const effectiveTargetId = targetMemberId || currentUserAccountId;
+  const selectedMember = studyDetail.members.find((m) => m.userAccountId === effectiveTargetId);
   const selectedMemberLabel = selectedMember
     ? selectedMember.userAccountId === currentUserAccountId
       ? `${selectedMember.bjAccountId} (나)`
       : selectedMember.bjAccountId
     : '멤버 선택';
 
+  const toggleLevel = (level: string) =>
+    setSelectedLevels(selectedLevels.includes(level) ? selectedLevels.filter((l) => l !== level) : [...selectedLevels, level]);
+  const toggleTag = (tag: string) =>
+    setSelectedTagsList(selectedTagsList.includes(tag) ? selectedTagsList.filter((t) => t !== tag) : [...selectedTagsList, tag]);
+
+  const levels = ['easy', 'normal', 'hard', 'extreme'] as const;
+  const filters = [
+    { key: 'problemNumber' as const, label: '문제번호' },
+    { key: 'problemTier' as const, label: '문제티어' },
+    { key: 'recommendReason' as const, label: '추천이유' },
+    { key: 'algorithm' as const, label: '알고리즘' },
+  ];
+  const initialShowFilters = { problemNumber: true, problemTier: true, recommendReason: true, algorithm: false };
+
+  const hasTagChanges = selectedTagsList.length > 0;
+  const hasFilterChanges = JSON.stringify(showFilters) !== JSON.stringify(initialShowFilters);
+  const hasLevelChanges = selectedLevels.length > 0;
+  const etcIsChanged = selectedExclusionMode !== 'LENIENT' || selectedCount !== 3;
+
   return (
-    <div className="flex w-full gap-2">
-      {/* 왼쪽: 컨트롤 패널 */}
-      <div className="flex w-52 shrink-0 flex-col gap-2 rounded-lg border-2 border-dashed p-2">
-        <div className="text-muted-foreground cursor-default text-xs font-semibold">문제 추천</div>
+    <div className="flex h-full gap-1">
+      <div className="flex h-full w-50 flex-col gap-2 rounded-lg border-2 border-dashed p-2">
+        {/* 헤더: 아이콘 버튼들 */}
+        <div className="flex items-center justify-between pl-2 text-xs">
+          <div className="text-muted-foreground cursor-default text-center text-xs font-semibold">문제 추천</div>
+          <div className="flex items-center justify-center gap-2">
+            <AppTooltip content="알고리즘 유형 선택" side="top">
+              <div aria-label="알고리즘 유형 선택창 열기" className="relative cursor-pointer" onClick={toggleTagSection}>
+                <Search className="text-muted-foreground h-4 w-4" />
+                {hasTagChanges && <div className="bg-primary/80 absolute top-0 -right-0.5 h-2 w-2 rounded-full" />}
+              </div>
+            </AppTooltip>
+            <AppTooltip content="표시 항목" side="top">
+              <div aria-label="표시 항목창 열기" className="relative cursor-pointer" onClick={toggleFilterSection}>
+                <EyeOff className="text-muted-foreground h-4 w-4" />
+                {hasFilterChanges && <div className="bg-primary/80 absolute top-0 -right-0.5 h-2 w-2 rounded-full" />}
+              </div>
+            </AppTooltip>
+            <AppTooltip content="난이도 선택" side="top">
+              <div aria-label="난이도 선택창 열기" className="relative cursor-pointer" onClick={toggleLevelSection}>
+                <SlidersHorizontal className="text-muted-foreground h-4 w-4" />
+                {hasLevelChanges && <div className="bg-primary/80 absolute top-0 -right-0.5 h-2 w-2 rounded-full" />}
+              </div>
+            </AppTooltip>
+            <AppTooltip content="기타 설정" side="top">
+              <div aria-label="기타 설정창 열기" className="relative cursor-pointer" onClick={toggleExcludedModeSection}>
+                <EllipsisVertical className="text-muted-foreground h-4 w-4" />
+                {selectedExclusionMode !== 'LENIENT' && <div className="bg-primary/80 absolute top-0 -right-0.5 h-2 w-2 rounded-full" />}
+              </div>
+            </AppTooltip>
+          </div>
+        </div>
 
         {/* 멤버 선택 */}
         <Select
-          value={String(targetMemberId)}
+          value={String(effectiveTargetId)}
           onValueChange={(val) => setTargetMemberId(Number(val))}
         >
           <SelectTrigger className="h-7 w-full text-xs" aria-label="기준 멤버 선택">
-            <SelectValue placeholder="멤버 선택">
+            <SelectValue>
               <span className="line-clamp-1">{selectedMemberLabel}</span>
             </SelectValue>
           </SelectTrigger>
@@ -119,7 +238,7 @@ export function StudyRecommendSection({ studyDetail, currentUserAccountId }: Stu
           </SelectContent>
         </Select>
 
-        {/* 미풀이 전체 기반 체크박스 */}
+        {/* 미풀이 전체 기반 */}
         <label className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded px-1">
           <input
             type="checkbox"
@@ -130,64 +249,171 @@ export function StudyRecommendSection({ studyDetail, currentUserAccountId }: Stu
           <span className="text-xs">미풀이 전체 기반</span>
         </label>
 
-        {/* 추천 문제수 */}
-        <div className="flex items-center justify-between px-1 text-xs">
-          <span className="text-muted-foreground cursor-default">추천 문제수</span>
-          <Popover open={isCountPopoverOpen} onOpenChange={setIsCountPopoverOpen}>
-            <PopoverTrigger asChild>
-              <Button aria-label="문제수 선택" variant="outline" className="h-6 w-8 cursor-pointer text-xs">
-                {count}
-                <ChevronDown className="ml-0.5 h-3 w-3" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-16 p-2">
-              <div className="space-y-2">
-                {[1, 2, 3, 4, 5, 6].map((cnt) => (
-                  <label key={cnt} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded p-1">
-                    <input
-                      type="checkbox"
-                      checked={count === cnt}
-                      onChange={() => {
-                        setCount(cnt);
-                        setIsCountPopoverOpen(false);
-                      }}
-                      className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 cursor-pointer appearance-none rounded border-2"
-                    />
-                    <span className="text-xs">{cnt}</span>
-                  </label>
-                ))}
+        {/* 알고리즘 유형 멀티셀렉트 */}
+        {showTagSection && (
+          <Popover>
+            <AppTooltip content="선택한 알고리즘 유형만 추천됩니다." side="right">
+              <PopoverTrigger asChild>
+                <Button aria-label="알고리즘 유형 선택" variant="outline" className="w-full cursor-pointer justify-between text-xs">
+                  {selectedTagsList.length > 0 ? `${selectedTagsList.length}개 선택됨` : '알고리즘 선택'}
+                  <ChevronDown className="ml-2 h-4 w-4" />
+                </Button>
+              </PopoverTrigger>
+            </AppTooltip>
+            <PopoverContent className="w-64 p-2">
+              <div className="max-h-64 space-y-2 overflow-y-auto">
+                {Object.entries(TAG_INFO)
+                  .sort(([, a], [, b]) => a.kr.localeCompare(b.kr, 'ko'))
+                  .map(([tagKey, tagInfo]) => (
+                    <label key={tagKey} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded p-1">
+                      <input
+                        type="checkbox"
+                        checked={selectedTagsList.includes(tagKey)}
+                        onChange={() => toggleTag(tagKey)}
+                        className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 cursor-pointer appearance-none rounded border-2"
+                      />
+                      <span className="text-xs">{tagInfo.kr}</span>
+                    </label>
+                  ))}
+              </div>
+              <div className="mt-2 flex justify-end border-t pt-2">
+                <button onClick={() => setSelectedTagsList([])} className="text-muted-foreground hover:text-foreground text-xs underline">
+                  전체 해제
+                </button>
               </div>
             </PopoverContent>
           </Popover>
-        </div>
+        )}
 
         {/* 추천받기 버튼 */}
-        <Button
-          aria-label="스터디 문제 추천받기"
-          className="flex-1 cursor-pointer"
-          onClick={handleRecommend}
-          disabled={isPending}
-        >
-          {isPending ? '추천 중...' : '추천 받기'}
-        </Button>
+        <AppTooltip content="추천 받기" side="top">
+          <Button aria-label="스터디 문제 추천받기" className="flex flex-1 cursor-pointer flex-col" onClick={recommend} disabled={isPending}>
+            {isPending ? '추천 중...' : '추천 받기'}
+          </Button>
+        </AppTooltip>
       </div>
 
-      {/* 오른쪽: 결과 영역 */}
-      <div className="flex flex-1 flex-col gap-1 rounded-lg border-2 border-dashed p-2">
-        {isPending ? (
-          <div className="flex h-full items-center justify-center">
-            <span className="text-muted-foreground text-sm">추천 중...</span>
+      {/* 레벨/필터/기타 섹션 */}
+      <div className={`h-full rounded-lg ${showLevelSection || showFilterSection ? 'w-26 border-2 border-dashed p-2' : showExcludedModeSection ? 'w-40 border-2 border-dashed p-2' : ''}`}>
+        {showLevelSection && (
+          <div>
+            <div className="text-muted-foreground mb-4 cursor-default text-xs font-semibold">난이도 선택</div>
+            <div className="space-y-5">
+              {levels.map((level) => (
+                <label key={level} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded">
+                  <input
+                    type="checkbox"
+                    checked={selectedLevels.includes(level)}
+                    onChange={() => toggleLevel(level)}
+                    className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 cursor-pointer appearance-none rounded border-2"
+                  />
+                  <span className="text-xs capitalize">{level}</span>
+                </label>
+              ))}
+            </div>
+            {selectedLevels.length > 0 && (
+              <div className="mt-4 mr-2 flex justify-end">
+                <button onClick={() => setSelectedLevels([])} className="text-muted-foreground text-xs underline">전체 해제</button>
+              </div>
+            )}
           </div>
-        ) : result.length === 0 ? (
-          <div className="flex h-full items-center justify-center">
-            <span className="text-muted-foreground text-sm">추천받기 버튼을 눌러주세요</span>
+        )}
+        {showFilterSection && (
+          <div>
+            <div className="text-muted-foreground mb-4 cursor-default text-xs font-semibold">표시 항목</div>
+            <div className="space-y-5">
+              {filters.map((filter) => (
+                <label key={filter.key} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded">
+                  <input
+                    type="checkbox"
+                    checked={showFilters[filter.key]}
+                    onChange={() => toggleFilter(filter.key)}
+                    className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 cursor-pointer appearance-none rounded border-2"
+                  />
+                  <span className="text-xs">{filter.label}</span>
+                </label>
+              ))}
+            </div>
+            {hasFilterChanges && (
+              <div className="mt-4 mr-2 flex justify-end">
+                <button onClick={resetFilters} className="text-muted-foreground hover:text-foreground text-xs underline">초기화</button>
+              </div>
+            )}
           </div>
-        ) : (
-          result.map((problem) => (
-            <StudyRecommendProblemCard key={problem.problemId} problem={problem} />
-          ))
+        )}
+        {showExcludedModeSection && (
+          <div>
+            <div className="text-muted-foreground mb-2 cursor-default text-xs font-semibold">제외된 태그 설정</div>
+            <div className="space-y-2">
+              {(['STRICT', 'LENIENT'] as const).map((mode) => (
+                <label key={mode} className="hover:bg-background/60 flex cursor-pointer items-start gap-2 rounded">
+                  <input
+                    type="checkbox"
+                    checked={selectedExclusionMode === mode}
+                    onChange={() => setSelectedExclusionMode(mode)}
+                    className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 shrink-0 cursor-pointer appearance-none rounded border-2"
+                  />
+                  <div className="flex flex-col gap-1">
+                    <span className="text-xs">{mode === 'STRICT' ? '엄격한 제외' : '느슨한 제외'}</span>
+                    <span className="text-muted-foreground text-xs">
+                      {mode === 'STRICT' ? '제외된 유형이 절대 추천되지 않음' : '제외된 유형 때문에 추천되지는 않음'}
+                    </span>
+                  </div>
+                </label>
+              ))}
+            </div>
+            <div className="mt-2 mr-2 flex items-center justify-between text-xs">
+              <div className="text-muted-foreground cursor-default font-semibold">추천 문제수</div>
+              <Popover open={isCountPopoverOpen} onOpenChange={setIsCountPopoverOpen}>
+                <PopoverTrigger asChild>
+                  <Button aria-label="문제수 선택" variant="outline" className="h-6 w-4 cursor-pointer text-xs">
+                    {selectedCount}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-16 p-2">
+                  <div className="max-h-64 space-y-2 overflow-y-auto">
+                    {[1, 2, 3, 4, 5, 6].map((cnt) => (
+                      <label key={cnt} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded p-1">
+                        <input
+                          type="checkbox"
+                          checked={selectedCount === cnt}
+                          onChange={() => {
+                            setSelectedCount(cnt);
+                            setIsCountPopoverOpen(false);
+                          }}
+                          className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 cursor-pointer appearance-none rounded border-2"
+                        />
+                        <span className="text-xs">{cnt}</span>
+                      </label>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
+            {etcIsChanged && (
+              <div className="mt-2 mr-2 flex justify-end">
+                <button
+                  onClick={() => { setSelectedExclusionMode('LENIENT'); setSelectedCount(3); }}
+                  className="text-muted-foreground hover:text-foreground text-xs underline"
+                >
+                  초기화
+                </button>
+              </div>
+            )}
+          </div>
         )}
       </div>
+    </div>
+  );
+}
+
+// ── 메인 섹션 (BottomRecommend 구조) ──────────────────────────────
+
+export function StudyRecommendSection({ studyDetail, currentUserAccountId }: { studyDetail: StudyDetail; currentUserAccountId: number }) {
+  return (
+    <div className="flex h-full w-full items-center justify-between gap-2">
+      <StudyRecommendButton studyDetail={studyDetail} currentUserAccountId={currentUserAccountId} studyId={studyDetail.studyId} />
+      <StudyRecommendAnswer />
     </div>
   );
 }
