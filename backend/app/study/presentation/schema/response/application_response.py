@@ -15,6 +15,7 @@ class ApplicationItemResponse(BaseModel):
     status: str
     message: str | None
     created_at: str
+    applicant_profile_image_url: str | None = None
 
     @classmethod
     def from_query(cls, q: ApplicationQuery) -> "ApplicationItemResponse":
@@ -27,6 +28,7 @@ class ApplicationItemResponse(BaseModel):
             status=q.status,
             message=q.message,
             created_at=q.created_at,
+            applicant_profile_image_url=q.applicant_profile_image_url,
         )
 
 

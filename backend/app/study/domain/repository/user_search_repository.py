@@ -7,6 +7,7 @@ class UserSearchResult:
     user_account_id: int
     bj_account_id: str
     user_code: str
+    profile_image: str | None = None
 
 
 class UserSearchRepository(ABC):

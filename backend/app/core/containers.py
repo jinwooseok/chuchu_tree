@@ -548,6 +548,7 @@ class Container(containers.DeclarativeContainer):
     search_user_usecase = providers.Singleton(
         SearchUserUsecase,
         user_search_repository=user_search_repository,
+        storage_gateway=storage_gateway,
     )
 
     validate_study_name_usecase = providers.Singleton(
@@ -568,11 +569,13 @@ class Container(containers.DeclarativeContainer):
         user_search_repository=user_search_repository,
         invitation_repository=study_invitation_repository,
         application_repository=study_application_repository,
+        storage_gateway=storage_gateway,
     )
 
     search_study_usecase = providers.Singleton(
         SearchStudyUsecase,
         study_repository=study_repository,
+        storage_gateway=storage_gateway,
     )
 
     update_study_usecase = providers.Singleton(
@@ -589,6 +592,7 @@ class Container(containers.DeclarativeContainer):
         GetMyStudiesUsecase,
         study_repository=study_repository,
         user_search_repository=user_search_repository,
+        storage_gateway=storage_gateway,
     )
 
     leave_study_usecase = providers.Singleton(
@@ -621,6 +625,7 @@ class Container(containers.DeclarativeContainer):
         invitation_repository=study_invitation_repository,
         study_repository=study_repository,
         user_search_repository=user_search_repository,
+        storage_gateway=storage_gateway,
     )
 
     accept_study_invitation_usecase = providers.Singleton(
@@ -661,6 +666,7 @@ class Container(containers.DeclarativeContainer):
         study_repository=study_repository,
         application_repository=study_application_repository,
         user_search_repository=user_search_repository,
+        storage_gateway=storage_gateway,
     )
 
     accept_study_application_usecase = providers.Singleton(
@@ -716,6 +722,8 @@ class Container(containers.DeclarativeContainer):
     get_my_notices_usecase = providers.Singleton(
         GetMyNoticesUsecase,
         notice_repository=notice_repository,
+        user_search_repository=user_search_repository,
+        storage_gateway=storage_gateway,
     )
 
     mark_notices_read_usecase = providers.Singleton(
@@ -728,6 +736,7 @@ class Container(containers.DeclarativeContainer):
         study_repository=study_repository,
         invitation_repository=study_invitation_repository,
         user_search_repository=user_search_repository,
+        storage_gateway=storage_gateway,
     )
 
     recommend_study_problems_usecase = providers.Singleton(

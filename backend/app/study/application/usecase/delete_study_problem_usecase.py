@@ -21,8 +21,8 @@ class DeleteStudyProblemUsecase:
         study = await self.study_repository.find_by_id(StudyId(command.study_id))
         if study is None:
             raise APIException(ErrorCode.STUDY_NOT_FOUND)
-        if not study.is_owner(UserAccountId(command.requester_user_account_id)):
-            raise APIException(ErrorCode.STUDY_OWNER_ONLY)
+        if not study.is_member(UserAccountId(command.requester_user_account_id)):
+            raise APIException(ErrorCode.STUDY_NOT_MEMBER)
 
         problem = await self.study_problem_repository.find_by_id(StudyProblemId(command.study_problem_id))
         if problem is None:

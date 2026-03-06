@@ -21,6 +21,7 @@ class StudyMemberResponse(BaseModel):
     user_code: str
     role: str
     joined_at: str
+    profile_image_url: str | None = None
 
     @classmethod
     def from_query(cls, q: StudyMemberQuery) -> "StudyMemberResponse":
@@ -30,6 +31,7 @@ class StudyMemberResponse(BaseModel):
             user_code=q.user_code,
             role=q.role,
             joined_at=q.joined_at,
+            profile_image_url=q.profile_image_url,
         )
 
 
@@ -41,6 +43,7 @@ class StudyPendingInvitationResponse(BaseModel):
     invitee_bj_account_id: str
     invitee_user_code: str
     created_at: str
+    profile_image_url: str | None = None
 
     @classmethod
     def from_query(cls, q: StudyPendingInvitationQuery) -> "StudyPendingInvitationResponse":
@@ -50,6 +53,7 @@ class StudyPendingInvitationResponse(BaseModel):
             invitee_bj_account_id=q.invitee_bj_account_id,
             invitee_user_code=q.invitee_user_code,
             created_at=q.created_at,
+            profile_image_url=q.profile_image_url,
         )
 
 
@@ -61,6 +65,7 @@ class StudyPendingApplicationResponse(BaseModel):
     applicant_bj_account_id: str
     applicant_user_code: str
     created_at: str
+    profile_image_url: str | None = None
 
     @classmethod
     def from_query(cls, q: StudyPendingApplicationQuery) -> "StudyPendingApplicationResponse":
@@ -70,6 +75,7 @@ class StudyPendingApplicationResponse(BaseModel):
             applicant_bj_account_id=q.applicant_bj_account_id,
             applicant_user_code=q.applicant_user_code,
             created_at=q.created_at,
+            profile_image_url=q.profile_image_url,
         )
 
 
@@ -135,6 +141,7 @@ class StudySearchItemResponse(BaseModel):
     owner_bj_account_id: str
     owner_user_code: str
     member_count: int
+    owner_profile_image_url: str | None = None
 
     @classmethod
     def from_query(cls, q: StudySearchItemQuery) -> "StudySearchItemResponse":
@@ -144,6 +151,7 @@ class StudySearchItemResponse(BaseModel):
             owner_bj_account_id=q.owner_bj_account_id,
             owner_user_code=q.owner_user_code,
             member_count=q.member_count,
+            owner_profile_image_url=q.owner_profile_image_url,
         )
 
 
@@ -169,6 +177,7 @@ class MyStudyItemResponse(BaseModel):
     max_members: int
     member_count: int
     created_at: str
+    owner_profile_image_url: str | None = None
 
     @classmethod
     def from_query(cls, q: MyStudyItemQuery) -> "MyStudyItemResponse":
@@ -182,6 +191,7 @@ class MyStudyItemResponse(BaseModel):
             max_members=q.max_members,
             member_count=q.member_count,
             created_at=q.created_at,
+            owner_profile_image_url=q.owner_profile_image_url,
         )
 
 

@@ -69,6 +69,7 @@ class AcceptStudyInvitationUsecase:
                 "userId": user_info.bj_account_id,
                 "userCode": user_info.user_code,
                 "status": "ACCEPTED",
+                "senderUserAccountId": requester_id.value,
             },
             reference_id=study.study_id.value,
             reference_type="STUDY",

@@ -27,6 +27,23 @@ from app.core.exception import APIException
 _ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/gif", "image/webp"}
 _MAX_IMAGE_SIZE = 5 * 1024 * 1024  # 5 MB
 
+_IMAGE_MAGIC_BYTES: dict[str, list[tuple[int, bytes]]] = {
+    "image/jpeg": [(0, b"\xFF\xD8\xFF")],
+    "image/png":  [(0, b"\x89PNG\r\n\x1a\n")],
+    "image/gif":  [(0, b"GIF87a"), (0, b"GIF89a")],
+    "image/webp": [(0, b"RIFF"), (8, b"WEBP")],
+}
+
+
+def _is_valid_image(file_content: bytes, content_type: str) -> bool:
+    checks = _IMAGE_MAGIC_BYTES.get(content_type, [])
+    if not checks:
+        return False
+    # gif has two alternative signatures — any one match is sufficient
+    if content_type == "image/gif":
+        return any(file_content[offset:offset + len(sig)] == sig for offset, sig in checks)
+    return all(file_content[offset:offset + len(sig)] == sig for offset, sig in checks)
+
 router = APIRouter(prefix="/user-accounts", tags=["user-accounts"])
 
 
@@ -70,6 +87,8 @@ async def set_profile_image(
     file_content = await profile_image.read()
     if len(file_content) > _MAX_IMAGE_SIZE:
         raise APIException(ErrorCode.INVALID_INPUT_VALUE)
+    if not _is_valid_image(file_content, profile_image.content_type):
+        raise APIException(ErrorCode.INVALID_INPUT_TYPE)
 
     presigned_url = await user_account_application_service.set_profile_image(
         user_account_id=current_user.user_account_id,

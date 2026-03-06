@@ -74,6 +74,7 @@ class SendStudyInvitationUsecase:
                 "userId": inviter_bj_id,
                 "userCode": inviter_user_code,
                 "status": "PENDING",
+                "senderUserAccountId": command.requester_user_account_id,
             },
             reference_id=saved.invitation_id.value,
             reference_type="STUDY_INVITATION",

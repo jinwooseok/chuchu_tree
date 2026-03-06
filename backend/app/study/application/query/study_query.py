@@ -8,6 +8,7 @@ class StudyMemberQuery:
     user_code: str
     role: str
     joined_at: str
+    profile_image_url: str | None = None
 
 
 @dataclass
@@ -17,6 +18,7 @@ class StudyPendingInvitationQuery:
     invitee_bj_account_id: str
     invitee_user_code: str
     created_at: str
+    profile_image_url: str | None = None
 
 
 @dataclass
@@ -26,6 +28,7 @@ class StudyPendingApplicationQuery:
     applicant_bj_account_id: str
     applicant_user_code: str
     created_at: str
+    profile_image_url: str | None = None
 
 
 @dataclass
@@ -49,6 +52,7 @@ class StudySearchItemQuery:
     owner_bj_account_id: str
     owner_user_code: str
     member_count: int
+    owner_profile_image_url: str | None = None
 
 
 @dataclass
@@ -73,6 +77,7 @@ class MyStudyItemQuery:
     max_members: int
     member_count: int
     created_at: str
+    owner_profile_image_url: str | None = None
 
 
 @dataclass
