@@ -31,4 +31,7 @@ export interface StudyRecommendParams {
   target_user_account_id: number | null;
   recommend_all_unsolved: boolean;
   count: number;
+  level: string;
+  tags: string;
+  exclusion_mode: string;
 }
