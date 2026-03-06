@@ -12,3 +12,4 @@ export { StudyReceivedApplicationsTab } from './ui/StudyReceivedApplicationsTab'
 export { StudyBigCalendar } from './ui/StudyBigCalendar';
 export { StudySmallCalendar } from './ui/StudySmallCalendar';
 export { StudySidebarInset } from './ui/StudySidebarInset';
+export { StudyRecommendSection } from './ui/StudyRecommendSection';
