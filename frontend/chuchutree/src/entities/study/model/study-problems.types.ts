@@ -1,4 +1,5 @@
 import { Tags } from '@/entities/calendar';
+import { TagKey } from '@/shared/constants/tagSystem';
 import { TierKey, TierNumKey } from '@/shared/constants/tierSystem';
 
 export interface StudyProblemSolveInfo {
@@ -17,7 +18,7 @@ export interface StudyProblem {
   problemTierName: TierKey;
   problemClassLevel: number;
   tags: Tags[];
-  representativeTag: { tagId: number; tagCode: string; tagDisplayName: string } | null;
+  representativeTag: { tagId: number; tagCode: TagKey; tagDisplayName: string } | null;
   solveInfo: StudyProblemSolveInfo[];
 }
 
