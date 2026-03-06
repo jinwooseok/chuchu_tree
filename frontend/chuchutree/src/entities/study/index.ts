@@ -3,3 +3,6 @@ export type { Study, SearchedUser, SearchedStudy, CreateStudyRequest } from './m
 
 export { useStudyDetail, useUpdateStudy, useLeaveStudy, useKickMember, useDeleteStudy, useStudyInvitations, useSendInvitation, useCancelInvitation, useStudyApplications, useAcceptApplication, useRejectApplication } from './model/study-detail.queries';
 export type { StudyDetail, StudyMember, PendingInvitation, PendingApplication, UpdateStudyRequest, StudyInvitation, StudyApplication } from './model/study-detail.types';
+
+export { useStudyProblems, useAssignProblemAll, useAssignProblemIndividual, useDeleteStudyProblem } from './model/study-problems.queries';
+export type { StudyCalendar, StudyMonthlyData, StudyProblem, StudyProblemSolveInfo, AssignAllProblemsRequest, AssignIndividualProblemsRequest } from './model/study-problems.types';
