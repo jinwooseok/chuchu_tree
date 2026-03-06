@@ -9,6 +9,7 @@ import { User } from '@/entities/user';
 import { useState, useEffect } from 'react';
 import { X, Loader2, Search, CheckCircle2, XCircle } from 'lucide-react';
 import { useMyStudies, useValidateStudyName, useSearchUsers, useSearchStudies, useApplyStudy, useCancelApplyStudy, useCreateStudy, SearchedUser } from '@/entities/study';
+import { useLayoutStore } from '@/lib/store/layout';
 
 interface props {
   user?: User;
@@ -31,6 +32,8 @@ export function CreateStudyDialog({ user, onClose }: props) {
   const [userSearchKeyword, setUserSearchKeyword] = useState('');
   const [debouncedUserKeyword, setDebouncedUserKeyword] = useState('');
   const [invitedUsers, setInvitedUsers] = useState<SearchedUser[]>([]);
+
+  const { setStudySection } = useLayoutStore();
 
   // --- 이름 중복검증 state ---
   const [nameValidated, setNameValidated] = useState<boolean | null>(null); // null=미검증, true=사용가능, false=중복
@@ -55,10 +58,6 @@ export function CreateStudyDialog({ user, onClose }: props) {
   const { mutate: validateName, isPending: isValidating } = useValidateStudyName();
   const { data: userSearchResults = [], isLoading: isSearchingUsers } = useSearchUsers(debouncedUserKeyword);
   const { mutate: createStudy, isPending: isCreatingStudy } = useCreateStudy({
-    onSuccess: () => {
-      toast.success(`${studyName} 스터디가 생성되었습니다.`);
-      onClose();
-    },
     onError: () => {
       toast.error('스터디 생성에 실패했습니다.');
     },
@@ -104,12 +103,21 @@ export function CreateStudyDialog({ user, onClose }: props) {
       toast.error('이미 사용 중인 스터디명입니다.');
       return;
     }
-    createStudy({
-      studyName: studyName.trim(),
-      description: description.trim(),
-      maxMembers,
-      inviteeUserAccountIds: invitedUsers.map((u) => u.userAccountId),
-    });
+    createStudy(
+      {
+        studyName: studyName.trim(),
+        description: description.trim(),
+        maxMembers,
+        inviteeUserAccountIds: invitedUsers.map((u) => u.userAccountId),
+      },
+      {
+        onSuccess: (study) => {
+          toast.success(`${studyName} 스터디가 생성되었습니다.`);
+          setStudySection(study.studyId.toString());
+          onClose();
+        },
+      },
+    );
   };
 
   const handleApply = (studyId: number) => {
@@ -117,13 +125,21 @@ export function CreateStudyDialog({ user, onClose }: props) {
     applyStudy(studyId, {
       onError: () => {
         toast.error('가입 신청에 실패했습니다.');
-        setAppliedStudyIds((prev) => { const next = new Set(prev); next.delete(studyId); return next; });
+        setAppliedStudyIds((prev) => {
+          const next = new Set(prev);
+          next.delete(studyId);
+          return next;
+        });
       },
     });
   };
 
   const handleCancelApply = (studyId: number) => {
-    setAppliedStudyIds((prev) => { const next = new Set(prev); next.delete(studyId); return next; });
+    setAppliedStudyIds((prev) => {
+      const next = new Set(prev);
+      next.delete(studyId);
+      return next;
+    });
     cancelApplyStudy(studyId, {
       onError: () => {
         toast.error('신청 취소에 실패했습니다.');
@@ -277,17 +293,25 @@ export function CreateStudyDialog({ user, onClose }: props) {
                         <div className="flex flex-col gap-0.5">
                           <span className="font-medium">{study.studyName}</span>
                           <div className="text-muted-foreground flex items-center gap-2 text-sm">
-                            <span>방장: {study.ownerBjAccountId}#{study.ownerUserCode}</span>
+                            <span>
+                              방장: {study.ownerBjAccountId}#{study.ownerUserCode}
+                            </span>
                             <span>·</span>
                             <span>{study.memberCount}명</span>
                           </div>
                         </div>
                         {joinedStudyIds.has(study.studyId) ? (
-                          <Button variant="secondary" size="sm" disabled className="ml-2 shrink-0">참여중</Button>
+                          <Button variant="secondary" size="sm" disabled className="ml-2 shrink-0">
+                            참여중
+                          </Button>
                         ) : appliedStudyIds.has(study.studyId) ? (
-                          <Button variant="outline" size="sm" onClick={() => handleCancelApply(study.studyId)} className="ml-2 shrink-0">신청취소</Button>
+                          <Button variant="outline" size="sm" onClick={() => handleCancelApply(study.studyId)} className="ml-2 shrink-0">
+                            신청취소
+                          </Button>
                         ) : (
-                          <Button size="sm" onClick={() => handleApply(study.studyId)} className="ml-2 shrink-0">신청</Button>
+                          <Button size="sm" onClick={() => handleApply(study.studyId)} className="ml-2 shrink-0">
+                            신청
+                          </Button>
                         )}
                       </div>
                     ))}

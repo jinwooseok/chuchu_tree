@@ -34,14 +34,12 @@ import {
   SidebarGroup,
   SidebarGroupAction,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarRail,
 } from '@/components/ui/sidebar';
 import { useSidebar } from '@/components/ui/sidebar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -62,7 +60,6 @@ import { useMyStudies } from '@/entities/study';
 import { useState } from 'react';
 import { useLandingRecommend } from '@/features/landing';
 import { useOnboardingStore } from '@/lib/store/onboarding';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { CreateStudyDialog } from '@/features/sidebar/ui/group-study/CreateStudyDialog';
 import { NoticeDialog } from '@/features/notification';
 import { useNotificationStore } from '@/lib/store/notification';
@@ -73,7 +70,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
   const { openModal, closeModal } = useModal();
   const router = useRouter();
   // 사이드바 상태
-  const { state: sidebarOpenState, toggleSidebar: setSidebarOpenState } = useSidebar();
+  const { state: sidebarOpenState, toggleSidebar: setSidebarOpenState, setOpen: setCloseAppSidebar } = useSidebar();
   // 레이아웃 상태
   const { topSection, centerSection, bottomSection, studySection, toggleTopSection, setCenterSection, toggleBottomSection, setStudySection } = useLayoutStore();
 
@@ -300,7 +297,10 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       title: '캘린더',
       short1: 'Shift',
       short2: 'C',
-      action: () => setCenterSection('calendar'),
+      action: () => {
+        setCenterSection('calendar');
+        setCloseAppSidebar(false);
+      },
       icon: Calendar,
       isActive: studySection === null && centerSection === 'calendar',
       tooltipText: '문제 풀이 일정 관리',
@@ -309,7 +309,10 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       title: '유형별 숙련도',
       short1: 'Shift',
       short2: 'D',
-      action: () => setCenterSection('dashboard'),
+      action: () => {
+        setCenterSection('dashboard');
+        setCloseAppSidebar(false);
+      },
       icon: LibraryBig,
       isActive: studySection === null && centerSection === 'dashboard',
       tooltipText: '유형별 실력 현황',
@@ -454,38 +457,77 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
           <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
-                <SidebarMenuItem key="addstudy" aria-label={'스터디 생성'}>
-                  <AppTooltip content={'스터디 생성'} side="right">
+                <SidebarMenuItem key="addstudy" aria-label={'스터디 생성/가입'}>
+                  <AppTooltip content={'스터디에 참여해보세요'} side="right">
                     <SidebarMenuButton asChild>
                       <div onClick={handleCreateStudy} className="cursor-pointer">
                         <CircleFadingPlus size={ICON_SIZE} className="relative z-10" />
-                        <span className="relative z-10">스터디 만들기</span>
+                        <span className="relative z-10">스터디 만들기/가입하기</span>
                       </div>
                     </SidebarMenuButton>
                   </AppTooltip>
                 </SidebarMenuItem>
-                <SidebarMenuItem key="studygroup" aria-label={'스터디'}>
-                  <AppTooltip content={'스터디를 만들어보세요'} side="right">
-                    <SidebarMenuButton asChild>
-                      <div onClick={() => {}} className="cursor-pointer">
-                        <Star size={ICON_SIZE} className="relative z-10" />
-                        <span className="relative z-10">스터디 목록</span>
-                      </div>
-                    </SidebarMenuButton>
-                  </AppTooltip>
-                  <SidebarMenuSub>
-                    <SidebarMenuSubItem>
-                      {studies.map((study) => (
-                        <SidebarMenuSubButton key={study.studyId} asChild isActive={studySection === study.studyId.toString()}>
-                          <div onClick={() => setStudySection(study.studyId.toString())} className="mb-1 cursor-pointer">
-                            <Bookmark size={ICON_SIZE} className="relative z-10" />
-                            <span className="relative z-10">{study.studyName}</span>
-                          </div>
-                        </SidebarMenuSubButton>
-                      ))}
-                    </SidebarMenuSubItem>
-                  </SidebarMenuSub>
-                </SidebarMenuItem>
+                {/* 스터디 목록 */}
+                {sidebarOpenState === 'expanded' && (
+                  <SidebarMenuItem key="studygroup" aria-label={'스터디'}>
+                    <AppTooltip content={'내가 참여한 스터디'} side="right">
+                      <SidebarMenuButton asChild>
+                        <div className="cursor-pointer">
+                          <Star size={ICON_SIZE} className="relative z-10" />
+                          <span className="relative z-10">스터디 목록</span>
+                        </div>
+                      </SidebarMenuButton>
+                    </AppTooltip>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        {studies.map((study) => (
+                          <SidebarMenuSubButton key={study.studyId} asChild isActive={studySection === study.studyId.toString()}>
+                            <div
+                              onClick={() => {
+                                setStudySection(study.studyId.toString());
+                                setCloseAppSidebar(false);
+                              }}
+                              className="mb-1 cursor-pointer"
+                            >
+                              <Bookmark size={ICON_SIZE} className="relative z-10" />
+                              <span className="relative z-10">{study.studyName}</span>
+                            </div>
+                          </SidebarMenuSubButton>
+                        ))}
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </SidebarMenuItem>
+                )}
+                {/* 스터디 목록 사이드바 접힘상태 전용 Dropdown방식 */}
+                {sidebarOpenState === 'collapsed' && (
+                  <SidebarMenuItem>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <SidebarMenuButton>
+                          <Star />
+                          스터디 목록
+                        </SidebarMenuButton>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className={`w-40`} side="right">
+                        <h1 className="text-muted-foreground w-full cursor-default p-1 text-xs font-semibold select-none">스터디 목록</h1>
+                        {studies.map((study) => (
+                          <DropdownMenuItem key={study.studyId} className={` ${studySection === study.studyId.toString() ? 'bg-logo' : ''} `}>
+                            <div
+                              onClick={() => {
+                                setStudySection(study.studyId.toString());
+                                setCloseAppSidebar(false);
+                              }}
+                              className={`flex cursor-pointer items-center gap-1 truncate`}
+                            >
+                              <Bookmark size={ICON_SIZE} className="relative z-10" />
+                              <span className="relative z-10">{study.studyName}</span>
+                            </div>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </SidebarMenuItem>
+                )}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>

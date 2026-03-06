@@ -19,8 +19,9 @@ export const studyApi = {
     });
     return data.data.users;
   },
-  createStudy: async (body: CreateStudyRequest): Promise<void> => {
-    await axiosInstance.post('/studies', body);
+  createStudy: async (body: CreateStudyRequest): Promise<Study> => {
+    const { data } = await axiosInstance.post<ApiResponse<Study>>('/studies', body);
+    return data.data;
   },
   searchStudies: async (keyword: string): Promise<SearchedStudy[]> => {
     const { data } = await axiosInstance.get<ApiResponse<{ studies: SearchedStudy[] }>>('/studies/search', {
