@@ -6,3 +6,6 @@ export type { StudyDetail, StudyMember, PendingInvitation, PendingApplication, U
 
 export { useStudyProblems, useAssignProblemAll, useAssignProblemIndividual, useDeleteStudyProblem } from './model/study-problems.queries';
 export type { StudyCalendar, StudyMonthlyData, StudyProblem, StudyProblemSolveInfo, AssignAllProblemsRequest, AssignIndividualProblemsRequest } from './model/study-problems.types';
+
+export { useGetStudyRecommendation } from './model/study-recommendation.queries';
+export type { StudyRecommendedProblem, StudyRecommendMemberSolveInfo, StudyRecommendReason, StudyRecommendationResponse, StudyRecommendParams } from './model/study-recommendation.types';
