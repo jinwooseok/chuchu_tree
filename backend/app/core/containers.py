@@ -742,6 +742,9 @@ class Container(containers.DeclarativeContainer):
         StudyWithdrawalService,
         study_repository=study_repository,
         study_problem_repository=study_problem_repository,
+        notice_repository=notice_repository,
+        study_invitation_repository=study_invitation_repository,
+        study_application_repository=study_application_repository,
     )
 
     async def init_resources(self):

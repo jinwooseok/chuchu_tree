@@ -46,3 +46,7 @@ class StudyRepository(ABC):
     @abstractmethod
     async def is_name_taken(self, name: str) -> bool:
         ...
+
+    @abstractmethod
+    async def delete_members_by_user_hard(self, user_account_id: int) -> None:
+        ...

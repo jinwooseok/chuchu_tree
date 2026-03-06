@@ -44,7 +44,7 @@ class SolvedacGatewayImpl(SolvedacGateway):
         logger.info(f"[SolvedacGateway] 유저 데이터 수집 시작: {bj_user_id}")
 
         try:
-            async with httpx.AsyncClient(timeout=30.0) as client:
+            async with httpx.AsyncClient(timeout=120.0) as client:
                 # 1단계: 첫 페이지, 유저 정보, 히스토리 병렬 요청
                 first_page_task = self._fetch_problem_page(client, bj_user_id, 1)
                 user_info_task = self._fetch_user_info(client, bj_user_id)
@@ -116,7 +116,7 @@ class SolvedacGatewayImpl(SolvedacGateway):
     async def fetch_user_data(self, bj_user_id: str, original_solved_data) -> SolvedacUserDataVO | None:
         raise NotImplementedError
     #     try:
-    #         async with httpx.AsyncClient(timeout=30.0) as client:
+    #         async with httpx.AsyncClient(timeout=120.0) as client:
     #             # 1단계: 첫 페이지, 유저 정보, 히스토리 병렬 요청
     #             user_info_task = self._fetch_user_info(client, bj_user_id)
     #             tag_stat_task = self._get_tag_stats(client, bj_user_id)

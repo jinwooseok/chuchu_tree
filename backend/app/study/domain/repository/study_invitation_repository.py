@@ -34,3 +34,7 @@ class StudyInvitationRepository(ABC):
     @abstractmethod
     async def soft_delete(self, invitation: StudyInvitation) -> None:
         ...
+
+    @abstractmethod
+    async def delete_all_by_user_account_id(self, user_account_id: UserAccountId) -> None:
+        ...
