@@ -4,7 +4,7 @@ import { Calendar, dateFnsLocalizer, ToolbarProps } from 'react-big-calendar';
 import { format, parse, startOfWeek, getDay, isSameDay, isToday, isSameMonth, addMonths, subMonths } from 'date-fns';
 import { ko } from 'date-fns/locale';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { ComponentType, useMemo, useState, useEffect, useRef } from 'react';
+import { ComponentType, useMemo, useState, useEffect } from 'react';
 
 import { transformToStudyCalendarEvents } from '../lib/utils';
 import { CalendarEvent } from '@/entities/calendar';
@@ -197,23 +197,8 @@ export function StudyBigCalendar({ studyCalendarData }: { studyCalendarData?: St
     ],
   });
 
-  const lastScrollTime = useRef(0);
-  const SCROLL_THROTTLE = 300;
-
-  const handleWheel = (e: React.WheelEvent) => {
-    const now = Date.now();
-    if (now - lastScrollTime.current < SCROLL_THROTTLE) return;
-    lastScrollTime.current = now;
-
-    if (e.deltaY > 0) {
-      handleBigCalendarNavigate(addMonths(currentDate, 1));
-    } else if (e.deltaY < 0) {
-      handleBigCalendarNavigate(subMonths(currentDate, 1));
-    }
-  };
-
   return (
-    <div className="calendar-12px h-full w-full" onWheel={handleWheel}>
+    <div className="calendar-12px h-full w-full">
       <Calendar
         localizer={localizer}
         events={events}

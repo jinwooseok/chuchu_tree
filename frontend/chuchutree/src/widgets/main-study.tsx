@@ -54,17 +54,17 @@ export default function MainStudy({ studyName }: { studyName: string }) {
 
   return (
     <div className="bg-innerground-white flex h-full w-full flex-col p-4">
-      <div className="hide-scrollbar relative flex min-h-0 flex-1 flex-col items-center space-y-4 overflow-y-auto">
+      <div className="hide-scrollbar relative flex min-h-0 flex-1 flex-col items-center space-y-16 overflow-y-auto py-10">
         {/* 상단 기본정보 및 모달 영역 */}
         <StudyDashboard studyDetail={studyDetail} currentUserAccountId={user?.userAccount?.userAccountId ?? 0} />
         {/* 중앙 캘린더영역 */}
         <div className="relative w-full" style={{ minHeight: '500px' }}>
           <StudyBigCalendar studyCalendarData={studyCalendarData} />
+          <RefreshButtonContainer />
         </div>
         {/* 하단 문제추천영역 */}
         <StudyRecommendSection studyDetail={studyDetail} currentUserAccountId={user?.userAccount?.userAccountId ?? 0} />
         {/* 하단 문제추천 history 영역 */}
-        <RefreshButtonContainer />
       </div>
     </div>
   );
