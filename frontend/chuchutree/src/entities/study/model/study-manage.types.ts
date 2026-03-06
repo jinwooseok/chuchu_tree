@@ -14,6 +14,7 @@ export interface SearchedUser {
   userAccountId: number;
   bjAccountId: string;
   userCode: string;
+  profileImageUrl: string | null;
 }
 
 export interface SearchedStudy {

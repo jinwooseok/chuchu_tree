@@ -4,6 +4,7 @@ export interface StudyMember {
   userCode: string;
   role: string;
   joinedAt: string;
+  profileImageUrl: string | null;
 }
 
 export interface PendingInvitation {
@@ -12,6 +13,7 @@ export interface PendingInvitation {
   inviteeBjAccountId: string;
   inviteeUserCode: string;
   createdAt: string;
+  profileImageUrl: string | null;
 }
 
 export interface PendingApplication {
@@ -20,6 +22,7 @@ export interface PendingApplication {
   applicantBjAccountId: string;
   applicantUserCode: string;
   createdAt: string;
+  profileImageUrl: string | null;
 }
 
 export interface StudyDetail {
@@ -47,6 +50,7 @@ export interface StudyInvitation {
   inviterUserAccountId: number;
   inviterBjAccountId: string;
   inviterUserCode: string;
+  inviterProfileImageUrl: string | null;
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
   createdAt: string;
 }
@@ -57,6 +61,7 @@ export interface StudyApplication {
   applicantUserAccountId: number;
   applicantBjAccountId: string;
   applicantUserCode: string;
+  applicantProfileImageUrl: string | null;
   status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
   message: string;
   createdAt: string;
