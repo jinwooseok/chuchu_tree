@@ -54,7 +54,7 @@ export function StudyDashboard({ studyDetail, currentUserAccountId }: StudyDashb
   };
 
   return (
-    <div className="hide-scrollbar flex h-full w-full flex-col items-center space-y-4 overflow-y-auto p-2">
+    <div className="flex w-full flex-col">
       {/* 상단영역 */}
       <div className="flex w-full flex-col gap-2 lg:flex-row">
         <div className="min-w-0 flex-1">
@@ -87,10 +87,7 @@ export function StudyDashboard({ studyDetail, currentUserAccountId }: StudyDashb
           </div>
         )}
       </div>
-      {/* 중앙 캘린더영역 */}
-      {/* 하단 문제추천영역 */}
-      {/* 하단 문제추천 history 영역 */}
-
+      {/* 모달 */}
       {isInviteOpen && <StudyInviteDialog studyDetail={studyDetail} isOwner={isOwner} onClose={() => setIsInviteOpen(false)} />}
     </div>
   );
