@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import and_, select
+from sqlalchemy import and_, delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.domain.enums import ApplicationStatus
@@ -70,4 +70,11 @@ class StudyApplicationRepositoryImpl(StudyApplicationRepository):
         application.deleted_at = datetime.now()
         model = StudyApplicationMapper.to_model(application)
         await self.session.merge(model)
+        await self.session.flush()
+
+    async def delete_all_by_user_account_id(self, user_account_id: UserAccountId) -> None:
+        stmt = delete(StudyApplicationModel).where(
+            StudyApplicationModel.applicant_user_account_id == user_account_id.value
+        )
+        await self.session.execute(stmt)
         await self.session.flush()

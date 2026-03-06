@@ -32,3 +32,7 @@ class NoticeRepository(ABC):
     @abstractmethod
     async def mark_all_read_by_recipient(self, user_account_id: UserAccountId) -> None:
         ...
+
+    @abstractmethod
+    async def delete_all_by_user_account_id(self, user_account_id: UserAccountId) -> None:
+        ...

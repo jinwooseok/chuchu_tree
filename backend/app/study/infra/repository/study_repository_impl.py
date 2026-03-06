@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import and_, func, or_, select
+from sqlalchemy import and_, delete, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -155,3 +155,10 @@ class StudyRepositoryImpl(StudyRepository):
         )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none() is not None
+
+    async def delete_members_by_user_hard(self, user_account_id: int) -> None:
+        stmt = delete(StudyMemberModel).where(
+            StudyMemberModel.user_account_id == user_account_id
+        )
+        await self.session.execute(stmt)
+        await self.session.flush()

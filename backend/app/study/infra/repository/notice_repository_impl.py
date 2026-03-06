@@ -1,4 +1,4 @@
-from sqlalchemy import and_, func, select, update
+from sqlalchemy import and_, delete, func, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.domain.vo.identifiers import UserAccountId
@@ -75,6 +75,13 @@ class NoticeRepositoryImpl(NoticeRepository):
         merged = await self.session.merge(model)
         await self.session.flush()
         return NoticeMapper.to_entity(merged)
+
+    async def delete_all_by_user_account_id(self, user_account_id: UserAccountId) -> None:
+        stmt = delete(NoticeModel).where(
+            NoticeModel.recipient_user_account_id == user_account_id.value
+        )
+        await self.session.execute(stmt)
+        await self.session.flush()
 
     async def mark_all_read_by_recipient(self, user_account_id: UserAccountId) -> None:
         from datetime import datetime
