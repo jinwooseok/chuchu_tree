@@ -4,6 +4,7 @@ import { Settings, UserPlus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { StudyDetail, StudyMember } from '@/entities/study';
+import { UserAvatar } from '@/components/custom/UserAvatar';
 
 interface StudyHeaderProps {
   studyDetail: StudyDetail;
@@ -22,6 +23,7 @@ function MemberRow({ member }: { member: StudyMember }) {
   return (
     <div className="flex items-center justify-between py-1.5">
       <div className="flex items-center gap-2">
+        <UserAvatar profileImageUrl={member.profileImageUrl} size={24} />
         <span className="text-sm font-medium">
           {member.bjAccountId}#{member.userCode}
         </span>

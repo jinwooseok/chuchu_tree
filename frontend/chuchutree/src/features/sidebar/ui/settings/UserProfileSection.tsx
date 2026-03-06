@@ -80,6 +80,7 @@ export default function UserProfileSection({
       <div className="space-y-3 rounded-lg border p-4">
         <div className="flex items-center gap-4">
           <div className="bg-muted flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-full border">
+            {/* 프로필사진 */}
             {displayImageUrl ? (
               <Image src={displayImageUrl} alt="프로필" width={64} height={64} className="h-full w-full object-cover" unoptimized />
             ) : (

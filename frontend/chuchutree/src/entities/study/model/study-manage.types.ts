@@ -22,6 +22,7 @@ export interface SearchedStudy {
   studyName: string;
   ownerBjAccountId: string;
   ownerUserCode: string;
+  ownerProfileImageUrl: string | null;
   memberCount: number;
 }
 

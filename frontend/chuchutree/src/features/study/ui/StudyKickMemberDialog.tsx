@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { StudyDetail, StudyMember, useKickMember } from '@/entities/study';
 import { toast } from '@/lib/utils/toast';
+import { UserAvatar } from '@/components/custom/UserAvatar';
 
 interface StudyKickMemberDialogProps {
   studyDetail: StudyDetail;
@@ -35,9 +36,12 @@ export function StudyKickMemberDialog({ studyDetail, currentUserAccountId, onClo
         <div className="divide-y">
           {kickableMembers.map((member) => (
             <div key={member.userAccountId} className="flex items-center justify-between py-2">
-              <span className="truncate text-sm">
-                {member.bjAccountId}#{member.userCode}
-              </span>
+              <div className="flex items-center gap-2">
+                <UserAvatar profileImageUrl={member.profileImageUrl} size={24} />
+                <span className="truncate text-sm">
+                  {member.bjAccountId}#{member.userCode}
+                </span>
+              </div>
               <button onClick={() => setSelectedMember(member)} className="text-destructive hover:text-destructive/80 text-xs font-medium whitespace-nowrap transition-colors">
                 퇴장
               </button>

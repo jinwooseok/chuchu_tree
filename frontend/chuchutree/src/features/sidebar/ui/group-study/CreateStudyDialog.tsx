@@ -10,6 +10,7 @@ import { useState, useEffect } from 'react';
 import { X, Loader2, Search, CheckCircle2, XCircle } from 'lucide-react';
 import { useMyStudies, useValidateStudyName, useSearchUsers, useSearchStudies, useApplyStudy, useCancelApplyStudy, useCreateStudy, SearchedUser } from '@/entities/study';
 import { useLayoutStore } from '@/lib/store/layout';
+import { UserAvatar } from '@/components/custom/UserAvatar';
 
 interface props {
   user?: User;
@@ -233,7 +234,10 @@ export function CreateStudyDialog({ user, onClose }: props) {
                   ) : userSearchResults.length > 0 ? (
                     userSearchResults.map((u) => (
                       <button key={u.userAccountId} className="hover:bg-muted flex w-full items-center justify-between px-3 py-2 text-sm transition-colors" onClick={() => handleAddInvitedUser(u)}>
-                        <span className="font-medium">{u.bjAccountId}</span>
+                        <div className="flex items-center gap-2">
+                          <UserAvatar profileImageUrl={u.profileImageUrl} size={24} />
+                          <span className="font-medium">{u.bjAccountId}</span>
+                        </div>
                         <span className="text-muted-foreground">#{u.userCode}</span>
                       </button>
                     ))
@@ -250,7 +254,8 @@ export function CreateStudyDialog({ user, onClose }: props) {
                 <label className="text-sm font-medium">초대 목록 ({invitedUsers.length}명)</label>
                 <div className="flex flex-wrap gap-1.5">
                   {invitedUsers.map((u) => (
-                    <div key={u.userAccountId} className="bg-muted flex items-center gap-1.5 rounded-full px-3 py-1 text-sm">
+                    <div key={u.userAccountId} className="bg-muted flex items-center gap-1.5 rounded-full py-1 pr-2 pl-1 text-sm">
+                      <UserAvatar profileImageUrl={u.profileImageUrl} size={20} />
                       <span>{u.bjAccountId}</span>
                       <span className="text-muted-foreground">#{u.userCode}</span>
                       <button onClick={() => handleRemoveInvitedUser(u.userAccountId)} className="text-muted-foreground hover:text-foreground">
@@ -293,6 +298,7 @@ export function CreateStudyDialog({ user, onClose }: props) {
                         <div className="flex flex-col gap-0.5">
                           <span className="font-medium">{study.studyName}</span>
                           <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                            <UserAvatar profileImageUrl={study.ownerProfileImageUrl} size={20} />
                             <span>
                               방장: {study.ownerBjAccountId}#{study.ownerUserCode}
                             </span>

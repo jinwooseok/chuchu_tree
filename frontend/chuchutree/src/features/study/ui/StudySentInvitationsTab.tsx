@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { StudyDetail, useStudyInvitations, useSendInvitation, useCancelInvitation, useSearchUsers, SearchedUser } from '@/entities/study';
 import { toast } from '@/lib/utils/toast';
+import { UserAvatar } from '@/components/custom/UserAvatar';
 
 const STATUS_LABEL: Record<string, string> = {
   PENDING: '대기중',
@@ -63,9 +64,12 @@ export function StudySentInvitationsTab({ studyDetail, isOwner }: StudySentInvit
         ) : (
           studyDetail.pendingInvitations.map((inv) => (
             <div key={inv.invitationId} className="flex items-center justify-between rounded-lg border p-3">
-              <span className="text-sm">
-                {inv.inviteeBjAccountId}#{inv.inviteeUserCode}
-              </span>
+              <div className="flex items-center gap-2">
+                <UserAvatar profileImageUrl={inv.profileImageUrl} size={24} />
+                <span className="text-sm">
+                  {inv.inviteeBjAccountId}#{inv.inviteeUserCode}
+                </span>
+              </div>
               <span className="text-muted-foreground text-xs">{inv.createdAt.slice(0, 10)}</span>
             </div>
           ))
@@ -110,7 +114,10 @@ export function StudySentInvitationsTab({ studyDetail, isOwner }: StudySentInvit
                     onClick={() => handleSelectUser(u)}
                     disabled={isSending}
                   >
-                    <span className="font-medium">{u.bjAccountId}</span>
+                    <div className="flex items-center gap-2">
+                      <UserAvatar profileImageUrl={u.profileImageUrl} size={24} />
+                      <span className="font-medium">{u.bjAccountId}</span>
+                    </div>
                     <span className="text-muted-foreground">#{u.userCode}</span>
                   </button>
                 ))
@@ -133,6 +140,7 @@ export function StudySentInvitationsTab({ studyDetail, isOwner }: StudySentInvit
           {invitations.map((inv) => (
             <div key={inv.invitationId} className="flex items-center justify-between rounded-lg border p-3">
               <div className="flex items-center gap-2">
+                <UserAvatar profileImageUrl={inv.inviterProfileImageUrl} size={24} />
                 <span className="text-sm font-medium">
                   {inv.inviterBjAccountId}#{inv.inviterUserCode}
                 </span>
