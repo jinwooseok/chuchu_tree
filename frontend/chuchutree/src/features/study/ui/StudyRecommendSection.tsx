@@ -2,9 +2,9 @@
 
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
+import { UserAvatar } from '@/components/custom/UserAvatar';
 import { EyeOff, Search, SlidersHorizontal, EllipsisVertical, ChevronDown } from 'lucide-react';
 import { useStudyRecommendStore } from '@/lib/store/studyRecommend';
 import { useStudyRecommend } from '../hooks/useStudyRecommend';
@@ -17,9 +17,7 @@ import { useState } from 'react';
 function MemberSolveBadge({ info }: { info: StudyRecommendMemberSolveInfo }) {
   return (
     <span
-      className={`inline-flex items-center rounded px-1 py-0.5 text-xs font-medium ${
-        info.solved ? 'bg-primary/20 text-primary' : 'bg-muted-foreground/10 text-muted-foreground'
-      }`}
+      className={`inline-flex items-center rounded px-1 py-0.5 text-xs font-medium ${info.solved ? 'bg-primary/20 text-primary' : 'bg-muted-foreground/10 text-muted-foreground'}`}
       title={info.bjAccountId}
     >
       {info.bjAccountId}
@@ -43,25 +41,16 @@ function StudyRecommendProblemCard({
   const tagName = firstTag ? (TAG_INFO[firstTag.tagCode as keyof typeof TAG_INFO]?.kr ?? firstTag.tagDisplayName) : null;
 
   return (
-    <div
-      className={`mr-2 flex ${totalCount <= 3 ? 'h-full' : 'h-auto'}`}
-      onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')}
-    >
+    <div className={`mr-2 flex ${totalCount <= 3 ? 'h-full' : 'h-auto'}`} onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')}>
       <div className="bg-innerground-hovergray/50 hover:bg-innerground-darkgray/70 flex flex-1 cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-colors">
         <div className="flex items-center gap-2">
-          {showFilters.problemTier && (
-            <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />
-          )}
+          {showFilters.problemTier && <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />}
           {showFilters.problemNumber && <span className="text-muted-foreground">#{problem.problemId}</span>}
           <span className="line-clamp-2 font-medium">{problem.problemTitle}</span>
         </div>
         <div className="flex min-w-30 flex-col items-end gap-0.5">
-          <div className="flex items-center gap-1">
-            {showFilters.algorithm && tagName && <span className="text-muted-foreground line-clamp-1">{tagName}</span>}
-          </div>
-          {showFilters.recommendReason && problem.recommandReasons.length > 0 && (
-            <p className="text-muted-foreground line-clamp-1">{problem.recommandReasons[0].reason}</p>
-          )}
+          <div className="flex items-center gap-1">{showFilters.algorithm && tagName && <span className="text-muted-foreground line-clamp-1">{tagName}</span>}</div>
+          {showFilters.recommendReason && problem.recommandReasons.length > 0 && <p className="text-muted-foreground line-clamp-1">{problem.recommandReasons[0].reason}</p>}
           {problem.studyMemberSolveInfo.length > 0 && (
             <div className="flex flex-wrap justify-end gap-1">
               {problem.studyMemberSolveInfo.map((info) => (
@@ -82,7 +71,7 @@ function StudyRecommendAnswer() {
 
   if (isLoading) {
     return (
-      <div className="ml-1 flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-2">
+      <div className="flex h-full w-full flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-2">
         <div className="text-muted-foreground text-sm">추천 중...</div>
       </div>
     );
@@ -90,7 +79,7 @@ function StudyRecommendAnswer() {
 
   if (problems.length === 0) {
     return (
-      <div className="ml-2 flex h-full flex-1 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-2">
+      <div className="flex h-full flex-1 flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-2">
         <div className="text-muted-foreground text-sm">추천받기 버튼을 눌러주세요</div>
       </div>
     );
@@ -100,7 +89,7 @@ function StudyRecommendAnswer() {
   const emptySlots = problems.length < totalSlots ? totalSlots - problems.length : 0;
 
   return (
-    <div className="ml-1 h-full w-full flex-1 rounded-lg border-2 border-dashed p-2">
+    <div className="h-full w-full flex-1 rounded-lg border-2 border-dashed p-2">
       <div className={`flex h-full flex-col gap-1 overflow-x-hidden ${problems.length <= 3 ? 'overflow-y-hidden' : 'overflow-y-scroll'}`}>
         {problems.map((problem) => (
           <StudyRecommendProblemCard key={problem.problemId} problem={problem} showFilters={showFilters} totalCount={problems.length} />
@@ -119,15 +108,7 @@ function StudyRecommendAnswer() {
 
 // ── 컨트롤 패널 ────────────────────────────────────────────────────
 
-function StudyRecommendButton({
-  studyDetail,
-  currentUserAccountId,
-  studyId,
-}: {
-  studyDetail: StudyDetail;
-  currentUserAccountId: number;
-  studyId: number;
-}) {
+function StudyRecommendButton({ studyDetail, currentUserAccountId, studyId }: { studyDetail: StudyDetail; currentUserAccountId: number; studyId: number }) {
   const {
     targetMemberId,
     recommendAllUnsolved,
@@ -158,17 +139,9 @@ function StudyRecommendButton({
   const { recommend, isPending } = useStudyRecommend(studyId);
 
   const effectiveTargetId = targetMemberId || currentUserAccountId;
-  const selectedMember = studyDetail.members.find((m) => m.userAccountId === effectiveTargetId);
-  const selectedMemberLabel = selectedMember
-    ? selectedMember.userAccountId === currentUserAccountId
-      ? `${selectedMember.bjAccountId} (나)`
-      : selectedMember.bjAccountId
-    : '멤버 선택';
 
-  const toggleLevel = (level: string) =>
-    setSelectedLevels(selectedLevels.includes(level) ? selectedLevels.filter((l) => l !== level) : [...selectedLevels, level]);
-  const toggleTag = (tag: string) =>
-    setSelectedTagsList(selectedTagsList.includes(tag) ? selectedTagsList.filter((t) => t !== tag) : [...selectedTagsList, tag]);
+  const toggleLevel = (level: string) => setSelectedLevels(selectedLevels.includes(level) ? selectedLevels.filter((l) => l !== level) : [...selectedLevels, level]);
+  const toggleTag = (tag: string) => setSelectedTagsList(selectedTagsList.includes(tag) ? selectedTagsList.filter((t) => t !== tag) : [...selectedTagsList, tag]);
 
   const levels = ['easy', 'normal', 'hard', 'extreme'] as const;
   const filters = [
@@ -185,7 +158,7 @@ function StudyRecommendButton({
   const etcIsChanged = selectedExclusionMode !== 'LENIENT' || selectedCount !== 3;
 
   return (
-    <div className="flex h-full gap-1">
+    <div className="flex h-80 gap-1">
       <div className="flex h-full w-50 flex-col gap-2 rounded-lg border-2 border-dashed p-2">
         {/* 헤더: 아이콘 버튼들 */}
         <div className="flex items-center justify-between pl-2 text-xs">
@@ -219,24 +192,18 @@ function StudyRecommendButton({
         </div>
 
         {/* 멤버 선택 */}
-        <Select
-          value={String(effectiveTargetId)}
-          onValueChange={(val) => setTargetMemberId(Number(val))}
-        >
-          <SelectTrigger className="h-7 w-full text-xs" aria-label="기준 멤버 선택">
-            <SelectValue>
-              <span className="line-clamp-1">{selectedMemberLabel}</span>
-            </SelectValue>
-          </SelectTrigger>
-          <SelectContent>
-            {studyDetail.members.map((member) => (
-              <SelectItem key={member.userAccountId} value={String(member.userAccountId)} className="text-xs">
-                {member.bjAccountId}
-                {member.userAccountId === currentUserAccountId ? ' (나)' : ''}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <span className="text-muted-foreground mt-2 text-xs">선택한 맴버를 기준으로 추천받기</span>
+        <div className="mb-2 flex flex-wrap gap-1">
+          {studyDetail.members.map((member) => (
+            <button
+              key={member.userAccountId}
+              onClick={() => setTargetMemberId(member.userAccountId)}
+              className={`rounded-full transition-all ${effectiveTargetId === member.userAccountId ? 'ring-primary ring-2 ring-offset-1' : 'opacity-50 hover:opacity-100'}`}
+            >
+              <UserAvatar profileImageUrl={member.profileImageUrl} bjAccountId={member.bjAccountId} userCode={member.userCode} size={30} />
+            </button>
+          ))}
+        </div>
 
         {/* 미풀이 전체 기반 */}
         <label className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded px-1">
@@ -246,7 +213,7 @@ function StudyRecommendButton({
             onChange={(e) => setRecommendAllUnsolved(e.target.checked)}
             className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 cursor-pointer appearance-none rounded border-2"
           />
-          <span className="text-xs">미풀이 전체 기반</span>
+          <span className={`text-xs ${recommendAllUnsolved ? '' : 'text-muted-foreground'}`}>모두가 처음푸는 문제 추천받기</span>
         </label>
 
         {/* 알고리즘 유형 멀티셀렉트 */}
@@ -313,7 +280,9 @@ function StudyRecommendButton({
             </div>
             {selectedLevels.length > 0 && (
               <div className="mt-4 mr-2 flex justify-end">
-                <button onClick={() => setSelectedLevels([])} className="text-muted-foreground text-xs underline">전체 해제</button>
+                <button onClick={() => setSelectedLevels([])} className="text-muted-foreground text-xs underline">
+                  전체 해제
+                </button>
               </div>
             )}
           </div>
@@ -336,7 +305,9 @@ function StudyRecommendButton({
             </div>
             {hasFilterChanges && (
               <div className="mt-4 mr-2 flex justify-end">
-                <button onClick={resetFilters} className="text-muted-foreground hover:text-foreground text-xs underline">초기화</button>
+                <button onClick={resetFilters} className="text-muted-foreground hover:text-foreground text-xs underline">
+                  초기화
+                </button>
               </div>
             )}
           </div>
@@ -355,9 +326,7 @@ function StudyRecommendButton({
                   />
                   <div className="flex flex-col gap-1">
                     <span className="text-xs">{mode === 'STRICT' ? '엄격한 제외' : '느슨한 제외'}</span>
-                    <span className="text-muted-foreground text-xs">
-                      {mode === 'STRICT' ? '제외된 유형이 절대 추천되지 않음' : '제외된 유형 때문에 추천되지는 않음'}
-                    </span>
+                    <span className="text-muted-foreground text-xs">{mode === 'STRICT' ? '제외된 유형이 절대 추천되지 않음' : '제외된 유형 때문에 추천되지는 않음'}</span>
                   </div>
                 </label>
               ))}
@@ -393,7 +362,10 @@ function StudyRecommendButton({
             {etcIsChanged && (
               <div className="mt-2 mr-2 flex justify-end">
                 <button
-                  onClick={() => { setSelectedExclusionMode('LENIENT'); setSelectedCount(3); }}
+                  onClick={() => {
+                    setSelectedExclusionMode('LENIENT');
+                    setSelectedCount(3);
+                  }}
                   className="text-muted-foreground hover:text-foreground text-xs underline"
                 >
                   초기화
@@ -411,7 +383,7 @@ function StudyRecommendButton({
 
 export function StudyRecommendSection({ studyDetail, currentUserAccountId }: { studyDetail: StudyDetail; currentUserAccountId: number }) {
   return (
-    <div className="flex h-full w-full items-center justify-between gap-2">
+    <div className="flex h-80 w-full items-center justify-between gap-2">
       <StudyRecommendButton studyDetail={studyDetail} currentUserAccountId={currentUserAccountId} studyId={studyDetail.studyId} />
       <StudyRecommendAnswer />
     </div>

@@ -7,17 +7,18 @@ import { useStudyCalendarStore } from '@/lib/store/studyCalendar';
 import { useStudySidebarStore } from '@/lib/store/studySidebar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { useSearchProblems, WillSolveProblems } from '@/entities/calendar';
-import { StudyCalendar, StudyProblem, StudyDetail, useAssignProblemAll, useAssignProblemIndividual, useDeleteStudyProblem } from '@/entities/study';
+import { StudyCalendar, StudyProblem, StudyDetail, StudyMember, useAssignProblemAll, useAssignProblemIndividual, useDeleteStudyProblem } from '@/entities/study';
 import { formatDateString } from '@/lib/utils/date';
 import { toast } from '@/lib/utils/toast';
 import { getStudyProblemStatus } from '../lib/utils';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
+import { UserAvatar } from '@/components/custom/UserAvatar';
 
 type SidebarShowFilters = { algorithm: boolean; problemTier: boolean; problemNumber: boolean };
 
 // ── 할당 문제 카드 ────────────────────────────────────────────────
 
-function StudyProblemCard({ problem, onDelete, showFilters }: { problem: StudyProblem; onDelete: () => void; showFilters: SidebarShowFilters }) {
+function StudyProblemCard({ problem, onDelete, showFilters, members }: { problem: StudyProblem; onDelete: () => void; showFilters: SidebarShowFilters; members: StudyMember[] }) {
   const status = getStudyProblemStatus(problem);
   const isSolved = status === 'solved';
   const firstTag = problem.tags[0];
@@ -25,11 +26,18 @@ function StudyProblemCard({ problem, onDelete, showFilters }: { problem: StudyPr
   const tagInfo = TAG_INFO[problem.representativeTag?.tagCode || lastTag?.tagCode || firstTag?.tagCode];
   const tagDisplayName = tagInfo ? tagInfo.kr : problem.representativeTag?.tagDisplayName || lastTag?.tagDisplayName;
 
-  return (
-    <div onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')} className="bg-background flex cursor-pointer flex-col gap-2 rounded-md px-2 py-2 text-xs">
-      {/* 문제 기본정보 + 제목 + 삭제버튼 */}
-      <div className="relative flex items-center">
+  const solvedInfos = problem.solveInfo.filter((info) => info.solved);
+  const unsolvedInfos = problem.solveInfo.filter((info) => !info.solved);
 
+  const getProfileImageUrl = (userAccountId: number) => members.find((m) => m.userAccountId === userAccountId)?.profileImageUrl ?? null;
+
+  return (
+    <div
+      onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')}
+      className="bg-background relative flex cursor-pointer flex-col gap-2 rounded-md py-2 pr-1 pl-4 text-xs"
+    >
+      {/* 문제 기본정보 + 제목 + 삭제버튼 */}
+      <div className="flex items-center">
         {/* 문제 기본정보 */}
         {(showFilters.algorithm || showFilters.problemTier || showFilters.problemNumber) && (
           <div className="mr-2 flex shrink-0 flex-col gap-1 text-center">
@@ -68,16 +76,26 @@ function StudyProblemCard({ problem, onDelete, showFilters }: { problem: StudyPr
       {/* 풀이 현황 */}
       {problem.solveInfo.length > 0 && (
         <div className="flex flex-col gap-1 border-t pt-1" onClick={(e) => e.stopPropagation()}>
-          <span className="text-muted-foreground text-[10px]">풀이 현황</span>
-          {problem.solveInfo.map((info) => (
-            <div key={info.userAccountId} className="flex items-center gap-1.5">
-              <span className={`text-[10px] ${info.solved ? 'text-primary' : 'text-muted-foreground'}`}>{info.solved ? '✓' : '✗'}</span>
-              <span className="text-[10px]">
-                {info.bjAccountId}#{info.userCode}
-              </span>
-              {info.solved && info.solveDate && <span className="text-muted-foreground text-[10px]">({info.solveDate})</span>}
+          {solvedInfos.length > 0 && (
+            <div className="flex items-center gap-1">
+              <span className="text-primary text-[16px]">✓</span>
+              <div className="flex flex-wrap gap-0.5">
+                {solvedInfos.map((info) => (
+                  <UserAvatar key={info.userAccountId} profileImageUrl={getProfileImageUrl(info.userAccountId)} bjAccountId={info.bjAccountId} userCode={info.userCode} size={32} />
+                ))}
+              </div>
             </div>
-          ))}
+          )}
+          {unsolvedInfos.length > 0 && (
+            <div className="flex items-center gap-1">
+              <span className="text-muted-foreground text-[16px]">✗</span>
+              <div className="flex flex-wrap gap-0.5">
+                {unsolvedInfos.map((info) => (
+                  <UserAvatar key={info.userAccountId} profileImageUrl={getProfileImageUrl(info.userAccountId)} bjAccountId={info.bjAccountId} userCode={info.userCode} size={32} />
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -163,6 +181,12 @@ export function StudySidebarInset({ studyCalendarData, studyDetail, studyId }: {
     return dayData?.problems || [];
   }, [studyCalendarData, selectedDate]);
 
+  // 해결/미해결 분리
+  const solvedAssignedProblems = useMemo(() => assignedProblems.filter((p) => getStudyProblemStatus(p) === 'solved'), [assignedProblems]);
+  const willSolveAssignedProblems = useMemo(() => assignedProblems.filter((p) => getStudyProblemStatus(p) === 'willSolve'), [assignedProblems]);
+
+  const members = studyDetail?.members ?? [];
+
   const resetAssignUI = () => {
     setShowAssignUI(false);
     setAssignStep('search');
@@ -242,19 +266,36 @@ export function StudySidebarInset({ studyCalendarData, studyDetail, studyId }: {
         )}
       </div>
 
-      {/* 할당된 문제 목록 */}
+      {/* 해결한 문제 */}
+      <div className="flex flex-col gap-2">
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold">해결한 문제</h3>
+          <span className="text-xs text-gray-500">{solvedAssignedProblems.length}개</span>
+        </div>
+        {solvedAssignedProblems.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-gray-300 p-4 text-center text-xs text-gray-400">해결한 문제가 없습니다</div>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {solvedAssignedProblems.map((problem) => (
+              <StudyProblemCard key={problem.studyProblemId} problem={problem} onDelete={() => deleteStudyProblem.mutate(problem.studyProblemId)} showFilters={showFilters} members={members} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* 할당된 문제 */}
       <div className="flex flex-col gap-2">
         <div className="flex items-center justify-between">
           <h3 className="text-sm font-semibold">할당된 문제</h3>
-          <span className="text-xs text-gray-500">{assignedProblems.length}개</span>
+          <span className="text-xs text-gray-500">{willSolveAssignedProblems.length}개</span>
         </div>
 
-        {assignedProblems.length === 0 ? (
+        {willSolveAssignedProblems.length === 0 ? (
           <div className="rounded-lg border border-dashed border-gray-300 p-4 text-center text-xs text-gray-400">할당된 문제가 없습니다</div>
         ) : (
           <div className="flex flex-col gap-2">
-            {assignedProblems.map((problem) => (
-              <StudyProblemCard key={problem.studyProblemId} problem={problem} onDelete={() => deleteStudyProblem.mutate(problem.studyProblemId)} showFilters={showFilters} />
+            {willSolveAssignedProblems.map((problem) => (
+              <StudyProblemCard key={problem.studyProblemId} problem={problem} onDelete={() => deleteStudyProblem.mutate(problem.studyProblemId)} showFilters={showFilters} members={members} />
             ))}
           </div>
         )}

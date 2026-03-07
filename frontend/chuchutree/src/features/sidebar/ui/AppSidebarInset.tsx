@@ -511,14 +511,15 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                       <DropdownMenuContent className={`w-40`} side="right">
                         <h1 className="text-muted-foreground w-full cursor-default p-1 text-xs font-semibold select-none">스터디 목록</h1>
                         {studies.map((study) => (
-                          <DropdownMenuItem key={study.studyId} className={` ${studySection === study.studyId.toString() ? 'bg-logo' : ''} `}>
-                            <div
-                              onClick={() => {
-                                setStudySection(study.studyId.toString());
-                                setCloseAppSidebar(false);
-                              }}
-                              className={`flex cursor-pointer items-center gap-1 truncate`}
-                            >
+                          <DropdownMenuItem
+                            key={study.studyId}
+                            onClick={() => {
+                              setStudySection(study.studyId.toString());
+                              setCloseAppSidebar(false);
+                            }}
+                            className={` ${studySection === study.studyId.toString() ? 'bg-logo' : ''} `}
+                          >
+                            <div className={`flex h-full w-full cursor-pointer items-center gap-1 truncate `}>
                               <Bookmark size={ICON_SIZE} className="relative z-10" />
                               <span className="relative z-10">{study.studyName}</span>
                             </div>

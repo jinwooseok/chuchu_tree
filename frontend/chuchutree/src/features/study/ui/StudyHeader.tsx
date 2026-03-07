@@ -3,7 +3,7 @@
 import { Settings, UserPlus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { StudyDetail, StudyMember } from '@/entities/study';
+import { StudyDetail } from '@/entities/study';
 import { UserAvatar } from '@/components/custom/UserAvatar';
 
 interface StudyHeaderProps {
@@ -18,25 +18,10 @@ interface StudyHeaderProps {
   onEditMaxMembersChange: (v: number) => void;
 }
 
-function MemberRow({ member }: { member: StudyMember }) {
-  const isOwner = member.role === 'OWNER';
-  return (
-    <div className="flex items-center justify-between py-1.5">
-      <div className="flex items-center gap-2">
-        <UserAvatar profileImageUrl={member.profileImageUrl} bjAccountId={member.bjAccountId} userCode={member.userCode} size={24} />
-        <span className="text-sm font-medium">
-          {member.bjAccountId}#{member.userCode}
-        </span>
-        {isOwner && <span className="bg-primary/10 text-primary rounded px-1.5 py-0.5 text-xs font-medium">방장</span>}
-      </div>
-      <span className="text-muted-foreground text-xs">가입일: {member.joinedAt.slice(0, 10)}</span>
-    </div>
-  );
-}
 
 export function StudyHeader({
   studyDetail,
-  currentUserAccountId,
+  currentUserAccountId: _currentUserAccountId,
   onSettingsClick,
   onInviteClick,
   isEditing,
@@ -101,10 +86,10 @@ export function StudyHeader({
 
       {/* 멤버 목록 */}
       <div className="border-t pt-3">
-        <p className="text-muted-foreground mb-1 text-xs font-medium tracking-wide uppercase">멤버 목록</p>
-        <div className="divide-y">
+        <p className="text-muted-foreground mb-2 text-xs font-medium tracking-wide uppercase">멤버 목록</p>
+        <div className="flex flex-wrap gap-1.5">
           {studyDetail.members.map((member) => (
-            <MemberRow key={member.userAccountId} member={member} />
+            <UserAvatar key={member.userAccountId} profileImageUrl={member.profileImageUrl} bjAccountId={member.bjAccountId} userCode={member.userCode} size={28} />
           ))}
         </div>
       </div>
