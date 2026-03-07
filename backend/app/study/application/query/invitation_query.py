@@ -11,3 +11,4 @@ class InvitationQuery:
     inviter_user_code: str
     status: str
     created_at: str
+    inviter_profile_image_url: str | None = None

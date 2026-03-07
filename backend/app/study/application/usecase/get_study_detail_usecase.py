@@ -1,3 +1,4 @@
+from app.common.domain.gateway.storage_gateway import StorageGateway
 from app.common.domain.vo.identifiers import StudyId, UserAccountId
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
@@ -14,6 +15,8 @@ from app.study.domain.repository.study_invitation_repository import StudyInvitat
 from app.study.domain.repository.study_repository import StudyRepository
 from app.study.domain.repository.user_search_repository import UserSearchRepository
 
+DEFAULT_PROFILE_IMAGE_PATH = "default-user-image.svg"
+
 
 class GetStudyDetailUsecase:
     def __init__(
@@ -22,11 +25,17 @@ class GetStudyDetailUsecase:
         user_search_repository: UserSearchRepository,
         invitation_repository: StudyInvitationRepository,
         application_repository: StudyApplicationRepository,
+        storage_gateway: StorageGateway,
     ):
         self.study_repository = study_repository
         self.user_search_repository = user_search_repository
         self.invitation_repository = invitation_repository
         self.application_repository = application_repository
+        self.storage_gateway = storage_gateway
+
+    async def _presigned_url(self, profile_image: str | None) -> str:
+        path = profile_image or DEFAULT_PROFILE_IMAGE_PATH
+        return await self.storage_gateway.generate_presigned_url(path)
 
     @transactional(readonly=True)
     async def execute(self, command: GetStudyDetailCommand) -> StudyDetailQuery:
@@ -49,44 +58,51 @@ class GetStudyDetailUsecase:
                     user_code=info.user_code if info else "",
                     role=member.role.value,
                     joined_at=member.joined_at.isoformat(),
+                    profile_image_url=await self._presigned_url(info.profile_image if info else None),
                 )
             )
 
-        # 대기 중인 초대 목록
-        invitations = await self.invitation_repository.find_pending_by_study(StudyId(command.study_id))
-        invitee_ids = list({inv.invitee_user_account_id.value for inv in invitations})
-        invitee_infos = await self.user_search_repository.find_by_user_account_ids(invitee_ids)
-        invitee_map = {u.user_account_id: u for u in invitee_infos}
-        pending_invitations = [
-            StudyPendingInvitationQuery(
-                invitation_id=inv.invitation_id.value,
-                invitee_user_account_id=inv.invitee_user_account_id.value,
-                invitee_bj_account_id=invitee_map[inv.invitee_user_account_id.value].bj_account_id
-                if inv.invitee_user_account_id.value in invitee_map else "",
-                invitee_user_code=invitee_map[inv.invitee_user_account_id.value].user_code
-                if inv.invitee_user_account_id.value in invitee_map else "",
-                created_at=inv.created_at.isoformat(),
-            )
-            for inv in invitations
-        ]
+        is_member = study.is_member(UserAccountId(command.requester_user_account_id))
 
-        # 대기 중인 신청 목록
-        applications = await self.application_repository.find_pending_by_study(StudyId(command.study_id))
-        applicant_ids = list({app.applicant_user_account_id.value for app in applications})
-        applicant_infos = await self.user_search_repository.find_by_user_account_ids(applicant_ids)
-        applicant_map = {u.user_account_id: u for u in applicant_infos}
-        pending_applications = [
-            StudyPendingApplicationQuery(
-                application_id=app.application_id.value,
-                applicant_user_account_id=app.applicant_user_account_id.value,
-                applicant_bj_account_id=applicant_map[app.applicant_user_account_id.value].bj_account_id
-                if app.applicant_user_account_id.value in applicant_map else "",
-                applicant_user_code=applicant_map[app.applicant_user_account_id.value].user_code
-                if app.applicant_user_account_id.value in applicant_map else "",
-                created_at=app.created_at.isoformat(),
-            )
-            for app in applications
-        ]
+        # 대기 중인 초대 목록 (멤버만 조회 가능)
+        pending_invitations = []
+        if is_member:
+            invitations = await self.invitation_repository.find_pending_by_study(StudyId(command.study_id))
+            invitee_ids = list({inv.invitee_user_account_id.value for inv in invitations})
+            invitee_infos = await self.user_search_repository.find_by_user_account_ids(invitee_ids)
+            invitee_map = {u.user_account_id: u for u in invitee_infos}
+            for inv in invitations:
+                info = invitee_map.get(inv.invitee_user_account_id.value)
+                pending_invitations.append(
+                    StudyPendingInvitationQuery(
+                        invitation_id=inv.invitation_id.value,
+                        invitee_user_account_id=inv.invitee_user_account_id.value,
+                        invitee_bj_account_id=info.bj_account_id if info else "",
+                        invitee_user_code=info.user_code if info else "",
+                        created_at=inv.created_at.isoformat(),
+                        profile_image_url=await self._presigned_url(info.profile_image if info else None),
+                    )
+                )
+
+        # 대기 중인 신청 목록 (멤버만 조회 가능)
+        pending_applications = []
+        if is_member:
+            applications = await self.application_repository.find_pending_by_study(StudyId(command.study_id))
+            applicant_ids = list({app.applicant_user_account_id.value for app in applications})
+            applicant_infos = await self.user_search_repository.find_by_user_account_ids(applicant_ids)
+            applicant_map = {u.user_account_id: u for u in applicant_infos}
+            for app in applications:
+                info = applicant_map.get(app.applicant_user_account_id.value)
+                pending_applications.append(
+                    StudyPendingApplicationQuery(
+                        application_id=app.application_id.value,
+                        applicant_user_account_id=app.applicant_user_account_id.value,
+                        applicant_bj_account_id=info.bj_account_id if info else "",
+                        applicant_user_code=info.user_code if info else "",
+                        created_at=app.created_at.isoformat(),
+                        profile_image_url=await self._presigned_url(info.profile_image if info else None),
+                    )
+                )
 
         return StudyDetailQuery(
             study_id=study.study_id.value,

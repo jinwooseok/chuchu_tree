@@ -87,3 +87,7 @@ class StudyProblemMemberId:
 @dataclass(frozen=True)
 class NoticeId:
     value: int
+
+@dataclass(frozen=True)
+class RecommendationHistoryId:
+    value: int

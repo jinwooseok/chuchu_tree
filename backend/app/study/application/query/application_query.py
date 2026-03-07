@@ -11,3 +11,4 @@ class ApplicationQuery:
     status: str
     message: str | None
     created_at: str
+    applicant_profile_image_url: str | None = None

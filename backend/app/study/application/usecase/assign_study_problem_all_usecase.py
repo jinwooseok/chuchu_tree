@@ -34,8 +34,8 @@ class AssignStudyProblemAllUsecase:
         study = await self.study_repository.find_by_id(StudyId(command.study_id))
         if study is None:
             raise APIException(ErrorCode.STUDY_NOT_FOUND)
-        if not study.is_owner(UserAccountId(command.requester_user_account_id)):
-            raise APIException(ErrorCode.STUDY_OWNER_ONLY)
+        if not study.is_member(UserAccountId(command.requester_user_account_id)):
+            raise APIException(ErrorCode.STUDY_NOT_MEMBER)
 
         active_member_ids = [m.user_account_id.value for m in study.members if m.deleted_at is None]
         linked_users = await self.user_search_repository.find_by_user_account_ids(active_member_ids)

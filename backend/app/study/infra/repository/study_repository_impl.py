@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import and_, func, or_, select
+from sqlalchemy import and_, delete, func, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -67,6 +67,7 @@ class StudyRepositoryImpl(StudyRepository):
                 StudyModel.study_name,
                 AccountLinkModel.bj_account_id,
                 UserAccountModel.user_code,
+                UserAccountModel.profile_image,
                 func.count(StudyMemberModel.study_member_id).label("member_count"),
             )
             .join(UserAccountModel, StudyModel.owner_user_account_id == UserAccountModel.user_account_id)
@@ -99,6 +100,7 @@ class StudyRepositoryImpl(StudyRepository):
                 StudyModel.study_name,
                 AccountLinkModel.bj_account_id,
                 UserAccountModel.user_code,
+                UserAccountModel.profile_image,
             )
             .limit(limit)
         )
@@ -111,6 +113,7 @@ class StudyRepositoryImpl(StudyRepository):
                 owner_bj_account_id=row.bj_account_id,
                 owner_user_code=row.user_code,
                 member_count=row.member_count,
+                owner_profile_image=row.profile_image,
             )
             for row in rows
         ]
@@ -155,3 +158,10 @@ class StudyRepositoryImpl(StudyRepository):
         )
         result = await self.session.execute(stmt)
         return result.scalar_one_or_none() is not None
+
+    async def delete_members_by_user_hard(self, user_account_id: int) -> None:
+        stmt = delete(StudyMemberModel).where(
+            StudyMemberModel.user_account_id == user_account_id
+        )
+        await self.session.execute(stmt)
+        await self.session.flush()

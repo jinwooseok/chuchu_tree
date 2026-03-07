@@ -13,6 +13,7 @@ interface UserAccount {
   target: Target;
   registeredAt: string;
   isSynced: boolean;
+  userCode: string;
 }
 
 interface Stat {

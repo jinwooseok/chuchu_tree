@@ -57,6 +57,7 @@ class RejectStudyInvitationUsecase:
                     "userId": user_info.bj_account_id if user_info else "",
                     "userCode": user_info.user_code if user_info else "",
                     "status": "REJECTED",
+                    "senderUserAccountId": requester_id.value,
                 },
                 reference_id=invitation.invitation_id.value,
                 reference_type="STUDY_INVITATION",

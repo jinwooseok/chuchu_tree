@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import and_, select
+from sqlalchemy import and_, delete, or_, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.domain.enums import InvitationStatus
@@ -81,4 +81,14 @@ class StudyInvitationRepositoryImpl(StudyInvitationRepository):
         invitation.deleted_at = datetime.now()
         model = StudyInvitationMapper.to_model(invitation)
         await self.session.merge(model)
+        await self.session.flush()
+
+    async def delete_all_by_user_account_id(self, user_account_id: UserAccountId) -> None:
+        stmt = delete(StudyInvitationModel).where(
+            or_(
+                StudyInvitationModel.invitee_user_account_id == user_account_id.value,
+                StudyInvitationModel.inviter_user_account_id == user_account_id.value,
+            )
+        )
+        await self.session.execute(stmt)
         await self.session.flush()

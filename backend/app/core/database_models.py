@@ -35,6 +35,7 @@ from app.problem.infra.model.problem_tag import ProblemTagModel
 # Recommendation Domain
 from app.recommendation.infra.model.problem_recommendation_level_filter import ProblemRecommendationLevelFilterModel
 from app.recommendation.infra.model.tag_skill import TagSkillModel
+from app.recommendation.infra.model.recommendation_history import RecommendationHistoryModel
 
 # Common Domain
 from app.common.infra.model.system_log import SystemLogModel
@@ -77,6 +78,7 @@ __all__ = [
     # Recommendation
     "ProblemRecommendationLevelFilterModel",
     "TagSkillModel",
+    "RecommendationHistoryModel",
     # Common
     "SystemLogModel",
     # Study

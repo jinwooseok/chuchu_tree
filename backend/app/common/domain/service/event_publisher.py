@@ -13,7 +13,8 @@ class DomainEventBus(ABC):
     async def publish(
         self,
         event: DomainEvent[TPayload, TResult],
-        ignore_errors: bool = False
+        ignore_errors: bool = False,
+        after_commit: bool = False,
     ) -> TResult | None:
         """
         이벤트 발행

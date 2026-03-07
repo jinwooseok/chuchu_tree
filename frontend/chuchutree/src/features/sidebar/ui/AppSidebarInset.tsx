@@ -566,9 +566,17 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
             <SidebarMenuItem>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton>
-                    <User2 /> {user?.bjAccount.bjAccountId ?? 'Guest'}
-                    <ChevronUp className="ml-auto" />
+                  <SidebarMenuButton size={'lg'} className="group-data-[collapsible=icon]:justify-center">
+                    {user?.userAccount?.profileImageUrl ? (
+                      <Image src={user.userAccount.profileImageUrl} alt="프로필" width={24} height={24} className="bg-logo rounded-full object-cover" unoptimized />
+                    ) : (
+                      <User2 />
+                    )}
+                    <div className="relative flex h-full w-full flex-col justify-center group-data-[collapsible=icon]:hidden">
+                      <div>{user?.bjAccount.bjAccountId ?? 'Guest'}</div>
+                      <div className="text-xs">#{user?.userAccount.userCode ?? ''}</div>
+                    </div>
+                    <ChevronUp className="ml-auto group-data-[collapsible=icon]:hidden" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="top" className="w-[radix-popper-anchor-width]">

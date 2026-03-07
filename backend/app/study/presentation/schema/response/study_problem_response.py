@@ -82,4 +82,4 @@ class StudyProblemsResponse(BaseModel):
 
     @classmethod
     def from_query(cls, q: StudyProblemsQuery) -> "StudyProblemsResponse":
-        return cls(study_data=[StudyDayDataResponse.from_query(d) for d in q.study_data])
+        return cls(monthly_data=[StudyDayDataResponse.from_query(d) for d in q.study_data])

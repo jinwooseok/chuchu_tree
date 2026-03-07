@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, Query
 from dependency_injector.wiring import inject, Provide
 
 from app.common.domain.vo.current_user import CurrentUser
-from app.common.presentation.dependency.auth_dependencies import get_current_member
+from app.common.presentation.dependency.auth_dependencies import get_current_member, get_current_member_or_none
 from app.core.api_response import ApiResponse, ApiResponseSchema
 from app.core.containers import Container
 from app.study.application.command.study_command import (
@@ -76,11 +76,12 @@ async def search_studies(
 @inject
 async def get_study_detail(
     study_id: int,
+    current_user: CurrentUser | None = Depends(get_current_member_or_none),
     usecase: GetStudyDetailUsecase = Depends(Provide[Container.get_study_detail_usecase]),
 ):
     query = await usecase.execute(GetStudyDetailCommand(
         study_id=study_id,
-        requester_user_account_id=0,
+        requester_user_account_id=current_user.user_account_id if current_user else 0,
     ))
     return ApiResponse(data=StudyDetailResponse.from_query(query).model_dump(by_alias=True))
 

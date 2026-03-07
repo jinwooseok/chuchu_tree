@@ -58,7 +58,11 @@ from app.config.settings import get_settings
 from app.core.database import Database, set_global_database
 from app.middlewares import DatabaseContextMiddleware
 from app.recommendation.application.usecase.recommend_problems_usecase import RecommendProblemsUsecase
+from app.recommendation.application.usecase.get_recommendation_history_usecase import GetRecommendationHistoryUsecase
+from app.recommendation.application.usecase.get_study_recommendation_history_usecase import GetStudyRecommendationHistoryUsecase
+from app.recommendation.application.service.recommendation_history_service import RecommendationHistoryService
 from app.recommendation.infra.repository.level_filter_repository_impl import LevelFilterRepositoryImpl
+from app.recommendation.infra.repository.recommendation_history_repository_impl import RecommendationHistoryRepositoryImpl
 from app.tag.application.service.tag_application_service import TagApplicationService
 from app.target.application.service.target_application_service import TargetApplicationService
 from app.tier.infra.repository.tier_repository_impl import TierRepositoryImpl
@@ -350,6 +354,7 @@ class Container(containers.DeclarativeContainer):
         domain_event_bus=domain_event_bus,
         user_date_record_repository=user_date_record_repository,
         user_activity_repository=user_activity_repository,
+        problem_update_service=problem_update_service,
     )
 
     get_baekjoon_me_usecase = providers.Singleton(
@@ -447,6 +452,11 @@ class Container(containers.DeclarativeContainer):
         db=database
     )
 
+    recommendation_history_repository = providers.Singleton(
+        RecommendationHistoryRepositoryImpl,
+        db=database
+    )
+
     # ========================================================================
     # Target domain
     # ========================================================================
@@ -523,7 +533,24 @@ class Container(containers.DeclarativeContainer):
         problem_repository=problem_repository,
         tier_repository=tier_repository,
         problem_history_repository=problem_history_repository,
-        target_repository=target_repository
+        target_repository=target_repository,
+        domain_event_bus=domain_event_bus,
+    )
+
+    recommendation_history_service = providers.Singleton(
+        RecommendationHistoryService,
+        recommendation_history_repository=recommendation_history_repository,
+    )
+
+    get_recommendation_history_usecase = providers.Singleton(
+        GetRecommendationHistoryUsecase,
+        recommendation_history_repository=recommendation_history_repository,
+    )
+
+    get_study_recommendation_history_usecase = providers.Singleton(
+        GetStudyRecommendationHistoryUsecase,
+        recommendation_history_repository=recommendation_history_repository,
+        study_repository=study_repository,
     )
 
     # ========================================================================
@@ -547,6 +574,7 @@ class Container(containers.DeclarativeContainer):
     search_user_usecase = providers.Singleton(
         SearchUserUsecase,
         user_search_repository=user_search_repository,
+        storage_gateway=storage_gateway,
     )
 
     validate_study_name_usecase = providers.Singleton(
@@ -567,11 +595,13 @@ class Container(containers.DeclarativeContainer):
         user_search_repository=user_search_repository,
         invitation_repository=study_invitation_repository,
         application_repository=study_application_repository,
+        storage_gateway=storage_gateway,
     )
 
     search_study_usecase = providers.Singleton(
         SearchStudyUsecase,
         study_repository=study_repository,
+        storage_gateway=storage_gateway,
     )
 
     update_study_usecase = providers.Singleton(
@@ -588,6 +618,7 @@ class Container(containers.DeclarativeContainer):
         GetMyStudiesUsecase,
         study_repository=study_repository,
         user_search_repository=user_search_repository,
+        storage_gateway=storage_gateway,
     )
 
     leave_study_usecase = providers.Singleton(
@@ -620,12 +651,14 @@ class Container(containers.DeclarativeContainer):
         invitation_repository=study_invitation_repository,
         study_repository=study_repository,
         user_search_repository=user_search_repository,
+        storage_gateway=storage_gateway,
     )
 
     accept_study_invitation_usecase = providers.Singleton(
         AcceptStudyInvitationUsecase,
         invitation_repository=study_invitation_repository,
         study_repository=study_repository,
+        application_repository=study_application_repository,
         user_search_repository=user_search_repository,
         notice_repository=notice_repository,
         notice_sse_manager=notice_sse_manager,
@@ -660,12 +693,14 @@ class Container(containers.DeclarativeContainer):
         study_repository=study_repository,
         application_repository=study_application_repository,
         user_search_repository=user_search_repository,
+        storage_gateway=storage_gateway,
     )
 
     accept_study_application_usecase = providers.Singleton(
         AcceptStudyApplicationUsecase,
         study_repository=study_repository,
         application_repository=study_application_repository,
+        invitation_repository=study_invitation_repository,
         user_search_repository=user_search_repository,
         notice_repository=notice_repository,
         notice_sse_manager=notice_sse_manager,
@@ -715,6 +750,8 @@ class Container(containers.DeclarativeContainer):
     get_my_notices_usecase = providers.Singleton(
         GetMyNoticesUsecase,
         notice_repository=notice_repository,
+        user_search_repository=user_search_repository,
+        storage_gateway=storage_gateway,
     )
 
     mark_notices_read_usecase = providers.Singleton(
@@ -727,6 +764,7 @@ class Container(containers.DeclarativeContainer):
         study_repository=study_repository,
         invitation_repository=study_invitation_repository,
         user_search_repository=user_search_repository,
+        storage_gateway=storage_gateway,
     )
 
     recommend_study_problems_usecase = providers.Singleton(
@@ -741,6 +779,9 @@ class Container(containers.DeclarativeContainer):
         StudyWithdrawalService,
         study_repository=study_repository,
         study_problem_repository=study_problem_repository,
+        notice_repository=notice_repository,
+        study_invitation_repository=study_invitation_repository,
+        study_application_repository=study_application_repository,
     )
 
     async def init_resources(self):
@@ -760,6 +801,7 @@ class Container(containers.DeclarativeContainer):
         self.tag_application_service()
         self.target_application_service()
         self.study_withdrawal_service()
+        self.recommendation_history_service()
 
         # 3. 스케줄러 시작 (추가)
         scheduler = self.bj_account_update_scheduler()

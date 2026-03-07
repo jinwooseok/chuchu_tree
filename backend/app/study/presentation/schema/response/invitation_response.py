@@ -15,6 +15,7 @@ class InvitationItemResponse(BaseModel):
     inviter_user_code: str
     status: str
     created_at: str
+    inviter_profile_image_url: str | None = None
 
     @classmethod
     def from_query(cls, q: InvitationQuery) -> "InvitationItemResponse":
@@ -27,6 +28,7 @@ class InvitationItemResponse(BaseModel):
             inviter_user_code=q.inviter_user_code,
             status=q.status,
             created_at=q.created_at,
+            inviter_profile_image_url=q.inviter_profile_image_url,
         )
 
 

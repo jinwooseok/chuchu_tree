@@ -10,6 +10,7 @@ class UserSearchItemResponse(BaseModel):
     user_account_id: int
     bj_account_id: str
     user_code: str
+    profile_image_url: str | None = None
 
     @classmethod
     def from_query(cls, q: UserSearchItemQuery) -> "UserSearchItemResponse":
@@ -17,6 +18,7 @@ class UserSearchItemResponse(BaseModel):
             user_account_id=q.user_account_id,
             bj_account_id=q.bj_account_id,
             user_code=q.user_code,
+            profile_image_url=q.profile_image_url,
         )
 
 

@@ -19,8 +19,11 @@ from app.recommendation.application.query.recommend_problems_query import (
     TagAliasQuery,
     TagTargetQuery
 )
+from app.common.domain.entity.domain_event import DomainEvent
+from app.common.domain.service.event_publisher import DomainEventBus
 from app.recommendation.domain.entity.level_filter import LevelFilter
 from app.recommendation.domain.entity.tag_skill import TagSkill
+from app.recommendation.domain.event.payloads import RecommendationCompletedPayload
 from app.recommendation.domain.repository.level_filter_repository import LevelFilterRepository
 from app.recommendation.domain.repository.tag_skill_repository import TagSkillRepository
 from app.recommendation.domain.vo.recommendation_candidate import RecommendationCandidate
@@ -44,7 +47,8 @@ class RecommendProblemsUsecase:
                  problem_repository: ProblemRepository,
                  tier_repository: TierRepository,
                  problem_history_repository: ProblemHistoryRepository,
-                 target_repository: TargetRepository
+                 target_repository: TargetRepository,
+                 domain_event_bus: DomainEventBus | None = None,
                 ):
         self.user_account_repository = user_account_repository
         self.baekjoon_account_repository = baekjoon_account_repository
@@ -56,6 +60,7 @@ class RecommendProblemsUsecase:
         self.tier_repository = tier_repository
         self.problem_history_repository = problem_history_repository
         self.target_repository = target_repository
+        self.domain_event_bus = domain_event_bus
         self.skill_name_map = {
             "AD": "ADVANCED",
             "MAS": "MASTER",
@@ -71,6 +76,9 @@ class RecommendProblemsUsecase:
         count: int = 3,
         exclusion_mode: ExclusionMode = ExclusionMode.LENIENT,
         additional_excluded_problem_ids: set[int] | None = None,
+        study_id: int | None = None,
+        target_user_account_id: int | None = None,
+        recommend_all_unsolved: bool = False,
     ) -> RecommendProblemsQuery:
         # 1. 초기 데이터 로딩
         bj_account = await self.baekjoon_account_repository.find_by_user_id(user_account_id)
@@ -203,7 +211,7 @@ class RecommendProblemsUsecase:
         recommended_problem_ids: set[int] = set()  # 이미 추천한 문제 ID 추적
         sampled_tags_log: list[tuple[str, bool]] = []  # 샘플링된 태그 로그 (태그명, 성공여부)
         failed_attempts = 0
-        max_failed_attempts = count * 10  # 무한 루프 방지
+        max_failed_attempts = count * 20  # 무한 루프 방지
 
         effective_filter_codes = level_filter_codes if len(level_filter_codes) != 0 else [FilterCode.NORMAL]
         display_filter_code = effective_filter_codes[0]  # 표시 목적용
@@ -371,7 +379,28 @@ class RecommendProblemsUsecase:
             )
             problem_queries.append(problem_query)
 
-        return RecommendProblemsQuery(problems=problem_queries)
+        result = RecommendProblemsQuery(problems=problem_queries)
+
+        if self.domain_event_bus:
+            await self.domain_event_bus.publish(
+                DomainEvent(
+                    event_type="RECOMMENDATION_COMPLETED",
+                    data=RecommendationCompletedPayload(
+                        requester_user_account_id=user_account_id.value,
+                        recommended_problems=result.problems,
+                        count=count,
+                        exclusion_mode=exclusion_mode.value,
+                        level_filter_codes=[c.value for c in level_filter_codes] if level_filter_codes else None,
+                        tag_filter_codes=tag_filter_codes,
+                        study_id=study_id,
+                        target_user_account_id=target_user_account_id,
+                        recommend_all_unsolved=recommend_all_unsolved,
+                    ),
+                ),
+                after_commit=True,
+            )
+
+        return result
 
     async def _get_search_criteria_list(
         self,

@@ -1,4 +1,4 @@
-from app.common.domain.enums import NoticeCategory
+from app.common.domain.enums import InvitationStatus, NoticeCategory
 from app.common.domain.vo.identifiers import StudyId, UserAccountId
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
@@ -45,24 +45,29 @@ class SendStudyInvitationUsecase:
         if study.is_member(invitee_id):
             raise APIException(ErrorCode.STUDY_ALREADY_MEMBER)
 
-        # PENDING 초대 중복 확인
+        # 기존 초대 확인 (PENDING이면 중복 오류, REJECTED면 재활성화)
         existing = await self.invitation_repository.find_by_study_and_invitee(
             StudyId(command.study_id), invitee_id
         )
-        if existing is not None:
-            raise APIException(ErrorCode.INVITATION_ALREADY_SENT)
 
         # inviter 정보 조회
         inviter_info = await self.user_search_repository.find_by_user_account_id(command.requester_user_account_id)
         inviter_bj_id = inviter_info.bj_account_id if inviter_info else ""
         inviter_user_code = inviter_info.user_code if inviter_info else ""
 
-        invitation = StudyInvitation.create(
-            study_id=study.study_id,
-            invitee_user_account_id=invitee_id,
-            inviter_user_account_id=UserAccountId(command.requester_user_account_id),
-        )
-        saved = await self.invitation_repository.insert(invitation)
+        if existing is not None:
+            if existing.status == InvitationStatus.PENDING:
+                raise APIException(ErrorCode.INVITATION_ALREADY_SENT)
+            # REJECTED → 재활성화 (새 row INSERT 없이 UPDATE)
+            existing.reactivate(UserAccountId(command.requester_user_account_id))
+            saved = await self.invitation_repository.update(existing)
+        else:
+            invitation = StudyInvitation.create(
+                study_id=study.study_id,
+                invitee_user_account_id=invitee_id,
+                inviter_user_account_id=UserAccountId(command.requester_user_account_id),
+            )
+            saved = await self.invitation_repository.insert(invitation)
 
         # invitee에게 Notice + SSE
         notice = Notice.create(
@@ -74,6 +79,7 @@ class SendStudyInvitationUsecase:
                 "userId": inviter_bj_id,
                 "userCode": inviter_user_code,
                 "status": "PENDING",
+                "senderUserAccountId": command.requester_user_account_id,
             },
             reference_id=saved.invitation_id.value,
             reference_type="STUDY_INVITATION",
