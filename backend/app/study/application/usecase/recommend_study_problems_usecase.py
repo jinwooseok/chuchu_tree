@@ -1,4 +1,5 @@
 from app.baekjoon.domain.repository.problem_history_repository import ProblemHistoryRepository
+from app.common.domain.enums import ExclusionMode
 from app.common.domain.vo.identifiers import BaekjoonAccountId, StudyId, UserAccountId
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
@@ -50,20 +51,27 @@ class RecommendStudyProblemsUsecase:
             )
             solved_map[u.bj_account_id] = set(solved_ids)
 
+        exclusion_mode = command.exclusion_mode if isinstance(command.exclusion_mode, ExclusionMode) else ExclusionMode(command.exclusion_mode)
+
         # recommend_all_unsolved: 스터디 멤버 중 한 명이라도 푼 문제 ID를 미리 계산하여 추천 도메인에 전달
-        # → 추천 루프가 처음부터 해당 문제를 건너뛰므로 count개가 정확히 채워짐
         additional_excluded: set[int] | None = None
         if command.recommend_all_unsolved:
             any_member_solved: set[int] = set()
-            for bj_id, s_ids in solved_map.items():
+            for s_ids in solved_map.values():
                 any_member_solved |= s_ids
             additional_excluded = any_member_solved if any_member_solved else None
 
         # 추천 실행 (중첩 트랜잭션 - savepoint)
         recommend_query = await self.recommend_problems_usecase.execute(
             user_account_id=UserAccountId(target_user_account_id),
+            level_filter_codes=command.level_filter_codes,
+            tag_filter_codes=command.tag_filter_codes,
             count=command.count,
+            exclusion_mode=exclusion_mode,
             additional_excluded_problem_ids=additional_excluded,
+            study_id=command.study_id,
+            target_user_account_id=command.target_user_account_id,
+            recommend_all_unsolved=command.recommend_all_unsolved,
         )
 
         # studyMemberSolveInfo 조립 (solved_map은 이미 계산됨)

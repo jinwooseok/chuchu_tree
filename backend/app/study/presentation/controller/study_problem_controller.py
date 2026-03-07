@@ -1,10 +1,15 @@
 from fastapi import APIRouter, Depends, Query
 from dependency_injector.wiring import inject, Provide
+from typing import Optional
+import json
 
+from app.common.domain.enums import FilterCode, ExclusionMode
 from app.common.domain.vo.current_user import CurrentUser
 from app.common.presentation.dependency.auth_dependencies import get_current_member
 from app.core.api_response import ApiResponse, ApiResponseSchema
 from app.core.containers import Container
+from app.recommendation.application.usecase.get_study_recommendation_history_usecase import GetStudyRecommendationHistoryUsecase
+from app.recommendation.presentation.schema.response.recommendation_history_response import RecommendationHistoryResponse
 from app.study.application.command.study_command import (
     AssignStudyProblemAllCommand,
     AssignStudyProblemCommand,
@@ -104,17 +109,51 @@ async def get_study_problems(
 @inject
 async def recommend_study_problems(
     study_id: int,
-    target_user_account_id: int | None = Query(default=None),
-    recommend_all_unsolved: bool = Query(default=False),
+    target_user_account_id: Optional[int] = Query(default=None),
+    level: Optional[str] = Query("[]", description="난이도 필터 (예: [\"EASY\", \"NORMAL\"])"),
+    tags: Optional[str] = Query("[]", description="태그 필터 (예: [1, 2, 3])"),
     count: int = Query(default=3),
+    exclusion_mode: Optional[str] = Query("LENIENT", description="제외 모드 (LENIENT|STRICT)"),
+    recommend_all_unsolved: bool = Query(default=False),
     current_user: CurrentUser = Depends(get_current_member),
     usecase: RecommendStudyProblemsUsecase = Depends(Provide[Container.recommend_study_problems_usecase]),
 ):
+    level_filter_codes: list[FilterCode] | None = None
+    if level:
+        level_codes = json.loads(level)
+        level_filter_codes = [FilterCode(code) for code in level_codes]
+
+    tag_filter_codes: list | None = None
+    if tags:
+        tag_filter_codes = json.loads(tags)
+
+    exclusion_mode_enum = ExclusionMode(exclusion_mode) if exclusion_mode else ExclusionMode.LENIENT
+
     query = await usecase.execute(RecommendStudyProblemsCommand(
         study_id=study_id,
         requester_user_account_id=current_user.user_account_id,
         target_user_account_id=target_user_account_id,
+        level_filter_codes=level_filter_codes,
+        tag_filter_codes=tag_filter_codes,
+        exclusion_mode=exclusion_mode_enum,
         recommend_all_unsolved=recommend_all_unsolved,
         count=count,
     ))
+
     return ApiResponse(data=StudyRecommendationResponse.from_query(query).model_dump(by_alias=True))
+
+
+@study_problem_router.get("/studies/{study_id}/recommend-history", response_model=ApiResponseSchema[RecommendationHistoryResponse])
+@inject
+async def get_study_recommendation_history(
+    study_id: int,
+    user_account_id: Optional[int] = Query(default=None),
+    current_user: CurrentUser = Depends(get_current_member),
+    usecase: GetStudyRecommendationHistoryUsecase = Depends(Provide[Container.get_study_recommendation_history_usecase]),
+):
+    query = await usecase.execute(
+        study_id=study_id,
+        requester_user_account_id=current_user.user_account_id,
+        user_account_id=user_account_id,
+    )
+    return ApiResponse(data=RecommendationHistoryResponse.from_query(query).model_dump(by_alias=True))
