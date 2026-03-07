@@ -58,7 +58,11 @@ from app.config.settings import get_settings
 from app.core.database import Database, set_global_database
 from app.middlewares import DatabaseContextMiddleware
 from app.recommendation.application.usecase.recommend_problems_usecase import RecommendProblemsUsecase
+from app.recommendation.application.usecase.get_recommendation_history_usecase import GetRecommendationHistoryUsecase
+from app.recommendation.application.usecase.get_study_recommendation_history_usecase import GetStudyRecommendationHistoryUsecase
+from app.recommendation.application.service.recommendation_history_service import RecommendationHistoryService
 from app.recommendation.infra.repository.level_filter_repository_impl import LevelFilterRepositoryImpl
+from app.recommendation.infra.repository.recommendation_history_repository_impl import RecommendationHistoryRepositoryImpl
 from app.tag.application.service.tag_application_service import TagApplicationService
 from app.target.application.service.target_application_service import TargetApplicationService
 from app.tier.infra.repository.tier_repository_impl import TierRepositoryImpl
@@ -448,6 +452,11 @@ class Container(containers.DeclarativeContainer):
         db=database
     )
 
+    recommendation_history_repository = providers.Singleton(
+        RecommendationHistoryRepositoryImpl,
+        db=database
+    )
+
     # ========================================================================
     # Target domain
     # ========================================================================
@@ -524,7 +533,24 @@ class Container(containers.DeclarativeContainer):
         problem_repository=problem_repository,
         tier_repository=tier_repository,
         problem_history_repository=problem_history_repository,
-        target_repository=target_repository
+        target_repository=target_repository,
+        domain_event_bus=domain_event_bus,
+    )
+
+    recommendation_history_service = providers.Singleton(
+        RecommendationHistoryService,
+        recommendation_history_repository=recommendation_history_repository,
+    )
+
+    get_recommendation_history_usecase = providers.Singleton(
+        GetRecommendationHistoryUsecase,
+        recommendation_history_repository=recommendation_history_repository,
+    )
+
+    get_study_recommendation_history_usecase = providers.Singleton(
+        GetStudyRecommendationHistoryUsecase,
+        recommendation_history_repository=recommendation_history_repository,
+        study_repository=study_repository,
     )
 
     # ========================================================================
@@ -632,6 +658,7 @@ class Container(containers.DeclarativeContainer):
         AcceptStudyInvitationUsecase,
         invitation_repository=study_invitation_repository,
         study_repository=study_repository,
+        application_repository=study_application_repository,
         user_search_repository=user_search_repository,
         notice_repository=notice_repository,
         notice_sse_manager=notice_sse_manager,
@@ -673,6 +700,7 @@ class Container(containers.DeclarativeContainer):
         AcceptStudyApplicationUsecase,
         study_repository=study_repository,
         application_repository=study_application_repository,
+        invitation_repository=study_invitation_repository,
         user_search_repository=user_search_repository,
         notice_repository=notice_repository,
         notice_sse_manager=notice_sse_manager,
@@ -773,6 +801,7 @@ class Container(containers.DeclarativeContainer):
         self.tag_application_service()
         self.target_application_service()
         self.study_withdrawal_service()
+        self.recommendation_history_service()
 
         # 3. 스케줄러 시작 (추가)
         scheduler = self.bj_account_update_scheduler()

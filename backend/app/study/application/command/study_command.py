@@ -186,5 +186,8 @@ class RecommendStudyProblemsCommand:
     study_id: int
     requester_user_account_id: int
     target_user_account_id: int | None = None
+    level_filter_codes: list | None = None
+    tag_filter_codes: list | None = None
+    exclusion_mode: str = "LENIENT"
     recommend_all_unsolved: bool = False
     count: int = 3

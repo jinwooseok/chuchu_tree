@@ -72,7 +72,8 @@ class InMemoryEventBus(DomainEventBus):
     async def publish(
         self,
         event: DomainEvent[TPayload, TResult],
-        ignore_errors: bool = False
+        ignore_errors: bool = False,
+        after_commit: bool = False,
     ) -> TResult | None:
         """
         도메인 이벤트 발행
@@ -84,20 +85,35 @@ class InMemoryEventBus(DomainEventBus):
         Args:
             event: 도메인 이벤트 (result_type이 포함됨)
             ignore_errors: True면 핸들러 에러 무시 (기본: False)
+            after_commit: True면 현재 트랜잭션 commit 이후 독립 트랜잭션으로 디스패치.
+                          트랜잭션 밖에서 호출 시 즉시 디스패치.
+                          result_type과 함께 사용 불가 (결과를 기다릴 수 없음).
 
         Returns:
+            - after_commit=True: 항상 None (deferred)
             - event.result_type=None: None (Fire-and-Forget)
             - event.result_type 지정: 변환된 결과 객체 (TResult 타입)
-
-        데이터 흐름:
-        1. Request Mapping: A의 Pydantic 객체 -> dict (EventBus 책임)
-        2. Handler 실행: dict -> B의 Pydantic 객체 -> B의 Query -> dict (wrapper 책임)
-        3. Response Mapping: dict -> A의 Result 객체 (EventBus 책임)
 
         에러 처리:
         - ignore_errors=False: 핸들러 에러 시 즉시 예외 발생 (트랜잭션 롤백)
         - ignore_errors=True: 핸들러 에러 무시하고 다음 핸들러 계속 실행
         """
+        from app.core.database import _session_context, collect_after_commit
+
+        # after_commit=True이고 활성 트랜잭션이 존재하면 commit 이후로 디스패치 예약
+        if after_commit and _session_context.get() is not None:
+            async def _deferred():
+                await self._dispatch(event, ignore_errors)
+            collect_after_commit(_deferred)
+            return None
+
+        return await self._dispatch(event, ignore_errors)
+
+    async def _dispatch(
+        self,
+        event: DomainEvent[TPayload, TResult],
+        ignore_errors: bool = False,
+    ) -> TResult | None:
         event_name = event.event_type
         expects_result = event.expects_result()
 

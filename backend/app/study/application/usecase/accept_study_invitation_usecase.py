@@ -6,6 +6,7 @@ from app.core.exception import APIException
 from app.study.application.command.study_command import AcceptStudyInvitationCommand
 from app.study.domain.entity.notice import Notice
 from app.study.domain.repository.notice_repository import NoticeRepository
+from app.study.domain.repository.study_application_repository import StudyApplicationRepository
 from app.study.domain.repository.study_invitation_repository import StudyInvitationRepository
 from app.study.domain.repository.study_repository import StudyRepository
 from app.study.domain.repository.user_search_repository import UserSearchRepository
@@ -17,12 +18,14 @@ class AcceptStudyInvitationUsecase:
         self,
         invitation_repository: StudyInvitationRepository,
         study_repository: StudyRepository,
+        application_repository: StudyApplicationRepository,
         user_search_repository: UserSearchRepository,
         notice_repository: NoticeRepository,
         notice_sse_manager: NoticeSSEManager,
     ):
         self.invitation_repository = invitation_repository
         self.study_repository = study_repository
+        self.application_repository = application_repository
         self.user_search_repository = user_search_repository
         self.notice_repository = notice_repository
         self.notice_sse_manager = notice_sse_manager
@@ -58,6 +61,13 @@ class AcceptStudyInvitationUsecase:
 
         study.add_member(requester_id)
         await self.study_repository.update(study)
+
+        # 동일 스터디에 PENDING 신청이 있으면 정리
+        pending_application = await self.application_repository.find_by_study_and_applicant(
+            invitation.study_id, requester_id
+        )
+        if pending_application is not None:
+            await self.application_repository.soft_delete(pending_application)
 
         # 방장에게 Notice (초대 수락)
         notice = Notice.create(
