@@ -29,3 +29,5 @@ class RecommendationHistoryItemQuery:
 class RecommendationHistoryQuery:
     """추천 히스토리 목록 쿼리"""
     items: list[RecommendationHistoryItemQuery] = field(default_factory=list)
+    next_cursor: int | None = None
+    has_next: bool = False

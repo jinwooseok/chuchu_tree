@@ -46,3 +46,9 @@ class StudyInvitation:
         self.status = InvitationStatus.REJECTED
         self.responded_at = datetime.now()
         self.updated_at = datetime.now()
+
+    def reactivate(self, inviter_user_account_id: UserAccountId) -> None:
+        self.inviter_user_account_id = inviter_user_account_id
+        self.status = InvitationStatus.PENDING
+        self.responded_at = None
+        self.updated_at = datetime.now()

@@ -55,11 +55,15 @@ class RecommendationHistoryItemResponse(BaseModel):
 
 class RecommendationHistoryResponse(BaseModel):
     items: list[RecommendationHistoryItemResponse]
+    next_cursor: int | None
+    has_next: bool
 
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
     @classmethod
     def from_query(cls, query: RecommendationHistoryQuery) -> "RecommendationHistoryResponse":
         return cls(
-            items=[RecommendationHistoryItemResponse.from_query(item) for item in query.items]
+            items=[RecommendationHistoryItemResponse.from_query(item) for item in query.items],
+            next_cursor=query.next_cursor,
+            has_next=query.has_next,
         )

@@ -12,14 +12,18 @@ class RecommendationHistoryRepository(ABC):
 
     @abstractmethod
     async def find_by_user_account_id(
-        self, user_account_id: UserAccountId
+        self, user_account_id: UserAccountId, cursor: int | None = None, limit: int = 10
     ) -> list[RecommendationHistory]:
-        """개인 추천 히스토리 조회 (study_id IS NULL)"""
+        """개인 추천 히스토리 조회 (study_id IS NULL), cursor 미설정 시 최신부터"""
         pass
 
     @abstractmethod
     async def find_by_study_id(
-        self, study_id: StudyId, user_account_id: UserAccountId | None = None
+        self,
+        study_id: StudyId,
+        user_account_id: UserAccountId | None = None,
+        cursor: int | None = None,
+        limit: int = 10,
     ) -> list[RecommendationHistory]:
         """스터디 추천 히스토리 조회 (user_account_id 미설정 시 스터디 전체)"""
         pass

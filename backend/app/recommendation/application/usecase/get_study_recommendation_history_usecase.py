@@ -27,7 +27,12 @@ class GetStudyRecommendationHistoryUsecase:
 
     @transactional(readonly=True)
     async def execute(
-        self, study_id: int, requester_user_account_id: int, user_account_id: int | None = None
+        self,
+        study_id: int,
+        requester_user_account_id: int,
+        user_account_id: int | None = None,
+        cursor: int | None = None,
+        limit: int = 10,
     ) -> RecommendationHistoryQuery:
         study = await self.study_repository.find_by_id(StudyId(study_id))
         if study is None:
@@ -38,7 +43,11 @@ class GetStudyRecommendationHistoryUsecase:
         histories = await self.recommendation_history_repository.find_by_study_id(
             StudyId(study_id),
             UserAccountId(user_account_id) if user_account_id is not None else None,
+            cursor=cursor,
+            limit=limit,
         )
+        has_next = len(histories) > limit
+        page = histories[:limit]
         items = [
             RecommendationHistoryItemQuery(
                 recommendation_history_id=h.recommendation_history_id.value,
@@ -55,6 +64,7 @@ class GetStudyRecommendationHistoryUsecase:
                 recommended_problems=[RecommendedProblemQuery.model_validate(p) for p in h.recommended_problems],
                 created_at=h.created_at.isoformat(),
             )
-            for h in histories
+            for h in page
         ]
-        return RecommendationHistoryQuery(items=items)
+        next_cursor = page[-1].recommendation_history_id.value if has_next and page else None
+        return RecommendationHistoryQuery(items=items, next_cursor=next_cursor, has_next=has_next)

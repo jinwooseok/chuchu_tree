@@ -54,8 +54,10 @@ async def get_recommended_problems(
 @router.get("/recommend-history", response_model=ApiResponseSchema[RecommendationHistoryResponse])
 @inject
 async def get_recommendation_history(
+    cursor: Optional[int] = Query(default=None, description="이전 페이지 마지막 항목의 ID"),
+    limit: int = Query(default=10, description="한 페이지 항목 수"),
     current_user: CurrentUser = Depends(get_current_member),
     usecase: GetRecommendationHistoryUsecase = Depends(Provide[Container.get_recommendation_history_usecase]),
 ):
-    query = await usecase.execute(user_account_id=current_user.user_account_id)
+    query = await usecase.execute(user_account_id=current_user.user_account_id, cursor=cursor, limit=limit)
     return ApiResponse(data=RecommendationHistoryResponse.from_query(query).model_dump(by_alias=True))

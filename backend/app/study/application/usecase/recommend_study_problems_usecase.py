@@ -38,6 +38,9 @@ class RecommendStudyProblemsUsecase:
 
         target_user_account_id = command.target_user_account_id or command.requester_user_account_id
 
+        if command.target_user_account_id is not None and not study.is_member(UserAccountId(command.target_user_account_id)):
+            raise APIException(ErrorCode.STUDY_NOT_MEMBER)
+
         # BJ 계정 연동된 스터디 활성 멤버만 조회 (INNER JOIN으로 연동 멤버만 반환)
         active_member_ids = [m.user_account_id.value for m in study.members if m.deleted_at is None]
         user_infos = await self.user_search_repository.find_by_user_account_ids(active_member_ids)
