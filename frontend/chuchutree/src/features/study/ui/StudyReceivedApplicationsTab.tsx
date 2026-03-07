@@ -45,7 +45,7 @@ export function StudyReceivedApplicationsTab({ studyDetail, isOwner }: StudyRece
           studyDetail.pendingApplications.map((app) => (
             <div key={app.applicationId} className="flex items-center justify-between rounded-lg border p-3">
               <div className="flex items-center gap-2">
-                <UserAvatar profileImageUrl={app.profileImageUrl} size={24} />
+                <UserAvatar profileImageUrl={app.profileImageUrl} bjAccountId={app.applicantBjAccountId} userCode={app.applicantUserCode} size={24} />
                 <span className="text-sm">
                   {app.applicantBjAccountId}#{app.applicantUserCode}
                 </span>
@@ -76,7 +76,7 @@ export function StudyReceivedApplicationsTab({ studyDetail, isOwner }: StudyRece
       {applications.map((app) => (
         <div key={app.applicationId} className="flex items-center justify-between rounded-lg border p-3">
           <div className="flex items-center gap-2">
-            <UserAvatar profileImageUrl={app.applicantProfileImageUrl} size={24} />
+            <UserAvatar profileImageUrl={app.applicantProfileImageUrl} bjAccountId={app.applicantBjAccountId} userCode={app.applicantUserCode} size={24} />
             <span className="text-sm font-medium">
               {app.applicantBjAccountId}#{app.applicantUserCode}
             </span>

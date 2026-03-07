@@ -1,14 +1,17 @@
 import Image from 'next/image';
 import { User2 } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface UserAvatarProps {
   profileImageUrl: string | null;
+  bjAccountId?: string;
+  userCode?: string;
   size?: number;
   className?: string;
 }
 
-export function UserAvatar({ profileImageUrl, size = 32, className = '' }: UserAvatarProps) {
-  return (
+export function UserAvatar({ profileImageUrl, bjAccountId, userCode, size = 32, className = '' }: UserAvatarProps) {
+  const avatar = (
     <div
       className={`bg-muted flex shrink-0 items-center justify-center overflow-hidden rounded-full border ${className}`}
       style={{ width: size, height: size }}
@@ -27,4 +30,18 @@ export function UserAvatar({ profileImageUrl, size = 32, className = '' }: UserA
       )}
     </div>
   );
+
+  if (bjAccountId || userCode) {
+    return (
+      <Tooltip>
+        <TooltipTrigger asChild>{avatar}</TooltipTrigger>
+        <TooltipContent>
+          {bjAccountId}
+          {userCode ? `#${userCode}` : ''}
+        </TooltipContent>
+      </Tooltip>
+    );
+  }
+
+  return avatar;
 }

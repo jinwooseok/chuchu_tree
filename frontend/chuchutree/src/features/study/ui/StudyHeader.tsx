@@ -23,7 +23,7 @@ function MemberRow({ member }: { member: StudyMember }) {
   return (
     <div className="flex items-center justify-between py-1.5">
       <div className="flex items-center gap-2">
-        <UserAvatar profileImageUrl={member.profileImageUrl} size={24} />
+        <UserAvatar profileImageUrl={member.profileImageUrl} bjAccountId={member.bjAccountId} userCode={member.userCode} size={24} />
         <span className="text-sm font-medium">
           {member.bjAccountId}#{member.userCode}
         </span>

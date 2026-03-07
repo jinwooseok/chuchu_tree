@@ -65,7 +65,7 @@ export function StudySentInvitationsTab({ studyDetail, isOwner }: StudySentInvit
           studyDetail.pendingInvitations.map((inv) => (
             <div key={inv.invitationId} className="flex items-center justify-between rounded-lg border p-3">
               <div className="flex items-center gap-2">
-                <UserAvatar profileImageUrl={inv.profileImageUrl} size={24} />
+                <UserAvatar profileImageUrl={inv.profileImageUrl} bjAccountId={inv.inviteeBjAccountId} userCode={inv.inviteeUserCode} size={24} />
                 <span className="text-sm">
                   {inv.inviteeBjAccountId}#{inv.inviteeUserCode}
                 </span>
@@ -115,7 +115,7 @@ export function StudySentInvitationsTab({ studyDetail, isOwner }: StudySentInvit
                     disabled={isSending}
                   >
                     <div className="flex items-center gap-2">
-                      <UserAvatar profileImageUrl={u.profileImageUrl} size={24} />
+                      <UserAvatar profileImageUrl={u.profileImageUrl} bjAccountId={u.bjAccountId} userCode={u.userCode} size={24} />
                       <span className="font-medium">{u.bjAccountId}</span>
                     </div>
                     <span className="text-muted-foreground">#{u.userCode}</span>
@@ -140,7 +140,7 @@ export function StudySentInvitationsTab({ studyDetail, isOwner }: StudySentInvit
           {invitations.map((inv) => (
             <div key={inv.invitationId} className="flex items-center justify-between rounded-lg border p-3">
               <div className="flex items-center gap-2">
-                <UserAvatar profileImageUrl={inv.inviterProfileImageUrl} size={24} />
+                <UserAvatar profileImageUrl={inv.inviterProfileImageUrl} bjAccountId={inv.inviterBjAccountId} userCode={inv.inviterUserCode} size={24} />
                 <span className="text-sm font-medium">
                   {inv.inviterBjAccountId}#{inv.inviterUserCode}
                 </span>

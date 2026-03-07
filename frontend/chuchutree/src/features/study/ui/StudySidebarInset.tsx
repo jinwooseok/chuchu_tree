@@ -29,10 +29,6 @@ function StudyProblemCard({ problem, onDelete, showFilters }: { problem: StudyPr
     <div onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')} className="bg-background flex cursor-pointer flex-col gap-2 rounded-md px-2 py-2 text-xs">
       {/* 문제 기본정보 + 제목 + 삭제버튼 */}
       <div className="relative flex items-center">
-        {/* 전원풀이 완료 뱃지 */}
-        <span className={`mr-2 shrink-0 rounded px-1.5 py-0.5 text-[10px] font-medium ${isSolved ? 'bg-primary/20 text-primary' : 'bg-innerground-darkgray text-only-gray'}`}>
-          {isSolved ? '완료' : '진행중'}
-        </span>
 
         {/* 문제 기본정보 */}
         {(showFilters.algorithm || showFilters.problemTier || showFilters.problemNumber) && (

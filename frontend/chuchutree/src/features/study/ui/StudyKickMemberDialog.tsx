@@ -37,7 +37,7 @@ export function StudyKickMemberDialog({ studyDetail, currentUserAccountId, onClo
           {kickableMembers.map((member) => (
             <div key={member.userAccountId} className="flex items-center justify-between py-2">
               <div className="flex items-center gap-2">
-                <UserAvatar profileImageUrl={member.profileImageUrl} size={24} />
+                <UserAvatar profileImageUrl={member.profileImageUrl} bjAccountId={member.bjAccountId} userCode={member.userCode} size={24} />
                 <span className="truncate text-sm">
                   {member.bjAccountId}#{member.userCode}
                 </span>
