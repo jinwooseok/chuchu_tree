@@ -34,14 +34,12 @@ import {
   SidebarGroup,
   SidebarGroupAction,
   SidebarGroupContent,
-  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
-  SidebarRail,
 } from '@/components/ui/sidebar';
 import { useSidebar } from '@/components/ui/sidebar';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
@@ -58,10 +56,10 @@ import { SettingsDialog } from '@/features/sidebar/ui/settings/SettingsDialog';
 import { AddPrevProblemsDialog } from '@/features/sidebar/ui/group-second/AddPrevProblemsDialog';
 import { BannedProblemsDialog } from '@/features/sidebar/ui/group-second/BannedProblemsDialog';
 import { User } from '@/entities/user';
+import { useMyStudies } from '@/entities/study';
 import { useState } from 'react';
 import { useLandingRecommend } from '@/features/landing';
 import { useOnboardingStore } from '@/lib/store/onboarding';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { CreateStudyDialog } from '@/features/sidebar/ui/group-study/CreateStudyDialog';
 import { NoticeDialog } from '@/features/notification';
 import { useNotificationStore } from '@/lib/store/notification';
@@ -72,7 +70,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
   const { openModal, closeModal } = useModal();
   const router = useRouter();
   // 사이드바 상태
-  const { state: sidebarOpenState, toggleSidebar: setSidebarOpenState } = useSidebar();
+  const { state: sidebarOpenState, toggleSidebar: setSidebarOpenState, setOpen: setCloseAppSidebar } = useSidebar();
   // 레이아웃 상태
   const { topSection, centerSection, bottomSection, studySection, toggleTopSection, setCenterSection, toggleBottomSection, setStudySection } = useLayoutStore();
 
@@ -159,6 +157,8 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       'settings',
       <SettingsDialog
         currentBjAccountId={user?.bjAccount?.bjAccountId || 'guest'}
+        currentUserCode={user?.userAccount.userCode || ''}
+        currentProfileImageUrl={user?.userAccount.profileImageUrl || null}
         currentTarget={user?.userAccount?.target?.targetCode as TargetCode}
         linkedAt={user?.linkedAt}
         isLanding={isLanding}
@@ -183,6 +183,9 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
     }
     openModal('notice-list', <NoticeDialog onClose={() => closeModal('notice-list')} />);
   };
+
+  // 스터디 목록 조회
+  const { data: studies = [] } = useMyStudies();
 
   // 튜토리얼 다시보기
   const { resetOnboarding, startOnboarding } = useOnboardingStore();
@@ -294,7 +297,10 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       title: '캘린더',
       short1: 'Shift',
       short2: 'C',
-      action: () => setCenterSection('calendar'),
+      action: () => {
+        setCenterSection('calendar');
+        setCloseAppSidebar(false);
+      },
       icon: Calendar,
       isActive: studySection === null && centerSection === 'calendar',
       tooltipText: '문제 풀이 일정 관리',
@@ -303,7 +309,10 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
       title: '유형별 숙련도',
       short1: 'Shift',
       short2: 'D',
-      action: () => setCenterSection('dashboard'),
+      action: () => {
+        setCenterSection('dashboard');
+        setCloseAppSidebar(false);
+      },
       icon: LibraryBig,
       isActive: studySection === null && centerSection === 'dashboard',
       tooltipText: '유형별 실력 현황',
@@ -445,69 +454,84 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
           </SidebarGroup>
           <div className="mt-10" />
           {/* 그룹3 : 스터디 전용 */}
-          {/* <SidebarGroup>
+          <SidebarGroup>
             <SidebarGroupContent>
               <SidebarMenu>
-                <SidebarMenuItem key="addstudy" aria-label={'스터디 생성'}>
-                  <AppTooltip content={'스터디 생성'} side="right">
+                <SidebarMenuItem key="addstudy" aria-label={'스터디 생성/가입'}>
+                  <AppTooltip content={'스터디에 참여해보세요'} side="right">
                     <SidebarMenuButton asChild>
                       <div onClick={handleCreateStudy} className="cursor-pointer">
                         <CircleFadingPlus size={ICON_SIZE} className="relative z-10" />
-                        <span className="relative z-10">스터디 만들기</span>
+                        <span className="relative z-10">스터디 만들기/가입하기</span>
                       </div>
                     </SidebarMenuButton>
                   </AppTooltip>
                 </SidebarMenuItem>
-                <SidebarMenuItem key="studygroup" aria-label={'스터디'}>
-                  <AppTooltip content={'스터디를 만들어보세요'} side="right">
-                    <SidebarMenuButton asChild>
-                      <div onClick={() => {}} className="cursor-pointer">
-                        <Star size={ICON_SIZE} className="relative z-10" />
-                        <span className="relative z-10">스터디 목록</span>
-                      </div>
-                    </SidebarMenuButton>
-                  </AppTooltip>
-                  <SidebarMenuSub>
-                    <SidebarMenuSubItem>
-                      <SidebarMenuSubButton asChild isActive={studySection === '스터디1'}>
-                        <div
-                          onClick={() => {
-                            setStudySection('스터디1');
-                          }}
-                          className="mb-1 cursor-pointer"
-                        >
-                          <Bookmark size={ICON_SIZE} className="relative z-10" />
-                          <span className="relative z-10">스터디1</span>
+                {/* 스터디 목록 */}
+                {sidebarOpenState === 'expanded' && (
+                  <SidebarMenuItem key="studygroup" aria-label={'스터디'}>
+                    <AppTooltip content={'내가 참여한 스터디'} side="right">
+                      <SidebarMenuButton asChild>
+                        <div className="cursor-pointer">
+                          <Star size={ICON_SIZE} className="relative z-10" />
+                          <span className="relative z-10">스터디 목록</span>
                         </div>
-                      </SidebarMenuSubButton>
-                      <SidebarMenuSubButton asChild isActive={studySection === '스터디2'}>
-                        <div
-                          onClick={() => {
-                            setStudySection('스터디2');
-                          }}
-                          className="mb-1 cursor-pointer"
-                        >
-                          <Bookmark size={ICON_SIZE} className="relative z-10" />
-                          <span className="relative z-10">스터디2</span>
-                        </div>
-                      </SidebarMenuSubButton>
-                      <SidebarMenuSubButton asChild isActive={studySection === '스터디3'}>
-                        <div
-                          onClick={() => {
-                            setStudySection('스터디3');
-                          }}
-                          className="mb-1 cursor-pointer"
-                        >
-                          <Bookmark size={ICON_SIZE} className="relative z-10" />
-                          <span className="relative z-10">스터디3</span>
-                        </div>
-                      </SidebarMenuSubButton>
-                    </SidebarMenuSubItem>
-                  </SidebarMenuSub>
-                </SidebarMenuItem>
+                      </SidebarMenuButton>
+                    </AppTooltip>
+                    <SidebarMenuSub>
+                      <SidebarMenuSubItem>
+                        {studies.map((study) => (
+                          <SidebarMenuSubButton key={study.studyId} asChild isActive={studySection === study.studyId.toString()}>
+                            <div
+                              onClick={() => {
+                                setStudySection(study.studyId.toString());
+                                setCloseAppSidebar(false);
+                              }}
+                              className="mb-1 cursor-pointer"
+                            >
+                              <Bookmark size={ICON_SIZE} className="relative z-10" />
+                              <span className="relative z-10">{study.studyName}</span>
+                            </div>
+                          </SidebarMenuSubButton>
+                        ))}
+                      </SidebarMenuSubItem>
+                    </SidebarMenuSub>
+                  </SidebarMenuItem>
+                )}
+                {/* 스터디 목록 사이드바 접힘상태 전용 Dropdown방식 */}
+                {sidebarOpenState === 'collapsed' && (
+                  <SidebarMenuItem>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <SidebarMenuButton>
+                          <Star />
+                          스터디 목록
+                        </SidebarMenuButton>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className={`w-40`} side="right">
+                        <h1 className="text-muted-foreground w-full cursor-default p-1 text-xs font-semibold select-none">스터디 목록</h1>
+                        {studies.map((study) => (
+                          <DropdownMenuItem
+                            key={study.studyId}
+                            onClick={() => {
+                              setStudySection(study.studyId.toString());
+                              setCloseAppSidebar(false);
+                            }}
+                            className={` ${studySection === study.studyId.toString() ? 'bg-logo' : ''} `}
+                          >
+                            <div className={`flex h-full w-full cursor-pointer items-center gap-1 truncate`}>
+                              <Bookmark size={ICON_SIZE} className="relative z-10" />
+                              <span className="relative z-10">{study.studyName}</span>
+                            </div>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </SidebarMenuItem>
+                )}
               </SidebarMenu>
             </SidebarGroupContent>
-          </SidebarGroup> */}
+          </SidebarGroup>
         </SidebarContent>
         {/* footer */}
         <SidebarFooter>
@@ -566,9 +590,17 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
             <SidebarMenuItem>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <SidebarMenuButton>
-                    <User2 /> {user?.bjAccount.bjAccountId ?? 'Guest'}
-                    <ChevronUp className="ml-auto" />
+                  <SidebarMenuButton size={'lg'} className="group-data-[collapsible=icon]:justify-center">
+                    {user?.userAccount?.profileImageUrl ? (
+                      <Image src={user.userAccount.profileImageUrl} alt="프로필" width={24} height={24} className="bg-logo rounded-full object-cover" unoptimized />
+                    ) : (
+                      <User2 />
+                    )}
+                    <div className="relative flex h-full w-full flex-col justify-center group-data-[collapsible=icon]:hidden">
+                      <div>{user?.bjAccount.bjAccountId ?? 'Guest'}</div>
+                      <div className="text-xs">#{user?.userAccount.userCode ?? ''}</div>
+                    </div>
+                    <ChevronUp className="ml-auto group-data-[collapsible=icon]:hidden" />
                   </SidebarMenuButton>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent side="top" className="w-[radix-popper-anchor-width]">

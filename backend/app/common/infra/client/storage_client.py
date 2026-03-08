@@ -67,17 +67,19 @@ class S3Client(StorageClient):
         try:
             endpoint = settings.STORAGE_ENDPOINT
             endpoint_url = endpoint if endpoint.startswith(("http://", "https://")) else f"http://{endpoint}"
-            print(settings.STORAGE_ACCESS_KEY)
-            print(settings.STORAGE_SECRET_KEY)
-            self.client = boto3.client(
-                "s3",
-                endpoint_url=endpoint_url,
+            client_kwargs = dict(
                 aws_access_key_id=settings.STORAGE_ACCESS_KEY,
                 aws_secret_access_key=settings.STORAGE_SECRET_KEY,
                 config=BotoConfig(signature_version="s3v4"),
                 region_name="us-east-1",
             )
-            logger.info("S3 클라이언트가 성공적으로 초기화되었습니다. (endpoint: %s)", endpoint_url)
+            self.client = boto3.client("s3", endpoint_url=endpoint_url, **client_kwargs)
+
+            # presigned URL 서명에 사용할 클라이언트: 공개 URL host로 서명해야 SignatureDoesNotMatch 방지
+            presign_endpoint = settings.STORAGE_PUBLIC_URL or endpoint_url
+            self.presign_client = boto3.client("s3", endpoint_url=presign_endpoint, **client_kwargs)
+
+            logger.info("S3 클라이언트가 성공적으로 초기화되었습니다. (endpoint: %s, presign_endpoint: %s)", endpoint_url, presign_endpoint)
         except Exception as e:
             logger.error("S3 클라이언트 초기화 실패: %s", e)
             raise HTTPException(status_code=500, detail="스토리지 서비스 연결 실패") from e
@@ -166,14 +168,13 @@ class S3Client(StorageClient):
             return None
 
     def get_file_url(self, bucket_name: str, object_name: str, expires: timedelta = timedelta(hours=1)) -> str | None:
-        """파일에 대한 임시 URL 생성"""
+        """파일에 대한 임시 URL 생성 (presign_client로 공개 URL host 기준 서명)"""
         try:
-            url = self.client.generate_presigned_url(
+            return self.presign_client.generate_presigned_url(
                 "get_object",
                 Params={"Bucket": bucket_name, "Key": object_name},
                 ExpiresIn=int(expires.total_seconds()),
             )
-            return url
         except ClientError as e:
             logger.error("파일 '%s'의 URL 생성 중 오류: %s", object_name, e)
             return None

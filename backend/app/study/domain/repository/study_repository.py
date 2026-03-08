@@ -12,6 +12,7 @@ class StudySearchResult:
     owner_bj_account_id: str
     owner_user_code: str
     member_count: int
+    owner_profile_image: str | None = None
 
 
 class StudyRepository(ABC):
@@ -45,4 +46,8 @@ class StudyRepository(ABC):
 
     @abstractmethod
     async def is_name_taken(self, name: str) -> bool:
+        ...
+
+    @abstractmethod
+    async def delete_members_by_user_hard(self, user_account_id: int) -> None:
         ...

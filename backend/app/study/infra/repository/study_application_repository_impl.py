@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import and_, select
+from sqlalchemy import and_, delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.domain.enums import ApplicationStatus
@@ -45,6 +45,18 @@ class StudyApplicationRepositoryImpl(StudyApplicationRepository):
         models = result.scalars().all()
         return [StudyApplicationMapper.to_entity(m) for m in models]
 
+    async def find_pending_by_applicant(self, applicant_id: UserAccountId) -> list[StudyApplication]:
+        stmt = select(StudyApplicationModel).where(
+            and_(
+                StudyApplicationModel.applicant_user_account_id == applicant_id.value,
+                StudyApplicationModel.status == ApplicationStatus.PENDING,
+                StudyApplicationModel.deleted_at.is_(None),
+            )
+        )
+        result = await self.session.execute(stmt)
+        models = result.scalars().all()
+        return [StudyApplicationMapper.to_entity(m) for m in models]
+
     async def find_by_study_and_applicant(
         self, study_id: StudyId, applicant_id: UserAccountId
     ) -> StudyApplication | None:
@@ -70,4 +82,11 @@ class StudyApplicationRepositoryImpl(StudyApplicationRepository):
         application.deleted_at = datetime.now()
         model = StudyApplicationMapper.to_model(application)
         await self.session.merge(model)
+        await self.session.flush()
+
+    async def delete_all_by_user_account_id(self, user_account_id: UserAccountId) -> None:
+        stmt = delete(StudyApplicationModel).where(
+            StudyApplicationModel.applicant_user_account_id == user_account_id.value
+        )
+        await self.session.execute(stmt)
         await self.session.flush()

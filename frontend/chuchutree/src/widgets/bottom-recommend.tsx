@@ -18,9 +18,9 @@ export default function BottomRecommend() {
     if (!tagDashboard) return undefined;
     return Object.fromEntries(
       tagDashboard.tags.map((tag) => {
-        const { excludedYn, accountStat } = tag;
-        const levelStr = !excludedYn ? accountStat.currentLevel : 'EXCLUDED';
-        const bg = !excludedYn ? getLevelColorClasses(accountStat.currentLevel).bg : 'bg-excluded-bg';
+        const { excludedYn, lockedYn, accountStat } = tag;
+        const levelStr = excludedYn ? 'EXCLUDED' : lockedYn ? 'LOCKED' : accountStat.currentLevel;
+        const bg = getLevelColorClasses(levelStr).bg;
         const daysAgo = accountStat.lastSolvedDate !== null ? getDaysAgo(accountStat.lastSolvedDate) : null;
         return [
           tag.tagCode,

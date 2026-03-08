@@ -14,6 +14,7 @@ from app.common.domain.vo.identifiers import BaekjoonAccountId, ProblemId, TierI
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
+from app.problem.application.service.problem_update_service import ProblemUpdateService
 
 
 class LinkBjAccountUsecase:
@@ -34,13 +35,15 @@ class LinkBjAccountUsecase:
         solvedac_gateway: SolvedacGateway,
         domain_event_bus: DomainEventBus,
         user_date_record_repository: UserDateRecordRepository,
-        user_activity_repository: UserActivityRepository
+        user_activity_repository: UserActivityRepository,
+        problem_update_service: ProblemUpdateService,
     ):
         self.baekjoon_account_repository = baekjoon_account_repository
         self.solvedac_gateway = solvedac_gateway
         self.domain_event_bus = domain_event_bus
         self.user_date_record_repository = user_date_record_repository
         self.user_activity_repository = user_activity_repository
+        self.problem_update_service = problem_update_service
 
     @transactional
     async def execute(
@@ -84,11 +87,12 @@ class LinkBjAccountUsecase:
             # 이 유저의 user_problem_status 생성 (user_data.problems 기반)
             # BaekjoonAccountMapper.to_entity()는 problem_histories=[]를 반환하므로
             # 이미 fetch한 user_data.problems를 사용
-            problem_ids = [p.problem_id for p in user_data.problems]
+            all_problem_ids = [p.problem_id for p in user_data.problems]
+            valid_problem_ids = await self.problem_update_service.ensure_problems_exist(all_problem_ids)
             await self._create_user_problem_statuses(
                 user_account_id=user_account_id,
                 bj_account_id=command.bj_account_id,
-                problem_ids=problem_ids
+                problem_ids=valid_problem_ids
             )
 
             event.data.problem_count = len(user_data.problems)
@@ -115,10 +119,16 @@ class LinkBjAccountUsecase:
         )
 
         # 4. 문제 히스토리 기록 (streak_id 없이)
+        # problem 테이블 보장 먼저 (FK 제약: problem_history.problem_id → problem.problem_id)
+        all_problem_ids = [p.problem_id for p in user_data.problems]
+        valid_problem_ids = await self.problem_update_service.ensure_problems_exist(all_problem_ids)
+        valid_id_set = set(valid_problem_ids)
+
         for problem in user_data.problems:
-            baekjoon_account.record_problem_solved(
-                problem_id=ProblemId(problem.problem_id)
-            )
+            if problem.problem_id in valid_id_set:
+                baekjoon_account.record_problem_solved(
+                    problem_id=ProblemId(problem.problem_id)
+                )
 
         # 5. 저장
         await self.baekjoon_account_repository.save(baekjoon_account)
@@ -134,7 +144,7 @@ class LinkBjAccountUsecase:
         await self._create_user_problem_statuses(
             user_account_id=user_account_id,
             bj_account_id=command.bj_account_id,
-            problem_ids=[p.problem_id for p in user_data.problems]
+            problem_ids=valid_problem_ids
         )
 
         event.data.problem_count = len(user_data.problems)

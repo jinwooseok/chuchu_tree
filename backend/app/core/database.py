@@ -21,6 +21,27 @@ _session_context: ContextVar[AsyncSession | None] = ContextVar('session', defaul
 _database_instance: ContextVar['Database | None'] = ContextVar('database', default=None)
 _transaction_depth: ContextVar[int] = ContextVar('transaction_depth', default=0)
 
+# after_commit 이벤트 수집 (최외곽 트랜잭션 commit 이후 디스패치)
+_pending_after_commit: ContextVar[list[Callable[[], Awaitable]] | None] = ContextVar(
+    'pending_after_commit', default=None
+)
+
+
+def collect_after_commit(dispatch_fn: Callable[[], Awaitable]) -> None:
+    """after_commit 디스패치 함수를 현재 트랜잭션 컨텍스트에 등록"""
+    pending = _pending_after_commit.get()
+    if pending is None:
+        pending = []
+        _pending_after_commit.set(pending)
+    pending.append(dispatch_fn)
+
+
+def _pop_after_commit_events() -> list[Callable[[], Awaitable]]:
+    """등록된 after_commit 함수 목록을 반환하고 초기화"""
+    pending = _pending_after_commit.get()
+    _pending_after_commit.set(None)
+    return pending or []
+
 # ⭐ 전역 Database 인스턴스
 _global_database: 'Database | None' = None
 
@@ -287,6 +308,7 @@ def transactional(
                 logger.debug(f"Starting new transaction (isolation: {isolation_level}, readonly: {readonly})")
                 _transaction_depth.set(depth + 1)
 
+                committed = False
                 try:
                     async with db.session() as session:
                         # 격리 레벨 설정
@@ -298,7 +320,10 @@ def transactional(
                             await session.execute(text("SET TRANSACTION READ ONLY"))
 
                         result = await func(*args, **kwargs)
-                        return result
+
+                    # db.session().__aexit__ 이후: commit 완료, ContextVar 세션 해제됨
+                    committed = True
+                    return result
 
                 except APIException:
                     # 비즈니스 로직 예외는 그대로 전파
@@ -315,6 +340,18 @@ def transactional(
 
                 finally:
                     _transaction_depth.set(depth)
+
+                    # 최외곽 트랜잭션(depth==0)이 성공적으로 commit된 경우에만 디스패치
+                    # 이 시점에서 _session_context는 이미 None (db.session() finally에서 reset됨)
+                    # → 핸들러의 @transactional이 새 세션을 생성하여 독립 트랜잭션으로 실행됨
+                    if depth == 0:
+                        pending = _pop_after_commit_events()
+                        if committed:
+                            for dispatch_fn in pending:
+                                try:
+                                    await dispatch_fn()
+                                except Exception as e:
+                                    logger.error(f"After-commit event dispatch failed: {e}")
 
         return _wrapper
 

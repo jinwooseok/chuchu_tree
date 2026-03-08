@@ -45,7 +45,7 @@ class SendStudyInvitationUsecase:
         if study.is_member(invitee_id):
             raise APIException(ErrorCode.STUDY_ALREADY_MEMBER)
 
-        # PENDING 초대 중복 확인
+        # 기존 초대 확인 (PENDING이면 중복 오류, REJECTED면 재활성화)
         existing = await self.invitation_repository.find_by_study_and_invitee(
             StudyId(command.study_id), invitee_id
         )
@@ -74,6 +74,7 @@ class SendStudyInvitationUsecase:
                 "userId": inviter_bj_id,
                 "userCode": inviter_user_code,
                 "status": "PENDING",
+                "senderUserAccountId": command.requester_user_account_id,
             },
             reference_id=saved.invitation_id.value,
             reference_type="STUDY_INVITATION",

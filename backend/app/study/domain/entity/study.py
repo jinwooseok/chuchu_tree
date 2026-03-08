@@ -47,6 +47,15 @@ class Study:
         if self.is_member(user_account_id):
             raise APIException(ErrorCode.STUDY_ALREADY_MEMBER)
         now = datetime.now()
+        # soft-deleted 멤버 재활성화 (uk_study_member 제약 유지)
+        for member in self.members:
+            if member.user_account_id.value == user_account_id.value and member.deleted_at is not None:
+                member.deleted_at = None
+                member.joined_at = now
+                member.updated_at = now
+                member.role = role
+                return member
+        # 신규 멤버
         member = StudyMember(
             study_member_id=None,
             study_id=self.study_id,

@@ -20,6 +20,7 @@ class UserSearchRepositoryImpl(UserSearchRepository):
             select(
                 UserAccountModel.user_account_id,
                 UserAccountModel.user_code,
+                UserAccountModel.profile_image,
                 AccountLinkModel.bj_account_id,
             )
             .join(
@@ -47,6 +48,7 @@ class UserSearchRepositoryImpl(UserSearchRepository):
                 user_account_id=row.user_account_id,
                 bj_account_id=row.bj_account_id,
                 user_code=row.user_code,
+                profile_image=row.profile_image,
             )
             for row in rows
         ]
@@ -56,6 +58,7 @@ class UserSearchRepositoryImpl(UserSearchRepository):
             select(
                 UserAccountModel.user_account_id,
                 UserAccountModel.user_code,
+                UserAccountModel.profile_image,
                 AccountLinkModel.bj_account_id,
             )
             .join(
@@ -80,6 +83,7 @@ class UserSearchRepositoryImpl(UserSearchRepository):
             user_account_id=row.user_account_id,
             bj_account_id=row.bj_account_id,
             user_code=row.user_code,
+            profile_image=row.profile_image,
         )
 
     async def find_by_user_account_ids(self, ids: list[int]) -> list[UserSearchResult]:
@@ -89,6 +93,7 @@ class UserSearchRepositoryImpl(UserSearchRepository):
             select(
                 UserAccountModel.user_account_id,
                 UserAccountModel.user_code,
+                UserAccountModel.profile_image,
                 AccountLinkModel.bj_account_id,
             )
             .join(
@@ -112,6 +117,7 @@ class UserSearchRepositoryImpl(UserSearchRepository):
                 user_account_id=row.user_account_id,
                 bj_account_id=row.bj_account_id,
                 user_code=row.user_code,
+                profile_image=row.profile_image,
             )
             for row in rows
         ]

@@ -7,7 +7,9 @@ from app.common.domain.enums import FilterCode, ExclusionMode
 from app.common.domain.vo.current_user import CurrentUser
 from app.common.domain.vo.identifiers import TagId, UserAccountId
 from app.common.presentation.dependency.auth_dependencies import get_current_member
+from app.recommendation.application.usecase.get_recommendation_history_usecase import GetRecommendationHistoryUsecase
 from app.recommendation.application.usecase.recommend_problems_usecase import RecommendProblemsUsecase
+from app.recommendation.presentation.schema.response.recommendation_history_response import RecommendationHistoryResponse
 from app.recommendation.presentation.schema.response.recommendation_response import (
     RecommendationResponse
 )
@@ -25,41 +27,37 @@ async def get_recommended_problems(
     count: Optional[int] = Query(3, description="문제 개수"),
     exclusion_mode: Optional[str] = Query("LENIENT", description="제외 모드 (LENIENT|STRICT)"),
     current_user: CurrentUser = Depends(get_current_member),
-    recommendation_usecase: RecommendProblemsUsecase = Depends(Provide[Container.recommand_problems_usecase])
+    recommendation_usecase: RecommendProblemsUsecase = Depends(Provide[Container.recommand_problems_usecase]),
 ):
-    """
-    문제 추천 API
-
-    Args:
-        level: 난이도 필터 (JSON array string, 예: ["EASY", "NORMAL"])
-        tags: 태그 필터 (JSON array string, 예: [1, 2, 3])
-
-    Returns:
-        추천 문제 목록
-    """
-    # 1. Query 파라미터 파싱 및 VO 변환
     level_filter_codes: list[FilterCode] | None = None
     if level:
         level_codes = json.loads(level)
         level_filter_codes = [FilterCode(code) for code in level_codes]
 
-    tag_filter_codes: list[TagId] | None = None
+    tag_filter_codes: list[str] | None = None
     if tags:
         tag_filter_codes = json.loads(tags)
 
-    # Parse exclusion_mode
     exclusion_mode_enum = ExclusionMode(exclusion_mode) if exclusion_mode else ExclusionMode.LENIENT
 
-    # 2. Usecase 실행 (Query 객체 반환)
     query = await recommendation_usecase.execute(
         user_account_id=UserAccountId(current_user.user_account_id),
         level_filter_codes=level_filter_codes,
         tag_filter_codes=tag_filter_codes,
         count=count,
-        exclusion_mode=exclusion_mode_enum
+        exclusion_mode=exclusion_mode_enum,
     )
 
-    # 3. Response 변환
-    response_data = RecommendationResponse.from_query(query)
+    return ApiResponse(data=RecommendationResponse.from_query(query))
 
-    return ApiResponse(data=response_data)
+
+@router.get("/recommend-history", response_model=ApiResponseSchema[RecommendationHistoryResponse])
+@inject
+async def get_recommendation_history(
+    page: int = Query(default=1, ge=1, description="페이지 번호 (1부터 시작)"),
+    size: int = Query(default=10, ge=1, description="한 페이지 항목 수"),
+    current_user: CurrentUser = Depends(get_current_member),
+    usecase: GetRecommendationHistoryUsecase = Depends(Provide[Container.get_recommendation_history_usecase]),
+):
+    query = await usecase.execute(user_account_id=current_user.user_account_id, page=page, size=size)
+    return ApiResponse(data=RecommendationHistoryResponse.from_query(query).model_dump(by_alias=True))

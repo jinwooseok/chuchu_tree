@@ -3,7 +3,11 @@ import { axiosInstance } from '@/lib/axios';
 
 export const refreshApi = {
   getRefresh: async (): Promise<void> => {
-    const { data } = await axiosInstance.post<ApiResponse<void>>('/bj-accounts/me/refresh');
+    const { data } = await axiosInstance.post<ApiResponse<void>>(
+      '/bj-accounts/me/refresh',
+      null, // request body
+      { timeout: 120000 }, // config
+    );
     return data.data;
   },
 };

@@ -10,7 +10,7 @@ import { toast } from '@/lib/utils/toast';
  */
 export function useRecommend() {
   const { mutate: getRecommendation, isPending } = useGetRecommendation();
-  const { selectedLevels, selectedTagsList, selectedExclusionMode, selectedCount, setProblems, setLoading, setError, addRecommendationHistory } = useRecommendationStore();
+  const { selectedLevels, selectedTagsList, selectedExclusionMode, selectedCount, setProblems, setLoading, setError } = useRecommendationStore();
 
   const recommend = () => {
     setLoading(true);
@@ -31,7 +31,6 @@ export function useRecommend() {
         onSuccess: (data) => {
           setProblems(data.problems);
           setLoading(false);
-          addRecommendationHistory(data.problems);
           toast.success('문제 추천을 받았습니다.');
         },
         onError: (error) => {

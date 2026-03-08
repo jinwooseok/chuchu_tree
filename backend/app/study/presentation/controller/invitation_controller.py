@@ -9,6 +9,7 @@ from app.study.application.command.study_command import (
     AcceptStudyInvitationCommand,
     CancelStudyInvitationCommand,
     GetMyInvitationsCommand,
+    GetMyPendingRequestsCommand,
     GetStudyInvitationsCommand,
     RejectStudyInvitationCommand,
     SendStudyInvitationCommand,
@@ -16,11 +17,12 @@ from app.study.application.command.study_command import (
 from app.study.application.usecase.accept_study_invitation_usecase import AcceptStudyInvitationUsecase
 from app.study.application.usecase.cancel_study_invitation_usecase import CancelStudyInvitationUsecase
 from app.study.application.usecase.get_my_invitations_usecase import GetMyInvitationsUsecase
+from app.study.application.usecase.get_my_pending_requests_usecase import GetMyPendingRequestsUsecase
 from app.study.application.usecase.get_study_invitations_usecase import GetStudyInvitationsUsecase
 from app.study.application.usecase.reject_study_invitation_usecase import RejectStudyInvitationUsecase
 from app.study.application.usecase.send_study_invitation_usecase import SendStudyInvitationUsecase
 from app.study.presentation.schema.request.study_request import SendInvitationRequest
-from app.study.presentation.schema.response.invitation_response import MyInvitationsResponse
+from app.study.presentation.schema.response.invitation_response import MyInvitationsResponse, MyPendingRequestsResponse
 
 invitation_router = APIRouter(tags=["study-invitations"])
 
@@ -69,6 +71,18 @@ async def cancel_study_invitation(
         requester_user_account_id=current_user.user_account_id,
     ))
     return ApiResponse(data=None)
+
+
+@invitation_router.get("/user-accounts/me/pending-requests", response_model=ApiResponseSchema[MyPendingRequestsResponse])
+@inject
+async def get_my_pending_requests(
+    current_user: CurrentUser = Depends(get_current_member),
+    usecase: GetMyPendingRequestsUsecase = Depends(Provide[Container.get_my_pending_requests_usecase]),
+):
+    invitation_queries, application_queries = await usecase.execute(GetMyPendingRequestsCommand(
+        requester_user_account_id=current_user.user_account_id,
+    ))
+    return ApiResponse(data=MyPendingRequestsResponse.from_queries(invitation_queries, application_queries).model_dump(by_alias=True))
 
 
 @invitation_router.get("/user-accounts/me/invitations", response_model=ApiResponseSchema[MyInvitationsResponse])
