@@ -1,5 +1,5 @@
 import { ApiResponse } from '@/shared/types/api';
-import { Study, SearchedUser, SearchedStudy, CreateStudyRequest } from '../model/study-manage.types';
+import { Study, SearchedUser, SearchedStudy, CreateStudyRequest, PendingRequests } from '../model/study-manage.types';
 import { axiosInstance } from '@/lib/axios';
 
 export const studyApi = {
@@ -34,5 +34,9 @@ export const studyApi = {
   },
   cancelApplyStudy: async (studyId: number): Promise<void> => {
     await axiosInstance.delete(`/studies/${studyId}/applications/me`);
+  },
+  getMyPendingRequests: async (): Promise<PendingRequests> => {
+    const { data } = await axiosInstance.get<ApiResponse<PendingRequests>>('/user-accounts/me/pending-requests');
+    return data.data;
   },
 };

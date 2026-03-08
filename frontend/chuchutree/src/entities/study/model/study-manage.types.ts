@@ -32,3 +32,33 @@ export interface CreateStudyRequest {
   maxMembers: number;
   inviteeUserAccountIds: number[];
 }
+
+export interface PendingInvitationItem {
+  invitationId: number;
+  studyId: number;
+  studyName: string;
+  inviterUserAccountId: number;
+  inviterBjAccountId: string;
+  inviterUserCode: string;
+  status: string;
+  createdAt: string;
+  inviterProfileImageUrl: string;
+}
+
+export interface PendingApplicationItem {
+  applicationId: number;
+  studyId: number;
+  studyName: string;
+  ownerUserAccountId: number;
+  ownerBjAccountId: string;
+  ownerUserCode: string;
+  status: string;
+  message: string;
+  createdAt: string;
+  ownerProfileImageUrl: string;
+}
+
+export interface PendingRequests {
+  invitations: PendingInvitationItem[];
+  applications: PendingApplicationItem[];
+}

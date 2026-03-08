@@ -6,9 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from '@/lib/utils/toast';
 import { User } from '@/entities/user';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { X, Loader2, Search, CheckCircle2, XCircle } from 'lucide-react';
-import { useMyStudies, useValidateStudyName, useSearchUsers, useSearchStudies, useApplyStudy, useCancelApplyStudy, useCreateStudy, SearchedUser } from '@/entities/study';
+import { useMyStudies, useValidateStudyName, useSearchUsers, useSearchStudies, useApplyStudy, useCancelApplyStudy, useCreateStudy, useMyPendingRequests, SearchedUser } from '@/entities/study';
 import { useLayoutStore } from '@/lib/store/layout';
 import { UserAvatar } from '@/components/custom/UserAvatar';
 
@@ -42,7 +42,8 @@ export function CreateStudyDialog({ user, onClose }: props) {
   // --- 가입 탭 state ---
   const [studySearchKeyword, setStudySearchKeyword] = useState('');
   const [debouncedStudyKeyword, setDebouncedStudyKeyword] = useState('');
-  const [appliedStudyIds, setAppliedStudyIds] = useState<Set<number>>(new Set());
+  const [sessionAppliedIds, setSessionAppliedIds] = useState<Set<number>>(new Set());
+  const [sessionCancelledIds, setSessionCancelledIds] = useState<Set<number>>(new Set());
 
   // 사용자 검색 debounce
   useEffect(() => {
@@ -66,6 +67,17 @@ export function CreateStudyDialog({ user, onClose }: props) {
 
   const { data: myStudies = [] } = useMyStudies();
   const joinedStudyIds = new Set(myStudies.map((s) => s.studyId));
+
+  const { data: pendingRequests, refetch: refetchPendingRequests } = useMyPendingRequests();
+  const invitedStudyIds = useMemo(() => new Set(pendingRequests?.invitations.map((inv) => inv.studyId) ?? []), [pendingRequests]);
+  const serverAppliedStudyIds = useMemo(() => new Set(pendingRequests?.applications.map((app) => app.studyId) ?? []), [pendingRequests]);
+
+  useEffect(() => {
+    refetchPendingRequests();
+  }, [refetchPendingRequests]);
+
+  const isEffectivelyApplied = (studyId: number) =>
+    (serverAppliedStudyIds.has(studyId) || sessionAppliedIds.has(studyId)) && !sessionCancelledIds.has(studyId);
 
   const { data: studySearchResults = [], isLoading: isSearchingStudies } = useSearchStudies(debouncedStudyKeyword);
 
@@ -122,11 +134,16 @@ export function CreateStudyDialog({ user, onClose }: props) {
   };
 
   const handleApply = (studyId: number) => {
-    setAppliedStudyIds((prev) => new Set([...prev, studyId]));
+    setSessionAppliedIds((prev) => new Set([...prev, studyId]));
+    setSessionCancelledIds((prev) => {
+      const next = new Set(prev);
+      next.delete(studyId);
+      return next;
+    });
     applyStudy(studyId, {
       onError: () => {
         toast.error('가입 신청에 실패했습니다.');
-        setAppliedStudyIds((prev) => {
+        setSessionAppliedIds((prev) => {
           const next = new Set(prev);
           next.delete(studyId);
           return next;
@@ -136,7 +153,9 @@ export function CreateStudyDialog({ user, onClose }: props) {
   };
 
   const handleCancelApply = (studyId: number) => {
-    setAppliedStudyIds((prev) => {
+    const wasSessionApplied = sessionAppliedIds.has(studyId);
+    setSessionCancelledIds((prev) => new Set([...prev, studyId]));
+    setSessionAppliedIds((prev) => {
       const next = new Set(prev);
       next.delete(studyId);
       return next;
@@ -144,7 +163,14 @@ export function CreateStudyDialog({ user, onClose }: props) {
     cancelApplyStudy(studyId, {
       onError: () => {
         toast.error('신청 취소에 실패했습니다.');
-        setAppliedStudyIds((prev) => new Set([...prev, studyId]));
+        setSessionCancelledIds((prev) => {
+          const next = new Set(prev);
+          next.delete(studyId);
+          return next;
+        });
+        if (wasSessionApplied) {
+          setSessionAppliedIds((prev) => new Set([...prev, studyId]));
+        }
       },
     });
   };
@@ -310,7 +336,11 @@ export function CreateStudyDialog({ user, onClose }: props) {
                           <Button variant="secondary" size="sm" disabled className="ml-2 shrink-0">
                             참여중
                           </Button>
-                        ) : appliedStudyIds.has(study.studyId) ? (
+                        ) : invitedStudyIds.has(study.studyId) ? (
+                          <Button variant="secondary" size="sm" disabled className="ml-2 shrink-0">
+                            초대받음
+                          </Button>
+                        ) : isEffectivelyApplied(study.studyId) ? (
                           <Button variant="outline" size="sm" onClick={() => handleCancelApply(study.studyId)} className="ml-2 shrink-0">
                             신청취소
                           </Button>

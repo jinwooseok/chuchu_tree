@@ -51,6 +51,13 @@ export const useCancelApplyStudy = (callbacks?: UseMutationCallback) => {
   });
 };
 
+export const useMyPendingRequests = () => {
+  return useQuery({
+    queryKey: studyKeys.pendingRequests(),
+    queryFn: studyApi.getMyPendingRequests,
+  });
+};
+
 export const useCreateStudy = (callbacks?: UseMutationCallback) => {
   const queryClient = useQueryClient();
 

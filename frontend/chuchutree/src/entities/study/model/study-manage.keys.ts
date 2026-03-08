@@ -4,4 +4,5 @@ export const studyKeys = {
   validateName: (name: string) => [...studyKeys.all, 'validateName', name] as const,
   searchUsers: (keyword: string) => [...studyKeys.all, 'searchUsers', keyword] as const,
   searchStudies: (keyword: string) => [...studyKeys.all, 'searchStudies', keyword] as const,
+  pendingRequests: () => [...studyKeys.all, 'pendingRequests'] as const,
 };
