@@ -35,3 +35,44 @@ export interface StudyRecommendParams {
   tags: string;
   exclusion_mode: string;
 }
+
+// 스터디 추천 히스토리
+export interface StudyRecommendHistoryParams {
+  study_id: number;
+  user_account_id?: number | null;
+  page?: number;
+  size?: number;
+}
+
+interface StudyRecommendHistoryItemParams {
+  count: number;
+  exclusionMode: string;
+  levelFilterCodes: string[] | null;
+  tagFilterCodes: number[];
+  targetUserAccountId: number | null;
+  recommendAllUnsolved: boolean;
+}
+
+export interface StudyRecommendHistoryProblem {
+  problemId: number;
+  problemTitle: string;
+  problemTierLevel: number;
+  problemTierName: string;
+  problemClassLevel: number;
+  recommandReasons: StudyRecommendReason[];
+  tags: Tags[];
+}
+
+export interface StudyRecommendHistoryItem {
+  recommendationHistoryId: number;
+  requesterUserAccountId: number;
+  studyId: number;
+  params: StudyRecommendHistoryItemParams;
+  recommendedProblems: StudyRecommendHistoryProblem[];
+  createdAt: string;
+}
+
+export interface StudyRecommendHistoryResponse {
+  items: StudyRecommendHistoryItem[];
+  hasNext: boolean;
+}
