@@ -65,7 +65,7 @@ export default function MainStudy({ studyName }: { studyName: string }) {
         {/* 하단 문제추천영역 */}
         <StudyRecommendSection studyDetail={studyDetail} currentUserAccountId={user?.userAccount?.userAccountId ?? 0} />
         {/* 하단 문제추천 history 영역 */}
-        <StudyRecommendHistorySection studyId={studyId} />
+        <StudyRecommendHistorySection studyId={studyId} studyDetail={studyDetail} />
       </div>
     </div>
   );

@@ -13,10 +13,11 @@ export const useGetStudyRecommendation = (callbacks?: UseMutationCallback) => {
   });
 };
 
-export const useGetStudyRecommendHistory = (studyId: number) => {
+export const useGetStudyRecommendHistory = (studyId: number, userAccountId?: number | null) => {
   return useInfiniteQuery({
-    queryKey: ['study', studyId, 'recommend-history'],
-    queryFn: ({ pageParam }) => studyRecommendationApi.getStudyRecommendHistory({ study_id: studyId, page: pageParam, size: 10 }),
+    queryKey: ['study', studyId, 'recommend-history', userAccountId ?? null],
+    queryFn: ({ pageParam }) =>
+      studyRecommendationApi.getStudyRecommendHistory({ study_id: studyId, user_account_id: userAccountId, page: pageParam, size: 10 }),
     initialPageParam: 1,
     getNextPageParam: (lastPage, _, lastPageParam) => (lastPage.hasNext ? lastPageParam + 1 : undefined),
   });

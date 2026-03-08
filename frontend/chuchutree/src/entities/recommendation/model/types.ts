@@ -75,7 +75,7 @@ interface RecommendHistoryItemParams {
   count: number;
   exclusionMode: string;
   levelFilterCodes: string[] | null;
-  tagFilterCodes: number[];
+  tagFilterCodes: string[];
   targetUserAccountId: number | null;
   recommendAllUnsolved: boolean;
 }
