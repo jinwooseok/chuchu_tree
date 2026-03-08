@@ -1,7 +1,7 @@
 import { RecommendationApi } from '@/entities/recommendation/api/recommendation.api';
-import { BanProblem, Recommendation } from '@/entities/recommendation/model/types';
+import { BanProblem } from '@/entities/recommendation/model/types';
 import { UseMutationCallback } from '@/shared/types/api';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import '@/shared/types/query';
 
 export const RecommendationKeys = {
@@ -9,6 +9,7 @@ export const RecommendationKeys = {
   lists: () => [...RecommendationKeys.all, 'list'],
   list: (level: string, tags: string) => [...RecommendationKeys.lists(), { level, tags }],
   bannedProblems: () => [...RecommendationKeys.all, 'banned'],
+  history: () => [...RecommendationKeys.all, 'history'],
 };
 
 export const useGetRecommendation = (callbacks?: UseMutationCallback) => {
@@ -58,5 +59,14 @@ export const useUnbanProblem = (callbacks?: UseMutationCallback) => {
     onError: (error) => {
       if (callbacks?.onError) callbacks?.onError(error);
     },
+  });
+};
+
+export const useGetRecommendHistory = () => {
+  return useInfiniteQuery({
+    queryKey: RecommendationKeys.history(),
+    queryFn: ({ pageParam }) => RecommendationApi.getRecommendHistory({ page: pageParam, size: 10 }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, _, lastPageParam) => (lastPage.hasNext ? lastPageParam + 1 : undefined),
   });
 };
