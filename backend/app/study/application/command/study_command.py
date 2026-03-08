@@ -85,6 +85,11 @@ class GetMyInvitationsCommand:
 
 
 @dataclass
+class GetMyPendingRequestsCommand:
+    requester_user_account_id: int
+
+
+@dataclass
 class GetStudyInvitationsCommand:
     study_id: int
     requester_user_account_id: int

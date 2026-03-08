@@ -55,7 +55,8 @@ class RecommendationHistoryItemResponse(BaseModel):
 
 class RecommendationHistoryResponse(BaseModel):
     items: list[RecommendationHistoryItemResponse]
-    next_cursor: int | None
+    page: int
+    size: int
     has_next: bool
 
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
@@ -64,6 +65,7 @@ class RecommendationHistoryResponse(BaseModel):
     def from_query(cls, query: RecommendationHistoryQuery) -> "RecommendationHistoryResponse":
         return cls(
             items=[RecommendationHistoryItemResponse.from_query(item) for item in query.items],
-            next_cursor=query.next_cursor,
+            page=query.page,
+            size=query.size,
             has_next=query.has_next,
         )

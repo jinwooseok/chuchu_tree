@@ -27,19 +27,17 @@ class RecommendationHistoryRepositoryImpl(RecommendationHistoryRepository):
         return RecommendationHistoryMapper.to_entity(model)
 
     async def find_by_user_account_id(
-        self, user_account_id: UserAccountId, cursor: int | None = None, limit: int = 10
+        self, user_account_id: UserAccountId, page: int = 1, size: int = 10
     ) -> list[RecommendationHistory]:
-        conditions = [
-            RecommendationHistoryModel.requester_user_account_id == user_account_id.value,
-            RecommendationHistoryModel.study_id.is_(None),
-        ]
-        if cursor is not None:
-            conditions.append(RecommendationHistoryModel.recommendation_history_id < cursor)
         stmt = (
             select(RecommendationHistoryModel)
-            .where(and_(*conditions))
+            .where(and_(
+                RecommendationHistoryModel.requester_user_account_id == user_account_id.value,
+                RecommendationHistoryModel.study_id.is_(None),
+            ))
             .order_by(RecommendationHistoryModel.recommendation_history_id.desc())
-            .limit(limit + 1)
+            .offset((page - 1) * size)
+            .limit(size + 1)
         )
         result = await self.session.execute(stmt)
         return [RecommendationHistoryMapper.to_entity(m) for m in result.scalars().all()]
@@ -48,21 +46,20 @@ class RecommendationHistoryRepositoryImpl(RecommendationHistoryRepository):
         self,
         study_id: StudyId,
         user_account_id: UserAccountId | None = None,
-        cursor: int | None = None,
-        limit: int = 10,
+        page: int = 1,
+        size: int = 10,
     ) -> list[RecommendationHistory]:
         conditions = [RecommendationHistoryModel.study_id == study_id.value]
         if user_account_id is not None:
             conditions.append(
                 RecommendationHistoryModel.requester_user_account_id == user_account_id.value
             )
-        if cursor is not None:
-            conditions.append(RecommendationHistoryModel.recommendation_history_id < cursor)
         stmt = (
             select(RecommendationHistoryModel)
             .where(and_(*conditions))
             .order_by(RecommendationHistoryModel.recommendation_history_id.desc())
-            .limit(limit + 1)
+            .offset((page - 1) * size)
+            .limit(size + 1)
         )
         result = await self.session.execute(stmt)
         return [RecommendationHistoryMapper.to_entity(m) for m in result.scalars().all()]

@@ -148,8 +148,8 @@ async def recommend_study_problems(
 async def get_study_recommendation_history(
     study_id: int,
     user_account_id: Optional[int] = Query(default=None),
-    cursor: Optional[int] = Query(default=None, description="이전 페이지 마지막 항목의 ID"),
-    limit: int = Query(default=10, description="한 페이지 항목 수"),
+    page: int = Query(default=1, ge=1, description="페이지 번호 (1부터 시작)"),
+    size: int = Query(default=10, ge=1, description="한 페이지 항목 수"),
     current_user: CurrentUser = Depends(get_current_member),
     usecase: GetStudyRecommendationHistoryUsecase = Depends(Provide[Container.get_study_recommendation_history_usecase]),
 ):
@@ -157,7 +157,7 @@ async def get_study_recommendation_history(
         study_id=study_id,
         requester_user_account_id=current_user.user_account_id,
         user_account_id=user_account_id,
-        cursor=cursor,
-        limit=limit,
+        page=page,
+        size=size,
     )
     return ApiResponse(data=RecommendationHistoryResponse.from_query(query).model_dump(by_alias=True))

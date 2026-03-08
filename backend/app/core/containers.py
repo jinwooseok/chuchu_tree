@@ -24,6 +24,7 @@ from app.study.application.usecase.kick_study_member_usecase import KickStudyMem
 from app.study.application.usecase.send_study_invitation_usecase import SendStudyInvitationUsecase
 from app.study.application.usecase.cancel_study_invitation_usecase import CancelStudyInvitationUsecase
 from app.study.application.usecase.get_my_invitations_usecase import GetMyInvitationsUsecase
+from app.study.application.usecase.get_my_pending_requests_usecase import GetMyPendingRequestsUsecase
 from app.study.application.usecase.accept_study_invitation_usecase import AcceptStudyInvitationUsecase
 from app.study.application.usecase.reject_study_invitation_usecase import RejectStudyInvitationUsecase
 from app.study.application.usecase.apply_to_study_usecase import ApplyToStudyUsecase
@@ -649,6 +650,15 @@ class Container(containers.DeclarativeContainer):
     get_my_invitations_usecase = providers.Singleton(
         GetMyInvitationsUsecase,
         invitation_repository=study_invitation_repository,
+        study_repository=study_repository,
+        user_search_repository=user_search_repository,
+        storage_gateway=storage_gateway,
+    )
+
+    get_my_pending_requests_usecase = providers.Singleton(
+        GetMyPendingRequestsUsecase,
+        invitation_repository=study_invitation_repository,
+        application_repository=study_application_repository,
         study_repository=study_repository,
         user_search_repository=user_search_repository,
         storage_gateway=storage_gateway,

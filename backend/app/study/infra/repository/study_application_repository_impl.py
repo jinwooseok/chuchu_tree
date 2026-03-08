@@ -45,6 +45,18 @@ class StudyApplicationRepositoryImpl(StudyApplicationRepository):
         models = result.scalars().all()
         return [StudyApplicationMapper.to_entity(m) for m in models]
 
+    async def find_pending_by_applicant(self, applicant_id: UserAccountId) -> list[StudyApplication]:
+        stmt = select(StudyApplicationModel).where(
+            and_(
+                StudyApplicationModel.applicant_user_account_id == applicant_id.value,
+                StudyApplicationModel.status == ApplicationStatus.PENDING,
+                StudyApplicationModel.deleted_at.is_(None),
+            )
+        )
+        result = await self.session.execute(stmt)
+        models = result.scalars().all()
+        return [StudyApplicationMapper.to_entity(m) for m in models]
+
     async def find_by_study_and_applicant(
         self, study_id: StudyId, applicant_id: UserAccountId
     ) -> StudyApplication | None:
