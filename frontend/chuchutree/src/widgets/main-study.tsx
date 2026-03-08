@@ -4,7 +4,9 @@ import { useStudyDetail, useStudyProblems } from '@/entities/study';
 import { useUser } from '@/entities/user';
 import { useStudyCalendarStore } from '@/lib/store/studyCalendar';
 import dynamic from 'next/dynamic';
-import { useEffect, useState } from 'react';
+import { ChevronUp } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
+import { useInView } from 'react-intersection-observer';
 
 // 클라이언트 전용 렌더링 (hydration mismatch 방지)
 const StudyBigCalendar = dynamic(() => import('@/features/study').then((mod) => mod.StudyBigCalendar), {
@@ -22,6 +24,13 @@ export default function MainStudy({ studyName }: { studyName: string }) {
   const { data: user } = useUser();
   const { bigCalendarDate, setBigCalendarDate } = useStudyCalendarStore();
   const [initialDate] = useState(new Date());
+  const dashboardRef = useRef<HTMLDivElement>(null);
+  const { ref: dashboardInViewRef, inView: dashboardInView } = useInView({ threshold: 0 });
+
+  const setDashboardRef = (el: HTMLDivElement | null) => {
+    dashboardRef.current = el;
+    dashboardInViewRef(el);
+  };
 
   // 컴포넌트 마운트 시 bigCalendarDate가 null이면 초기 날짜로 설정
   useEffect(() => {
@@ -56,7 +65,9 @@ export default function MainStudy({ studyName }: { studyName: string }) {
     <div className="bg-innerground-white flex h-full w-full flex-col p-4">
       <div className="hide-scrollbar relative flex min-h-0 flex-1 flex-col items-center space-y-16 overflow-y-auto py-10">
         {/* 상단 기본정보 및 모달 영역 */}
-        <StudyDashboard studyDetail={studyDetail} currentUserAccountId={user?.userAccount?.userAccountId ?? 0} />
+        <div ref={setDashboardRef} className="w-full">
+          <StudyDashboard studyDetail={studyDetail} currentUserAccountId={user?.userAccount?.userAccountId ?? 0} />
+        </div>
         {/* 중앙 캘린더영역 */}
         <div className="relative w-full" style={{ minHeight: '500px' }}>
           <StudyBigCalendar studyCalendarData={studyCalendarData} />
@@ -67,6 +78,17 @@ export default function MainStudy({ studyName }: { studyName: string }) {
         {/* 하단 문제추천 history 영역 */}
         <StudyRecommendHistorySection studyId={studyId} studyDetail={studyDetail} />
       </div>
+
+      {/* 상단(StudyDashboard)으로 스크롤 버튼 */}
+      {!dashboardInView && (
+        <button
+          onClick={() => dashboardRef.current?.scrollIntoView({ behavior: 'smooth' })}
+          className="bg-innerground-darkgray text-muted-foreground hover:bg-primary hover:text-primary-foreground fixed right-6 bottom-20 rounded-full p-2 shadow-lg transition-all"
+          aria-label="상단으로 이동"
+        >
+          <ChevronUp className="h-5 w-5" />
+        </button>
+      )}
     </div>
   );
 }

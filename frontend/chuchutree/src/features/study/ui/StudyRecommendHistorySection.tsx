@@ -87,10 +87,7 @@ function ParamsBadges({ params, requesterUserAccountId, members }: ParamsBadgesP
   }
 
   // 레벨 필터 (null이면 Normal 표시)
-  const levelLabel =
-    !params.levelFilterCodes || params.levelFilterCodes.length === 0
-      ? 'Normal'
-      : params.levelFilterCodes.map((l) => LEVEL_LABEL[l] ?? l).join(', ');
+  const levelLabel = !params.levelFilterCodes || params.levelFilterCodes.length === 0 ? 'Normal' : params.levelFilterCodes.map((l) => LEVEL_LABEL[l] ?? l).join(', ');
   badges.push(
     <span key="level" className="bg-innerground-hovergray text-muted-foreground rounded px-1.5 py-0.5">
       {levelLabel}
@@ -139,7 +136,7 @@ export function StudyRecommendHistorySection({ studyId, studyDetail }: { studyId
   };
 
   return (
-    <div className="w-full space-y-3">
+    <div className="relative w-full space-y-3">
       {/* 헤더: 제목 + 멤버 필터 */}
       <div className="flex items-center justify-between">
         <h3 className="text-sm font-semibold">추천 기록</h3>
@@ -150,9 +147,7 @@ export function StudyRecommendHistorySection({ studyId, studyDetail }: { studyId
           <button
             onClick={() => setSelectedMemberId(null)}
             className={`rounded-full border px-2 py-0.5 text-xs transition-all ${
-              selectedMemberId === null
-                ? 'border-primary text-primary font-semibold'
-                : 'border-transparent text-muted-foreground opacity-50 hover:opacity-100'
+              selectedMemberId === null ? 'border-primary text-primary font-semibold' : 'text-muted-foreground border-transparent opacity-50 hover:opacity-100'
             }`}
           >
             All
@@ -189,11 +184,7 @@ export function StudyRecommendHistorySection({ studyId, studyDetail }: { studyId
                   <span className="text-sm font-medium">{formatTimestamp(historyItem.createdAt)}</span>
                   <span className="text-muted-foreground text-xs">{historyItem.recommendedProblems.length}개 문제</span>
                 </div>
-                <ParamsBadges
-                  params={historyItem.params}
-                  requesterUserAccountId={historyItem.requesterUserAccountId}
-                  members={studyDetail.members}
-                />
+                <ParamsBadges params={historyItem.params} requesterUserAccountId={historyItem.requesterUserAccountId} members={studyDetail.members} />
               </div>
 
               {/* 문제 목록 */}
@@ -215,9 +206,7 @@ export function StudyRecommendHistorySection({ studyId, studyDetail }: { studyId
                       </div>
                       <div className="flex flex-col items-end gap-0.5">
                         {tagName && <span className="text-muted-foreground line-clamp-1">{tagName}</span>}
-                        {problem.recommandReasons.length > 0 && (
-                          <span className="text-muted-foreground line-clamp-1">{problem.recommandReasons[0].reason}</span>
-                        )}
+                        {problem.recommandReasons.length > 0 && <span className="text-muted-foreground line-clamp-1">{problem.recommandReasons[0].reason}</span>}
                       </div>
                     </div>
                   );
@@ -233,6 +222,7 @@ export function StudyRecommendHistorySection({ studyId, studyDetail }: { studyId
           </div>
         </>
       )}
+
     </div>
   );
 }
