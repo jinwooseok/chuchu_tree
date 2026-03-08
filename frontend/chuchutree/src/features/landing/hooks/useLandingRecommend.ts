@@ -21,7 +21,7 @@ export function useLandingRecommend() {
   const [isPending, setIsPending] = useState(false);
 
   const {
-    setProblems, setLoading, setError, addRecommendationHistory
+    setProblems, setLoading, setError,
   } = useRecommendationStore();
 
   const recommend = () => {
@@ -38,8 +38,6 @@ export function useLandingRecommend() {
         // store에 데이터 설정
         setProblems(problems);
         setLoading(false);
-        addRecommendationHistory(problems);
-
         // 다음 인덱스로 이동 (순환)
         setCurrentIndex((prev) => (prev + 1) % RECOMMENDATION_DATA.length);
 
