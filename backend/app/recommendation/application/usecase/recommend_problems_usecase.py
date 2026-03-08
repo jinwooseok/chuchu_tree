@@ -434,6 +434,8 @@ class RecommendProblemsUsecase:
             if level_filter.filter_code == FilterCode.EXTREME:
                 highest_val = tag_stat.highest_tier_id.value if tag_stat.highest_tier_id else 0
                 min_val = max(tier_range.min_tier_id.value if tier_range.min_tier_id else 0, highest_val + 2)
+                if min_val > 31:
+                    continue
                 tier_range = TierRange(min_tier_id=TierId(min_val), max_tier_id=TierId(31))
 
             criteria_list.append(SearchCriteria(

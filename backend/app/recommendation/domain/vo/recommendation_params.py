@@ -7,7 +7,7 @@ class RecommendationParams:
     count: int
     exclusion_mode: str
     level_filter_codes: list[str] | None = None
-    tag_filter_codes: list[int] | None = None
+    tag_filter_codes: list[str] | None = None
     target_user_account_id: int | None = None
     recommend_all_unsolved: bool = False
 
