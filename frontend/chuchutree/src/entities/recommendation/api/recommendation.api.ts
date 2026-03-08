@@ -1,4 +1,4 @@
-import { BannedProblems, BanProblem, Recommendation } from '@/entities/recommendation/model/types';
+import { BannedProblems, BanProblem, Recommendation, RecommendHistoryParams, RecommendHistoryResponse } from '@/entities/recommendation/model/types';
 import { axiosInstance } from '@/lib/axios';
 import { ApiResponse } from '@/shared/types/api';
 
@@ -27,5 +27,9 @@ export const RecommendationApi = {
         problemId: data.problemId,
       },
     });
+  },
+  getRecommendHistory: async (params: RecommendHistoryParams): Promise<RecommendHistoryResponse> => {
+    const { data } = await axiosInstance.get<ApiResponse<RecommendHistoryResponse>>('/user-accounts/me/recommend-history', { params });
+    return data.data;
   },
 };

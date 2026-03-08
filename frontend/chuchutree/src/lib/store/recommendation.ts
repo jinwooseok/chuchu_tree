@@ -27,11 +27,6 @@ export interface RecommendedProblems {
   }[];
 }
 
-interface RecommendationHistoryItem {
-  timestamp: number;
-  problems: RecommendedProblems[];
-}
-
 interface RecommendationStore {
   // Filter state
   selectedLevels: string[];
@@ -43,9 +38,6 @@ interface RecommendationStore {
   problems: RecommendedProblems[];
   isLoading: boolean;
   error: Error | null;
-
-  // Recommendation history
-  recommendationHistory: RecommendationHistoryItem[];
 
   // Display options
   showFilters: {
@@ -76,8 +68,6 @@ interface RecommendationStore {
   toggleFilterSection: () => void;
   toggleExcludedModeSection: () => void;
   clearRecommendation: () => void;
-  addRecommendationHistory: (problems: RecommendedProblems[]) => void;
-  clearRecommendationHistory: () => void;
   reset: () => void;
 }
 
@@ -89,7 +79,6 @@ const initialState = {
   problems: [],
   isLoading: false,
   error: null,
-  recommendationHistory: [],
   showFilters: {
     problemNumber: true,
     problemTier: true,
@@ -216,27 +205,6 @@ export const useRecommendationStore = create<RecommendationStore>()(
           });
         },
 
-        // Add recommendation to history
-        addRecommendationHistory: (problems: RecommendedProblems[]) => {
-          set((state) => {
-            state.recommendationHistory.unshift({
-              timestamp: Date.now(),
-              problems,
-            });
-            // Keep only last 50 records
-            if (state.recommendationHistory.length > 50) {
-              state.recommendationHistory = state.recommendationHistory.slice(0, 50);
-            }
-          });
-        },
-
-        // Clear recommendation history
-        clearRecommendationHistory: () => {
-          set((state) => {
-            state.recommendationHistory = [];
-          });
-        },
-
         // Reset all state
         reset: () => {
           set(initialState);
@@ -254,7 +222,6 @@ export const useRecommendationStore = create<RecommendationStore>()(
           showTagSection: state.showTagSection,
           showFilterSection: state.showFilterSection,
           showExcludedModeSection: state.showExcludedModeSection,
-          recommendationHistory: state.recommendationHistory,
         }),
       },
     ),

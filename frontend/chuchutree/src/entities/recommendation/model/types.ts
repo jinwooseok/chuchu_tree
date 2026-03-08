@@ -63,3 +63,33 @@ interface BannedProblem {
 export interface BannedProblems {
   bannedProblems: BannedProblem[];
 }
+
+// 추천 히스토리
+export interface RecommendHistoryParams {
+  study_id?: number | null;
+  page?: number;
+  size?: number;
+}
+
+interface RecommendHistoryItemParams {
+  count: number;
+  exclusionMode: string;
+  levelFilterCodes: string[] | null;
+  tagFilterCodes: string[];
+  targetUserAccountId: number | null;
+  recommendAllUnsolved: boolean;
+}
+
+export interface RecommendHistoryItem {
+  recommendationHistoryId: number;
+  requesterUserAccountId: number;
+  studyId: number | null;
+  params: RecommendHistoryItemParams;
+  recommendedProblems: RecommendedProblems[];
+  createdAt: string;
+}
+
+export interface RecommendHistoryResponse {
+  items: RecommendHistoryItem[];
+  hasNext: boolean;
+}
