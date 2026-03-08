@@ -1,5 +1,5 @@
 import { RefreshButtonContainer } from '@/features/refresh';
-import { StudyDashboard, StudyRecommendSection } from '@/features/study';
+import { StudyDashboard, StudyRecommendSection, StudyRecommendHistorySection } from '@/features/study';
 import { useStudyDetail, useStudyProblems } from '@/entities/study';
 import { useUser } from '@/entities/user';
 import { useStudyCalendarStore } from '@/lib/store/studyCalendar';
@@ -65,6 +65,7 @@ export default function MainStudy({ studyName }: { studyName: string }) {
         {/* 하단 문제추천영역 */}
         <StudyRecommendSection studyDetail={studyDetail} currentUserAccountId={user?.userAccount?.userAccountId ?? 0} />
         {/* 하단 문제추천 history 영역 */}
+        <StudyRecommendHistorySection studyId={studyId} />
       </div>
     </div>
   );

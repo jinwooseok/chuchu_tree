@@ -13,3 +13,4 @@ export { StudyBigCalendar } from './ui/StudyBigCalendar';
 export { StudySmallCalendar } from './ui/StudySmallCalendar';
 export { StudySidebarInset } from './ui/StudySidebarInset';
 export { StudyRecommendSection } from './ui/StudyRecommendSection';
+export { StudyRecommendHistorySection } from './ui/StudyRecommendHistorySection';
