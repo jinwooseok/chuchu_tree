@@ -52,6 +52,7 @@ class StudyInvitationRepositoryImpl(StudyInvitationRepository):
             and_(
                 StudyInvitationModel.study_id == study_id.value,
                 StudyInvitationModel.invitee_user_account_id == invitee_id.value,
+                StudyInvitationModel.status == InvitationStatus.PENDING,
                 StudyInvitationModel.deleted_at.is_(None),
             )
         )

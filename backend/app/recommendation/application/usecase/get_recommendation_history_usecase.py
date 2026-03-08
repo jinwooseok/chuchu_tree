@@ -19,13 +19,12 @@ class GetRecommendationHistoryUsecase:
 
     @transactional(readonly=True)
     async def execute(
-        self, user_account_id: int, cursor: int | None = None, limit: int = 10
+        self, user_account_id: int, page: int = 1, size: int = 10
     ) -> RecommendationHistoryQuery:
         histories = await self.recommendation_history_repository.find_by_user_account_id(
-            UserAccountId(user_account_id), cursor=cursor, limit=limit
+            UserAccountId(user_account_id), page=page, size=size
         )
-        has_next = len(histories) > limit
-        page = histories[:limit]
+        has_next = len(histories) > size
         items = [
             RecommendationHistoryItemQuery(
                 recommendation_history_id=h.recommendation_history_id.value,
@@ -42,7 +41,6 @@ class GetRecommendationHistoryUsecase:
                 recommended_problems=[RecommendedProblemQuery.model_validate(p) for p in h.recommended_problems],
                 created_at=h.created_at.isoformat(),
             )
-            for h in page
+            for h in histories[:size]
         ]
-        next_cursor = page[-1].recommendation_history_id.value if has_next and page else None
-        return RecommendationHistoryQuery(items=items, next_cursor=next_cursor, has_next=has_next)
+        return RecommendationHistoryQuery(items=items, page=page, size=size, has_next=has_next)
