@@ -34,7 +34,7 @@ async def get_recommended_problems(
         level_codes = json.loads(level)
         level_filter_codes = [FilterCode(code) for code in level_codes]
 
-    tag_filter_codes: list[TagId] | None = None
+    tag_filter_codes: list[str] | None = None
     if tags:
         tag_filter_codes = json.loads(tags)
 

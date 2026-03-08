@@ -13,7 +13,7 @@ class RecommendationParamsResponse(BaseModel):
     count: int
     exclusion_mode: str
     level_filter_codes: list[str] | None
-    tag_filter_codes: list[int] | None
+    tag_filter_codes: list[str] | None
     target_user_account_id: int | None
     recommend_all_unsolved: bool
 
