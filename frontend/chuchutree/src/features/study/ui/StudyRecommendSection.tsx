@@ -5,25 +5,21 @@ import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { UserAvatar } from '@/components/custom/UserAvatar';
-import { EyeOff, Search, SlidersHorizontal, EllipsisVertical, ChevronDown } from 'lucide-react';
+import { EyeOff, Search, SlidersHorizontal, EllipsisVertical, ChevronDown, CheckCircle, Check, X } from 'lucide-react';
 import { useStudyRecommendStore } from '@/lib/store/studyRecommend';
 import { useStudyRecommend } from '../hooks/useStudyRecommend';
-import { StudyDetail, StudyRecommendedProblem, StudyRecommendMemberSolveInfo } from '@/entities/study';
+import { StudyDetail, StudyMember, StudyRecommendedProblem, StudyRecommendMemberSolveInfo, useAssignProblemAll, useAssignProblemIndividual, useStudyProblems } from '@/entities/study';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
-import { useState } from 'react';
+import { useStudyCalendarStore } from '@/lib/store/studyCalendar';
+import { formatDateString } from '@/lib/utils/date';
+import { toast } from '@/lib/utils/toast';
+import { useState, useMemo } from 'react';
 
 // ── 멤버 풀이 배지 ─────────────────────────────────────────────────
 
-function MemberSolveBadge({ info }: { info: StudyRecommendMemberSolveInfo }) {
-  return (
-    <span
-      className={`inline-flex items-center rounded px-1 py-0.5 text-xs font-medium ${info.solved ? 'bg-primary/20 text-primary' : 'bg-muted-foreground/10 text-muted-foreground'}`}
-      title={info.bjAccountId}
-    >
-      {info.bjAccountId}
-      {info.solved ? ' ✓' : ' ✗'}
-    </span>
-  );
+function MemberSolveBadge({ info, members }: { info: StudyRecommendMemberSolveInfo; members: StudyMember[] }) {
+  const member = members.find((m) => m.userAccountId === info.userAccountId);
+  return <UserAvatar profileImageUrl={member?.profileImageUrl ?? null} bjAccountId={info.bjAccountId} userCode={member?.userCode} size={24} />;
 }
 
 // ── 문제 카드 ──────────────────────────────────────────────────────
@@ -32,32 +28,158 @@ function StudyRecommendProblemCard({
   problem,
   showFilters,
   totalCount,
+  studyDetail,
+  studyId,
+  assignedProblemIds,
 }: {
   problem: StudyRecommendedProblem;
   showFilters: { problemNumber: boolean; problemTier: boolean; recommendReason: boolean; algorithm: boolean };
   totalCount: number;
+  studyDetail: StudyDetail;
+  studyId: number;
+  assignedProblemIds: Set<number>;
 }) {
+  const [assignPopoverOpen, setAssignPopoverOpen] = useState(false);
+  const [selectedMemberIds, setSelectedMemberIds] = useState<number[]>([]);
+
+  const { selectedDate } = useStudyCalendarStore();
+  const isAlreadyAssigned = assignedProblemIds.has(problem.problemId);
+
+  const { mutate: assignAll, isPending: isAssigningAll } = useAssignProblemAll(studyId, {
+    onSuccess: () => {
+      toast.success('전원에게 문제가 할당되었습니다.');
+      setAssignPopoverOpen(false);
+    },
+    onError: () => toast.error('문제 할당에 실패했습니다.'),
+  });
+
+  const { mutate: assignIndividual, isPending: isAssigningIndividual } = useAssignProblemIndividual(studyId, {
+    onSuccess: () => {
+      toast.success('문제가 할당되었습니다.');
+      setAssignPopoverOpen(false);
+      setSelectedMemberIds([]);
+    },
+    onError: () => toast.error('문제 할당에 실패했습니다.'),
+  });
+
+  const handleAssignAll = () => {
+    if (!selectedDate) {
+      toast.error('날짜를 먼저 선택해주세요.');
+      return;
+    }
+    assignAll({ problemId: problem.problemId, targetDate: formatDateString(selectedDate) });
+  };
+
+  const handleAssignIndividual = () => {
+    if (!selectedDate) {
+      toast.error('날짜를 먼저 선택해주세요.');
+      return;
+    }
+    if (selectedMemberIds.length === 0) return;
+    assignIndividual({
+      problemId: problem.problemId,
+      assignments: selectedMemberIds.map((id) => ({ userAccountId: id, targetDate: formatDateString(selectedDate) })),
+    });
+  };
+
+  const toggleMember = (userAccountId: number) => {
+    setSelectedMemberIds((prev) => (prev.includes(userAccountId) ? prev.filter((id) => id !== userAccountId) : [...prev, userAccountId]));
+  };
+
   const firstTag = problem.tags[0];
   const tagName = firstTag ? (TAG_INFO[firstTag.tagCode as keyof typeof TAG_INFO]?.kr ?? firstTag.tagDisplayName) : null;
+  const isPending = isAssigningAll || isAssigningIndividual;
 
   return (
-    <div className={`mr-2 flex ${totalCount <= 3 ? 'h-full' : 'h-auto'}`} onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')}>
-      <div className="bg-innerground-hovergray/50 hover:bg-innerground-darkgray/70 flex flex-1 cursor-pointer items-center justify-between rounded-lg px-2 py-1.5 text-xs transition-colors">
+    <div className={`mr-2 flex ${totalCount <= 3 ? 'h-full' : 'h-auto'}`}>
+      {/* 할당 버튼 */}
+      {isAlreadyAssigned ? (
+        <Button
+          className={`bg-destructive text-destructive-foreground hover:bg-destructive/90 ${totalCount <= 3 ? 'h-full' : 'h-auto min-h-10'} w-8 cursor-pointer items-center justify-center rounded-l-lg rounded-r-none text-xs`}
+          onClick={(e) => {
+            e.stopPropagation();
+            toast.info('이미 등록된 문제입니다.');
+          }}
+        >
+          <CheckCircle className="h-5 w-5" />
+        </Button>
+      ) : (
+        <Popover open={assignPopoverOpen} onOpenChange={setAssignPopoverOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              className={`bg-innerground-darkgray text-muted-foreground hover:bg-primary hover:text-primary-foreground ${totalCount <= 3 ? 'h-full' : 'h-auto min-h-10'} w-8 cursor-pointer items-center justify-center rounded-l-lg rounded-r-none text-xs`}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex flex-col leading-tight">
+                <span>문제</span>
+                <span>할당</span>
+              </div>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent side="left" className="w-44 p-2" onClick={(e) => e.stopPropagation()}>
+            <p className="text-muted-foreground mb-2 text-xs font-medium">문제 할당</p>
+            <Button size="sm" className="mb-2 w-full text-xs" onClick={handleAssignAll} disabled={isPending}>
+              전원에게 할당
+            </Button>
+            <div className="mb-2 border-t pt-2">
+              <p className="text-muted-foreground mb-1.5 text-xs">특정 멤버 선택</p>
+              <div className="flex flex-wrap gap-1">
+                {studyDetail.members.map((member) => (
+                  <button
+                    key={member.userAccountId}
+                    onClick={() => toggleMember(member.userAccountId)}
+                    className={`rounded-full transition-all ${selectedMemberIds.includes(member.userAccountId) ? 'ring-primary ring-2 ring-offset-1' : 'opacity-50 hover:opacity-100'}`}
+                  >
+                    <UserAvatar profileImageUrl={member.profileImageUrl} bjAccountId={member.bjAccountId} userCode={member.userCode} size={24} />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <Button size="sm" variant="outline" className="w-full text-xs" onClick={handleAssignIndividual} disabled={isPending || selectedMemberIds.length === 0}>
+              선택 멤버에게 할당 {selectedMemberIds.length > 0 ? `(${selectedMemberIds.length}명)` : ''}
+            </Button>
+          </PopoverContent>
+        </Popover>
+      )}
+
+      {/* 문제 정보 */}
+      <div
+        className="bg-innerground-hovergray/50 hover:bg-innerground-darkgray/70 flex flex-1 cursor-pointer items-center justify-between rounded-l-none rounded-r-lg px-2 py-1.5 text-xs transition-colors"
+        onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')}
+      >
         <div className="flex items-center gap-2">
           {showFilters.problemTier && <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />}
           {showFilters.problemNumber && <span className="text-muted-foreground">#{problem.problemId}</span>}
           <span className="line-clamp-2 font-medium">{problem.problemTitle}</span>
         </div>
         <div className="flex min-w-30 flex-col items-end gap-0.5">
-          <div className="flex items-center gap-1">{showFilters.algorithm && tagName && <span className="text-muted-foreground line-clamp-1">{tagName}</span>}</div>
+          <div className="flex items-center gap-1">{showFilters.algorithm && tagName && <span className="line-clamp-1">{tagName}</span>}</div>
           {showFilters.recommendReason && problem.recommandReasons.length > 0 && <p className="text-muted-foreground line-clamp-1">{problem.recommandReasons[0].reason}</p>}
-          {problem.studyMemberSolveInfo.length > 0 && (
-            <div className="flex flex-wrap justify-end gap-1">
-              {problem.studyMemberSolveInfo.map((info) => (
-                <MemberSolveBadge key={info.userAccountId} info={info} />
-              ))}
-            </div>
-          )}
+          {problem.studyMemberSolveInfo.length > 0 &&
+            (() => {
+              const solved = problem.studyMemberSolveInfo.filter((i) => i.solved);
+              const unsolved = problem.studyMemberSolveInfo.filter((i) => !i.solved);
+              return (
+                <div className="flex items-end gap-2">
+                  {unsolved.length > 0 && (
+                    <div className="flex items-center gap-0.5 opacity-40">
+                      <div>new</div>
+                      {unsolved.map((info) => (
+                        <MemberSolveBadge key={info.userAccountId} info={info} members={studyDetail.members} />
+                      ))}
+                    </div>
+                  )}
+                  {solved.length > 0 && (
+                    <div className="flex items-center gap-0.5">
+                      <Check className="text-primary h-3 w-3 shrink-0" />
+                      {solved.map((info) => (
+                        <MemberSolveBadge key={info.userAccountId} info={info} members={studyDetail.members} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
         </div>
       </div>
     </div>
@@ -66,8 +188,20 @@ function StudyRecommendProblemCard({
 
 // ── 결과 패널 ──────────────────────────────────────────────────────
 
-function StudyRecommendAnswer() {
+function StudyRecommendAnswer({ studyDetail, studyId }: { studyDetail: StudyDetail; studyId: number }) {
   const { problems, isLoading, showFilters } = useStudyRecommendStore();
+  const { selectedDate, bigCalendarDate } = useStudyCalendarStore();
+
+  const year = bigCalendarDate?.getFullYear() ?? new Date().getFullYear();
+  const month = (bigCalendarDate?.getMonth() ?? new Date().getMonth()) + 1;
+  const { data: calendarData } = useStudyProblems(studyId, year, month);
+
+  const assignedProblemIds = useMemo(() => {
+    if (!selectedDate || !calendarData) return new Set<number>();
+    const dateStr = formatDateString(selectedDate);
+    const dayData = calendarData.monthlyData.find((d) => d.targetDate === dateStr);
+    return new Set<number>(dayData?.problems.map((p) => p.problemId) ?? []);
+  }, [selectedDate, calendarData]);
 
   if (isLoading) {
     return (
@@ -92,7 +226,15 @@ function StudyRecommendAnswer() {
     <div className="h-full w-full flex-1 rounded-lg border-2 border-dashed p-2">
       <div className={`flex h-full flex-col gap-1 overflow-x-hidden ${problems.length <= 3 ? 'overflow-y-hidden' : 'overflow-y-scroll'}`}>
         {problems.map((problem) => (
-          <StudyRecommendProblemCard key={problem.problemId} problem={problem} showFilters={showFilters} totalCount={problems.length} />
+          <StudyRecommendProblemCard
+            key={problem.problemId}
+            problem={problem}
+            showFilters={showFilters}
+            totalCount={problems.length}
+            studyDetail={studyDetail}
+            studyId={studyId}
+            assignedProblemIds={assignedProblemIds}
+          />
         ))}
         {Array.from({ length: emptySlots }).map((_, index) => (
           <div key={`empty-${index}`} className="mr-2 flex h-full rounded-lg">
@@ -158,7 +300,7 @@ function StudyRecommendButton({ studyDetail, currentUserAccountId, studyId }: { 
   const etcIsChanged = selectedExclusionMode !== 'LENIENT' || selectedCount !== 3;
 
   return (
-    <div className="flex h-80 gap-1">
+    <div className="flex h-full gap-1">
       <div className="flex h-full w-50 flex-col gap-2 rounded-lg border-2 border-dashed p-2">
         {/* 헤더: 아이콘 버튼들 */}
         <div className="flex items-center justify-between pl-2 text-xs">
@@ -385,7 +527,7 @@ export function StudyRecommendSection({ studyDetail, currentUserAccountId }: { s
   return (
     <div className="flex h-80 w-full items-center justify-between gap-2">
       <StudyRecommendButton studyDetail={studyDetail} currentUserAccountId={currentUserAccountId} studyId={studyDetail.studyId} />
-      <StudyRecommendAnswer />
+      <StudyRecommendAnswer studyDetail={studyDetail} studyId={studyDetail.studyId} />
     </div>
   );
 }

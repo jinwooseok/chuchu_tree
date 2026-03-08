@@ -519,7 +519,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                             }}
                             className={` ${studySection === study.studyId.toString() ? 'bg-logo' : ''} `}
                           >
-                            <div className={`flex h-full w-full cursor-pointer items-center gap-1 truncate `}>
+                            <div className={`flex h-full w-full cursor-pointer items-center gap-1 truncate`}>
                               <Bookmark size={ICON_SIZE} className="relative z-10" />
                               <span className="relative z-10">{study.studyName}</span>
                             </div>
@@ -568,7 +568,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                 </>
               )}
               {/* 실 서비스 전용 튜토리얼 이동하기*/}
-              {/* {!isLanding && (
+              {!isLanding && (
                 <SidebarMenuItem key="bell" aria-label={'알림 및 업데이트 알림'}>
                   <AppTooltip content="알림 및 업데이트 알림" side="right">
                     <SidebarMenuButton asChild>
@@ -582,7 +582,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                     </SidebarMenuButton>
                   </AppTooltip>
                 </SidebarMenuItem>
-              )} */}
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
           {/* 드롭다운 */}
