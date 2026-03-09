@@ -76,8 +76,7 @@ export function CreateStudyDialog({ user, onClose }: props) {
     refetchPendingRequests();
   }, [refetchPendingRequests]);
 
-  const isEffectivelyApplied = (studyId: number) =>
-    (serverAppliedStudyIds.has(studyId) || sessionAppliedIds.has(studyId)) && !sessionCancelledIds.has(studyId);
+  const isEffectivelyApplied = (studyId: number) => (serverAppliedStudyIds.has(studyId) || sessionAppliedIds.has(studyId)) && !sessionCancelledIds.has(studyId);
 
   const { data: studySearchResults = [], isLoading: isSearchingStudies } = useSearchStudies(debouncedStudyKeyword);
 
