@@ -185,7 +185,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
   };
 
   // 스터디 목록 조회
-  const { data: studies = [] } = useMyStudies();
+  const { data: studies = [] } = useMyStudies({ enabled: !isLanding });
 
   // 튜토리얼 다시보기
   const { resetOnboarding, startOnboarding } = useOnboardingStore();
