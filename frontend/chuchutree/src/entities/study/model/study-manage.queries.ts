@@ -6,10 +6,11 @@ import { studyKeys } from './study-manage.keys';
 import { CreateStudyRequest } from './study-manage.types';
 import { UseMutationCallback } from '@/shared/types/api';
 
-export const useMyStudies = () => {
+export const useMyStudies = (options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: studyKeys.myList(),
     queryFn: studyApi.getMyStudies,
+    enabled: options?.enabled !== false,
   });
 };
 
