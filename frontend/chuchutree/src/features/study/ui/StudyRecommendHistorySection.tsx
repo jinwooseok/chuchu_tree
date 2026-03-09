@@ -3,10 +3,13 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
 import Image from 'next/image';
-import { useGetStudyRecommendHistory } from '@/entities/study';
+import { useGetStudyRecommendHistory, useResetStudyRecommendHistory } from '@/entities/study';
 import { StudyDetail } from '@/entities/study';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { UserAvatar } from '@/components/custom/UserAvatar';
+import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
+import { Button } from '@/components/ui/button';
+import { RotateCcw } from 'lucide-react';
 
 function formatTimestamp(createdAt: string): string {
   const date = new Date(createdAt);
@@ -120,6 +123,7 @@ export function StudyRecommendHistorySection({ studyId, studyDetail }: { studyId
   const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useGetStudyRecommendHistory(studyId, selectedMemberId);
+  const { mutate: resetHistory } = useResetStudyRecommendHistory(studyId);
 
   const { ref: bottomRef, inView } = useInView({ threshold: 0 });
 
@@ -138,11 +142,16 @@ export function StudyRecommendHistorySection({ studyId, studyDetail }: { studyId
   return (
     <div className="relative w-full space-y-3">
       {/* 헤더: 제목 + 멤버 필터 */}
-      <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold">추천 기록</h3>
-        <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-4">
+        <h3 className="text-xl font-semibold">추천 기록</h3>
+        {/* 추천기록 초기화 버튼 */}
+        <AppTooltip content="추천기록 초기화" side="top">
+          <Button onClick={() => resetHistory()} variant="outline" size="icon" aria-label="추천기록 초기화" className="text-muted-foreground hover:text-foreground shrink-0 cursor-pointer">
+            <RotateCcw className="h-4 w-4" />
+          </Button>
+        </AppTooltip>
+        <div className="ml-4 flex items-center gap-1.5">
           <span className="text-muted-foreground text-xs">멤버 필터</span>
-
           {/* All 버튼 */}
           <button
             onClick={() => setSelectedMemberId(null)}
@@ -222,7 +231,6 @@ export function StudyRecommendHistorySection({ studyId, studyDetail }: { studyId
           </div>
         </>
       )}
-
     </div>
   );
 }

@@ -6,10 +6,11 @@ import { studyKeys } from './study-manage.keys';
 import { CreateStudyRequest } from './study-manage.types';
 import { UseMutationCallback } from '@/shared/types/api';
 
-export const useMyStudies = () => {
+export const useMyStudies = (options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: studyKeys.myList(),
     queryFn: studyApi.getMyStudies,
+    enabled: options?.enabled !== false,
   });
 };
 
@@ -55,6 +56,31 @@ export const useMyPendingRequests = () => {
   return useQuery({
     queryKey: studyKeys.pendingRequests(),
     queryFn: studyApi.getMyPendingRequests,
+  });
+};
+
+export const useAcceptInvitation = (callbacks?: UseMutationCallback) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (invitationId: number) => studyApi.acceptInvitation(invitationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: studyKeys.pendingRequests() });
+      queryClient.invalidateQueries({ queryKey: studyKeys.myList() });
+      callbacks?.onSuccess?.();
+    },
+    onError: (error) => callbacks?.onError?.(error),
+  });
+};
+
+export const useRejectInvitation = (callbacks?: UseMutationCallback) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (invitationId: number) => studyApi.rejectInvitation(invitationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: studyKeys.pendingRequests() });
+      callbacks?.onSuccess?.();
+    },
+    onError: (error) => callbacks?.onError?.(error),
   });
 };
 

@@ -8,7 +8,7 @@ import { toast } from '@/lib/utils/toast';
 import { User } from '@/entities/user';
 import { useState, useEffect, useMemo } from 'react';
 import { X, Loader2, Search, CheckCircle2, XCircle } from 'lucide-react';
-import { useMyStudies, useValidateStudyName, useSearchUsers, useSearchStudies, useApplyStudy, useCancelApplyStudy, useCreateStudy, useMyPendingRequests, SearchedUser } from '@/entities/study';
+import { useMyStudies, useValidateStudyName, useSearchUsers, useSearchStudies, useApplyStudy, useCancelApplyStudy, useCreateStudy, useMyPendingRequests, useAcceptInvitation, useRejectInvitation, SearchedUser } from '@/entities/study';
 import { useLayoutStore } from '@/lib/store/layout';
 import { UserAvatar } from '@/components/custom/UserAvatar';
 
@@ -17,7 +17,7 @@ interface props {
   onClose: () => void;
 }
 
-type TabType = 'create' | 'join';
+type TabType = 'create' | 'join' | 'records';
 
 export function CreateStudyDialog({ user, onClose }: props) {
   const [activeTab, setActiveTab] = useState<TabType>('create');
@@ -76,13 +76,16 @@ export function CreateStudyDialog({ user, onClose }: props) {
     refetchPendingRequests();
   }, [refetchPendingRequests]);
 
-  const isEffectivelyApplied = (studyId: number) =>
-    (serverAppliedStudyIds.has(studyId) || sessionAppliedIds.has(studyId)) && !sessionCancelledIds.has(studyId);
+  const isEffectivelyApplied = (studyId: number) => (serverAppliedStudyIds.has(studyId) || sessionAppliedIds.has(studyId)) && !sessionCancelledIds.has(studyId);
 
   const { data: studySearchResults = [], isLoading: isSearchingStudies } = useSearchStudies(debouncedStudyKeyword);
 
   const { mutate: applyStudy } = useApplyStudy();
   const { mutate: cancelApplyStudy } = useCancelApplyStudy();
+  const { mutate: acceptInvitation } = useAcceptInvitation();
+  const { mutate: rejectInvitation } = useRejectInvitation();
+  const [acceptingId, setAcceptingId] = useState<number | null>(null);
+  const [rejectingId, setRejectingId] = useState<number | null>(null);
 
   const handleValidateName = () => {
     if (!studyName.trim()) return;
@@ -152,6 +155,24 @@ export function CreateStudyDialog({ user, onClose }: props) {
     });
   };
 
+  const handleAcceptInvitation = (invitationId: number) => {
+    setAcceptingId(invitationId);
+    acceptInvitation(invitationId, {
+      onSuccess: () => toast.success('초대를 수락했습니다.'),
+      onError: () => toast.error('초대 수락에 실패했습니다.'),
+      onSettled: () => setAcceptingId(null),
+    });
+  };
+
+  const handleRejectInvitation = (invitationId: number) => {
+    setRejectingId(invitationId);
+    rejectInvitation(invitationId, {
+      onSuccess: () => toast.success('초대를 거절했습니다.'),
+      onError: () => toast.error('초대 거절에 실패했습니다.'),
+      onSettled: () => setRejectingId(null),
+    });
+  };
+
   const handleCancelApply = (studyId: number) => {
     const wasSessionApplied = sessionAppliedIds.has(studyId);
     setSessionCancelledIds((prev) => new Set([...prev, studyId]));
@@ -196,6 +217,12 @@ export function CreateStudyDialog({ user, onClose }: props) {
             onClick={() => setActiveTab('join')}
           >
             가입 신청
+          </button>
+          <button
+            className={`flex-1 py-2 text-sm font-medium transition-colors ${activeTab === 'records' ? 'border-primary text-foreground border-b-2' : 'text-muted-foreground hover:text-foreground'}`}
+            onClick={() => setActiveTab('records')}
+          >
+            신청/초대 기록
           </button>
         </div>
 
@@ -303,7 +330,7 @@ export function CreateStudyDialog({ user, onClose }: props) {
               </Button>
             </div>
           </div>
-        ) : (
+        ) : activeTab === 'join' ? (
           /* ───────────── 가입 신청 탭 ───────────── */
           <div className="flex min-h-0 flex-1 flex-col gap-4">
             <div className="relative">
@@ -365,6 +392,70 @@ export function CreateStudyDialog({ user, onClose }: props) {
             )}
 
             <div className="flex shrink-0 justify-end gap-2 pt-2">
+              <Button variant="outline" onClick={onClose}>
+                닫기
+              </Button>
+            </div>
+          </div>
+        ) : (
+          /* ───────────── 신청/초대 기록 탭 ───────────── */
+          <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto pr-1">
+            {/* 받은 초대 */}
+            <div className="flex flex-col gap-2">
+              <h4 className="text-sm font-semibold">받은 초대</h4>
+              {!pendingRequests || pendingRequests.invitations.length === 0 ? (
+                <p className="text-muted-foreground py-2 text-center text-sm">받은 초대가 없습니다.</p>
+              ) : (
+                pendingRequests.invitations.map((inv) => (
+                  <div key={inv.invitationId} className="flex items-center justify-between rounded-lg border p-3">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-medium">{inv.studyName}</span>
+                      <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                        <UserAvatar profileImageUrl={inv.inviterProfileImageUrl} bjAccountId={inv.inviterBjAccountId} userCode={inv.inviterUserCode} size={16} />
+                        <span>
+                          {inv.inviterBjAccountId}#{inv.inviterUserCode}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="ml-2 flex shrink-0 gap-1.5">
+                      <Button size="sm" disabled={acceptingId === inv.invitationId || rejectingId === inv.invitationId} onClick={() => handleAcceptInvitation(inv.invitationId)}>
+                        {acceptingId === inv.invitationId ? <Loader2 className="h-3 w-3 animate-spin" /> : '수락'}
+                      </Button>
+                      <Button variant="outline" size="sm" disabled={acceptingId === inv.invitationId || rejectingId === inv.invitationId} onClick={() => handleRejectInvitation(inv.invitationId)}>
+                        {rejectingId === inv.invitationId ? <Loader2 className="h-3 w-3 animate-spin" /> : '거절'}
+                      </Button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* 내 신청 */}
+            <div className="flex flex-col gap-2">
+              <h4 className="text-sm font-semibold">내 신청</h4>
+              {!pendingRequests || pendingRequests.applications.length === 0 ? (
+                <p className="text-muted-foreground py-2 text-center text-sm">신청 중인 스터디가 없습니다.</p>
+              ) : (
+                pendingRequests.applications.map((app) => (
+                  <div key={app.applicationId} className="flex items-center justify-between rounded-lg border p-3">
+                    <div className="flex flex-col gap-0.5">
+                      <span className="font-medium">{app.studyName}</span>
+                      <div className="text-muted-foreground flex items-center gap-2 text-sm">
+                        <UserAvatar profileImageUrl={app.ownerProfileImageUrl} bjAccountId={app.ownerBjAccountId} userCode={app.ownerUserCode} size={16} />
+                        <span>
+                          방장: {app.ownerBjAccountId}#{app.ownerUserCode}
+                        </span>
+                      </div>
+                    </div>
+                    <Button variant="outline" size="sm" className="ml-2 shrink-0" onClick={() => handleCancelApply(app.studyId)}>
+                      신청취소
+                    </Button>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <div className="mt-auto flex shrink-0 justify-end gap-2 pt-2">
               <Button variant="outline" onClick={onClose}>
                 닫기
               </Button>
