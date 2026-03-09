@@ -14,6 +14,8 @@ export const useRefresh = (callbacks: UseMutationCallback) => {
       queryClient.invalidateQueries({ queryKey: ['user'] });
       queryClient.invalidateQueries({ queryKey: ['calendar'] });
       queryClient.invalidateQueries({ queryKey: ['tagDashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['study-problems'] });
+      queryClient.invalidateQueries({ queryKey: ['studyDetail'] });
     },
     onError: (error) => {
       if (callbacks.onError) callbacks.onError(error);
