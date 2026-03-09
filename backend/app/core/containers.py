@@ -613,6 +613,8 @@ class Container(containers.DeclarativeContainer):
     delete_study_usecase = providers.Singleton(
         DeleteStudyUsecase,
         study_repository=study_repository,
+        invitation_repository=study_invitation_repository,
+        application_repository=study_application_repository,
     )
 
     get_my_studies_usecase = providers.Singleton(
@@ -625,6 +627,8 @@ class Container(containers.DeclarativeContainer):
     leave_study_usecase = providers.Singleton(
         LeaveStudyUsecase,
         study_repository=study_repository,
+        invitation_repository=study_invitation_repository,
+        application_repository=study_application_repository,
     )
 
     kick_study_member_usecase = providers.Singleton(
