@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import and_, delete, or_, select
+from sqlalchemy import and_, delete, or_, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.domain.enums import InvitationStatus
@@ -90,6 +90,20 @@ class StudyInvitationRepositoryImpl(StudyInvitationRepository):
                 StudyInvitationModel.invitee_user_account_id == user_account_id.value,
                 StudyInvitationModel.inviter_user_account_id == user_account_id.value,
             )
+        )
+        await self.session.execute(stmt)
+        await self.session.flush()
+
+    async def soft_delete_all_by_study_id(self, study_id: StudyId) -> None:
+        stmt = (
+            update(StudyInvitationModel)
+            .where(
+                and_(
+                    StudyInvitationModel.study_id == study_id.value,
+                    StudyInvitationModel.deleted_at.is_(None),
+                )
+            )
+            .values(deleted_at=datetime.now())
         )
         await self.session.execute(stmt)
         await self.session.flush()

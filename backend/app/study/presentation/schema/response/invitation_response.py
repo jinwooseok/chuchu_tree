@@ -3,6 +3,7 @@ from pydantic.alias_generators import to_camel
 
 from app.study.application.query.application_query import MyApplicationQuery
 from app.study.application.query.invitation_query import InvitationQuery
+from app.study.application.query.study_query import StudyPendingInvitationQuery
 
 
 class InvitationItemResponse(BaseModel):
@@ -71,6 +72,38 @@ class MyApplicationItemResponse(BaseModel):
             created_at=q.created_at,
             owner_profile_image_url=q.owner_profile_image_url,
         )
+
+
+class StudyInvitationItemResponse(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    invitation_id: int
+    invitee_user_account_id: int
+    invitee_bj_account_id: str
+    invitee_user_code: str
+    created_at: str
+    profile_image_url: str | None = None
+
+    @classmethod
+    def from_query(cls, q: StudyPendingInvitationQuery) -> "StudyInvitationItemResponse":
+        return cls(
+            invitation_id=q.invitation_id,
+            invitee_user_account_id=q.invitee_user_account_id,
+            invitee_bj_account_id=q.invitee_bj_account_id,
+            invitee_user_code=q.invitee_user_code,
+            created_at=q.created_at,
+            profile_image_url=q.profile_image_url,
+        )
+
+
+class StudyInvitationsResponse(BaseModel):
+    model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
+
+    invitations: list[StudyInvitationItemResponse]
+
+    @classmethod
+    def from_query(cls, queries: list[StudyPendingInvitationQuery]) -> "StudyInvitationsResponse":
+        return cls(invitations=[StudyInvitationItemResponse.from_query(q) for q in queries])
 
 
 class MyPendingRequestsResponse(BaseModel):

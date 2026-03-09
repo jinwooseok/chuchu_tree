@@ -22,12 +22,12 @@ from app.study.application.usecase.get_study_invitations_usecase import GetStudy
 from app.study.application.usecase.reject_study_invitation_usecase import RejectStudyInvitationUsecase
 from app.study.application.usecase.send_study_invitation_usecase import SendStudyInvitationUsecase
 from app.study.presentation.schema.request.study_request import SendInvitationRequest
-from app.study.presentation.schema.response.invitation_response import MyInvitationsResponse, MyPendingRequestsResponse
+from app.study.presentation.schema.response.invitation_response import MyInvitationsResponse, MyPendingRequestsResponse, StudyInvitationsResponse
 
 invitation_router = APIRouter(tags=["study-invitations"])
 
 
-@invitation_router.get("/studies/{study_id}/invitations", response_model=ApiResponseSchema[MyInvitationsResponse])
+@invitation_router.get("/studies/{study_id}/invitations", response_model=ApiResponseSchema[StudyInvitationsResponse])
 @inject
 async def get_study_invitations(
     study_id: int,
@@ -38,7 +38,7 @@ async def get_study_invitations(
         study_id=study_id,
         requester_user_account_id=current_user.user_account_id,
     ))
-    return ApiResponse(data=MyInvitationsResponse.from_query(queries).model_dump(by_alias=True))
+    return ApiResponse(data=StudyInvitationsResponse.from_query(queries).model_dump(by_alias=True))
 
 
 @invitation_router.post("/studies/{study_id}/invitations", response_model=ApiResponseSchema[None])
