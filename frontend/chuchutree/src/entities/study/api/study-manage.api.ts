@@ -39,4 +39,10 @@ export const studyApi = {
     const { data } = await axiosInstance.get<ApiResponse<PendingRequests>>('/user-accounts/me/pending-requests');
     return data.data;
   },
+  acceptInvitation: async (invitationId: number): Promise<void> => {
+    await axiosInstance.post(`/user-accounts/me/invitations/${invitationId}/accept`);
+  },
+  rejectInvitation: async (invitationId: number): Promise<void> => {
+    await axiosInstance.post(`/user-accounts/me/invitations/${invitationId}/reject`);
+  },
 };

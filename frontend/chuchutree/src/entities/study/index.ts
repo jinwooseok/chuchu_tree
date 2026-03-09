@@ -1,4 +1,4 @@
-export { useMyStudies, useValidateStudyName, useSearchUsers, useSearchStudies, useApplyStudy, useCancelApplyStudy, useCreateStudy, useMyPendingRequests } from './model/study-manage.queries';
+export { useMyStudies, useValidateStudyName, useSearchUsers, useSearchStudies, useApplyStudy, useCancelApplyStudy, useCreateStudy, useMyPendingRequests, useAcceptInvitation, useRejectInvitation } from './model/study-manage.queries';
 export type { Study, SearchedUser, SearchedStudy, CreateStudyRequest, PendingRequests, PendingInvitationItem, PendingApplicationItem } from './model/study-manage.types';
 
 export { useStudyDetail, useUpdateStudy, useLeaveStudy, useKickMember, useDeleteStudy, useStudyInvitations, useSendInvitation, useCancelInvitation, useStudyApplications, useAcceptApplication, useRejectApplication } from './model/study-detail.queries';

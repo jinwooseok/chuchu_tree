@@ -58,6 +58,31 @@ export const useMyPendingRequests = () => {
   });
 };
 
+export const useAcceptInvitation = (callbacks?: UseMutationCallback) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (invitationId: number) => studyApi.acceptInvitation(invitationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: studyKeys.pendingRequests() });
+      queryClient.invalidateQueries({ queryKey: studyKeys.myList() });
+      callbacks?.onSuccess?.();
+    },
+    onError: (error) => callbacks?.onError?.(error),
+  });
+};
+
+export const useRejectInvitation = (callbacks?: UseMutationCallback) => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (invitationId: number) => studyApi.rejectInvitation(invitationId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: studyKeys.pendingRequests() });
+      callbacks?.onSuccess?.();
+    },
+    onError: (error) => callbacks?.onError?.(error),
+  });
+};
+
 export const useCreateStudy = (callbacks?: UseMutationCallback) => {
   const queryClient = useQueryClient();
 
