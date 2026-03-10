@@ -1,16 +1,16 @@
-from app.common.domain.enums import NoticeCategory
+from app.common.domain.entity.domain_event import DomainEvent
+from app.common.domain.enums import NoticeCategory, NoticeCategoryDetail
+from app.common.domain.service.event_publisher import DomainEventBus
 from app.common.domain.vo.identifiers import StudyId, UserAccountId
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
 from app.study.application.command.study_command import ApplyToStudyCommand
-from app.study.domain.entity.notice import Notice
 from app.study.domain.entity.study_application import StudyApplication
-from app.study.domain.repository.notice_repository import NoticeRepository
+from app.study.domain.event.payloads import NoticeRequestedPayload
 from app.study.domain.repository.study_application_repository import StudyApplicationRepository
 from app.study.domain.repository.study_repository import StudyRepository
 from app.study.domain.repository.user_search_repository import UserSearchRepository
-from app.study.infra.sse.notice_manager import NoticeSSEManager
 
 
 class ApplyToStudyUsecase:
@@ -19,14 +19,12 @@ class ApplyToStudyUsecase:
         study_repository: StudyRepository,
         application_repository: StudyApplicationRepository,
         user_search_repository: UserSearchRepository,
-        notice_repository: NoticeRepository,
-        notice_sse_manager: NoticeSSEManager,
+        domain_event_bus: DomainEventBus,
     ):
         self.study_repository = study_repository
         self.application_repository = application_repository
         self.user_search_repository = user_search_repository
-        self.notice_repository = notice_repository
-        self.notice_sse_manager = notice_sse_manager
+        self.domain_event_bus = domain_event_bus
 
     @transactional
     async def execute(self, command: ApplyToStudyCommand) -> None:
@@ -56,21 +54,25 @@ class ApplyToStudyUsecase:
         )
         saved = await self.application_repository.insert(application)
 
-        # owner에게 Notice + SSE
-        owner_id = study.owner_user_account_id.value
-        notice = Notice.create(
-            recipient_user_account_id=study.owner_user_account_id,
-            category=NoticeCategory.STUDY_APPLICATION_STATUS,
-            title="스터디 가입 신청",
-            content={
-                "studyName": study.study_name,
-                "status": "PENDING",
-            },
-            reference_id=saved.application_id.value,
-            reference_type="STUDY_APPLICATION",
-        )
-        await self.notice_repository.insert(notice)
-        await self.notice_sse_manager.notify(
-            owner_id,
-            {"type": "STUDY_APPLICATION_STATUS", "studyId": study.study_id.value},
+        # owner에게 Notice 이벤트 발행
+        await self.domain_event_bus.publish(
+            DomainEvent(
+                event_type="NOTICE_REQUESTED",
+                data=NoticeRequestedPayload(
+                    recipient_user_account_id=study.owner_user_account_id.value,
+                    category=NoticeCategory.STUDY_APPLICATION.value,
+                    category_detail=NoticeCategoryDetail.REQUESTED_STUDY_APPLICATION.value,
+                    content={
+                        "studyId": study.study_id.value,
+                        "studyName": study.study_name,
+                        "applicantUserAccountId": command.requester_user_account_id,
+                        "applicantBjAccountId": user_info.bj_account_id,
+                        "applicantUserCode": user_info.user_code,
+                        "status": "PENDING",
+                    },
+                    reference_id=saved.application_id.value,
+                    reference_type="STUDY_APPLICATION",
+                ),
+            ),
+            after_commit=True,
         )

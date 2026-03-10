@@ -1,16 +1,16 @@
-from app.common.domain.enums import NoticeCategory
+from app.common.domain.entity.domain_event import DomainEvent
+from app.common.domain.enums import NoticeCategory, NoticeCategoryDetail
+from app.common.domain.service.event_publisher import DomainEventBus
 from app.common.domain.vo.identifiers import StudyId, UserAccountId
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
 from app.study.application.command.study_command import SendStudyInvitationCommand
-from app.study.domain.entity.notice import Notice
 from app.study.domain.entity.study_invitation import StudyInvitation
-from app.study.domain.repository.notice_repository import NoticeRepository
+from app.study.domain.event.payloads import NoticeRequestedPayload
 from app.study.domain.repository.study_invitation_repository import StudyInvitationRepository
 from app.study.domain.repository.study_repository import StudyRepository
 from app.study.domain.repository.user_search_repository import UserSearchRepository
-from app.study.infra.sse.notice_manager import NoticeSSEManager
 
 
 class SendStudyInvitationUsecase:
@@ -19,14 +19,12 @@ class SendStudyInvitationUsecase:
         study_repository: StudyRepository,
         invitation_repository: StudyInvitationRepository,
         user_search_repository: UserSearchRepository,
-        notice_repository: NoticeRepository,
-        notice_sse_manager: NoticeSSEManager,
+        domain_event_bus: DomainEventBus,
     ):
         self.study_repository = study_repository
         self.invitation_repository = invitation_repository
         self.user_search_repository = user_search_repository
-        self.notice_repository = notice_repository
-        self.notice_sse_manager = notice_sse_manager
+        self.domain_event_bus = domain_event_bus
 
     @transactional
     async def execute(self, command: SendStudyInvitationCommand) -> None:
@@ -45,7 +43,7 @@ class SendStudyInvitationUsecase:
         if study.is_member(invitee_id):
             raise APIException(ErrorCode.STUDY_ALREADY_MEMBER)
 
-        # 기존 초대 확인 (PENDING이면 중복 오류, REJECTED면 재활성화)
+        # 기존 초대 확인
         existing = await self.invitation_repository.find_by_study_and_invitee(
             StudyId(command.study_id), invitee_id
         )
@@ -64,23 +62,25 @@ class SendStudyInvitationUsecase:
         )
         saved = await self.invitation_repository.insert(invitation)
 
-        # invitee에게 Notice + SSE
-        notice = Notice.create(
-            recipient_user_account_id=invitee_id,
-            category=NoticeCategory.STUDY_INVITATION_STATUS,
-            title="스터디 초대",
-            content={
-                "studyName": study.study_name,
-                "userId": inviter_bj_id,
-                "userCode": inviter_user_code,
-                "status": "PENDING",
-                "senderUserAccountId": command.requester_user_account_id,
-            },
-            reference_id=saved.invitation_id.value,
-            reference_type="STUDY_INVITATION",
-        )
-        await self.notice_repository.insert(notice)
-        await self.notice_sse_manager.notify(
-            command.invitee_user_account_id,
-            {"type": "STUDY_INVITATION_STATUS", "studyId": study.study_id.value},
+        # invitee에게 Notice 이벤트 발행
+        await self.domain_event_bus.publish(
+            DomainEvent(
+                event_type="NOTICE_REQUESTED",
+                data=NoticeRequestedPayload(
+                    recipient_user_account_id=command.invitee_user_account_id,
+                    category=NoticeCategory.STUDY_INVITATION.value,
+                    category_detail=NoticeCategoryDetail.REQUESTED_STUDY_INVITATION.value,
+                    content={
+                        "studyId": study.study_id.value,
+                        "studyName": study.study_name,
+                        "inviterUserAccountId": command.requester_user_account_id,
+                        "inviterBjAccountId": inviter_bj_id,
+                        "inviterUserCode": inviter_user_code,
+                        "status": "PENDING",
+                    },
+                    reference_id=saved.invitation_id.value,
+                    reference_type="STUDY_INVITATION",
+                ),
+            ),
+            after_commit=True,
         )

@@ -1,16 +1,16 @@
+from app.common.domain.entity.domain_event import DomainEvent
+from app.common.domain.enums import InvitationStatus, NoticeCategory, NoticeCategoryDetail
+from app.common.domain.service.event_publisher import DomainEventBus
 from app.common.domain.vo.identifiers import StudyInvitationId, UserAccountId
-from app.common.domain.enums import InvitationStatus, NoticeCategory
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
 from app.study.application.command.study_command import AcceptStudyInvitationCommand
-from app.study.domain.entity.notice import Notice
-from app.study.domain.repository.notice_repository import NoticeRepository
+from app.study.domain.event.payloads import NoticeRequestedPayload
 from app.study.domain.repository.study_application_repository import StudyApplicationRepository
 from app.study.domain.repository.study_invitation_repository import StudyInvitationRepository
 from app.study.domain.repository.study_repository import StudyRepository
 from app.study.domain.repository.user_search_repository import UserSearchRepository
-from app.study.infra.sse.notice_manager import NoticeSSEManager
 
 
 class AcceptStudyInvitationUsecase:
@@ -20,15 +20,13 @@ class AcceptStudyInvitationUsecase:
         study_repository: StudyRepository,
         application_repository: StudyApplicationRepository,
         user_search_repository: UserSearchRepository,
-        notice_repository: NoticeRepository,
-        notice_sse_manager: NoticeSSEManager,
+        domain_event_bus: DomainEventBus,
     ):
         self.invitation_repository = invitation_repository
         self.study_repository = study_repository
         self.application_repository = application_repository
         self.user_search_repository = user_search_repository
-        self.notice_repository = notice_repository
-        self.notice_sse_manager = notice_sse_manager
+        self.domain_event_bus = domain_event_bus
 
     @transactional
     async def execute(self, command: AcceptStudyInvitationCommand) -> None:
@@ -69,23 +67,25 @@ class AcceptStudyInvitationUsecase:
         if pending_application is not None:
             await self.application_repository.soft_delete(pending_application)
 
-        # 방장에게 Notice (초대 수락)
-        notice = Notice.create(
-            recipient_user_account_id=study.owner_user_account_id,
-            category=NoticeCategory.STUDY_INVITATION_STATUS,
-            title="스터디 초대 수락",
-            content={
-                "studyName": study.study_name,
-                "userId": user_info.bj_account_id,
-                "userCode": user_info.user_code,
-                "status": "ACCEPTED",
-                "senderUserAccountId": requester_id.value,
-            },
-            reference_id=study.study_id.value,
-            reference_type="STUDY",
-        )
-        await self.notice_repository.insert(notice)
-        await self.notice_sse_manager.notify(
-            study.owner_user_account_id.value,
-            {"type": "STUDY_INVITATION_STATUS", "studyId": study.study_id.value},
+        # 방장에게 Notice 이벤트 발행 (초대 수락)
+        await self.domain_event_bus.publish(
+            DomainEvent(
+                event_type="NOTICE_REQUESTED",
+                data=NoticeRequestedPayload(
+                    recipient_user_account_id=study.owner_user_account_id.value,
+                    category=NoticeCategory.STUDY_INVITATION.value,
+                    category_detail=NoticeCategoryDetail.RESPONSED_STUDY_INVITATION.value,
+                    content={
+                        "studyId": study.study_id.value,
+                        "studyName": study.study_name,
+                        "inviteeUserAccountId": requester_id.value,
+                        "inviteeBjAccountId": user_info.bj_account_id,
+                        "inviteeUserCode": user_info.user_code,
+                        "status": "ACCEPTED",
+                    },
+                    reference_id=study.study_id.value,
+                    reference_type="STUDY",
+                ),
+            ),
+            after_commit=True,
         )

@@ -1,3 +1,4 @@
+from app.common.domain.enums import NoticeCategoryDetail
 from app.common.domain.vo.identifiers import NoticeId, UserAccountId
 from app.study.domain.entity.notice import Notice
 from app.study.infra.model.notice import NoticeModel
@@ -11,7 +12,7 @@ class NoticeMapper:
             model.notice_id = entity.notice_id.value
         model.recipient_user_account_id = entity.recipient_user_account_id.value
         model.category = entity.category
-        model.title = entity.title
+        model.category_detail = entity.category_detail.value if entity.category_detail else None
         model.content = entity.content
         model.is_read = entity.is_read
         model.reference_id = entity.reference_id
@@ -23,11 +24,17 @@ class NoticeMapper:
 
     @staticmethod
     def to_entity(model: NoticeModel) -> Notice:
+        category_detail = None
+        if model.category_detail:
+            try:
+                category_detail = NoticeCategoryDetail(model.category_detail)
+            except ValueError:
+                category_detail = None
         return Notice(
             notice_id=NoticeId(model.notice_id),
             recipient_user_account_id=UserAccountId(model.recipient_user_account_id),
             category=model.category,
-            title=model.title,
+            category_detail=category_detail,
             content=model.content,
             is_read=model.is_read,
             reference_id=model.reference_id,

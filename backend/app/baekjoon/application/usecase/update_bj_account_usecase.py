@@ -7,14 +7,17 @@ from app.activity.domain.repository.user_date_record_repository import UserDateR
 from app.activity.domain.repository.user_activity_repository import UserActivityRepository
 from app.baekjoon.domain.entity.baekjoon_account import BaekjoonAccount
 from app.baekjoon.domain.entity.problem_history import ProblemHistory
+from app.baekjoon.domain.event.bj_sync_payload import BjAccountSyncedPayload
 from app.baekjoon.domain.gateway.solvedac_gateway import SolvedacGateway
 from app.baekjoon.domain.repository.baekjoon_account_repository import BaekjoonAccountRepository
 from app.baekjoon.domain.repository.problem_history_repository import ProblemHistoryRepository
+from app.common.domain.entity.domain_event import DomainEvent
 from app.common.domain.entity.system_log import SystemLog
 from app.common.domain.entity.system_log_data import RefreshLogData, SchedulerLogData
 from app.problem.application.service.problem_update_service import ProblemUpdateService
 from app.common.domain.enums import SystemLogType, SystemLogStatus
 from app.common.domain.repository.system_log_repository import SystemLogRepository
+from app.common.domain.service.event_publisher import DomainEventBus
 from app.common.domain.vo.identifiers import BaekjoonAccountId, ProblemId, TierId, UserAccountId
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
@@ -45,6 +48,7 @@ class UpdateBjAccountUsecase:
         user_activity_repository: UserActivityRepository,
         system_log_repository: SystemLogRepository,
         problem_update_service: ProblemUpdateService,
+        domain_event_bus: DomainEventBus,
     ):
         self.baekjoon_account_repository = baekjoon_account_repository
         self.solvedac_gateway = solvedac_gateway
@@ -53,6 +57,7 @@ class UpdateBjAccountUsecase:
         self.user_activity_repository = user_activity_repository
         self.system_log_repository = system_log_repository
         self.problem_update_service = problem_update_service
+        self.domain_event_bus = domain_event_bus
 
     @transactional
     async def execute(self, user_account_id: int) -> None:
@@ -137,6 +142,9 @@ class UpdateBjAccountUsecase:
 
             added_problem_ids = [p.problem_id for p in new_problems]
 
+            # tier 변경 여부 확인 (update_tier() 호출 후 tier_histories에 기록됨)
+            tier_change = bj_account.tier_histories[-1] if bj_account.tier_histories else None
+
             for user_account_id in linked_user_ids:
                 ua_id = UserAccountId(user_account_id)
 
@@ -194,6 +202,23 @@ class UpdateBjAccountUsecase:
                         target_date=today,
                         increment=total_solved
                     )
+
+                # d. BJ_ACCOUNT_SYNCED 이벤트 발행 (after_commit)
+                await self.domain_event_bus.publish(
+                    DomainEvent(
+                        event_type="BJ_ACCOUNT_SYNCED",
+                        data=BjAccountSyncedPayload(
+                            user_account_id=user_account_id,
+                            bj_account_id=bj_account.bj_account_id.value,
+                            added_problem_ids=added_problem_ids,
+                            prev_tier_id=tier_change.prev_tier_id.value if tier_change else None,
+                            new_tier_id=tier_change.changed_tier_id.value if tier_change else None,
+                            log_type=log_type.value,
+                            date=today.isoformat(),
+                        ),
+                    ),
+                    after_commit=True,
+                )
 
             # system_log에 SUCCESS 기록
             log = self._build_success_log(
