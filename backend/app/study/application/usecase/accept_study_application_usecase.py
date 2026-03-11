@@ -87,8 +87,6 @@ class AcceptStudyApplicationUsecase:
                         "ownerUserCode": owner_info.user_code if owner_info else "",
                         "status": "ACCEPTED",
                     },
-                    reference_id=study.study_id.value,
-                    reference_type="STUDY",
                 ),
             ),
             after_commit=True,

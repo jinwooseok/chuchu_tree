@@ -54,6 +54,7 @@ class RejectStudyInvitationUsecase:
                         category=NoticeCategory.STUDY_INVITATION.value,
                         category_detail=NoticeCategoryDetail.RESPONSED_STUDY_INVITATION.value,
                         content={
+                            "invitationId": invitation.invitation_id.value,
                             "studyId": study.study_id.value,
                             "studyName": study.study_name,
                             "inviteeUserAccountId": requester_id.value,
@@ -61,8 +62,6 @@ class RejectStudyInvitationUsecase:
                             "inviteeUserCode": user_info.user_code if user_info else "",
                             "status": "REJECTED",
                         },
-                        reference_id=invitation.invitation_id.value,
-                        reference_type="STUDY_INVITATION",
                     ),
                 ),
                 after_commit=True,

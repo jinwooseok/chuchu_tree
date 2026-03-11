@@ -83,8 +83,6 @@ class AcceptStudyInvitationUsecase:
                         "inviteeUserCode": user_info.user_code,
                         "status": "ACCEPTED",
                     },
-                    reference_id=study.study_id.value,
-                    reference_type="STUDY",
                 ),
             ),
             after_commit=True,

@@ -13,8 +13,6 @@ class Notice:
     category_detail: NoticeCategoryDetail | None
     content: dict
     is_read: bool
-    reference_id: int | None
-    reference_type: str | None
     created_at: datetime
     updated_at: datetime
     deleted_at: datetime | None = None
@@ -26,8 +24,6 @@ class Notice:
         category: NoticeCategory,
         category_detail: NoticeCategoryDetail | None,
         content: dict,
-        reference_id: int | None = None,
-        reference_type: str | None = None,
     ) -> "Notice":
         now = datetime.now()
         return cls(
@@ -37,8 +33,6 @@ class Notice:
             category_detail=category_detail,
             content=content,
             is_read=False,
-            reference_id=reference_id,
-            reference_type=reference_type,
             created_at=now,
             updated_at=now,
             deleted_at=None,

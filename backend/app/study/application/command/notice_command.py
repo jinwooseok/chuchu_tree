@@ -6,8 +6,6 @@ class CreateNoticeCommand(BaseModel):
     category: str
     category_detail: str
     content: dict
-    reference_id: int | None = None
-    reference_type: str | None = None
 
 
 class HandleBjSyncedCommand(BaseModel):

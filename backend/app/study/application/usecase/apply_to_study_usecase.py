@@ -63,6 +63,7 @@ class ApplyToStudyUsecase:
                     category=NoticeCategory.STUDY_APPLICATION.value,
                     category_detail=NoticeCategoryDetail.REQUESTED_STUDY_APPLICATION.value,
                     content={
+                        "applicationId": saved.application_id.value,
                         "studyId": study.study_id.value,
                         "studyName": study.study_name,
                         "applicantUserAccountId": command.requester_user_account_id,
@@ -70,8 +71,6 @@ class ApplyToStudyUsecase:
                         "applicantUserCode": user_info.user_code,
                         "status": "PENDING",
                     },
-                    reference_id=saved.application_id.value,
-                    reference_type="STUDY_APPLICATION",
                 ),
             ),
             after_commit=True,

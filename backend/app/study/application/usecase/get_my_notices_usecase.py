@@ -75,8 +75,21 @@ class GetMyNoticesUsecase:
                     if uid is not None:
                         user = user_map.get(uid)
                         profile_image = (user.profile_image if user else None) or DEFAULT_PROFILE_IMAGE_PATH
-                        content["profileImageUrl"] = self.storage_gateway.get_public_url(profile_image)
+                        content["profileImageUrl"] = await self.storage_gateway.generate_presigned_url(profile_image, expiry_seconds=21600)
                         break
+
+            # ASSIGNED_STUDY_PROBLEM: assignees 각각에 profileImageUrl 주입
+            if detail == "ASSIGNED_STUDY_PROBLEM" and "assignees" in content:
+                enriched_assignees = []
+                for assignee in content["assignees"]:
+                    uid = assignee.get("userAccountId")
+                    user = user_map.get(uid) if uid is not None else None
+                    profile_image = (user.profile_image if user else None) or DEFAULT_PROFILE_IMAGE_PATH
+                    enriched_assignees.append({
+                        **assignee,
+                        "profileImageUrl": await self.storage_gateway.generate_presigned_url(profile_image, expiry_seconds=21600),
+                    })
+                content["assignees"] = enriched_assignees
 
             # 구 레코드 호환: senderUserAccountId 처리
             sender_id = content.get("senderUserAccountId") if detail is None else None
@@ -87,7 +100,7 @@ class GetMyNoticesUsecase:
             if sender_id is not None:
                 sender = user_map.get(sender_id)
                 profile_image = (sender.profile_image if sender else None) or DEFAULT_PROFILE_IMAGE_PATH
-                content["profileImageUrl"] = self.storage_gateway.get_public_url(profile_image)
+                content["profileImageUrl"] = await self.storage_gateway.generate_presigned_url(profile_image, expiry_seconds=21600)
 
             message = generate_notice_message(detail, content)
 

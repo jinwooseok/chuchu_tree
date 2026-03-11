@@ -71,8 +71,15 @@ class ProblemRepositoryImpl(ProblemRepository):
 
     @override
     async def find_by_id(self, problem_id: ProblemId) -> Problem | None:
-        """문제 ID로 조회 (구현 필요)"""
-        raise NotImplementedError()
+        stmt = select(ProblemModel).where(
+            and_(ProblemModel.problem_id == problem_id.value, ProblemModel.deleted_at.is_(None))
+        )
+        result = await self.session.execute(stmt)
+        model = result.scalars().one_or_none()
+        if model is None:
+            return None
+        problems = await self._attach_tags_and_map_to_entities([model])
+        return problems[0] if problems else None
 
     async def _attach_tags_and_map_to_entities(self, problem_models: list[ProblemModel]) -> list[Problem]:
         """조회된 ProblemModel 리스트에 태그를 붙여 Entity로 변환합니다."""

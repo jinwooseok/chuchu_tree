@@ -104,6 +104,7 @@ class AssignStudyProblemUsecase:
                         category=NoticeCategory.STUDY_PROBLEM.value,
                         category_detail=NoticeCategoryDetail.ASSIGNED_STUDY_PROBLEM.value,
                         content={
+                            "studyProblemId": saved_problem.study_problem_id.value,
                             "studyId": study.study_id.value,
                             "studyName": study.study_name,
                             "assignerUserAccountId": assigner_id,
@@ -114,8 +115,6 @@ class AssignStudyProblemUsecase:
                             "problemTitle": problem_title,
                             "calendarDate": uid_to_date.get(uid, ""),
                         },
-                        reference_id=saved_problem.study_problem_id.value,
-                        reference_type="STUDY_PROBLEM",
                     ),
                 ),
                 after_commit=True,

@@ -3,7 +3,7 @@ from sqlalchemy import Boolean, DateTime, Integer, ForeignKey, Index, String, En
 from sqlalchemy.dialects.mysql import JSON
 from sqlalchemy.orm import Mapped, mapped_column
 
-from app.common.domain.enums import NoticeCategory, NoticeCategoryDetail
+from app.common.domain.enums import NoticeCategory
 from app.core.database import Base
 
 
@@ -22,8 +22,6 @@ class NoticeModel(Base):
     category_detail: Mapped[str | None] = mapped_column(String(50), nullable=True)
     content: Mapped[dict] = mapped_column(JSON, nullable=False)
     is_read: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    reference_id: Mapped[int | None] = mapped_column(Integer, nullable=True)
-    reference_type: Mapped[str | None] = mapped_column(String(50), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, nullable=False)
     deleted_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)

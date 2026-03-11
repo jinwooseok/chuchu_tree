@@ -1,6 +1,6 @@
 import logging
 
-from app.common.domain.enums import NoticeCategory, NoticeCategoryDetail
+from app.common.domain.enums import NoticeCategory, NoticeCategoryDetail, SystemLogType
 from app.common.domain.gateway.storage_gateway import StorageGateway
 from app.common.domain.vo.identifiers import ProblemId, UserAccountId
 from app.common.infra.event.decorators import event_handler, event_register_handlers
@@ -72,7 +72,7 @@ class NoticeCreationService:
             return None
         user = await self.user_search_repository.find_by_user_account_id(uid)
         image_path = (user.profile_image if user else None) or DEFAULT_PROFILE_IMAGE_PATH
-        return self.storage_gateway.get_public_url(image_path)
+        return await self.storage_gateway.generate_presigned_url(image_path, expiry_seconds=21600)
 
     @event_handler("NOTICE_REQUESTED")
     @transactional
@@ -83,8 +83,6 @@ class NoticeCreationService:
                 category=NoticeCategory(command.category),
                 category_detail=NoticeCategoryDetail(command.category_detail),
                 content=command.content,
-                reference_id=command.reference_id,
-                reference_type=command.reference_type,
             )
             saved = await self.notice_repository.insert(notice)
             profile_image_url = await self._get_profile_image_url(command.content, command.category_detail)
@@ -100,16 +98,20 @@ class NoticeCreationService:
     @transactional
     async def handle_bj_account_synced(self, command: HandleBjSyncedCommand) -> None:
         try:
+            if command.log_type == SystemLogType.BULK_UPDATE.value:
+                return
+
             if command.added_problem_ids:
                 problems = await self.problem_repository.find_by_ids(
                     [ProblemId(pid) for pid in command.added_problem_ids]
                 )
                 summary = [{"problemId": p.problem_id.value, "problemTitle": p.title} for p in problems]
+                updated_by = "DIRECT_REFRESH" if command.log_type == SystemLogType.REFRESH.value else command.log_type
                 notice = Notice.create(
                     recipient_user_account_id=UserAccountId(command.user_account_id),
                     category=NoticeCategory.USER_PROBLEM,
                     category_detail=NoticeCategoryDetail.UPDATED_USER_PROBLEM,
-                    content={"problems": summary, "updatedBy": command.log_type, "date": command.date},
+                    content={"problemsByDate": [{"solvedDate": command.date, "problems": summary}], "updatedBy": updated_by},
                 )
                 saved = await self.notice_repository.insert(notice)
                 await self.notice_sse_manager.notify(
@@ -121,7 +123,7 @@ class NoticeCreationService:
                     recipient_user_account_id=UserAccountId(command.user_account_id),
                     category=NoticeCategory.USER_TIER,
                     category_detail=NoticeCategoryDetail.UPDATED_USER_TIER,
-                    content={"tierLevel": command.new_tier_id, "updatedBy": command.log_type, "date": command.date},
+                    content={"tierLevel": command.new_tier_id, "updatedBy": updated_by, "updatedDate": command.date},
                 )
                 saved = await self.notice_repository.insert(notice)
                 await self.notice_sse_manager.notify(
@@ -144,7 +146,7 @@ class NoticeCreationService:
                 recipient_user_account_id=UserAccountId(command.user_account_id),
                 category=NoticeCategory.USER_PROBLEM,
                 category_detail=NoticeCategoryDetail.UPDATED_USER_PROBLEM,
-                content={"problems": summary, "updatedBy": "DIRECT_BATCH_UPDATE", "date": command.date},
+                content={"problemsByDate": [{"solvedDate": command.date, "problems": summary}], "updatedBy": "DIRECT_BATCH_UPDATE"},
             )
             saved = await self.notice_repository.insert(notice)
             await self.notice_sse_manager.notify(

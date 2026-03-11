@@ -65,8 +65,6 @@ class RejectStudyApplicationUsecase:
                         "ownerUserCode": owner_info.user_code if owner_info else "",
                         "status": "REJECTED",
                     },
-                    reference_id=study.study_id.value,
-                    reference_type="STUDY",
                 ),
             ),
             after_commit=True,

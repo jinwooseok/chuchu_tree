@@ -71,6 +71,7 @@ class SendStudyInvitationUsecase:
                     category=NoticeCategory.STUDY_INVITATION.value,
                     category_detail=NoticeCategoryDetail.REQUESTED_STUDY_INVITATION.value,
                     content={
+                        "invitationId": saved.invitation_id.value,
                         "studyId": study.study_id.value,
                         "studyName": study.study_name,
                         "inviterUserAccountId": command.requester_user_account_id,
@@ -78,8 +79,6 @@ class SendStudyInvitationUsecase:
                         "inviterUserCode": inviter_user_code,
                         "status": "PENDING",
                     },
-                    reference_id=saved.invitation_id.value,
-                    reference_type="STUDY_INVITATION",
                 ),
             ),
             after_commit=True,
