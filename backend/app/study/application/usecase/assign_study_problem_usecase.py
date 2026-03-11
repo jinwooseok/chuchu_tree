@@ -93,7 +93,6 @@ class AssignStudyProblemUsecase:
                     "userCode": assignee_map[other_uid].user_code if other_uid in assignee_map else "",
                 }
                 for other_uid in target_user_ids
-                if other_uid != uid
             ]
 
             await self.domain_event_bus.publish(
