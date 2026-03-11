@@ -41,6 +41,7 @@ from app.study.application.usecase.mark_notices_read_usecase import MarkNoticesR
 from app.study.application.usecase.get_study_invitations_usecase import GetStudyInvitationsUsecase
 from app.study.application.usecase.recommend_study_problems_usecase import RecommendStudyProblemsUsecase
 from app.study.application.service.study_withdrawal_service import StudyWithdrawalService
+from app.study.application.service.notice_creation_service import NoticeCreationService
 
 from app.activity.infra.repository.user_date_record_repository_impl import UserDateRecordRepositoryImpl
 from app.baekjoon.application.usecase.get_scheduler_inactive_periods_usecase import GetSchedulerInactivePeriodsUsecase
@@ -383,6 +384,7 @@ class Container(containers.DeclarativeContainer):
         user_activity_repository=user_activity_repository,
         system_log_repository=system_log_repository,
         problem_update_service=problem_update_service,
+        domain_event_bus=domain_event_bus,
     )
 
     get_unrecorded_problems_usecase = providers.Singleton(
@@ -641,8 +643,7 @@ class Container(containers.DeclarativeContainer):
         study_repository=study_repository,
         invitation_repository=study_invitation_repository,
         user_search_repository=user_search_repository,
-        notice_repository=notice_repository,
-        notice_sse_manager=notice_sse_manager,
+        domain_event_bus=domain_event_bus,
     )
 
     cancel_study_invitation_usecase = providers.Singleton(
@@ -674,8 +675,7 @@ class Container(containers.DeclarativeContainer):
         study_repository=study_repository,
         application_repository=study_application_repository,
         user_search_repository=user_search_repository,
-        notice_repository=notice_repository,
-        notice_sse_manager=notice_sse_manager,
+        domain_event_bus=domain_event_bus,
     )
 
     reject_study_invitation_usecase = providers.Singleton(
@@ -683,8 +683,7 @@ class Container(containers.DeclarativeContainer):
         invitation_repository=study_invitation_repository,
         study_repository=study_repository,
         user_search_repository=user_search_repository,
-        notice_repository=notice_repository,
-        notice_sse_manager=notice_sse_manager,
+        domain_event_bus=domain_event_bus,
     )
 
     apply_to_study_usecase = providers.Singleton(
@@ -692,8 +691,7 @@ class Container(containers.DeclarativeContainer):
         study_repository=study_repository,
         application_repository=study_application_repository,
         user_search_repository=user_search_repository,
-        notice_repository=notice_repository,
-        notice_sse_manager=notice_sse_manager,
+        domain_event_bus=domain_event_bus,
     )
 
     cancel_study_application_usecase = providers.Singleton(
@@ -716,16 +714,15 @@ class Container(containers.DeclarativeContainer):
         application_repository=study_application_repository,
         invitation_repository=study_invitation_repository,
         user_search_repository=user_search_repository,
-        notice_repository=notice_repository,
-        notice_sse_manager=notice_sse_manager,
+        domain_event_bus=domain_event_bus,
     )
 
     reject_study_application_usecase = providers.Singleton(
         RejectStudyApplicationUsecase,
         study_repository=study_repository,
         application_repository=study_application_repository,
-        notice_repository=notice_repository,
-        notice_sse_manager=notice_sse_manager,
+        user_search_repository=user_search_repository,
+        domain_event_bus=domain_event_bus,
     )
 
     assign_study_problem_all_usecase = providers.Singleton(
@@ -733,8 +730,8 @@ class Container(containers.DeclarativeContainer):
         study_repository=study_repository,
         study_problem_repository=study_problem_repository,
         user_search_repository=user_search_repository,
-        notice_repository=notice_repository,
-        notice_sse_manager=notice_sse_manager,
+        problem_repository=problem_repository,
+        domain_event_bus=domain_event_bus,
     )
 
     assign_study_problem_usecase = providers.Singleton(
@@ -742,8 +739,8 @@ class Container(containers.DeclarativeContainer):
         study_repository=study_repository,
         study_problem_repository=study_problem_repository,
         user_search_repository=user_search_repository,
-        notice_repository=notice_repository,
-        notice_sse_manager=notice_sse_manager,
+        problem_repository=problem_repository,
+        domain_event_bus=domain_event_bus,
     )
 
     delete_study_problem_usecase = providers.Singleton(
@@ -798,6 +795,15 @@ class Container(containers.DeclarativeContainer):
         study_application_repository=study_application_repository,
     )
 
+    notice_creation_service = providers.Singleton(
+        NoticeCreationService,
+        notice_repository=notice_repository,
+        notice_sse_manager=notice_sse_manager,
+        problem_repository=problem_repository,
+        user_search_repository=user_search_repository,
+        storage_gateway=storage_gateway,
+    )
+
     async def init_resources(self):
         """앱 시작 시점에 싱글톤 객체들을 미리 생성"""
         # 1. 인프라 클라이언트 (Redis, Storage 등)
@@ -815,6 +821,7 @@ class Container(containers.DeclarativeContainer):
         self.tag_application_service()
         self.target_application_service()
         self.study_withdrawal_service()
+        self.notice_creation_service()
         self.recommendation_history_service()
 
         # 3. 스케줄러 시작 (추가)

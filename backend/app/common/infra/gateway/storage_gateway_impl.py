@@ -112,6 +112,12 @@ class S3StorageGatewayImpl(StorageGateway):
             return None
 
     @override
+    def get_public_url(self, file_path: str) -> str:
+        """퍼블릭 URL 반환 (버킷 퍼블릭 정책 설정 필요)"""
+        object_key = self._to_object_key(file_path)
+        return f"{self.storage_public_url}/{self.bucket_name}/{object_key}"
+
+    @override
     async def generate_presigned_url(self, file_name: str, expiry_seconds: int = 3600) -> str | None:
         """Presigned URL 생성 (file_name은 환경 prefix 미포함, 도메인을 공개 URL로 치환)"""
         try:

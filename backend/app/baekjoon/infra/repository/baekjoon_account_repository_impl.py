@@ -50,6 +50,7 @@ class BaekjoonAccountRepositoryImpl(BaekjoonAccountRepository):
         existing_model = result.scalar_one_or_none()
 
         if existing_model:
+            existing_model.tier_start_date = account.tier_start_date
             existing_model.tier_id = account.current_tier_id.value
             existing_model.rating = account.rating.value
             existing_model.class_ = account.statistics.class_level

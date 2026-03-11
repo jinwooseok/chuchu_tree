@@ -38,6 +38,17 @@ class StorageGateway(ABC):
         """
 
     @abstractmethod
+    def get_public_url(self, file_path: str) -> str:
+        """퍼블릭 URL 반환 (presigned 없이 직접 접근 가능한 경로용)
+
+        Args:
+            file_path: 파일 경로 (환경 prefix 미포함)
+
+        Returns:
+            퍼블릭 URL
+        """
+
+    @abstractmethod
     async def delete_file(self, file_path: str) -> bool:
         """파일 삭제
 

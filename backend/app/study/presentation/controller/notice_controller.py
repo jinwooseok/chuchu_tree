@@ -1,3 +1,4 @@
+import asyncio
 import json
 from fastapi import APIRouter, Depends
 from fastapi.responses import StreamingResponse
@@ -52,10 +53,13 @@ async def notice_stream(
     async def event_generator():
         q = notice_sse_manager.connect(current_user.user_account_id)
         try:
-            yield "data: connected\n\n"
+            yield f"data: {json.dumps({'eventType': 'CONNECTED', 'data': {}}, ensure_ascii=False)}\n\n"
             while True:
-                data = await q.get()
-                yield f"data: {json.dumps(data, ensure_ascii=False)}\n\n"
+                try:
+                    data = await asyncio.wait_for(q.get(), timeout=30)
+                    yield f"data: {json.dumps(data, ensure_ascii=False)}\n\n"
+                except asyncio.TimeoutError:
+                    yield ": keepalive\n\n"
         finally:
             notice_sse_manager.disconnect(current_user.user_account_id, q)
 

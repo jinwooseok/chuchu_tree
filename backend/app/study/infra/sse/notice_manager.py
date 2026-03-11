@@ -15,6 +15,14 @@ class NoticeSSEManager:
         if q in queues:
             queues.remove(q)
 
-    async def notify(self, user_account_id: int, data: dict) -> None:
+    async def notify(self, user_account_id: int, event_type: str, payload: dict) -> None:
+        """SSE 이벤트 전송.
+
+        Args:
+            user_account_id: 수신자
+            event_type: 이벤트 종류 (예: "NOTICE")
+            payload: 이벤트 데이터
+        """
+        data = {"eventType": event_type, "data": payload}
         for q in self._queues.get(user_account_id, []):
             await q.put(data)

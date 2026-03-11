@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import String, DateTime, Integer, ForeignKey, UniqueConstraint, Index
+from sqlalchemy import String, DateTime, Integer, ForeignKey, Index
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
@@ -8,7 +8,6 @@ from app.core.database import Base
 class StudyModel(Base):
     __tablename__ = "study"
     __table_args__ = (
-        UniqueConstraint('study_name', name='uk_study_name'),
         Index('idx_study_owner', 'owner_user_account_id'),
         {'comment': '스터디'}
     )

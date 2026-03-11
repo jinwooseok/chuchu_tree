@@ -9,8 +9,10 @@ class NoticeItemResponse(BaseModel):
 
     notice_id: int
     category: str
+    category_detail: str | None
     is_read: bool
     created_at: str
+    message: str
     content: dict
 
     @classmethod
@@ -18,8 +20,10 @@ class NoticeItemResponse(BaseModel):
         return cls(
             notice_id=q.notice_id,
             category=q.category,
+            category_detail=q.category_detail,
             is_read=q.is_read,
             created_at=q.created_at,
+            message=q.message,
             content=q.content,
         )
 
