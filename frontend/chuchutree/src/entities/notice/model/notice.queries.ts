@@ -3,6 +3,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { noticeApi } from '../api/notice.api';
 import { noticeKeys } from './notice.keys';
+import { BaseNotice } from './notice.types';
 
 export const useNotices = () => {
   return useQuery({
@@ -17,7 +18,7 @@ export const useReadNotices = () => {
   return useMutation({
     mutationFn: (noticeIds: number[]) => noticeApi.readNotices(noticeIds),
     onSuccess: (_, noticeIds) => {
-      queryClient.setQueryData(noticeKeys.list(), (prev: ReturnType<typeof useNotices>['data']) => {
+      queryClient.setQueryData<BaseNotice[]>(noticeKeys.list(), (prev) => {
         if (!prev) return prev;
         return prev.map((n) => (noticeIds.includes(n.noticeId) ? { ...n, isRead: true } : n));
       });

@@ -69,13 +69,14 @@ export interface AssignedStudyProblemContent {
   assignerUserCode: string;
   profileImageUrl: string;
   assignees: { userAccountId: string; bjAccountId: string; userCode: string; profileImageUrl: string }[];
-  problem: { problemId: number; problemTitle: string };
+  problemId: number;
+  problemTitle: string;
   calendarDate: string; // YYYY-MM-DD
 }
 
 // 내가 푼 문제가 등록됨 알림
 export interface UpdatedUserProblemContent {
-  problemsByDate: { solvedDate: string; problems: { problemId: number; problemTitle: string } }[];
+  problemsByDate: { solvedDate: string; problems: { problemId: number; problemTitle: string }[] }[];
   updatedBy: 'SCHEDULER' | 'DIRECT_REFRESH';
 }
 

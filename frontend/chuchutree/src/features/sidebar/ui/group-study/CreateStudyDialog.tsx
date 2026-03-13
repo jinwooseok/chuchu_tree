@@ -15,12 +15,13 @@ import { UserAvatar } from '@/components/custom/UserAvatar';
 interface props {
   user?: User;
   onClose: () => void;
+  defaultTab?: TabType;
 }
 
 type TabType = 'create' | 'join' | 'records';
 
-export function CreateStudyDialog({ user, onClose }: props) {
-  const [activeTab, setActiveTab] = useState<TabType>('create');
+export function CreateStudyDialog({ user, onClose, defaultTab = 'create' }: props) {
+  const [activeTab, setActiveTab] = useState<TabType>(defaultTab);
 
   // --- 생성 탭 state ---
   const bjAccountId = user?.bjAccount?.bjAccountId;

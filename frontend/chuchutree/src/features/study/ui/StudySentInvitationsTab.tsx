@@ -8,17 +8,6 @@ import { StudyDetail, useStudyInvitations, useSendInvitation, useCancelInvitatio
 import { toast } from '@/lib/utils/toast';
 import { UserAvatar } from '@/components/custom/UserAvatar';
 
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: '대기중',
-  ACCEPTED: '수락됨',
-  REJECTED: '거절됨',
-};
-
-const STATUS_CLASS: Record<string, string> = {
-  PENDING: 'bg-yellow-100 text-yellow-800',
-  ACCEPTED: 'bg-green-100 text-green-800',
-  REJECTED: 'bg-red-100 text-red-800',
-};
 
 interface StudySentInvitationsTabProps {
   studyDetail: StudyDetail;
@@ -91,13 +80,7 @@ export function StudySentInvitationsTab({ studyDetail, isOwner }: StudySentInvit
         <div className="space-y-2">
           <div className="relative">
             <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
-            <Input
-              value={userSearchKeyword}
-              onChange={(e) => setUserSearchKeyword(e.target.value)}
-              placeholder="백준 아이디 또는 코드로 검색"
-              className="pl-9"
-              autoFocus
-            />
+            <Input value={userSearchKeyword} onChange={(e) => setUserSearchKeyword(e.target.value)} placeholder="백준 아이디 또는 코드로 검색" className="pl-9" autoFocus />
           </div>
 
           {debouncedKeyword && (
@@ -140,25 +123,16 @@ export function StudySentInvitationsTab({ studyDetail, isOwner }: StudySentInvit
           {invitations.map((inv) => (
             <div key={inv.invitationId} className="flex items-center justify-between rounded-lg border p-3">
               <div className="flex items-center gap-2">
-                <UserAvatar profileImageUrl={inv.inviterProfileImageUrl} bjAccountId={inv.inviterBjAccountId} userCode={inv.inviterUserCode} size={24} />
+                <UserAvatar profileImageUrl={inv.profileImageUrl} bjAccountId={inv.inviteeBjAccountId} userCode={inv.inviteeUserCode} size={24} />
                 <span className="text-sm font-medium">
-                  {inv.inviterBjAccountId}#{inv.inviterUserCode}
-                </span>
-                <span className={`rounded px-1.5 py-0.5 text-xs font-medium ${STATUS_CLASS[inv.status] ?? ''}`}>
-                  {STATUS_LABEL[inv.status] ?? inv.status}
+                  {inv.inviteeBjAccountId}#{inv.inviteeUserCode}
                 </span>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground text-xs">{inv.createdAt.slice(0, 10)}</span>
-                {inv.status === 'PENDING' && (
-                  <button
-                    onClick={() => cancelInvitation(inv.invitationId)}
-                    disabled={isCanceling}
-                    className="text-destructive hover:text-destructive/80 text-xs font-medium transition-colors"
-                  >
-                    취소
-                  </button>
-                )}
+                <button onClick={() => cancelInvitation(inv.invitationId)} disabled={isCanceling} className="text-destructive hover:text-destructive/80 text-xs font-medium transition-colors">
+                  취소
+                </button>
               </div>
             </div>
           ))}

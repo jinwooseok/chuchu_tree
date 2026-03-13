@@ -12,10 +12,11 @@ interface StudyInviteDialogProps {
   studyDetail: StudyDetail;
   isOwner: boolean;
   onClose: () => void;
+  defaultTab?: TabType;
 }
 
-export function StudyInviteDialog({ studyDetail, isOwner, onClose }: StudyInviteDialogProps) {
-  const [activeTab, setActiveTab] = useState<TabType>('sent');
+export function StudyInviteDialog({ studyDetail, isOwner, onClose, defaultTab = 'sent' }: StudyInviteDialogProps) {
+  const [activeTab, setActiveTab] = useState<TabType>(defaultTab);
 
   return (
     <Dialog open={true} onOpenChange={onClose}>

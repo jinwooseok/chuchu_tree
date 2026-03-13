@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { StudyDetail, useUpdateStudy } from '@/entities/study';
 import { toast } from '@/lib/utils/toast';
 import { StudyHeader } from './StudyHeader';
 import { StudySettingsPanel } from './StudySettingsPanel';
 import { StudyInviteDialog } from './StudyInviteDialog';
+import { useNotificationStore } from '@/lib/store/notification';
 
 export type SettingsView = 'menu' | 'edit' | 'kick';
 
@@ -17,7 +18,19 @@ interface StudyDashboardProps {
 export function StudyDashboard({ studyDetail, currentUserAccountId }: StudyDashboardProps) {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isInviteOpen, setIsInviteOpen] = useState(false);
+  const [inviteDefaultTab, setInviteDefaultTab] = useState<'sent' | 'received'>('sent');
   const [settingsView, setSettingsView] = useState<SettingsView>('menu');
+
+  const { pendingStudyInviteAction, setPendingStudyInviteAction } = useNotificationStore();
+
+  // 알림에서 "확인하러가기" 클릭 시 자동으로 received 탭 열기
+  useEffect(() => {
+    if (pendingStudyInviteAction && pendingStudyInviteAction.studyId === studyDetail.studyId) {
+      setInviteDefaultTab(pendingStudyInviteAction.tab);
+      setIsInviteOpen(true);
+      setPendingStudyInviteAction(null);
+    }
+  }, [pendingStudyInviteAction, studyDetail.studyId, setPendingStudyInviteAction]);
 
   // 인라인 수정 상태
   const [editDescription, setEditDescription] = useState('');
@@ -88,7 +101,7 @@ export function StudyDashboard({ studyDetail, currentUserAccountId }: StudyDashb
         )}
       </div>
       {/* 모달 */}
-      {isInviteOpen && <StudyInviteDialog studyDetail={studyDetail} isOwner={isOwner} onClose={() => setIsInviteOpen(false)} />}
+      {isInviteOpen && <StudyInviteDialog studyDetail={studyDetail} isOwner={isOwner} defaultTab={inviteDefaultTab} onClose={() => { setIsInviteOpen(false); setInviteDefaultTab('sent'); }} />}
     </div>
   );
 }
