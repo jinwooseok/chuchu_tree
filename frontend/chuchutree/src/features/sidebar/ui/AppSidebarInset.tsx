@@ -567,8 +567,8 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                   </SidebarMenuItem>
                 </>
               )}
-              {/* 실 서비스 전용 튜토리얼 이동하기*/}
-              {/* {!isLanding && (
+              {/* 실 서비스 전용 튜토리얼 이동하기 */}
+              {!isLanding && (
                 <SidebarMenuItem key="bell" aria-label={'알림 및 업데이트 알림'}>
                   <AppTooltip content="알림 및 업데이트 알림" side="right">
                     <SidebarMenuButton asChild>
@@ -582,7 +582,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                     </SidebarMenuButton>
                   </AppTooltip>
                 </SidebarMenuItem>
-              )} */}
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
           {/* 드롭다운 */}
