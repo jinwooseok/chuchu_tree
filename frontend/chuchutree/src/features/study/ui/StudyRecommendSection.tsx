@@ -525,7 +525,7 @@ function StudyRecommendButton({ studyDetail, currentUserAccountId, studyId }: { 
 
 export function StudyRecommendSection({ studyDetail, currentUserAccountId }: { studyDetail: StudyDetail; currentUserAccountId: number }) {
   return (
-    <div className="flex h-80 w-full items-center justify-between gap-2">
+    <div className="flex h-60 w-full shrink-0 items-center justify-between gap-2">
       <StudyRecommendButton studyDetail={studyDetail} currentUserAccountId={currentUserAccountId} studyId={studyDetail.studyId} />
       <StudyRecommendAnswer studyDetail={studyDetail} studyId={studyDetail.studyId} />
     </div>
