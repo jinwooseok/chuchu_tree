@@ -154,7 +154,16 @@ function StudyRecommendProblemCard({
         </div>
         <div className="flex min-w-30 flex-col items-end gap-0.5">
           <div className="flex items-center gap-1">{showFilters.algorithm && tagName && <span className="line-clamp-1">{tagName}</span>}</div>
-          {showFilters.recommendReason && problem.recommandReasons.length > 0 && <p className="text-muted-foreground line-clamp-1">{problem.recommandReasons[0].reason}</p>}
+          {showFilters.recommendReason && problem.recommandReasons.length > 0 && (
+            <p className="text-muted-foreground line-clamp-1">
+              {showFilters.algorithm
+                ? problem.recommandReasons[0].reason
+                : problem.recommandReasons[0].reason
+                    .replace(/'[^']+'/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim()}
+            </p>
+          )}
           {problem.studyMemberSolveInfo.length > 0 &&
             (() => {
               const solved = problem.studyMemberSolveInfo.filter((i) => i.solved);

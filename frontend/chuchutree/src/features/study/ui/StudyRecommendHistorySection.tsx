@@ -9,7 +9,9 @@ import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { UserAvatar } from '@/components/custom/UserAvatar';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { Button } from '@/components/ui/button';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, EyeOff } from 'lucide-react';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { useStudyRecommendStore } from '@/lib/store/studyRecommend';
 
 function formatTimestamp(createdAt: string): string {
   const date = new Date(createdAt);
@@ -54,9 +56,10 @@ interface ParamsBadgesProps {
   };
   requesterUserAccountId: number;
   members: StudyDetail['members'];
+  showAlgorithm: boolean;
 }
 
-function ParamsBadges({ params, requesterUserAccountId, members }: ParamsBadgesProps) {
+function ParamsBadges({ params, requesterUserAccountId, members, showAlgorithm }: ParamsBadgesProps) {
   // targetUserAccountId가 null이면 requesterUserAccountId 사용
   const effectiveTargetId = params.targetUserAccountId ?? requesterUserAccountId;
   const targetMember = members.find((m) => m.userAccountId === effectiveTargetId);
@@ -97,8 +100,8 @@ function ParamsBadges({ params, requesterUserAccountId, members }: ParamsBadgesP
     </span>,
   );
 
-  // 태그 필터 — 한글 태그명 표시
-  if (params.tagFilterCodes.length > 0) {
+  // 태그 필터 — 알고리즘 표시항목 켜져있을 때만 표시
+  if (showAlgorithm && params.tagFilterCodes.length > 0) {
     const tagNames = params.tagFilterCodes.map((code) => TAG_INFO[code as keyof typeof TAG_INFO]?.kr ?? code).join(', ');
     badges.push(
       <span key="tags" className="bg-innerground-hovergray text-muted-foreground rounded px-1.5 py-0.5">
@@ -121,6 +124,7 @@ function ParamsBadges({ params, requesterUserAccountId, members }: ParamsBadgesP
 
 export function StudyRecommendHistorySection({ studyId, studyDetail }: { studyId: number; studyDetail: StudyDetail }) {
   const [selectedMemberId, setSelectedMemberId] = useState<number | null>(null);
+  const { showFilters, toggleFilter } = useStudyRecommendStore();
 
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } = useGetStudyRecommendHistory(studyId, selectedMemberId);
   const { mutate: resetHistory } = useResetStudyRecommendHistory(studyId);
@@ -150,6 +154,39 @@ export function StudyRecommendHistorySection({ studyId, studyDetail }: { studyId
             <RotateCcw className="h-4 w-4" />
           </Button>
         </AppTooltip>
+        {/* 표시항목 */}
+        <Popover>
+          <AppTooltip content="표시 항목" side="top">
+            <PopoverTrigger asChild>
+              <button aria-label="표시 항목창 열기" className="relative cursor-pointer">
+                <EyeOff className="text-muted-foreground h-4 w-4" />
+              </button>
+            </PopoverTrigger>
+          </AppTooltip>
+          <PopoverContent className="w-36 p-2">
+            <div className="text-muted-foreground mb-2 text-xs font-semibold">표시 항목</div>
+            <div className="space-y-2">
+              {(
+                [
+                  { key: 'problemNumber', label: '문제번호' },
+                  { key: 'problemTier', label: '문제티어' },
+                  { key: 'recommendReason', label: '추천이유' },
+                  { key: 'algorithm', label: '알고리즘' },
+                ] as const
+              ).map((filter) => (
+                <label key={filter.key} className="hover:bg-background/60 flex cursor-pointer items-center gap-2 rounded p-1">
+                  <input
+                    type="checkbox"
+                    checked={showFilters[filter.key]}
+                    onChange={() => toggleFilter(filter.key)}
+                    className="checked:bg-primary checked:border-primary border-muted-foreground h-4 w-4 cursor-pointer appearance-none rounded border-2"
+                  />
+                  <span className="text-xs">{filter.label}</span>
+                </label>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
         <div className="ml-4 flex items-center gap-1.5">
           <span className="text-muted-foreground text-xs">멤버 필터</span>
           {/* All 버튼 */}
@@ -193,7 +230,7 @@ export function StudyRecommendHistorySection({ studyId, studyDetail }: { studyId
                   <span className="text-sm font-medium">{formatTimestamp(historyItem.createdAt)}</span>
                   <span className="text-muted-foreground text-xs">{historyItem.recommendedProblems.length}개 문제</span>
                 </div>
-                <ParamsBadges params={historyItem.params} requesterUserAccountId={historyItem.requesterUserAccountId} members={studyDetail.members} />
+                <ParamsBadges params={historyItem.params} requesterUserAccountId={historyItem.requesterUserAccountId} members={studyDetail.members} showAlgorithm={showFilters.algorithm} />
               </div>
 
               {/* 문제 목록 */}
@@ -209,13 +246,22 @@ export function StudyRecommendHistorySection({ studyId, studyDetail }: { studyId
                       onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')}
                     >
                       <div className="flex items-center gap-2">
-                        <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />
-                        <span className="text-muted-foreground">#{problem.problemId}</span>
+                        {showFilters.problemTier && <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />}
+                        {showFilters.problemNumber && <span className="text-muted-foreground">#{problem.problemId}</span>}
                         <span className="font-medium">{problem.problemTitle}</span>
                       </div>
                       <div className="flex flex-col items-end gap-0.5">
-                        {tagName && <span className="text-muted-foreground line-clamp-1">{tagName}</span>}
-                        {problem.recommandReasons.length > 0 && <span className="text-muted-foreground line-clamp-1">{problem.recommandReasons[0].reason}</span>}
+                        {showFilters.algorithm && tagName && <span className="text-muted-foreground line-clamp-1">{tagName}</span>}
+                        {showFilters.recommendReason && problem.recommandReasons.length > 0 && (
+                          <span className="text-muted-foreground line-clamp-1">
+                            {showFilters.algorithm
+                              ? problem.recommandReasons[0].reason
+                              : problem.recommandReasons[0].reason
+                                  .replace(/'[^']+'/g, '')
+                                  .replace(/\s+/g, ' ')
+                                  .trim()}
+                          </span>
+                        )}
                       </div>
                     </div>
                   );

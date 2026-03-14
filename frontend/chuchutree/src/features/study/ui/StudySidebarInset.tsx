@@ -231,7 +231,7 @@ export function StudySidebarInset({ studyCalendarData, studyDetail, studyId }: {
     { key: 'problemTier' as const, label: '문제티어' },
     { key: 'algorithm' as const, label: '알고리즘' },
   ];
-  const hasFilterChanges = !showFilters.algorithm || !showFilters.problemTier || !showFilters.problemNumber;
+  const hasFilterChanges = showFilters.algorithm || !showFilters.problemTier || !showFilters.problemNumber;
 
   return (
     <div className="flex flex-col gap-8">

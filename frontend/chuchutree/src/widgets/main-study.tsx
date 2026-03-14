@@ -71,7 +71,7 @@ export default function MainStudy({ studyName }: { studyName: string }) {
         {/* 문제추천영역 */}
         <StudyRecommendSection studyDetail={studyDetail} currentUserAccountId={user?.userAccount?.userAccountId ?? 0} />
         {/* 캘린더영역 */}
-        <div className="relative w-full" style={{ minHeight: '500px' }}>
+        <div className="relative  w-full  " style={{ minHeight: '750px' }}>
           <StudyBigCalendar studyCalendarData={studyCalendarData} />
           <RefreshButtonContainer />
         </div>
