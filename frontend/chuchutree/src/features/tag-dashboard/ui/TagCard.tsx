@@ -3,7 +3,7 @@
 import { memo } from 'react';
 import { CategoryTags, usePostTagBan, useDeleteTagBan } from '@/entities/tag-dashboard';
 import { getLevelColorClasses, getDaysAgo } from '../lib/utils';
-import Image from 'next/image';
+import { TierSvg } from '@/shared/ui';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid'; // filled
 import { CheckCircleIcon as CheckCircleIconOutline } from '@heroicons/react/24/outline'; // outline
 import { toast } from '@/lib/utils/toast';
@@ -172,7 +172,7 @@ const TagCard = memo(
               <div>최소 달성 티어</div>
             </AppTooltip>
             <div className={`${excludedYn ? 'text-excluded-text' : isSuccessTier ? 'text-advanced-bg font-semibold' : 'text-muted-foreground'} flex items-center justify-center`}>
-              <Image src={`/tiers/tier_${nextLevelStat.requiredMinTier}.svg`} alt={`Tier ${nextLevelStat.requiredMinTier}`} width={12} height={12} />
+              <TierSvg tier={nextLevelStat.requiredMinTier} size={12} />
               <div className="ml-2" aria-label={isSuccessTier ? '최소 티어 달성' : '최소 티어 미달성'}>
                 {isSuccessTier ? <CheckCircleIconSolid height={12} width={12} aria-hidden="true" /> : <CheckCircleIconOutline height={12} width={12} aria-hidden="true" />}
               </div>

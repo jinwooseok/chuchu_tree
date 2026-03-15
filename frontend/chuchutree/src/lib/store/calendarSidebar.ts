@@ -13,7 +13,7 @@ interface CalendarSidebarStore {
 }
 
 const initialFilters = {
-  algorithm: true,
+  algorithm: false,
   problemTier: true,
   problemNumber: true,
 };

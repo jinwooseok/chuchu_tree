@@ -1,12 +1,12 @@
 'use client';
 
 import { SocialWays } from '@/shared/constants/auth';
-import { ThemeButton } from '@/shared/ui';
-import Image from 'next/image';
+import { ThemeButton, LogoSvg } from '@/shared/ui';
 import { useTheme } from 'next-themes';
 import { useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
+import Image from 'next/image';
 
 type SocialWay = (typeof SocialWays)[number];
 
@@ -45,7 +45,7 @@ export default function SignInClient() {
       <div className="flex items-center justify-between">
         <AppTooltip content="튜토리얼 하러가기" side="right" delayDuration={300}>
           <div className="flex cursor-pointer items-center gap-2" onClick={() => router.push('/')}>
-            <Image src="/logo/logo.svg" alt="logo" width={16} height={16} />
+            <LogoSvg size={16} />
             <div>ChuChuTree</div>
           </div>
         </AppTooltip>

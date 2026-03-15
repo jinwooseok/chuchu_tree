@@ -1,3 +1,5 @@
+'use client'
+
 import { RefreshButtonContainer } from '@/features/refresh';
 import { StudyDashboard, StudyRecommendSection, StudyRecommendHistorySection } from '@/features/study';
 import { useStudyDetail, useStudyProblems } from '@/entities/study';
@@ -68,13 +70,13 @@ export default function MainStudy({ studyName }: { studyName: string }) {
         <div ref={setDashboardRef} className="w-full">
           <StudyDashboard studyDetail={studyDetail} currentUserAccountId={user?.userAccount?.userAccountId ?? 0} />
         </div>
-        {/* 중앙 캘린더영역 */}
-        <div className="relative w-full" style={{ minHeight: '500px' }}>
+        {/* 문제추천영역 */}
+        <StudyRecommendSection studyDetail={studyDetail} currentUserAccountId={user?.userAccount?.userAccountId ?? 0} />
+        {/* 캘린더영역 */}
+        <div className="relative w-full" style={{ minHeight: '750px' }}>
           <StudyBigCalendar studyCalendarData={studyCalendarData} />
           <RefreshButtonContainer />
         </div>
-        {/* 하단 문제추천영역 */}
-        <StudyRecommendSection studyDetail={studyDetail} currentUserAccountId={user?.userAccount?.userAccountId ?? 0} />
         {/* 하단 문제추천 history 영역 */}
         <StudyRecommendHistorySection studyId={studyId} studyDetail={studyDetail} />
       </div>

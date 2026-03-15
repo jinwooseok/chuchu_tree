@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/image';
+import { TierSvg } from '@/shared/ui';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
@@ -148,13 +148,22 @@ function StudyRecommendProblemCard({
         onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')}
       >
         <div className="flex items-center gap-2">
-          {showFilters.problemTier && <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />}
+          {showFilters.problemTier && <TierSvg tier={problem.problemTierLevel} size={16} />}
           {showFilters.problemNumber && <span className="text-muted-foreground">#{problem.problemId}</span>}
           <span className="line-clamp-2 font-medium">{problem.problemTitle}</span>
         </div>
         <div className="flex min-w-30 flex-col items-end gap-0.5">
           <div className="flex items-center gap-1">{showFilters.algorithm && tagName && <span className="line-clamp-1">{tagName}</span>}</div>
-          {showFilters.recommendReason && problem.recommandReasons.length > 0 && <p className="text-muted-foreground line-clamp-1">{problem.recommandReasons[0].reason}</p>}
+          {showFilters.recommendReason && problem.recommandReasons.length > 0 && (
+            <p className="text-muted-foreground line-clamp-1">
+              {showFilters.algorithm
+                ? problem.recommandReasons[0].reason
+                : problem.recommandReasons[0].reason
+                    .replace(/'[^']+'/g, '')
+                    .replace(/\s+/g, ' ')
+                    .trim()}
+            </p>
+          )}
           {problem.studyMemberSolveInfo.length > 0 &&
             (() => {
               const solved = problem.studyMemberSolveInfo.filter((i) => i.solved);
@@ -525,7 +534,7 @@ function StudyRecommendButton({ studyDetail, currentUserAccountId, studyId }: { 
 
 export function StudyRecommendSection({ studyDetail, currentUserAccountId }: { studyDetail: StudyDetail; currentUserAccountId: number }) {
   return (
-    <div className="flex h-80 w-full items-center justify-between gap-2">
+    <div className="flex h-60 w-full shrink-0 items-center justify-between gap-2">
       <StudyRecommendButton studyDetail={studyDetail} currentUserAccountId={currentUserAccountId} studyId={studyDetail.studyId} />
       <StudyRecommendAnswer studyDetail={studyDetail} studyId={studyDetail.studyId} />
     </div>

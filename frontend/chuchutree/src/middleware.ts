@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { refreshAccessToken, parseCookiesForMiddleware } from '@/lib/auth-utils';
+import { serverLog } from '@/lib/logger';
 
 // 인증이 필요한 경로
 const protectedPaths = ['/chu', '/bj-account'];
@@ -12,7 +13,7 @@ export async function middleware(request: NextRequest) {
 
   if (protectedPaths.includes(pathname)) {
     if (!accessToken) {
-      console.log('[Middleware] access토큰 없음');
+      serverLog('[Middleware] access토큰 없음');
       return NextResponse.redirect(new URL('/sign-in', request.url));
     }
     // access_token이 있는 경우, 유효성 검증
@@ -31,18 +32,18 @@ export async function middleware(request: NextRequest) {
       });
 
       if (verifyResponse.ok) {
-        console.log('[Middleware] verifyResponse ok');
+        serverLog('[Middleware] verifyResponse ok');
         return NextResponse.next();
       }
       // 404는 백준 계정 미연동일 가능성이 있으므로 Layout에서 처리
       if (verifyResponse.status === 404) {
-        console.log('[Middleware] 404 response, let layout handle it');
+        serverLog('[Middleware] 404 response, let layout handle it');
         return NextResponse.next();
       }
       // 401 에러 - 토큰 만료
       if (verifyResponse.status === 401 && refreshToken) {
         // 공통 함수 사용
-        console.log('[Middleware] 토큰2개있음');
+        serverLog('[Middleware] 토큰2개있음');
         const { success, newCookies } = await refreshAccessToken(refreshToken, backendUrl);
 
         if (success && newCookies) {
@@ -59,9 +60,9 @@ export async function middleware(request: NextRequest) {
         }
       }
       if (verifyResponse.status === 401) {
-        console.log('[Middleware] 401맞음 refreshToken 없었거나 failed함');
+        serverLog('[Middleware] 401맞음 refreshToken 없었거나 failed함');
       } else {
-        console.log('[Middleware] 401, 404말고 다른에러:');
+        serverLog('[Middleware] 401, 404말고 다른에러:');
       }
       const response = NextResponse.redirect(new URL('/', request.url));
       response.cookies.delete('access_token');
@@ -73,7 +74,7 @@ export async function middleware(request: NextRequest) {
       return NextResponse.next();
     }
   }
-  console.log('[Middleware] pass');
+  serverLog('[Middleware] pass');
   return NextResponse.next();
 }
 

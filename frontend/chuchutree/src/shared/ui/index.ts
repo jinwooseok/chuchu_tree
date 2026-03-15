@@ -7,3 +7,7 @@ export { Loader, PageLoader, SkeletonCard, SkeletonList } from './loader';
 
 // Theme button
 export { default as ThemeButton } from './theme-button';
+
+// SVG components
+export { LogoSvg } from './svg/logo-svg';
+export { TierSvg } from './svg/tier-svg';

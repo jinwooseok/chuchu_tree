@@ -4,7 +4,7 @@ import { CategoryTags, useTagDetail } from '@/entities/tag-dashboard';
 import { getLevelColorClasses, getDaysAgo } from '../lib/utils';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { TIER_INFO } from '@/shared/constants/tierSystem';
-import Image from 'next/image';
+import { TierSvg } from '@/shared/ui';
 
 type TagWithProgress = CategoryTags & { progress: number };
 
@@ -57,11 +57,10 @@ export function TagDetailCard({ tag }: TagDetailCardProps) {
                 {sortedProblems.map((problem) => (
                   <div key={problem.problemId} className="flex items-center justify-between gap-2 rounded border px-2 py-1.5">
                     <div className="flex min-w-0 items-center gap-2">
-                      <Image
-                        src={`/tiers/tier_${problem.problemTierLevel}.svg`}
+                      <TierSvg
+                        tier={problem.problemTierLevel}
+                        size={14}
                         alt={TIER_INFO[problem.problemTierLevel as keyof typeof TIER_INFO]?.short ?? problem.problemTierName}
-                        width={14}
-                        height={14}
                         className="shrink-0"
                       />
                       <span className="truncate">

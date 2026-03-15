@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { Problem, useUpdateWillSolveProblems, useUpdateSolvedProblems, useSearchProblems, WillSolveProblems, useUpdateRepresentativeTag, Calendar } from '@/entities/calendar';
-import Image from 'next/image';
+import { TierSvg } from '@/shared/ui';
 import { useState, useEffect, useMemo, useId } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
@@ -114,7 +114,7 @@ function DraggableProblemCard({
           {showFilters.algorithm && !lastTag && <div className={`rounded px-2 py-0.5 ${isSolved && tagInfo ? tagInfo.bgColor : 'bg-gray-300'}`}>Undefined</div>}
           {(showFilters.problemTier || showFilters.problemNumber) && (
             <div className="flex items-center gap-1">
-              {showFilters.problemTier && <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={12} height={12} />}
+              {showFilters.problemTier && <TierSvg tier={problem.problemTierLevel} size={12} />}
               {showFilters.problemNumber && <span>{problem.problemId}</span>}
             </div>
           )}
@@ -158,7 +158,7 @@ function SearchResultCard({ problem, onClick, showFilters }: { problem: WillSolv
           {showFilters.algorithm && !lastTag && <div className="bg-only-gray rounded px-2 py-0.5">Undefined</div>}
           {(showFilters.problemTier || showFilters.problemNumber) && (
             <div className="flex items-center gap-1">
-              {showFilters.problemTier && <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={12} height={12} />}
+              {showFilters.problemTier && <TierSvg tier={problem.problemTierLevel} size={12} />}
               {showFilters.problemNumber && <span>{problem.problemId}</span>}
             </div>
           )}
@@ -366,7 +366,7 @@ export function CalendarSidebarInset({ isLanding = false, calendarData }: { cale
     { key: 'problemTier' as const, label: '문제티어' },
     { key: 'algorithm' as const, label: '알고리즘' },
   ];
-  const hasFilterChanges = !showFilters.algorithm || !showFilters.problemTier || !showFilters.problemNumber;
+  const hasFilterChanges = showFilters.algorithm || !showFilters.problemTier || !showFilters.problemNumber;
 
   return (
     <div className="flex flex-col gap-8">

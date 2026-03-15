@@ -1,32 +1,39 @@
 'use client';
 
-import { CalendarPlus, CheckCheck, ClipboardList, Megaphone, TrendingUp, UserCheck, UserPlus, Users } from 'lucide-react';
-import { NoticeCategory, NoticeStatusValue } from './notice.types';
+import { CalendarPlus, CheckCheck, Megaphone, TrendingUp, UserCheck, UserPlus } from 'lucide-react';
+import { NoticeCategory, NoticeCategoryDetail } from '@/entities/notice';
 
-export const STATUS_CONFIG: Record<NoticeStatusValue, { label: string; className: string }> = {
-  pending: { label: '대기 중', className: 'text-muted-foreground' },
-  accepted: { label: '수락됨', className: 'text-advanced-bg' },
-  rejected: { label: '거절됨', className: 'text-excluded-bg' },
+export const STATUS_CONFIG: Record<'PENDING' | 'ACCEPTED' | 'REJECTED', { label: string; className: string }> = {
+  PENDING: { label: '대기 중', className: 'text-muted-foreground' },
+  ACCEPTED: { label: '수락됨', className: 'text-advanced-bg' },
+  REJECTED: { label: '거절됨', className: 'text-excluded-bg' },
 };
 
 export const CATEGORY_LABEL: Record<NoticeCategory, string> = {
-  'study-received-invitation': '스터디 초대 받음',
-  'study-received-application': '가입 신청 받음',
-  'study-invitation-status': '스터디 초대',
-  'study-application-status': '가입 신청',
-  'study-problems-status': '문제 등록',
-  'user-problems-status': '문제 업데이트',
-  'user-tier-status': '티어 상승',
-  'system-announcement': '공지사항',
+  STUDY_INVITATION: '스터디 초대',
+  STUDY_APPLICATION: '가입 신청',
+  STUDY_PROBLEM: '문제 등록',
+  USER_PROBLEM: '문제 업데이트',
+  USER_TIER: '티어 상승',
+  SYSTEM_ANNOUNCEMENT: '공지사항',
+};
+
+export const CATEGORY_DETAIL_LABEL: Record<NoticeCategoryDetail, string> = {
+  REQUESTED_STUDY_INVITATION: '스터디 초대 받음',
+  RESPONSED_STUDY_INVITATION: '스터디 초대 결과',
+  REQUESTED_STUDY_APPLICATION: '가입 신청 받음',
+  RESPONSED_STUDY_APPLICATION: '가입 신청 결과',
+  ASSIGNED_STUDY_PROBLEM: '문제 등록',
+  UPDATED_USER_PROBLEM: '문제 업데이트',
+  UPDATED_USER_TIER: '티어 상승',
+  SYSTEM_ANNOUNCEMENT: '공지사항',
 };
 
 export const CATEGORY_ICON: Record<NoticeCategory, React.ReactNode> = {
-  'study-received-invitation': <UserPlus className="mt-0.5 h-4 w-4 shrink-0" />,
-  'study-received-application': <UserCheck className="mt-0.5 h-4 w-4 shrink-0" />,
-  'study-invitation-status': <Users className="mt-0.5 h-4 w-4 shrink-0" />,
-  'study-application-status': <ClipboardList className="mt-0.5 h-4 w-4 shrink-0" />,
-  'study-problems-status': <CalendarPlus className="mt-0.5 h-4 w-4 shrink-0" />,
-  'user-problems-status': <CheckCheck className="mt-0.5 h-4 w-4 shrink-0" />,
-  'user-tier-status': <TrendingUp className="mt-0.5 h-4 w-4 shrink-0" />,
-  'system-announcement': <Megaphone className="mt-0.5 h-4 w-4 shrink-0" />,
+  STUDY_INVITATION: <UserPlus className="mt-0.5 h-4 w-4 shrink-0" />,
+  STUDY_APPLICATION: <UserCheck className="mt-0.5 h-4 w-4 shrink-0" />,
+  STUDY_PROBLEM: <CalendarPlus className="mt-0.5 h-4 w-4 shrink-0" />,
+  USER_PROBLEM: <CheckCheck className="mt-0.5 h-4 w-4 shrink-0" />,
+  USER_TIER: <TrendingUp className="mt-0.5 h-4 w-4 shrink-0" />,
+  SYSTEM_ANNOUNCEMENT: <Megaphone className="mt-0.5 h-4 w-4 shrink-0" />,
 };

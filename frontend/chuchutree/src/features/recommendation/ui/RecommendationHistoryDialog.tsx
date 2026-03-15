@@ -12,7 +12,7 @@ import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { useEffect, useMemo } from 'react';
 import { formatDateString } from '@/lib/utils/date';
 import { getErrorCode, getErrorMessage } from '@/lib/utils/error';
-import Image from 'next/image';
+import { TierSvg } from '@/shared/ui';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
 import { useInView } from 'react-intersection-observer';
@@ -204,12 +204,12 @@ export function RecommendationHistoryDialog({ onClose }: props) {
                             <div className="flex items-center gap-2">
                               {showFilters.problemTier && !showFilters.problemNumber && (
                                 <div className="flex min-w-4 items-center gap-1">
-                                  <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />
+                                  <TierSvg tier={problem.problemTierLevel} size={16} />
                                 </div>
                               )}
                               {showFilters.problemTier && showFilters.problemNumber && (
                                 <div className="flex min-w-20 items-center gap-1">
-                                  <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />
+                                  <TierSvg tier={problem.problemTierLevel} size={16} />
                                   <p>{problem.problemId}</p>
                                 </div>
                               )}

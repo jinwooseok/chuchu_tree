@@ -27,6 +27,7 @@ import {
 import { useLayoutStore } from '@/lib/store/layout';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { LogoSvg } from '@/shared/ui';
 import {
   Sidebar,
   SidebarContent,
@@ -57,12 +58,16 @@ import { AddPrevProblemsDialog } from '@/features/sidebar/ui/group-second/AddPre
 import { BannedProblemsDialog } from '@/features/sidebar/ui/group-second/BannedProblemsDialog';
 import { User } from '@/entities/user';
 import { useMyStudies } from '@/entities/study';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLandingRecommend } from '@/features/landing';
 import { useOnboardingStore } from '@/lib/store/onboarding';
 import { CreateStudyDialog } from '@/features/sidebar/ui/group-study/CreateStudyDialog';
 import { NoticeDialog } from '@/features/notification';
 import { useNotificationStore } from '@/lib/store/notification';
+import { useNoticeSSE, noticeKeys } from '@/entities/notice';
+import { noticeApi } from '@/entities/notice/api/notice.api';
+import { useQueryClient } from '@tanstack/react-query';
+import { UserAvatar } from '@/components/custom/UserAvatar';
 
 const ICON_SIZE = 32;
 
@@ -75,7 +80,23 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
   const { topSection, centerSection, bottomSection, studySection, toggleTopSection, setCenterSection, toggleBottomSection, setStudySection } = useLayoutStore();
 
   // 알림 dot 상태
-  const { hasUnread } = useNotificationStore();
+  const { hasUnread, setHasUnread } = useNotificationStore();
+
+  // SSE 연결 (로그인 상태에서만)
+  useNoticeSSE(!isLanding);
+
+  // 앱 첫 로드 시 기존 읽지 않은 알림 여부로 bell dot 초기화
+  // fetchQuery는 캐시에 결과를 저장하지만 컴포넌트를 구독시키지 않음 → SSE 수신 시 리렌더 없음
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (isLanding) return;
+    queryClient
+      .fetchQuery({ queryKey: noticeKeys.list(), queryFn: noticeApi.getNotices })
+      .then((notices) => {
+        if (notices.some((n) => !n.isRead)) setHasUnread(true);
+      })
+      .catch(() => {});
+  }, [isLanding, setHasUnread, queryClient]);
 
   // 리프래시버튼 훅
   const { isRefreshButtonVisible, showRefreshButton } = useRefreshButtonStore();
@@ -343,7 +364,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
               {/* 서비스아이콘 */}
               <div className="mt-1 mb-8 flex items-center">
                 <div className="absolute top-2 left-3">
-                  <Image src="/logo/logo.svg" alt="logo" width={24} height={32} />
+                  <LogoSvg size={24} />
                 </div>
                 <div className={`text-md ml-9 flex flex-col font-bold ${sidebarOpenState !== 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>
                   <span>ChuChuTree</span>
@@ -567,8 +588,8 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                   </SidebarMenuItem>
                 </>
               )}
-              {/* 실 서비스 전용 튜토리얼 이동하기*/}
-              {/* {!isLanding && (
+              {/* 실 서비스 전용 튜토리얼 이동하기 */}
+              {!isLanding && (
                 <SidebarMenuItem key="bell" aria-label={'알림 및 업데이트 알림'}>
                   <AppTooltip content="알림 및 업데이트 알림" side="right">
                     <SidebarMenuButton asChild>
@@ -582,7 +603,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                     </SidebarMenuButton>
                   </AppTooltip>
                 </SidebarMenuItem>
-              )} */}
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
           {/* 드롭다운 */}
@@ -592,7 +613,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton size={'lg'} className="group-data-[collapsible=icon]:justify-center">
                     {user?.userAccount?.profileImageUrl ? (
-                      <Image src={user.userAccount.profileImageUrl} alt="프로필" width={24} height={24} className="bg-logo rounded-full object-cover" unoptimized />
+                      <UserAvatar profileImageUrl={user.userAccount.profileImageUrl} bjAccountId={user.bjAccount.bjAccountId} userCode={user.userAccount.userCode} size={24} side="right" />
                     ) : (
                       <User2 />
                     )}

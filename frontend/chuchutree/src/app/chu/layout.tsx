@@ -1,5 +1,6 @@
 import { redirect } from 'next/navigation';
 import { isAuthenticated, ApiResponseError } from '@/lib/server';
+import { serverLog } from '@/lib/logger';
 import { MainLayoutClient } from './MainLayoutClient';
 import { userServerApi } from '@/entities/user/api/user.server';
 import { calendarServerApi } from '@/entities/calendar/api/calendar.server';
@@ -18,7 +19,7 @@ export default async function MainLayout({
   const isLoggedIn = await isAuthenticated();
 
   if (!isLoggedIn) {
-    console.log('[MainLayout] User not authenticated, redirecting to sign-in');
+    serverLog('[MainLayout] User not authenticated, redirecting to sign-in');
     redirect('/sign-in');
   }
 
@@ -27,16 +28,16 @@ export default async function MainLayout({
 
   // 2단계: 사용자 정보 직접 호출 및 에러 처리
   try {
-    console.log('[MainLayout] Fetching user data...');
+    serverLog('[MainLayout] Fetching user data...');
     const userData = await userServerApi.getMe();
 
     // 성공하면 QueryClient에 수동으로 설정
     queryClient.setQueryData(userKeys.me(), userData);
-    console.log('[MainLayout] User data fetched successfully');
+    serverLog('[MainLayout] User data fetched successfully');
   } catch (error) {
     // UNLINKED_USER 에러: 백준 계정 미등록 사용자
     if (error instanceof ApiResponseError && error.errorCode === 'UNLINKED_USER') {
-      console.log('[MainLayout] User not linked to Baekjoon account, redirecting to registration page');
+      serverLog('[MainLayout] User not linked to Baekjoon account, redirecting to registration page');
       redirect('/bj-account');
     }
 
@@ -54,12 +55,12 @@ export default async function MainLayout({
   const month = today.getMonth() + 1; // 0-based → 1-based
 
   try {
-    console.log('[MainLayout] Prefetching calendar data...', { year, month });
+    serverLog('[MainLayout] Prefetching calendar data...', { year, month });
     await queryClient.prefetchQuery({
       queryKey: calendarKeys.list(year, month),
       queryFn: () => calendarServerApi.getCalendar({ year, month }),
     });
-    console.log('[MainLayout] Calendar data prefetched successfully');
+    serverLog('[MainLayout] Calendar data prefetched successfully');
   } catch (error) {
     console.error('[MainLayout] Failed to prefetch calendar data:', {
       message: error instanceof Error ? error.message : 'Unknown error',
@@ -70,12 +71,12 @@ export default async function MainLayout({
 
   // 4단계: TagDashboard 데이터 prefetch
   try {
-    console.log('[MainLayout] Prefetching TagDashboard...');
+    serverLog('[MainLayout] Prefetching TagDashboard...');
     await queryClient.prefetchQuery({
       queryKey: tagDashboardKeys.dashboard(),
       queryFn: TagDashboardServerApi.getTagDashboard,
     });
-    console.log('[MainLayout] TagDashboard data prefetched successfully');
+    serverLog('[MainLayout] TagDashboard data prefetched successfully');
   } catch (error) {
     console.error('[MainLayout] Failed to prefetch TagDashboard data:', {
       message: error instanceof Error ? error.message : 'Unknown error',
