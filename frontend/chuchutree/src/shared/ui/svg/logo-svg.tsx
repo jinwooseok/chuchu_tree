@@ -11,5 +11,5 @@ const LOGO_HEIGHT = 70;
 
 export function LogoSvg({ size = 24, className }: LogoSvgProps) {
   const height = Math.round(size * (LOGO_HEIGHT / LOGO_WIDTH));
-  return <Image src="/logo/logo.svg" alt="logo" width={size} height={height} className={className} />;
+  return <Image src="/logo/logo.svg" alt="logo" width={size} height={height} className={className} unoptimized/>;
 }

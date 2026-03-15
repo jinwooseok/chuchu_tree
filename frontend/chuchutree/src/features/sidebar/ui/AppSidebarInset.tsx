@@ -67,6 +67,7 @@ import { useNotificationStore } from '@/lib/store/notification';
 import { useNoticeSSE, noticeKeys } from '@/entities/notice';
 import { noticeApi } from '@/entities/notice/api/notice.api';
 import { useQueryClient } from '@tanstack/react-query';
+import { UserAvatar } from '@/components/custom/UserAvatar';
 
 const ICON_SIZE = 32;
 
@@ -612,7 +613,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
                 <DropdownMenuTrigger asChild>
                   <SidebarMenuButton size={'lg'} className="group-data-[collapsible=icon]:justify-center">
                     {user?.userAccount?.profileImageUrl ? (
-                      <Image src={user.userAccount.profileImageUrl} alt="프로필" width={24} height={24} className="bg-logo rounded-full object-cover" unoptimized />
+                      <UserAvatar profileImageUrl={user.userAccount.profileImageUrl} bjAccountId={user.bjAccount.bjAccountId} userCode={user.userAccount.userCode} size={24} side="right" />
                     ) : (
                       <User2 />
                     )}

@@ -6,6 +6,7 @@ import { useTheme } from 'next-themes';
 import { useSyncExternalStore } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
+import Image from 'next/image';
 
 type SocialWay = (typeof SocialWays)[number];
 

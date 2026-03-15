@@ -13,5 +13,5 @@ const TIER_HEIGHT = 512;
 
 export function TierSvg({ tier, size = 16, alt, className }: TierSvgProps) {
   const height = Math.round(size * (TIER_HEIGHT / TIER_WIDTH));
-  return <Image src={`/tiers/tier_${tier}.svg`} alt={alt ?? `Tier ${tier}`} width={size} height={height} className={className} />;
+  return <Image src={`/tiers/tier_${tier}.svg`} alt={alt ?? `Tier ${tier}`} width={size} height={height} className={className} unoptimized/>;
 }
