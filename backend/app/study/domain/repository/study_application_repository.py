@@ -38,3 +38,7 @@ class StudyApplicationRepository(ABC):
     @abstractmethod
     async def delete_all_by_user_account_id(self, user_account_id: UserAccountId) -> None:
         ...
+
+    @abstractmethod
+    async def soft_delete_all_by_study_id(self, study_id: StudyId) -> None:
+        ...

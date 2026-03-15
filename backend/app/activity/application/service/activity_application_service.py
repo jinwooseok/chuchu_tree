@@ -21,7 +21,7 @@ from app.activity.application.query.monthly_activity_data_query import (
 from app.activity.domain.entity.user_problem_status import UserProblemStatus
 from app.problem.application.query.problems_info_query import ProblemsInfoQuery
 from app.activity.domain.entity.user_activity import UserActivity
-from app.activity.domain.event.payloads import GetProblemsInfoPayload, GetTagSummaryPayload, GetTagSummaryResultPayload, GetTagSummarysPayload, GetTagSummarysResultPayload
+from app.activity.domain.event.payloads import BatchProblemsUpdatedPayload, GetProblemsInfoPayload, GetTagSummaryPayload, GetTagSummaryResultPayload, GetTagSummarysPayload, GetTagSummarysResultPayload
 from app.activity.domain.entity.user_date_record import UserDateRecord
 from app.activity.domain.repository.user_activity_repository import UserActivityRepository
 from app.activity.domain.repository.user_date_record_repository import UserDateRecordRepository
@@ -509,6 +509,21 @@ class ActivityApplicationService:
             result_type=None
         )
         await self.domain_event_bus.publish(sync_event)
+
+        # 10. BATCH_PROBLEMS_UPDATED 이벤트 발행 (after_commit, 알림 생성용)
+        added_problem_ids = [r.problem_id.value for r in all_new_records]
+        if added_problem_ids:
+            await self.domain_event_bus.publish(
+                DomainEvent(
+                    event_type="BATCH_PROBLEMS_UPDATED",
+                    data=BatchProblemsUpdatedPayload(
+                        user_account_id=command.user_account_id,
+                        problem_ids=added_problem_ids,
+                        date=date.today().isoformat(),
+                    ),
+                ),
+                after_commit=True,
+            )
 
     @transactional
     async def ban_tag(self, command: TagCustomCommand):

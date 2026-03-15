@@ -1,14 +1,15 @@
-from app.common.domain.enums import ApplicationStatus, NoticeCategory
+from app.common.domain.entity.domain_event import DomainEvent
+from app.common.domain.enums import ApplicationStatus, NoticeCategory, NoticeCategoryDetail
+from app.common.domain.service.event_publisher import DomainEventBus
 from app.common.domain.vo.identifiers import StudyApplicationId, UserAccountId
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
 from app.core.exception import APIException
 from app.study.application.command.study_command import RejectStudyApplicationCommand
-from app.study.domain.entity.notice import Notice
-from app.study.domain.repository.notice_repository import NoticeRepository
+from app.study.domain.event.payloads import NoticeRequestedPayload
 from app.study.domain.repository.study_application_repository import StudyApplicationRepository
 from app.study.domain.repository.study_repository import StudyRepository
-from app.study.infra.sse.notice_manager import NoticeSSEManager
+from app.study.domain.repository.user_search_repository import UserSearchRepository
 
 
 class RejectStudyApplicationUsecase:
@@ -16,13 +17,13 @@ class RejectStudyApplicationUsecase:
         self,
         study_repository: StudyRepository,
         application_repository: StudyApplicationRepository,
-        notice_repository: NoticeRepository,
-        notice_sse_manager: NoticeSSEManager,
+        user_search_repository: UserSearchRepository,
+        domain_event_bus: DomainEventBus,
     ):
         self.study_repository = study_repository
         self.application_repository = application_repository
-        self.notice_repository = notice_repository
-        self.notice_sse_manager = notice_sse_manager
+        self.user_search_repository = user_search_repository
+        self.domain_event_bus = domain_event_bus
 
     @transactional
     async def execute(self, command: RejectStudyApplicationCommand) -> None:
@@ -43,20 +44,28 @@ class RejectStudyApplicationUsecase:
         application.reject()
         await self.application_repository.update(application)
 
-        # 신청자에게 Notice (거절)
-        notice = Notice.create(
-            recipient_user_account_id=application.applicant_user_account_id,
-            category=NoticeCategory.STUDY_APPLICATION_STATUS,
-            title="가입 신청 거절",
-            content={
-                "studyName": study.study_name,
-                "status": "REJECTED",
-            },
-            reference_id=study.study_id.value,
-            reference_type="STUDY",
+        # owner 정보 조회
+        owner_info = await self.user_search_repository.find_by_user_account_id(
+            study.owner_user_account_id.value
         )
-        await self.notice_repository.insert(notice)
-        await self.notice_sse_manager.notify(
-            application.applicant_user_account_id.value,
-            {"type": "STUDY_APPLICATION_STATUS", "studyId": study.study_id.value, "accepted": False},
+
+        # 신청자에게 Notice 이벤트 발행 (거절)
+        await self.domain_event_bus.publish(
+            DomainEvent(
+                event_type="NOTICE_REQUESTED",
+                data=NoticeRequestedPayload(
+                    recipient_user_account_id=application.applicant_user_account_id.value,
+                    category=NoticeCategory.STUDY_APPLICATION.value,
+                    category_detail=NoticeCategoryDetail.RESPONSED_STUDY_APPLICATION.value,
+                    content={
+                        "studyId": study.study_id.value,
+                        "studyName": study.study_name,
+                        "ownerUserAccountId": study.owner_user_account_id.value,
+                        "ownerBjAccountId": owner_info.bj_account_id if owner_info else "",
+                        "ownerUserCode": owner_info.user_code if owner_info else "",
+                        "status": "REJECTED",
+                    },
+                ),
+            ),
+            after_commit=True,
         )

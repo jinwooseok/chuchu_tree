@@ -11,6 +11,7 @@ import { CalendarEvent } from '@/entities/calendar';
 import { StudyCalendar } from '@/entities/study';
 import { TAG_INFO, TagKey } from '@/shared/constants/tagSystem';
 import { useStudyCalendarStore } from '@/lib/store/studyCalendar';
+import { useStudySidebarStore } from '@/lib/store/studySidebar';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import { AppTooltip } from '@/components/custom/tooltip/AppTooltip';
 import { useSidebar } from '@/components/ui/sidebar';
@@ -66,9 +67,10 @@ interface CustomMonthDateHeaderProps {
   date: Date;
   label: string;
   allEvents: CalendarEvent[];
+  showAlgorithm: boolean;
 }
 
-function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeaderProps) {
+function CustomMonthDateHeader({ date, label, allEvents, showAlgorithm }: CustomMonthDateHeaderProps) {
   const dayEvents = allEvents.filter((event) => isSameDay(new Date(event.start), date));
 
   // 기존 getDisplayTags 로직 인라인 (최대 3개, 4개 이상이면 2개 + "+n더보기")
@@ -99,10 +101,12 @@ function CustomMonthDateHeader({ date, label, allEvents }: CustomMonthDateHeader
             const bgColorClass = !isSolved ? 'bg-innerground-darkgray' : tagInfo ? tagInfo.bgColor : 'bg-logo';
             const textColorClass = isSolved && tagInfo ? tagInfo.textColor : 'text-only-gray';
 
+            const displayTitle = showAlgorithm ? (tagInfo ? tagInfo.kr : event.title) : event.resource.problem.problemTitle;
+
             return (
               <div key={`${event.resource.problem.problemId}-${tagCode}-${index}`} className={`rounded px-2 py-0.5 text-xs ${textColorClass} ${bgColorClass} relative line-clamp-1`}>
                 {!isSolved && <div className={`absolute top-0 left-0 h-full w-2 rounded-l ${tagInfo ? tagInfo.bgColor : 'bg-only-gray'}`}></div>}
-                {tagInfo ? tagInfo.kr : event.title}
+                {displayTitle}
               </div>
             );
           })}
@@ -117,6 +121,7 @@ export function StudyBigCalendar({ studyCalendarData }: { studyCalendarData?: St
   const { selectedDate, bigCalendarDate, setSelectedDate, setBigCalendarDate } = useStudyCalendarStore();
   const { setOpen: setCloseAppSidebar } = useSidebar();
   const { studySection } = useLayoutStore();
+  const { showFilters } = useStudySidebarStore();
 
   const [initialDate] = useState(new Date());
 
@@ -145,8 +150,8 @@ export function StudyBigCalendar({ studyCalendarData }: { studyCalendarData?: St
 
   const CustomMonthDateHeaderWrapper = useMemo(() => {
     // eslint-disable-next-line react/display-name
-    return ({ date, label }: { date: Date; label: string }) => <CustomMonthDateHeader date={date} label={label} allEvents={events} />;
-  }, [events]);
+    return ({ date, label }: { date: Date; label: string }) => <CustomMonthDateHeader date={date} label={label} allEvents={events} showAlgorithm={showFilters.algorithm} />;
+  }, [events, showFilters.algorithm]);
 
   const handleSelectSlot = ({ start }: { start: Date }) => {
     setSelectedDate(start);
@@ -198,7 +203,7 @@ export function StudyBigCalendar({ studyCalendarData }: { studyCalendarData?: St
   });
 
   return (
-    <div className="calendar-12px h-full w-full">
+    <div className="calendar-12px h-full w-full ">
       <Calendar
         localizer={localizer}
         events={events}

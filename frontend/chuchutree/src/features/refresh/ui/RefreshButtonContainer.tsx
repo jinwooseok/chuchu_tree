@@ -44,7 +44,7 @@ export function RefreshButtonContainer() {
   }, [showDroppedMessage]);
 
   return (
-    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+    <DndContext id="refresh-button-dnd" sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
       {isRefreshButtonVisible && (
         <div className="absolute right-4 bottom-4 z-10 md:right-16 md:bottom-16">
           <DraggableRefreshButton />

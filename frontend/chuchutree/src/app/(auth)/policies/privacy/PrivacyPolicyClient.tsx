@@ -1,7 +1,6 @@
 'use client';
 
-import { ThemeButton } from '@/shared/ui';
-import Image from 'next/image';
+import { ThemeButton, LogoSvg } from '@/shared/ui';
 import { useRouter } from 'next/navigation';
 import ReactMarkdown from 'react-markdown';
 
@@ -24,7 +23,7 @@ export default function PrivacyPolicyClient({ markdownContent }: PrivacyPolicyCl
     <div className="bg-innerground-white flex h-full w-full max-w-4xl flex-col overflow-auto rounded-xl px-8 py-4">
       <div className="mb-4 flex items-center justify-between select-none">
         <div className="flex cursor-pointer items-center gap-2" onClick={handleLogoClick}>
-          <Image src="/logo/logo.svg" alt="logo" width={16} height={16} />
+          <LogoSvg size={16} />
           <div>ChuChuTree</div>
         </div>
         <div className="min-w-22">

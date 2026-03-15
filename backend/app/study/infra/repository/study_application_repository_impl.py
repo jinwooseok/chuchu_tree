@@ -1,5 +1,5 @@
 from datetime import datetime
-from sqlalchemy import and_, delete, select
+from sqlalchemy import and_, delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.common.domain.enums import ApplicationStatus
@@ -87,6 +87,20 @@ class StudyApplicationRepositoryImpl(StudyApplicationRepository):
     async def delete_all_by_user_account_id(self, user_account_id: UserAccountId) -> None:
         stmt = delete(StudyApplicationModel).where(
             StudyApplicationModel.applicant_user_account_id == user_account_id.value
+        )
+        await self.session.execute(stmt)
+        await self.session.flush()
+
+    async def soft_delete_all_by_study_id(self, study_id: StudyId) -> None:
+        stmt = (
+            update(StudyApplicationModel)
+            .where(
+                and_(
+                    StudyApplicationModel.study_id == study_id.value,
+                    StudyApplicationModel.deleted_at.is_(None),
+                )
+            )
+            .values(deleted_at=datetime.now())
         )
         await self.session.execute(stmt)
         await self.session.flush()

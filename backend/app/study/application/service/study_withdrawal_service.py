@@ -57,6 +57,7 @@ class StudyWithdrawalService:
                 ]
                 if not remaining:
                     await self.study_repository.soft_delete(study)
+                    await self.study_application_repository.soft_delete_all_by_study_id(study.study_id)
                     continue
                 study.delegate_owner(remaining[0].user_account_id.value)
             study.remove_member(uid)

@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { refreshAccessToken } from '@/lib/auth-utils';
+import { serverLog } from '@/lib/logger';
 
 interface ServerResponse<T = any> {
   status: number;
@@ -49,7 +50,6 @@ export async function serverFetch<T>(endpoint: string, options?: RequestInit): P
   // 에러 처리 (401 재발급은 isAuthenticated()에서 처리)
   if (!response.ok) {
     const errorData: ServerResponse<any> = await response.json().catch(() => ({}));
-    console.log('?ser?', errorData);
 
     throw new ApiResponseError(response.status, errorData.error?.code, errorData.error?.message || errorData.message);
   }
@@ -66,7 +66,7 @@ export async function isAuthenticated(): Promise<boolean> {
 
   // 1. 토큰이 없으면 false
   if (!accessToken) {
-    console.log('[isAuthenticated] No access token');
+    serverLog('[isAuthenticated] No access token');
     return false;
   }
 
@@ -81,26 +81,26 @@ export async function isAuthenticated(): Promise<boolean> {
 
     // 3. 유효하면 true (404는 백준 미연동이지만 인증은 성공)
     if (verifyResponse.ok || verifyResponse.status === 404) {
-      console.log('[isAuthenticated] Token valid, status:', verifyResponse.status);
+      serverLog('[isAuthenticated] Token valid, status:', verifyResponse.status);
       return true;
     }
 
     // 4. 401이면 재발급 시도
     if (verifyResponse.status === 401 && refreshToken) {
-      console.log('[isAuthenticated] Token expired, attempting refresh');
+      serverLog('[isAuthenticated] Token expired, attempting refresh');
       const { success } = await refreshAccessToken(refreshToken, API_URL);
 
       if (success) {
-        console.log('[isAuthenticated] Token refresh successful');
+        serverLog('[isAuthenticated] Token refresh successful');
       } else {
-        console.log('[isAuthenticated] Token refresh failed');
+        serverLog('[isAuthenticated] Token refresh failed');
       }
 
       return success;
     }
 
     // 5. 기타 에러
-    console.log('[isAuthenticated] Verification failed, status:', verifyResponse.status);
+    serverLog('[isAuthenticated] Verification failed, status:', verifyResponse.status);
     return false;
   } catch (error) {
     console.error('[isAuthenticated] Error during verification:', error);

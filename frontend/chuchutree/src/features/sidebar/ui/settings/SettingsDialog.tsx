@@ -34,8 +34,7 @@ export function SettingsDialog({ onClose, currentBjAccountId, currentTarget, lin
           <ThemeSection />
 
           <Separator />
-
-          <UserProfileSection currentBjAccountId={currentBjAccountId} currentUserCode={currentUserCode} currentProfileImageUrl={currentProfileImageUrl}/>
+          {!isLanding && <UserProfileSection currentBjAccountId={currentBjAccountId} currentUserCode={currentUserCode} currentProfileImageUrl={currentProfileImageUrl} />}
 
           <BjAccountSection currentBjAccountId={currentBjAccountId} linkedAt={linkedAt} onClose={onClose} isLanding={isLanding} />
 

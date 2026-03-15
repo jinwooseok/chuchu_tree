@@ -45,13 +45,10 @@ export interface UpdateStudyRequest {
 
 export interface StudyInvitation {
   invitationId: number;
-  studyId: number;
-  studyName: string;
-  inviterUserAccountId: number;
-  inviterBjAccountId: string;
-  inviterUserCode: string;
-  inviterProfileImageUrl: string | null;
-  status: 'PENDING' | 'ACCEPTED' | 'REJECTED';
+  inviteeUserAccountId: number;
+  inviteeBjAccountId: string;
+  inviteeUserCode: string;
+  profileImageUrl: string | null;
   createdAt: string;
 }
 
