@@ -19,4 +19,4 @@ class RecommendationHistoryModel(Base):
     )
     params: Mapped[dict] = mapped_column(JSON, nullable=False, comment="추천 파라미터")
     recommended_problems: Mapped[list] = mapped_column(JSON, nullable=False, comment="추천받은 문제 목록 (스냅샷)")
-    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.utcnow)
+    created_at: Mapped[datetime] = mapped_column(DateTime, nullable=False, default=datetime.now)

@@ -590,6 +590,7 @@ class Container(containers.DeclarativeContainer):
         study_repository=study_repository,
         invitation_repository=study_invitation_repository,
         user_search_repository=user_search_repository,
+        domain_event_bus=domain_event_bus,
     )
 
     get_study_detail_usecase = providers.Singleton(

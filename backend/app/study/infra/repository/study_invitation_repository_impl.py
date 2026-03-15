@@ -45,6 +45,17 @@ class StudyInvitationRepositoryImpl(StudyInvitationRepository):
         models = result.scalars().all()
         return [StudyInvitationMapper.to_entity(m) for m in models]
 
+    async def find_by_invitee(self, invitee_id: UserAccountId) -> list[StudyInvitation]:
+        stmt = select(StudyInvitationModel).where(
+            and_(
+                StudyInvitationModel.invitee_user_account_id == invitee_id.value,
+                StudyInvitationModel.deleted_at.is_(None),
+            )
+        )
+        result = await self.session.execute(stmt)
+        models = result.scalars().all()
+        return [StudyInvitationMapper.to_entity(m) for m in models]
+
     async def find_by_study_and_invitee(
         self, study_id: StudyId, invitee_id: UserAccountId
     ) -> StudyInvitation | None:

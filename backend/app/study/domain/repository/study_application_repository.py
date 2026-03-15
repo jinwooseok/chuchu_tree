@@ -22,6 +22,10 @@ class StudyApplicationRepository(ABC):
         ...
 
     @abstractmethod
+    async def find_by_applicant(self, applicant_id: UserAccountId) -> list[StudyApplication]:
+        ...
+
+    @abstractmethod
     async def find_by_study_and_applicant(
         self, study_id: StudyId, applicant_id: UserAccountId
     ) -> StudyApplication | None:
