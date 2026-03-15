@@ -18,6 +18,10 @@ class StudyInvitationRepository(ABC):
         ...
 
     @abstractmethod
+    async def find_by_invitee(self, invitee_id: UserAccountId) -> list[StudyInvitation]:
+        ...
+
+    @abstractmethod
     async def find_by_study_and_invitee(
         self, study_id: StudyId, invitee_id: UserAccountId
     ) -> StudyInvitation | None:

@@ -26,7 +26,7 @@ class GetMyInvitationsUsecase:
     @transactional(readonly=True)
     async def execute(self, command: GetMyInvitationsCommand) -> list[InvitationQuery]:
         invitee_id = UserAccountId(command.requester_user_account_id)
-        invitations = await self.invitation_repository.find_pending_by_invitee(invitee_id)
+        invitations = await self.invitation_repository.find_by_invitee(invitee_id)
 
         # bulk 조회
         inviter_ids = list({inv.inviter_user_account_id.value for inv in invitations})

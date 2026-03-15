@@ -28,5 +28,5 @@ class RecommendationHistory:
             study_id=study_id,
             params=params,
             recommended_problems=recommended_problems,
-            created_at=datetime.utcnow(),
+            created_at=datetime.now(),
         )
