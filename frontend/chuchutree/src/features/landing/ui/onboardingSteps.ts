@@ -173,13 +173,6 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
         highlightAnimation: 'pulse',
         duration: 300,
       },
-      // {
-      //   type: 's',
-      //   duration: 300,
-      //   systemAction: () => {
-      //     console.log('Top Section을 Streak으로 변경');
-      //   },
-      // },
       {
         type: 'f',
         targetSelector: '[data-onboarding-id="top-streakbar"]',
@@ -203,9 +196,7 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
       {
         type: 's',
         duration: 300,
-        systemAction: () => {
-          console.log('Top Section 닫기');
-        },
+        systemAction: () => {},
       },
       {
         type: 'u',

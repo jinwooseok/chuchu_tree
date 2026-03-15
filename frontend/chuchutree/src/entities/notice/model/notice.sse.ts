@@ -5,6 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { noticeKeys } from './notice.keys';
 import { BaseNotice } from './notice.types';
 import { useNotificationStore } from '@/lib/store/notification';
+import { clientLog } from '@/lib/logger';
 
 const MAX_RETRIES = 5;
 
@@ -23,7 +24,7 @@ export const useNoticeSSE = (enabled: boolean) => {
     const scheduleReconnect = () => {
       if (isCancelled) return;
       if (attempt >= MAX_RETRIES) {
-        console.log('[NoticeSSE] 최대 재시도 횟수 초과. 재연결 중단.');
+        clientLog('[NoticeSSE] 최대 재시도 횟수 초과. 재연결 중단.');
         return;
       }
 
@@ -44,7 +45,7 @@ export const useNoticeSSE = (enabled: boolean) => {
 
       es.onopen = () => {
         attempt = 0;
-        console.log('[NoticeSSE] SSE 연결됨');
+        clientLog('[NoticeSSE] SSE 연결됨');
       };
 
       es.onmessage = (event) => {
@@ -52,7 +53,7 @@ export const useNoticeSSE = (enabled: boolean) => {
           const parsed: { eventType: string; data: BaseNotice } = JSON.parse(event.data);
 
           if (parsed.eventType === 'CONNECTED') {
-            console.log('[NoticeSSE] 서버 연결 확인 (CONNECTED)');
+            clientLog('[NoticeSSE] 서버 연결 확인 (CONNECTED)');
             return;
           }
 
@@ -70,7 +71,7 @@ export const useNoticeSSE = (enabled: boolean) => {
       };
 
       es.onerror = () => {
-        console.log('[NoticeSSE] 연결 오류 발생');
+        clientLog('[NoticeSSE] 연결 오류 발생');
         es.close();
         esRef.current = null;
         scheduleReconnect();
