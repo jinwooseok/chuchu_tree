@@ -1,8 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { ThemeButton } from '@/shared/ui';
-import Image from 'next/image';
+import { ThemeButton, LogoSvg } from '@/shared/ui';
 import { useRouter } from 'next/navigation';
 
 // const action =  'next' | 'skip' | 'start' | 'login';
@@ -19,7 +18,7 @@ export function OnboardingInitialDialog({ onButtonClick, isLanding }: Props) {
         {/* 상단헤더 */}
         <div className="flex w-full items-center justify-between">
           <div className="flex cursor-default items-center gap-2">
-            <Image src="/logo/logo.svg" alt="logo" width={16} height={16} />
+            <LogoSvg size={16} />
             <div>ChuChuTree</div>
           </div>
           <div className="flex items-center gap-2">

@@ -1,6 +1,6 @@
 import { CategoryTags } from '@/entities/tag-dashboard';
 import { calculateBoxPosition, calculatePeekPosition, getLevelColorClasses } from '@/features/tag-dashboard/lib/utils';
-import Image from 'next/image';
+import { TierSvg } from '@/shared/ui';
 import { CheckCircleIcon as CheckCircleIconSolid } from '@heroicons/react/24/solid'; // filled
 import { CheckCircleIcon as CheckCircleIconOutline } from '@heroicons/react/24/outline'; // outline
 import { BadgeCheck } from 'lucide-react';
@@ -49,7 +49,7 @@ export default function TagCardProgressBar({ tag, progress }: { tag: CategoryTag
           <div className="flex h-full flex-col items-center justify-start">
             <p className="mb-2 font-semibold">최소 시작 티어</p>
             <div className={`flex items-center justify-center ${excludedYn ? 'text-excluded-text' : isStartTier ? 'text-advanced-bg font-semibold' : 'text-muted-foreground'}`}>
-              <Image src={`/tiers/tier_${requiredStat.requiredMinTier}.svg`} alt={`Tier ${requiredStat.requiredMinTier}`} width={24} height={24} />
+              <TierSvg tier={requiredStat.requiredMinTier} size={24} />
               <div className="ml-2">{isStartTier ? <CheckCircleIconSolid height={12} width={12} /> : <CheckCircleIconOutline height={12} width={12} />}</div>
             </div>
           </div>

@@ -1,7 +1,6 @@
 'use client';
 
-import { ThemeButton } from '@/shared/ui';
-import Image from 'next/image';
+import { ThemeButton, LogoSvg } from '@/shared/ui';
 import { useState } from 'react';
 import { useLinkBjAccount } from '@/entities/bj-account';
 import { usePostTarget } from '@/entities/user';
@@ -70,7 +69,7 @@ export default function BjAccountRegistrationClient() {
     <div className="bg-innerground-white hide-scrollbar flex h-full w-full max-w-md flex-col overflow-auto rounded-xl px-8 py-4">
       <div className="mb-4 flex items-center justify-between">
         <div className="flex cursor-default items-center gap-2">
-          <Image src="/logo/logo.svg" alt="logo" width={16} height={16} />
+          <LogoSvg size={16} />
           <div>ChuChuTree</div>
         </div>
         <div className="min-w-22">

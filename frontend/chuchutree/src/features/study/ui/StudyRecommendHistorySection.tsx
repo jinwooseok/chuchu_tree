@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useInView } from 'react-intersection-observer';
-import Image from 'next/image';
+import { TierSvg } from '@/shared/ui';
 import { useGetStudyRecommendHistory, useResetStudyRecommendHistory } from '@/entities/study';
 import { StudyDetail } from '@/entities/study';
 import { TAG_INFO } from '@/shared/constants/tagSystem';
@@ -246,7 +246,7 @@ export function StudyRecommendHistorySection({ studyId, studyDetail }: { studyId
                       onClick={() => window.open(`https://www.acmicpc.net/problem/${problem.problemId}`, '_blank')}
                     >
                       <div className="flex items-center gap-2">
-                        {showFilters.problemTier && <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />}
+                        {showFilters.problemTier && <TierSvg tier={problem.problemTierLevel} size={16} />}
                         {showFilters.problemNumber && <span className="text-muted-foreground">#{problem.problemId}</span>}
                         <span className="font-medium">{problem.problemTitle}</span>
                       </div>

@@ -27,6 +27,7 @@ import {
 import { useLayoutStore } from '@/lib/store/layout';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import { LogoSvg } from '@/shared/ui';
 import {
   Sidebar,
   SidebarContent,
@@ -362,7 +363,7 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
               {/* 서비스아이콘 */}
               <div className="mt-1 mb-8 flex items-center">
                 <div className="absolute top-2 left-3">
-                  <Image src="/logo/logo.svg" alt="logo" width={24} height={32} />
+                  <LogoSvg size={24} />
                 </div>
                 <div className={`text-md ml-9 flex flex-col font-bold ${sidebarOpenState !== 'collapsed' ? 'max-h-8 opacity-100' : 'max-h-0 opacity-0'}`}>
                   <span>ChuChuTree</span>

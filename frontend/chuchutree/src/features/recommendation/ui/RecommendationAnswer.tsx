@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import Image from 'next/image';
+import { TierSvg } from '@/shared/ui';
 import { useRecommendationStore } from '@/lib/store/recommendation';
 import { useCalendarStore } from '@/lib/store/calendar';
 import { useUpdateWillSolveProblems, useUpdateRepresentativeTag, Calendar } from '@/entities/calendar';
@@ -187,12 +187,12 @@ export function RecommendationAnswer({ calendarData, bannedListData, isLanding =
                 <div className="flex items-center gap-2">
                   {showFilters.problemTier && !showFilters.problemNumber && (
                     <div className="flex min-w-4 items-center gap-1">
-                      <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />
+                      <TierSvg tier={problem.problemTierLevel} size={16} />
                     </div>
                   )}
                   {showFilters.problemTier && showFilters.problemNumber && (
                     <div className="flex min-w-20 items-center gap-1">
-                      <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={16} height={16} />
+                      <TierSvg tier={problem.problemTierLevel} size={16} />
                       <p>{problem.problemId}</p>
                     </div>
                   )}

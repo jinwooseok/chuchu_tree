@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import Image from 'next/image';
+import { TierSvg } from '@/shared/ui';
 import { X, Search, EyeOff } from 'lucide-react';
 import { useStudyCalendarStore } from '@/lib/store/studyCalendar';
 import { useStudySidebarStore } from '@/lib/store/studySidebar';
@@ -48,7 +48,7 @@ function StudyProblemCard({ problem, onDelete, showFilters, members }: { problem
             )}
             {(showFilters.problemTier || showFilters.problemNumber) && (
               <div className="flex items-center gap-1">
-                {showFilters.problemTier && <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={12} height={12} />}
+                {showFilters.problemTier && <TierSvg tier={problem.problemTierLevel} size={12} />}
                 {showFilters.problemNumber && <span>{problem.problemId}</span>}
               </div>
             )}
@@ -117,7 +117,7 @@ function SearchResultCard({ problem, onClick, showFilters }: { problem: WillSolv
           {showFilters.algorithm && !lastTag && <div className="bg-only-gray rounded px-2 py-0.5">Undefined</div>}
           {(showFilters.problemTier || showFilters.problemNumber) && (
             <div className="flex items-center gap-1">
-              {showFilters.problemTier && <Image src={`/tiers/tier_${problem.problemTierLevel}.svg`} alt={`Tier ${problem.problemTierLevel}`} width={12} height={12} />}
+              {showFilters.problemTier && <TierSvg tier={problem.problemTierLevel} size={12} />}
               {showFilters.problemNumber && <span>{problem.problemId}</span>}
             </div>
           )}
