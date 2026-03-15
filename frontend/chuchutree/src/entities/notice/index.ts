@@ -1,4 +1,5 @@
 export { useNotices, useReadNotices } from './model/notice.queries';
+export { useNoticeSSE } from './model/notice.sse';
 export type {
   BaseNotice,
   NoticeCategory,

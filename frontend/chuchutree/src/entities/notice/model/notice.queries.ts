@@ -5,11 +5,12 @@ import { noticeApi } from '../api/notice.api';
 import { noticeKeys } from './notice.keys';
 import { BaseNotice } from './notice.types';
 
-export const useNotices = () => {
+export const useNotices = (options?: { enabled?: boolean }) => {
   return useQuery({
     queryKey: noticeKeys.list(),
     queryFn: noticeApi.getNotices,
     staleTime: 0,
+    enabled: options?.enabled ?? true,
   });
 };
 

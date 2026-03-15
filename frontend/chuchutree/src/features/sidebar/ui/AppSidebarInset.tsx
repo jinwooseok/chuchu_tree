@@ -57,12 +57,15 @@ import { AddPrevProblemsDialog } from '@/features/sidebar/ui/group-second/AddPre
 import { BannedProblemsDialog } from '@/features/sidebar/ui/group-second/BannedProblemsDialog';
 import { User } from '@/entities/user';
 import { useMyStudies } from '@/entities/study';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLandingRecommend } from '@/features/landing';
 import { useOnboardingStore } from '@/lib/store/onboarding';
 import { CreateStudyDialog } from '@/features/sidebar/ui/group-study/CreateStudyDialog';
 import { NoticeDialog } from '@/features/notification';
 import { useNotificationStore } from '@/lib/store/notification';
+import { useNoticeSSE, noticeKeys } from '@/entities/notice';
+import { noticeApi } from '@/entities/notice/api/notice.api';
+import { useQueryClient } from '@tanstack/react-query';
 
 const ICON_SIZE = 32;
 
@@ -75,7 +78,23 @@ export function AppSidebarInset({ user, isLanding = false }: { user?: User; isLa
   const { topSection, centerSection, bottomSection, studySection, toggleTopSection, setCenterSection, toggleBottomSection, setStudySection } = useLayoutStore();
 
   // 알림 dot 상태
-  const { hasUnread } = useNotificationStore();
+  const { hasUnread, setHasUnread } = useNotificationStore();
+
+  // SSE 연결 (로그인 상태에서만)
+  useNoticeSSE(!isLanding);
+
+  // 앱 첫 로드 시 기존 읽지 않은 알림 여부로 bell dot 초기화
+  // fetchQuery는 캐시에 결과를 저장하지만 컴포넌트를 구독시키지 않음 → SSE 수신 시 리렌더 없음
+  const queryClient = useQueryClient();
+  useEffect(() => {
+    if (isLanding) return;
+    queryClient
+      .fetchQuery({ queryKey: noticeKeys.list(), queryFn: noticeApi.getNotices })
+      .then((notices) => {
+        if (notices.some((n) => !n.isRead)) setHasUnread(true);
+      })
+      .catch(() => {});
+  }, [isLanding, setHasUnread, queryClient]);
 
   // 리프래시버튼 훅
   const { isRefreshButtonVisible, showRefreshButton } = useRefreshButtonStore();
