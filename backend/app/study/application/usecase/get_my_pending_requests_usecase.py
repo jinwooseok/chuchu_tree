@@ -33,8 +33,8 @@ class GetMyPendingRequestsUsecase:
     ) -> tuple[list[InvitationQuery], list[MyApplicationQuery]]:
         user_id = UserAccountId(command.requester_user_account_id)
 
-        invitations = await self.invitation_repository.find_pending_by_invitee(user_id)
-        applications = await self.application_repository.find_pending_by_applicant(user_id)
+        invitations = await self.invitation_repository.find_by_invitee(user_id)
+        applications = await self.application_repository.find_by_applicant(user_id)
 
         # invitations: inviter 정보 bulk 조회
         inviter_ids = list({inv.inviter_user_account_id.value for inv in invitations})
