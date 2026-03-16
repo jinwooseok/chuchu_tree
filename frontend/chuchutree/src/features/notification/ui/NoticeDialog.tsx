@@ -84,28 +84,23 @@ export function NoticeDialog({ onClose }: Props) {
         </div>
 
         {isLoading ? (
-          <div className="flex min-h-48 flex-col items-center justify-center gap-2">
+          <div className="flex min-h-48 flex-1 flex-col items-center justify-center gap-2">
             <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
           </div>
         ) : isError ? (
-          <div className="flex min-h-48 flex-col items-center justify-center gap-2">
+          <div className="flex min-h-48 flex-1 flex-col items-center justify-center gap-2">
             <p className="text-muted-foreground text-sm">알림을 불러오지 못했습니다.</p>
           </div>
         ) : filteredNotices.length > 0 ? (
           <div className="min-h-0 flex-1 overflow-y-auto pt-2 pr-1">
             <div className="space-y-2">
               {filteredNotices.map((notice) => (
-                <NoticeCard
-                  key={notice.noticeId}
-                  notice={notice}
-                  showUnreadDot={initiallyUnreadIds.has(notice.noticeId)}
-                  onGoToDetail={handleGoToDetail}
-                />
+                <NoticeCard key={notice.noticeId} notice={notice} showUnreadDot={initiallyUnreadIds.has(notice.noticeId)} onGoToDetail={handleGoToDetail} />
               ))}
             </div>
           </div>
         ) : (
-          <div className="flex min-h-48 flex-col items-center justify-center gap-2">
+          <div className="flex min-h-48 flex-1 flex-col items-center justify-center gap-2">
             <Bell className="text-muted-foreground h-8 w-8 opacity-30" />
             <p className="text-muted-foreground text-sm">새로운 알림이 없습니다.</p>
           </div>
