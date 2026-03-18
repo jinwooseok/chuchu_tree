@@ -1,5 +1,7 @@
 from app.baekjoon.domain.repository.problem_history_repository import ProblemHistoryRepository
+from app.common.domain.entity.domain_event import DomainEvent
 from app.common.domain.enums import ExclusionMode
+from app.common.domain.service.event_publisher import DomainEventBus
 from app.common.domain.vo.identifiers import BaekjoonAccountId, StudyId, UserAccountId
 from app.core.database import transactional
 from app.core.error_codes import ErrorCode
@@ -11,6 +13,7 @@ from app.study.application.query.study_recommend_query import (
     StudyRecommendedProblemQuery,
     StudyRecommendProblemsQuery,
 )
+from app.study.domain.event.payloads import StudyRecommendationCompletedPayload
 from app.study.domain.repository.study_repository import StudyRepository
 from app.study.domain.repository.user_search_repository import UserSearchRepository
 
@@ -22,11 +25,13 @@ class RecommendStudyProblemsUsecase:
         user_search_repository: UserSearchRepository,
         problem_history_repository: ProblemHistoryRepository,
         recommend_problems_usecase: RecommendProblemsUsecase,
+        domain_event_bus: DomainEventBus,
     ):
         self.study_repository = study_repository
         self.user_search_repository = user_search_repository
         self.problem_history_repository = problem_history_repository
         self.recommend_problems_usecase = recommend_problems_usecase
+        self.domain_event_bus = domain_event_bus
 
     @transactional(readonly=True)
     async def execute(self, command: RecommendStudyProblemsCommand) -> StudyRecommendProblemsQuery:
@@ -99,5 +104,17 @@ class RecommendStudyProblemsUsecase:
             )
             for problem_query in recommend_query.problems
         ]
+
+        await self.domain_event_bus.publish(
+            DomainEvent(
+                event_type="STUDY_RECOMMENDATION_COMPLETED",
+                data=StudyRecommendationCompletedPayload(
+                    study_id=command.study_id,
+                    requester_user_account_id=command.requester_user_account_id,
+                    problems=result_problems,
+                ),
+            ),
+            after_commit=True,
+        )
 
         return StudyRecommendProblemsQuery(problems=result_problems)

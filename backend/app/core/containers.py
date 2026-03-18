@@ -11,6 +11,8 @@ from app.study.infra.repository.study_problem_repository_impl import StudyProble
 from app.study.infra.repository.notice_repository_impl import NoticeRepositoryImpl
 from app.study.infra.repository.user_search_repository_impl import UserSearchRepositoryImpl
 from app.study.infra.sse.notice_manager import NoticeSSEManager
+from app.study.infra.sse.study_sse_manager import StudySSEManager
+from app.study.application.service.study_recommendation_sse_service import StudyRecommendationSSEService
 from app.study.application.usecase.search_user_usecase import SearchUserUsecase
 from app.study.application.usecase.create_study_usecase import CreateStudyUsecase
 from app.study.application.usecase.get_study_detail_usecase import GetStudyDetailUsecase
@@ -40,6 +42,7 @@ from app.study.application.usecase.get_my_notices_usecase import GetMyNoticesUse
 from app.study.application.usecase.mark_notices_read_usecase import MarkNoticesReadUsecase
 from app.study.application.usecase.get_study_invitations_usecase import GetStudyInvitationsUsecase
 from app.study.application.usecase.recommend_study_problems_usecase import RecommendStudyProblemsUsecase
+from app.study.application.usecase.validate_study_member_usecase import ValidateStudyMemberUsecase
 from app.study.application.service.study_withdrawal_service import StudyWithdrawalService
 from app.study.application.service.notice_creation_service import NoticeCreationService
 
@@ -570,6 +573,7 @@ class Container(containers.DeclarativeContainer):
     # Study domain - SSE Manager
     # ========================================================================
     notice_sse_manager = providers.Singleton(NoticeSSEManager)
+    study_sse_manager = providers.Singleton(StudySSEManager)
 
     # ========================================================================
     # Study domain - Usecases
@@ -590,6 +594,7 @@ class Container(containers.DeclarativeContainer):
         study_repository=study_repository,
         invitation_repository=study_invitation_repository,
         user_search_repository=user_search_repository,
+        domain_event_bus=domain_event_bus,
     )
 
     get_study_detail_usecase = providers.Singleton(
@@ -784,6 +789,12 @@ class Container(containers.DeclarativeContainer):
         user_search_repository=user_search_repository,
         problem_history_repository=problem_history_repository,
         recommend_problems_usecase=recommand_problems_usecase,
+        domain_event_bus=domain_event_bus,
+    )
+
+    validate_study_member_usecase = providers.Singleton(
+        ValidateStudyMemberUsecase,
+        study_repository=study_repository,
     )
 
     study_withdrawal_service = providers.Singleton(
@@ -802,6 +813,11 @@ class Container(containers.DeclarativeContainer):
         problem_repository=problem_repository,
         user_search_repository=user_search_repository,
         storage_gateway=storage_gateway,
+    )
+
+    study_recommendation_sse_service = providers.Singleton(
+        StudyRecommendationSSEService,
+        study_sse_manager=study_sse_manager,
     )
 
     async def init_resources(self):
@@ -823,6 +839,7 @@ class Container(containers.DeclarativeContainer):
         self.study_withdrawal_service()
         self.notice_creation_service()
         self.recommendation_history_service()
+        self.study_recommendation_sse_service()
 
         # 3. 스케줄러 시작 (추가)
         scheduler = self.bj_account_update_scheduler()

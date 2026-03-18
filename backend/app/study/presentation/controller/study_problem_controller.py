@@ -1,4 +1,7 @@
+import asyncio
+
 from fastapi import APIRouter, Depends, Query
+from fastapi.responses import StreamingResponse
 from dependency_injector.wiring import inject, Provide
 from typing import Optional
 import json
@@ -8,6 +11,7 @@ from app.common.domain.vo.current_user import CurrentUser
 from app.common.presentation.dependency.auth_dependencies import get_current_member
 from app.core.api_response import ApiResponse, ApiResponseSchema
 from app.core.containers import Container
+from app.study.infra.sse.study_sse_manager import StudySSEManager
 from app.recommendation.application.usecase.get_study_recommendation_history_usecase import GetStudyRecommendationHistoryUsecase
 from app.recommendation.presentation.schema.response.recommendation_history_response import RecommendationHistoryResponse
 from app.study.application.command.study_command import (
@@ -23,6 +27,7 @@ from app.study.application.usecase.assign_study_problem_usecase import AssignStu
 from app.study.application.usecase.delete_study_problem_usecase import DeleteStudyProblemUsecase
 from app.study.application.usecase.get_study_problems_usecase import GetStudyProblemsUsecase
 from app.study.application.usecase.recommend_study_problems_usecase import RecommendStudyProblemsUsecase
+from app.study.application.usecase.validate_study_member_usecase import ValidateStudyMemberUsecase
 from app.study.presentation.schema.request.study_request import (
     AssignStudyProblemAllRequest,
     AssignStudyProblemRequest,
@@ -161,3 +166,29 @@ async def get_study_recommendation_history(
         size=size,
     )
     return ApiResponse(data=RecommendationHistoryResponse.from_query(query).model_dump(by_alias=True))
+
+
+@study_problem_router.get("/studies/{study_id}/stream")
+@inject
+async def study_stream(
+    study_id: int,
+    current_user: CurrentUser = Depends(get_current_member),
+    study_sse_manager: StudySSEManager = Depends(Provide[Container.study_sse_manager]),
+    validate_usecase: ValidateStudyMemberUsecase = Depends(Provide[Container.validate_study_member_usecase]),
+):
+    await validate_usecase.execute(study_id, current_user.user_account_id)
+
+    async def event_generator():
+        q = study_sse_manager.connect(study_id, current_user.user_account_id)
+        try:
+            yield f"data: {json.dumps({'eventType': 'CONNECTED', 'data': {}}, ensure_ascii=False)}\n\n"
+            while True:
+                try:
+                    data = await asyncio.wait_for(q.get(), timeout=30)
+                    yield f"data: {json.dumps(data, ensure_ascii=False)}\n\n"
+                except asyncio.TimeoutError:
+                    yield ": keepalive\n\n"
+        finally:
+            study_sse_manager.disconnect(study_id, current_user.user_account_id, q)
+
+    return StreamingResponse(event_generator(), media_type="text/event-stream")
