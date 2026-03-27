@@ -13,6 +13,7 @@ from app.study.infra.repository.user_search_repository_impl import UserSearchRep
 from app.study.infra.sse.notice_manager import NoticeSSEManager
 from app.study.infra.sse.study_sse_manager import StudySSEManager
 from app.study.application.service.study_recommendation_sse_service import StudyRecommendationSSEService
+from app.study.application.service.study_problem_sse_service import StudyProblemSSEService
 from app.study.application.usecase.search_user_usecase import SearchUserUsecase
 from app.study.application.usecase.create_study_usecase import CreateStudyUsecase
 from app.study.application.usecase.get_study_detail_usecase import GetStudyDetailUsecase
@@ -820,6 +821,11 @@ class Container(containers.DeclarativeContainer):
         study_sse_manager=study_sse_manager,
     )
 
+    study_problem_sse_service = providers.Singleton(
+        StudyProblemSSEService,
+        study_sse_manager=study_sse_manager,
+    )
+
     async def init_resources(self):
         """앱 시작 시점에 싱글톤 객체들을 미리 생성"""
         # 1. 인프라 클라이언트 (Redis, Storage 등)
@@ -840,6 +846,7 @@ class Container(containers.DeclarativeContainer):
         self.notice_creation_service()
         self.recommendation_history_service()
         self.study_recommendation_sse_service()
+        self.study_problem_sse_service()
 
         # 3. 스케줄러 시작 (추가)
         scheduler = self.bj_account_update_scheduler()
