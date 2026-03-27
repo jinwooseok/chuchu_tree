@@ -1,7 +1,7 @@
 import asyncio
 
 from fastapi import APIRouter, Depends, Query
-from fastapi.responses import StreamingResponse
+from app.core.sse_response import SseStreamingResponse
 from dependency_injector.wiring import inject, Provide
 from typing import Optional
 import json
@@ -191,4 +191,4 @@ async def study_stream(
         finally:
             study_sse_manager.disconnect(study_id, current_user.user_account_id, q)
 
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+    return SseStreamingResponse(event_generator())

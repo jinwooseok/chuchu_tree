@@ -1,7 +1,7 @@
 import asyncio
 import json
 from fastapi import APIRouter, Depends
-from fastapi.responses import StreamingResponse
+from app.core.sse_response import SseStreamingResponse
 from dependency_injector.wiring import inject, Provide
 
 from app.common.domain.vo.current_user import CurrentUser
@@ -63,4 +63,4 @@ async def notice_stream(
         finally:
             notice_sse_manager.disconnect(current_user.user_account_id, q)
 
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+    return SseStreamingResponse(event_generator())

@@ -3,7 +3,7 @@ from sqlalchemy import and_, delete, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
-from app.common.domain.vo.identifiers import StudyId, StudyProblemId, UserAccountId
+from app.common.domain.vo.identifiers import ProblemId, StudyId, StudyProblemId, UserAccountId
 from app.core.database import Database
 from app.study.domain.entity.study_problem import StudyProblem, StudyProblemMember
 from app.study.domain.repository.study_problem_repository import StudyProblemRepository
@@ -33,6 +33,53 @@ class StudyProblemRepositoryImpl(StudyProblemRepository):
         await self.session.flush()
         await self.session.refresh(model, ["members"])
         return StudyProblemMapper.to_entity(model)
+
+    async def insert_members(self, study_problem: StudyProblem, new_members: list[StudyProblemMember]) -> StudyProblem:
+        existing_user_ids = {m.user_account_id.value for m in study_problem.members if m.deleted_at is None}
+
+        stmt = (
+            select(StudyProblemModel)
+            .where(StudyProblemModel.study_problem_id == study_problem.study_problem_id.value)
+        )
+        result = await self.session.execute(stmt)
+        model = result.scalars().one()
+
+        for member in new_members:
+            if member.user_account_id.value not in existing_user_ids:
+                member.study_problem_id = study_problem.study_problem_id
+                member_model = StudyProblemMapper.member_to_model(member)
+                self.session.add(member_model)
+
+        await self.session.flush()
+        await self.session.refresh(model, ["members"])
+        return StudyProblemMapper.to_entity(model)
+
+    async def find_by_study_problem_and_date(
+        self, study_id: StudyId, problem_id: ProblemId, target_date: date
+    ) -> StudyProblem | None:
+        stmt = (
+            select(StudyProblemModel)
+            .options(selectinload(StudyProblemModel.members))
+            .join(
+                StudyProblemMemberModel,
+                and_(
+                    StudyProblemMemberModel.study_problem_id == StudyProblemModel.study_problem_id,
+                    StudyProblemMemberModel.deleted_at.is_(None),
+                    StudyProblemMemberModel.target_date == target_date,
+                ),
+            )
+            .where(
+                and_(
+                    StudyProblemModel.study_id == study_id.value,
+                    StudyProblemModel.problem_id == problem_id.value,
+                    StudyProblemModel.deleted_at.is_(None),
+                )
+            )
+            .limit(1)
+        )
+        result = await self.session.execute(stmt)
+        model = result.scalars().first()
+        return StudyProblemMapper.to_entity(model) if model else None
 
     async def find_by_id(self, study_problem_id: StudyProblemId) -> StudyProblem | None:
         stmt = (
