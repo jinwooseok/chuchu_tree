@@ -10,11 +10,12 @@ interface OnboardingSpotlightProps {
   tooltipPosition: 'top' | 'bottom' | 'left' | 'right';
   buttonText?: string;
   onNext: () => void;
+  type: 'f' | 'u'
   highlightAnimation?: 'pulse' | 'arrow' | 'none';
   onPositionChange?: (position: ElementPosition | null) => void; // 위치 변경 콜백
 }
 
-export function OnboardingSpotlight({ targetSelector, message, tooltipPosition, buttonText = '다음', onNext, highlightAnimation = 'pulse', onPositionChange }: OnboardingSpotlightProps) {
+export function OnboardingSpotlight({ targetSelector, message, tooltipPosition, buttonText = '다음', onNext, highlightAnimation = 'pulse', onPositionChange , type='f' }: OnboardingSpotlightProps) {
   const [targetPos, setTargetPos] = useState<ElementPosition | null>(null);
   const [tooltipPos, setTooltipPos] = useState<{ x: number; y: number; placement: 'top' | 'bottom' | 'left' | 'right' } | null>(null);
 
@@ -95,7 +96,7 @@ export function OnboardingSpotlight({ targetSelector, message, tooltipPosition, 
       />
 
       {/* Tooltip */}
-      <OnboardingTooltip message={message} position={{ x: tooltipPos.x, y: tooltipPos.y }} placement={tooltipPos.placement} buttonText={buttonText} onButtonClick={onNext} />
+      <OnboardingTooltip message={message} position={{ x: tooltipPos.x, y: tooltipPos.y }} placement={tooltipPos.placement} buttonText={buttonText} onButtonClick={onNext} type={type} />
     </>
   );
 }
