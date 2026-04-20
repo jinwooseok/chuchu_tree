@@ -50,7 +50,11 @@ export function OnboardingInitialDialog({ onButtonClick, isLanding }: Props) {
             <div className="space-y-1">
               <p className="text-primary text-sm font-semibold">서비스 공지</p>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                2026년 4월 28일 백준의 서비스 종료에 따라,
+                2026년 4월 28일 백준의{' '}
+                <a href="https://www.acmicpc.net/board/view/165799" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:opacity-80">
+                  서비스 종료
+                </a>
+                에 따라,
                 <br />
                 ChuchuTree의 일부 기능이 사용 불가할 수 있습니다.
               </p>
