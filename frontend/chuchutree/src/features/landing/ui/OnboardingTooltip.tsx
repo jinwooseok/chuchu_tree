@@ -8,10 +8,11 @@ interface OnboardingTooltipProps {
   position: { x: number; y: number };
   placement: 'top' | 'bottom' | 'left' | 'right';
   buttonText?: string;
+  type: 'f' | 'u';
   onButtonClick?: () => void;
 }
 
-export function OnboardingTooltip({ message, position, placement, buttonText, onButtonClick }: OnboardingTooltipProps) {
+export function OnboardingTooltip({ message, position, placement, buttonText, onButtonClick, type }: OnboardingTooltipProps) {
   const messages = Array.isArray(message) ? message : [message];
 
   // 화살표 위치 계산
@@ -45,7 +46,7 @@ export function OnboardingTooltip({ message, position, placement, buttonText, on
       {/* 버튼 */}
       {buttonText && onButtonClick && (
         <div className="mt-3">
-          <Button onClick={onButtonClick} size="sm" className="w-full cursor-pointer">
+          <Button onClick={onButtonClick} size="sm" className={`w-full ${type === 'u' ? 'text-muted-foreground bg-background hover:bg-background cursor-default' : 'cursor-pointer'}`}>
             {buttonText}
           </Button>
         </div>
