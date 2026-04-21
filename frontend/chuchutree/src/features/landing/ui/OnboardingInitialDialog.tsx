@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Megaphone } from 'lucide-react';
 import { ThemeButton, LogoSvg } from '@/shared/ui';
 import { useRouter } from 'next/navigation';
 
@@ -42,6 +42,23 @@ export function OnboardingInitialDialog({ onButtonClick, isLanding }: Props) {
             <p className="text-lg whitespace-pre-wrap">
               <span className="text-primary/60">ChuChuTree</span>에서, 가장 빠르고 효율적으로 최고의 실력에 도달할 수 있습니다.
             </p>
+          </div>
+
+          {/* 추가 공지 */}
+          <div className="border-primary/20 bg-primary/5 mb-6 flex w-full max-w-lg items-start gap-3 rounded-lg border p-4">
+            <Megaphone className="text-primary mt-0.5 h-4 w-4 shrink-0" />
+            <div className="space-y-1">
+              <p className="text-primary text-sm font-semibold">서비스 공지</p>
+              <p className="text-muted-foreground text-sm leading-relaxed">
+                2026년 4월 28일 백준의{' '}
+                <a href="https://www.acmicpc.net/board/view/165799" target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2 hover:opacity-80">
+                  서비스 종료
+                </a>
+                에 따라,
+                <br />
+                ChuchuTree의 일부 기능이 사용 불가할 수 있습니다.
+              </p>
+            </div>
           </div>
 
           {/* 버튼 */}
