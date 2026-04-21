@@ -172,6 +172,7 @@ export function OnboardingController({ isLanding }: { isLanding: boolean }) {
         <OnboardingSpotlight
           key={`f-${currentStep}-${currentSequence}`}
           targetSelector={sequenceData.targetSelector}
+          type='f'
           message={sequenceData.message}
           tooltipPosition={sequenceData.tooltipPosition || 'right'}
           buttonText={sequenceData.buttonText}
@@ -185,6 +186,7 @@ export function OnboardingController({ isLanding }: { isLanding: boolean }) {
         <OnboardingSpotlight
           key={`u-${currentStep}-${currentSequence}`}
           targetSelector={sequenceData.targetSelector || sequenceData.eventTarget!}
+          type='u'
           message={sequenceData.message}
           tooltipPosition={sequenceData.tooltipPosition || 'right'}
           buttonText={sequenceData.buttonText || '클릭해주세요'}
