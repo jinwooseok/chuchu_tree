@@ -9,7 +9,7 @@ pipeline {
                         return env.GIT_BRANCH?.contains('develop') || env.BRANCH_NAME == 'develop'
                     }
                     anyOf {
-                        changeset "frontend/**"
+                        changeset "apps/web/**"
                         triggeredBy 'UserCause'
                     }
                 }
@@ -23,11 +23,11 @@ pipeline {
                 ]) {
                     // 변수를 사용할 때는 "${ROOT_PATH}" 형식으로 사용합니다.
                     dir("${ROOT_PATH}/chuchu-tree-dev") {
-                        checkout scm 
-                        dir('frontend') {
-                            sh "cp ${ENV_FILE_PATH} chuchutree/.env.development"
+                        checkout scm
+                        dir('apps/web') {
+                            sh "cp ${ENV_FILE_PATH} .env.development"
                             sh 'docker-compose -f docker-compose.dev.yml up -d --build'
-                            sh 'rm chuchutree/.env.development'
+                            sh 'rm .env.development'
                         }
                     }
                 }
@@ -35,13 +35,13 @@ pipeline {
         }
 
         stage('Build & Deploy Production') {
-            when { 
+            when {
                 allOf {
-                    expression { 
+                    expression {
                         return env.GIT_BRANCH?.contains('main') || env.BRANCH_NAME == 'main'
                     }
                     anyOf {
-                        changeset "frontend/**"
+                        changeset "apps/web/**"
                         triggeredBy 'UserCause'
                     }
                 }
@@ -53,11 +53,11 @@ pipeline {
                     file(credentialsId: 'chuchu-fe-env', variable: 'ENV_FILE_PATH')
                 ]) {
                     dir("${ROOT_PATH}/chuchu_tree") {
-                        checkout scm 
-                        dir('frontend') {
-                            sh "cp ${ENV_FILE_PATH} chuchutree/.env.development"
+                        checkout scm
+                        dir('apps/web') {
+                            sh "cp ${ENV_FILE_PATH} .env.development"
                             sh 'docker-compose -f docker-compose.prod.yml up -d --build'
-                            sh 'rm chuchutree/.env.development'
+                            sh 'rm .env.development'
                         }
                     }
                 }
