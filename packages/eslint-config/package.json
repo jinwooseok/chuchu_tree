@@ -1,0 +1,14 @@
+{
+  "name": "@chuchutree/eslint-config",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./base.js": "./base.js",
+    "./next.js": "./next.js",
+    "./expo.js": "./expo.js"
+  },
+  "peerDependencies": {
+    "eslint": ">=9"
+  }
+}
