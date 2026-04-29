@@ -1,0 +1,5 @@
+packages:
+  - "apps/web"
+  - "apps/mobile"
+  - "packages/*"
+  # apps/api-server 는 의도적으로 제외 (Python, JS 워크스페이스 밖)
