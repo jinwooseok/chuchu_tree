@@ -55,6 +55,8 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@chuchutree/eslint-config": "workspace:*",
+    "@chuchutree/tsconfig": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",

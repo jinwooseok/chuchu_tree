@@ -5,7 +5,5 @@
     "allowSyntheticDefaultImports": true,
     "moduleResolution": "bundler",
     "jsx": "react-jsx"
-  },
-  "include": ["**/*.ts", "**/*.tsx"],
-  "exclude": ["node_modules", "localfiles"]
+  }
 }
