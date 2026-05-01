@@ -1,6 +1,6 @@
 import Constants from "expo-constants";
 import * as SecureStore from "expo-secure-store";
-import CookieManager from "@react-native-cookies/cookies";
+import { setPendingTokens } from "../lib/tokenStore";
 
 const BASE_URL =
   (Constants.expoConfig?.extra?.webviewBaseUrl as string) ??
@@ -12,31 +12,17 @@ const SECURE_STORE_KEY = "chuchutree_refresh_token";
 // 쿠키 심기
 // ─────────────────────────────────────────────
 
-/** access / refresh 토큰을 WebView 쿠키 저장소에 주입 */
-export async function seedCookies(access: string, refresh: string) {
-  const domain = new URL(BASE_URL).hostname;
-  const isSecure = BASE_URL.startsWith("https");
-  const expires = new Date(Date.now() + 1000 * 60 * 60 * 24 * 7).toUTCString(); // 7일
-
-  await CookieManager.set(BASE_URL, {
-    name: "access_token",
-    value: access,
-    domain,
-    path: "/",
-    secure: isSecure,
-    httpOnly: true,
-    expires,
-  });
-
-  await CookieManager.set(BASE_URL, {
-    name: "refresh_token",
-    value: refresh,
-    domain,
-    path: "/",
-    secure: isSecure,
-    httpOnly: true,
-    expires,
-  });
+/**
+ * WebView에 심을 토큰을 in-memory store에 저장한다.
+ * WebViewScreen이 injectedJavaScriptBeforeContentLoaded 로 실제 쿠키를 주입한다.
+ *
+ * [Phase 1 임시 구현]
+ * 현재는 JS로 document.cookie를 설정 (HttpOnly 불가).
+ * Phase 3에서 BE의 /api/auth/mobile/exchange 가 Set-Cookie 헤더를 내려주면
+ * 서버 측 HttpOnly 쿠키 방식으로 교체 예정.
+ */
+export function seedCookies(access: string, refresh: string): void {
+  setPendingTokens(access, refresh);
 }
 
 // ─────────────────────────────────────────────
@@ -126,7 +112,7 @@ export async function bootstrapSession(): Promise<BootstrapResult> {
     };
 
     await saveRefreshToken(data.refresh);
-    await seedCookies(data.access, data.refresh);
+    seedCookies(data.access, data.refresh);
 
     return { authenticated: true };
   } catch {

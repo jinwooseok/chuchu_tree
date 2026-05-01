@@ -1,16 +1,48 @@
 import Constants from "expo-constants";
 import * as SplashScreen from "expo-splash-screen";
-import { useCallback, useRef } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BackHandler, Platform, StyleSheet, View } from "react-native";
 import { useFocusEffect } from "expo-router";
 import WebView, { type WebViewNavigation } from "react-native-webview";
+import { consumePendingTokens } from "../lib/tokenStore";
 
 const BASE_URL =
   (Constants.expoConfig?.extra?.webviewBaseUrl as string) ?? "https://chuchu-tree.duckdns.org";
 
+/**
+ * 토큰을 document.cookie 에 주입하는 JS 스크립트를 생성한다.
+ *
+ * [Phase 1 임시 구현] — HttpOnly 불가 (JS 주입 방식의 한계)
+ * Phase 3에서 BE Set-Cookie 방식으로 교체 예정.
+ */
+function buildCookieScript(access: string, refresh: string): string {
+  const domain = new URL(BASE_URL).hostname;
+  // JSON.stringify로 토큰 값 이스케이프 처리
+  return `
+    (function() {
+      var a = ${JSON.stringify(access)};
+      var r = ${JSON.stringify(refresh)};
+      var d = ${JSON.stringify(domain)};
+      var opts = '; path=/; domain=' + d + '; SameSite=Strict';
+      document.cookie = 'access_token='  + a + opts;
+      document.cookie = 'refresh_token=' + r + opts;
+    })();
+    true;
+  `;
+}
+
 export default function WebViewScreen() {
   const webViewRef = useRef<WebView>(null);
   const canGoBackRef = useRef(false);
+  const [cookieScript, setCookieScript] = useState<string | undefined>();
+
+  // 로그인/세션 복원 후 저장된 토큰을 1회 소비해 쿠키 주입 스크립트 준비
+  useEffect(() => {
+    const tokens = consumePendingTokens();
+    if (tokens) {
+      setCookieScript(buildCookieScript(tokens.access, tokens.refresh));
+    }
+  }, []);
 
   // Android 하드웨어 뒤로가기 처리
   useFocusEffect(
@@ -20,9 +52,9 @@ export default function WebViewScreen() {
       const onBackPress = () => {
         if (canGoBackRef.current) {
           webViewRef.current?.goBack();
-          return true; // 기본 동작(앱 종료) 차단
+          return true;
         }
-        return false; // 기본 동작 허용
+        return false;
       };
 
       const subscription = BackHandler.addEventListener("hardwareBackPress", onBackPress);
@@ -46,10 +78,9 @@ export default function WebViewScreen() {
         style={styles.webview}
         onNavigationStateChange={handleNavigationStateChange}
         onLoadEnd={handleLoadEnd}
-        // iOS: WKWebView 쿠키 저장소 통합
+        injectedJavaScriptBeforeContentLoaded={cookieScript}
         sharedCookiesEnabled={true}
         thirdPartyCookiesEnabled={true}
-        // 미디어 인라인 재생 허용 (향후 카메라 등 대비)
         allowsInlineMediaPlayback={true}
         mediaPlaybackRequiresUserAction={false}
       />

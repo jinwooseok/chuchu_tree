@@ -13,7 +13,6 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^15.0.3",
-    "@react-native-cookies/cookies": "^6.2.1",
     "@react-navigation/bottom-tabs": "^7.4.0",
     "@react-navigation/elements": "^2.6.3",
     "@react-navigation/native": "^7.1.8",
@@ -52,14 +51,5 @@
     "eslint-config-expo": "~55.0.0",
     "typescript": "~5.9.2"
   },
-  "private": true,
-  "expo": {
-    "doctor": {
-      "reactNativeDirectoryCheck": {
-        "exclude": [
-          "@react-native-cookies/cookies"
-        ]
-      }
-    }
-  }
+  "private": true
 }
