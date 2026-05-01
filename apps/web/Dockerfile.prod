@@ -7,14 +7,14 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # 하위 폴더의 패키지 파일만 복사해서 캐시 효율 극대화
-COPY chuchutree/package.json chuchutree/package-lock.json* ./
+COPY package.json package-lock.json* ./
 RUN npm ci
 
 # --- Stage 2: Builder ---
 FROM base AS builder
 WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
-COPY chuchutree/ . 
+COPY . .
 
 # 빌드 시 필요한 환경변수 주입
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -34,5 +34,5 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 USER nextjs
-EXPOSE 3334
+EXPOSE 3333
 CMD ["node", "server.js"]
