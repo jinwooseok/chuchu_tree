@@ -3,3 +3,7 @@ packages:
   - "apps/mobile"
   - "packages/*"
   # apps/api-server 는 의도적으로 제외 (Python, JS 워크스페이스 밖)
+
+# React Native 네이티브 빌드(CMake/ninja)가 pnpm 심링크를 "변경됨"으로 오인해
+# 무한 루프에 빠지는 문제를 방지하기 위해 hoisted 모드 사용.
+nodeLinker: hoisted
