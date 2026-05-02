@@ -1,7 +1,10 @@
 from datetime import timedelta
+import hashlib
 import logging
 import base64
 import json
+import secrets
+import uuid
 from typing import Optional
 
 from fastapi import Response
@@ -23,6 +26,7 @@ from app.user.application.command.get_user_account_info_command import GetUserAc
 from app.user.application.query.user_account_info_query import GetUserAccountInfoQuery
 
 from app.common.domain.gateway.refresh_token_whitelist_gateway import RefreshTokenWhitelistGateway
+from app.common.infra.client.redis_client import AsyncRedisClient
 
 logger = logging.getLogger()
 
@@ -40,7 +44,8 @@ class AuthApplicationService:
             google_oauth_client: OAuthClient,
             github_oauth_client: OAuthClient,
             domain_event_bus: DomainEventBus,
-            refresh_token_whitelist: RefreshTokenWhitelistGateway
+            refresh_token_whitelist: RefreshTokenWhitelistGateway,
+            redis_client: AsyncRedisClient
     ):
         self.token_service = token_service
         self.cookie_service = cookie_service
@@ -50,6 +55,7 @@ class AuthApplicationService:
         self.github_oauth_client = github_oauth_client
         self.domain_event_bus = domain_event_bus
         self.refresh_token_whitelist = refresh_token_whitelist
+        self.redis_client = redis_client
     
     def authenticate_user(self, token: Optional[str]) -> CurrentUser:
         """사용자 인증 - Application Layer 로직"""
@@ -63,6 +69,42 @@ class AuthApplicationService:
         
         return CurrentUser(user_account_id)
     
+    async def get_mobile_login_url(self, provider: str, code_challenge: str) -> str:
+        """모바일 PKCE OAuth 시작 — code_challenge를 Redis에 저장하고 OAuth URL 반환"""
+        provider_enum = Provider(provider)
+        oauth_client = self._get_oauth_client(provider_enum)
+        session_id = str(uuid.uuid4())
+        await self.redis_client.set(f"mobile_pkce:{session_id}", code_challenge, ex=600)
+        return await oauth_client.get_social_login_url(None, action=f"mobile:{session_id}")
+
+    async def mobile_exchange(self, code: str, code_verifier: str) -> dict:
+        """app_code + code_verifier 검증 후 access/refresh 토큰 발급"""
+        stored = await self.redis_client.get(f"mobile_app_code:{code}")
+        if not stored:
+            raise APIException(ErrorCode.INVALID_REQUEST)
+
+        user_account_id = stored["user_account_id"]
+        code_challenge = stored["code_challenge"]
+
+        hash_bytes = hashlib.sha256(code_verifier.encode("ascii")).digest()
+        computed = base64.urlsafe_b64encode(hash_bytes).rstrip(b"=").decode("ascii")
+        if computed != code_challenge:
+            raise APIException(ErrorCode.INVALID_REQUEST)
+
+        await self.redis_client.delete(f"mobile_app_code:{code}")
+
+        access_token = self.token_service.create_token(
+            payload={"user_account_id": user_account_id},
+            expires_delta=timedelta(hours=6)
+        )
+        refresh_token, jti = self.token_service.create_refresh_token(
+            payload={"user_account_id": user_account_id},
+            expires_delta=timedelta(days=7)
+        )
+        await self.refresh_token_whitelist.store_token(user_account_id, jti, RT_TTL_SECONDS)
+
+        return {"access": access_token, "refresh": refresh_token, "expires_in": 6 * 60 * 60}
+
     async def get_social_login_url(self, command: SocialLoginCommand) -> str:
         """소셜 로그인 URL 생성"""
         provider = Provider(command.provider)
@@ -144,10 +186,23 @@ class AuthApplicationService:
             # RT 전체 폐기 + 쿠키 삭제
             await self.refresh_token_whitelist.revoke_all_user_tokens(user_account.user_account_id)
             self._clear_auth_cookies(command.response)
+        elif action and action.startswith("mobile:"):
+            mobile_session_id = action.split(":", 1)[1]
+            code_challenge = await self.redis_client.get(f"mobile_pkce:{mobile_session_id}")
+            if not code_challenge:
+                raise APIException(ErrorCode.INVALID_REQUEST)
+            await self.redis_client.delete(f"mobile_pkce:{mobile_session_id}")
+            app_code = secrets.token_urlsafe(32)
+            await self.redis_client.set(
+                f"mobile_app_code:{app_code}",
+                {"user_account_id": user_account.user_account_id, "code_challenge": code_challenge},
+                ex=60
+            )
+            return f"chuchutreeapp://auth/callback?code={app_code}"
         else:
             # JWT 토큰 생성 및 쿠키 설정
             await self._create_and_set_tokens(command.response, user_account.user_account_id)
-        
+
         return frontend_redirect_url
     
     async def logout(self, response: Response, user_account_id: int):
