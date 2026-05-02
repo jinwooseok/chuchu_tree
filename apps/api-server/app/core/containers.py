@@ -430,7 +430,8 @@ class Container(containers.DeclarativeContainer):
         naver_oauth_client=naver_oauth_client,
         google_oauth_client=google_oauth_client,
         github_oauth_client=github_oauth_client,
-        refresh_token_whitelist=refresh_token_whitelist_gateway
+        refresh_token_whitelist=refresh_token_whitelist_gateway,
+        redis_client=redis_client
     )
 
     # ========================================================================

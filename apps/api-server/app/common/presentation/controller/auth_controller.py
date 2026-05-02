@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Cookie, Depends, Query, Request, Response
 from dependency_injector.wiring import inject, Provide
 from fastapi.responses import RedirectResponse
+from pydantic import BaseModel
 
 from app.common.application.command.social_login_command import SocialLoginCommand
 from app.common.application.command.social_login_callback_command import SocialLoginCallbackCommand
@@ -10,6 +11,11 @@ from app.common.domain.vo.identifiers import UserAccountId
 from app.common.presentation.dependency.auth_dependencies import get_current_member
 from app.core.containers import Container
 from app.core.api_response import ApiResponse, ApiResponseSchema
+
+
+class MobileExchangeRequest(BaseModel):
+    code: str
+    code_verifier: str
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
@@ -116,6 +122,30 @@ async def me(
     current_user: CurrentUser = Depends(get_current_member),
 ):
     return ApiResponse()
+
+@router.get("/mobile/start/{provider}")
+@inject
+async def mobile_start(
+    provider: str,
+    code_challenge: str = Query(...),
+    code_challenge_method: str = Query("S256"),
+    auth_application_service: AuthApplicationService = Depends(Provide[Container.auth_application_service])
+):
+    """모바일 OAuth 시작 — PKCE code_challenge 등록 후 소셜 provider로 302 리다이렉트"""
+    login_url = await auth_application_service.get_mobile_login_url(provider, code_challenge)
+    return RedirectResponse(url=login_url, status_code=302)
+
+
+@router.post("/mobile/exchange", response_model=ApiResponseSchema[dict])
+@inject
+async def mobile_exchange(
+    body: MobileExchangeRequest,
+    auth_application_service: AuthApplicationService = Depends(Provide[Container.auth_application_service])
+):
+    """app_code + code_verifier 검증 후 access/refresh 토큰 반환"""
+    tokens = await auth_application_service.mobile_exchange(body.code, body.code_verifier)
+    return ApiResponse(data=tokens)
+
 
 @router.get("/withdraw", response_model=ApiResponseSchema[dict])
 @inject
