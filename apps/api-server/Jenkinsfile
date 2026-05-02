@@ -9,7 +9,7 @@ pipeline {
                         return env.GIT_BRANCH?.contains('develop') || env.BRANCH_NAME == 'develop'
                     }
                     anyOf {
-                        changeset "backend/**"
+                        changeset "apps/api-server/**"
                         triggeredBy 'UserCause'
                     }
                 }
@@ -24,7 +24,7 @@ pipeline {
                     // 변수를 사용할 때는 "${ROOT_PATH}" 형식으로 사용합니다.
                     dir("${ROOT_PATH}/chuchu-tree-dev") {
                         checkout scm 
-                        dir('backend') {
+                        dir('apps/api-server') {
                             sh "cp ${ENV_FILE_PATH} .env"
                             sh 'docker-compose -f docker-compose.dev.yml up -d --build'
                             sh 'rm .env'
@@ -50,7 +50,7 @@ pipeline {
                 ]) {
                     dir("${ROOT_PATH}/chuchu_tree") {
                         checkout scm 
-                        dir('backend') {
+                        dir('apps/api-server') {
                             sh "cp ${ENV_FILE_PATH} .env"
                             sh 'docker-compose -f docker-compose.prod.yml up -d --build'
                             sh 'rm .env'
