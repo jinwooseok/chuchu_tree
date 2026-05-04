@@ -1,8 +1,8 @@
 services:
   frontend-dev:
     build:
-      context: .
-      dockerfile: Dockerfile.dev
+      context: ../..
+      dockerfile: apps/web/Dockerfile.dev
     image: chuchu-frontend-dev:latest
     container_name: chuchu-frontend-dev
     network_mode: host 
