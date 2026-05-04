@@ -22,6 +22,9 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 WORKDIR /app
 
+# 워크스페이스 설정 파일 복사 (pnpm이 root node_modules/.bin을 PATH에 추가하려면 필요)
+COPY package.json pnpm-workspace.yaml ./
+
 COPY --from=deps /app/node_modules ./node_modules
 COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
 COPY --from=deps /app/packages ./packages
@@ -30,7 +33,7 @@ COPY apps/web/ ./apps/web/
 
 ENV NEXT_TELEMETRY_DISABLED=1
 
-RUN cd apps/web && NODE_OPTIONS="--max-old-space-size=4096" pnpm build
+RUN NODE_OPTIONS="--max-old-space-size=4096" pnpm --filter @chuchutree/web build
 
 # --- Stage 3: Runner ---
 FROM base AS runner
