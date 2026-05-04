@@ -7,13 +7,8 @@ FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
-# 모노레포 루트 파일 (lockfile 캐시 활용)
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-
-# workspace packages
 COPY packages/ ./packages/
-
-# apps/web package.json만 먼저 복사 (캐시 효율)
 COPY apps/web/package.json ./apps/web/
 
 RUN pnpm install --frozen-lockfile
@@ -22,9 +17,8 @@ RUN pnpm install --frozen-lockfile
 FROM base AS builder
 WORKDIR /app
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
-COPY --from=deps /app/packages ./packages
+# pnpm 가상 스토어 심링크 구조 유지를 위해 통째로 복사
+COPY --from=deps /app/ ./
 
 COPY apps/web/ ./apps/web/
 
