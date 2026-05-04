@@ -11,5 +11,5 @@ services:
       - PORT=3333
       - HOSTNAME=localhost
       - NEXT_PUBLIC_BACKEND_URL=http://localhost:8004
-    command: ["node", "server.js", "--port", "3333"] 
+    command: ["node", "apps/web/server.js"]
     restart: unless-stopped
