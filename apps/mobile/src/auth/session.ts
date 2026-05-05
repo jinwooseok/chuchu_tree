@@ -40,7 +40,7 @@ export async function exchange(
   code: string,
   codeVerifier: string,
 ): Promise<ExchangeResult> {
-  const res = await fetch(`${BASE_URL}/api/auth/mobile/exchange`, {
+  const res = await fetch(`${BASE_URL}/api/v1/auth/mobile/exchange`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ code, code_verifier: codeVerifier }),
@@ -50,7 +50,8 @@ export async function exchange(
     throw new Error(`exchange 실패: ${res.status}`);
   }
 
-  return res.json() as Promise<ExchangeResult>;
+  const body = (await res.json()) as { data: ExchangeResult };
+  return body.data;
 }
 
 // ─────────────────────────────────────────────
@@ -89,7 +90,7 @@ export async function bootstrapSession(): Promise<BootstrapResult> {
   if (!refresh) return { authenticated: false };
 
   try {
-    const res = await fetch(`${BASE_URL}/api/refresh`, {
+    const res = await fetch(`${BASE_URL}/api/v1/auth/token/refresh`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refresh_token: refresh }),

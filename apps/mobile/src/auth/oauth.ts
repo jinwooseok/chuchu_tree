@@ -29,7 +29,7 @@ export async function startMobileAuth(provider: OAuthProvider): Promise<AuthResu
 
     // ── 1. 서버에서 소셜 OAuth URL 받기 ──────────────────────────────
     const startUrl =
-      `${BASE_URL}/api/auth/mobile/start/${provider}` +
+      `${BASE_URL}/api/v1/auth/mobile/start/${provider.toUpperCase()}` +
       `?code_challenge=${encodeURIComponent(codeChallenge)}` +
       `&code_challenge_method=S256`;
 
