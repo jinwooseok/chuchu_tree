@@ -1,0 +1,11 @@
+{
+  "name": "@chuchutree/api-types",
+  "version": "0.0.0",
+  "private": true,
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "devDependencies": {
+    "@chuchutree/tsconfig": "workspace:*"
+  }
+}
